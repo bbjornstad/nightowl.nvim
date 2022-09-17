@@ -1,78 +1,95 @@
 set nocompatible              " be iMproved, required
 
-" plugins and things
+" Main Plugin Definitions and Installations
+" - This section is 
 call plug#begin('~/.local/share/nvim/site/plugged')
 Plug 'vim-syntastic/syntastic'
+Plug 'sheerun/vim-polyglot'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'bling/vim-airline'
+Plug 'chriskempson/base16-vim'
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }
 Plug 'Raimondi/delimitmate'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'arcticicestudio/nord-vim'
+Plug 'morhetz/gruvbox'
+Plug 'nanotech/jellybeans.vim'
+Plug 'w0ng/vim-hybrid'
+Plug 'bluz71/vim-moonfly-colors'
+Plug 'dikiaap/minimalist'
 Plug 'tpope/vim-repeat'
 Plug 'lervag/vimtex'
 Plug 'stevearc/vim-arduino'
 Plug 'cjrh/vim-conda'
+Plug 'pedrohdz/vim-yaml-folds'
+Plug 'saltstack/salt-vim'
+Plug 'godlygeek/tabular'
+Plug 'preservim/vim-markdown' 
 
 " All of your Plugins must be added before the following line
+" - This already sets `filetype plugin indent on` and `syntax enable`
 call plug#end()
 
-filetype plugin indent on    " required
 
-" Some Basic Settings
-set backspace=indent,eol,start
-set ruler
-set number
-set showcmd
-set incsearch
-set hlsearch
-set colorcolumn=80
-set t_Co=256
-set textwidth=80
-set softtabstop=4
-set shiftwidth=4
-set expandtab
-
-syntax enable
+" Basic Behavioral Settings
+" - Mouse behavior
+" - Selection Behavior
+" - CMD input
+"
+"   - basic -
 set mouse=a
-
-set background=dark
-colorscheme nord
-
-" for some plugins
-hi clear SignColumn
-
-set hidden
-set wildmenu
-
-set ignorecase
-set smartcase
-
+set backspace=indent,eol,start
 set autoindent
 set nostartofline
+set confirm
+set visualbell
+set notimeout ttimeout ttimeoutlen=200
 
+"   - cmd input -
+set showcmd
+set wildmenu
 set laststatus=2
 set cmdheight=2
 
-set confirm
-set visualbell
+"   - search input -
+set ignorecase
+set incsearch
+set hlsearch
+set hidden
+set smartcase
 
-set notimeout ttimeout ttimeoutlen=200
+" Page Settings, e.g. Tabbing, Lines/Width, etc.
+" - color schemes go under the appropriate section below.
+"
+"   - tab behavior - 
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+"   - page indicators -
+set ruler
+set number
+set textwidth=80
+set colorcolumn=80
+
+set t_Co=256
+if has('termguicolors')
+    set termguicolors
+endif
+set background=dark
+colorscheme jellybeans
+
+" for some plugins
+hi clear SignColumn
 
 " -----Mappings-----
 map Y y$
 nnoremap <C-L> :nohl<CR><C-L>
 
-
-
 " -----Airline Configuration-----
 let g:airline#extensions#tabline#enabled=1
-let g:airline_theme='nord'
+let g:airline_theme='minimalist'
 let g:airline_powerline_fonts=1
-
-" -----VIM NERDTree Tabs Configuration-----
-" Open/Close NERDTree with \t
-nmap <silent> <leader>t :NERDTreeTabsToggle<CR>
-let g:nerdtree_tabs_open_on_console_startup=2
 
 " -----Syntastic Configuration-----
 let g:syntastic_error_symbol = ''
