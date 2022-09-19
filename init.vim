@@ -45,6 +45,7 @@ set nostartofline
 set confirm
 set visualbell
 set notimeout ttimeout ttimeoutlen=200
+set splitright
 
 "   - cmd input -
 set showcmd
