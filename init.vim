@@ -22,7 +22,7 @@ Plug 'tpope/vim-repeat'
 Plug 'lervag/vimtex'
 Plug 'stevearc/vim-arduino'
 Plug 'cjrh/vim-conda'
-Plug 'pedrohdz/vim-yaml-folds'
+" Plug 'pedrohdz/vim-yaml-folds'
 Plug 'saltstack/salt-vim'
 Plug 'godlygeek/tabular'
 Plug 'preservim/vim-markdown' 
@@ -77,8 +77,12 @@ set t_Co=256
 if has('termguicolors')
     set termguicolors
 endif
+
+let g:gruvbox_italic=1
+let g:gruvbox_contrast_dark='hard'
 set background=dark
-colorscheme jellybeans
+colorscheme gruvbox
+
 
 " for some plugins
 hi clear SignColumn
@@ -89,7 +93,7 @@ nnoremap <C-L> :nohl<CR><C-L>
 
 " -----Airline Configuration-----
 let g:airline#extensions#tabline#enabled=1
-let g:airline_theme='minimalist'
+let g:airline_theme='gruvbox'
 let g:airline_powerline_fonts=1
 
 " -----Syntastic Configuration-----
