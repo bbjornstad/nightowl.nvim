@@ -1,6 +1,8 @@
 set nocompatible              " be iMproved, required
 
+" 
 " Main Plugin Definitions and Installations
+"
 " - This section is 
 call plug#begin('~/.local/share/nvim/site/plugged')
 Plug 'vim-syntastic/syntastic'
@@ -11,12 +13,13 @@ Plug 'chriskempson/base16-vim'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }
 Plug 'Raimondi/delimitmate'
+Plug 'majutsushi/tagbar'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'arcticicestudio/nord-vim'
+" Plug 'arcticicestudio/nord-vim'
 Plug 'morhetz/gruvbox'
 Plug 'nanotech/jellybeans.vim'
 Plug 'w0ng/vim-hybrid'
-Plug 'bluz71/vim-moonfly-colors'
+" Plug 'bluz71/vim-moonfly-colors'
 Plug 'dikiaap/minimalist'
 Plug 'tpope/vim-repeat'
 Plug 'lervag/vimtex'
@@ -28,7 +31,9 @@ Plug 'godlygeek/tabular'
 Plug 'preservim/vim-markdown' 
 
 " All of your Plugins must be added before the following line
+" 
 " - This already sets `filetype plugin indent on` and `syntax enable`
+" 
 call plug#end()
 
 
@@ -45,7 +50,6 @@ set nostartofline
 set confirm
 set visualbell
 set notimeout ttimeout ttimeoutlen=200
-set splitright
 
 "   - cmd input -
 set showcmd
@@ -70,7 +74,7 @@ set expandtab
 "   - page indicators -
 set ruler
 set number
-set textwidth=80
+set textwidth=79
 set colorcolumn=80
 
 set t_Co=256
@@ -83,13 +87,23 @@ let g:gruvbox_contrast_dark='hard'
 set background=dark
 colorscheme gruvbox
 
-
 " for some plugins
 hi clear SignColumn
+
+autocmd BufWinEnter <buffer> wincmd L
+
+" -----Vertical Split Default-----
+
+
 
 " -----Mappings-----
 map Y y$
 nnoremap <C-L> :nohl<CR><C-L>
+" let s:commentseplen = &textwidth-2
+" inoremap <M-i><M-l> <ESC>s:commentseplena-<ESC>
+inoremap <M-i><M-l> <ESC>78a-<ESC>a
+
+" command -count=&textwidth-2 ILS insert '-'
 
 " -----Airline Configuration-----
 let g:airline#extensions#tabline#enabled=1
