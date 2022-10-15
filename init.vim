@@ -1,13 +1,13 @@
+" -----------------------------------------------------------------------------
+" NeoVIM Configuration. Could be symlinked to .vimrc
+" -----------------------------------------------------------------------------
 set nocompatible              " be iMproved, required
 
-" 
-" Main Plugin Definitions and Installations
-"
-" - This section is 
+" -----------------------------------------------------------------------------
+" NeoVIM Configuration. Could be symlinked to .vimrc
+" -----------------------------------------------------------------------------
 call plug#begin('~/.local/share/nvim/site/plugged')
-Plug 'vim-syntastic/syntastic'
 Plug 'sheerun/vim-polyglot'
-Plug 'christoomey/vim-tmux-navigator'
 Plug 'bling/vim-airline'
 Plug 'chriskempson/base16-vim'
 Plug 'kyazdani42/nvim-web-devicons'
@@ -15,20 +15,32 @@ Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }
 Plug 'Raimondi/delimitmate'
 Plug 'majutsushi/tagbar'
 Plug 'vim-airline/vim-airline-themes'
-" Plug 'arcticicestudio/nord-vim'
 Plug 'morhetz/gruvbox'
 Plug 'nanotech/jellybeans.vim'
 Plug 'w0ng/vim-hybrid'
-" Plug 'bluz71/vim-moonfly-colors'
 Plug 'dikiaap/minimalist'
-Plug 'tpope/vim-repeat'
 Plug 'lervag/vimtex'
-Plug 'stevearc/vim-arduino'
 Plug 'cjrh/vim-conda'
-" Plug 'pedrohdz/vim-yaml-folds'
 Plug 'saltstack/salt-vim'
 Plug 'godlygeek/tabular'
-Plug 'preservim/vim-markdown' 
+Plug 'preservim/vim-markdown'
+Plug 'kkoomen/vim-doge'
+Plug 'tpope/vim-surround'
+Plug 'airblade/vim-gitgutter'
+
+" deoplete only
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+let g:deoplete#enable_at_startup = 1
+
+" Load ALE
+Plug 'dense-analysis/ale'
+
 
 " All of your Plugins must be added before the following line
 " 
@@ -36,8 +48,9 @@ Plug 'preservim/vim-markdown'
 " 
 call plug#end()
 
-
+" -----------------------------------------------------------------------------
 " Basic Behavioral Settings
+" -----------------------------------------------------------------------------
 " - Mouse behavior
 " - Selection Behavior
 " - CMD input
@@ -64,8 +77,11 @@ set hlsearch
 set hidden
 set smartcase
 
-" Page Settings, e.g. Tabbing, Lines/Width, etc.
-" - color schemes go under the appropriate section below.
+" -----------------------------------------------------------------------------
+" Basic Behavioral Settings
+" -----------------------------------------------------------------------------
+"   - Page Settings, e.g. Tabbing, Lines/Width, etc.
+"       - color schemes go under the appropriate section below.
 "
 "   - tab behavior - 
 set softtabstop=4
@@ -76,7 +92,12 @@ set ruler
 set number
 set textwidth=79
 set colorcolumn=80
+set rnu
+" set nofoldenable -> probably should go in a different place
 
+" -----------------------------------------------------------------------------
+" Colors and Themes
+" -----------------------------------------------------------------------------
 set t_Co=256
 if has('termguicolors')
     set termguicolors
@@ -90,33 +111,62 @@ colorscheme gruvbox
 " for some plugins
 hi clear SignColumn
 
-autocmd BufWinEnter <buffer> wincmd L
+" -----------------------------------------------------------------------------
+" Complex Behavior Overrides
+" -----------------------------------------------------------------------------
+" -----Vertical Split Default----
+augroup default_vertical_split
+    autocmd WinNew * wincmd L
+    autocmd BufWinEnter <buffer> wincmd L
+augroup END
 
-" -----Vertical Split Default-----
 
 
-
-" -----Mappings-----
+" -----------------------------------------------------------------------------
+" Custom Mappings
+" -----------------------------------------------------------------------------
+" -----User Mappings-----
 map Y y$
 nnoremap <C-L> :nohl<CR><C-L>
-" let s:commentseplen = &textwidth-2
-" inoremap <M-i><M-l> <ESC>s:commentseplena-<ESC>
-inoremap <M-i><M-l> <ESC>78a-<ESC>a
 
-" command -count=&textwidth-2 ILS insert '-'
+function CommentBreak()
+    let l:commentcharlen=strlen(split(&commentstring, '%s')[0])
+    let l:breaklen=(&l:colorcolumn - l:commentcharlen - col('.'))
+    execute printf(":normal! %sa-\<ESC>\<CR>", l:breaklen)
+endfunction
+nnoremap <M-i><M-l> :call CommentBreak()<CR>
+inoremap <M-i><M-l> <C-O>:call CommentBreak()<CR>
 
+" -----------------------------------------------------------------------------
+" Language Configuration Sections
+" -----------------------------------------------------------------------------
+" -----ALE and deoplete-----
+let g:ale_linters = {'rust': ['analyzer', 'rls']}
+let g:auto_refresh_delay=20
+
+inoremap <leader><c> call deoplete#auto_complete()
+
+" -----Rust Configuration-----
+let g:rust_recommended_style=0
+
+
+" -----------------------------------------------------------------------------
+" Plugin Configuration Sections
+" -----------------------------------------------------------------------------
+" -----Tagbar Configuration-----
+let g:tagbar_position='topleft vertical'
+let g:tagbar_width=0
+"
 " -----Airline Configuration-----
 let g:airline#extensions#tabline#enabled=1
 let g:airline_theme='gruvbox'
 let g:airline_powerline_fonts=1
 
-" -----Syntastic Configuration-----
-let g:syntastic_error_symbol = ''
-let g:syntastic_warning_symbol = ''
-augroup mySyntastic
-	autocmd!
-	autocmd FileType tex,latex let b:syntastic_mode="passive"
-augroup END
+" -----Vim-Doge Configuration-----
+" nmap <silent> <leader>h call doge#generate
+
+" -----Vim-Markdown Configuration-----
+let g:vim_markdown_folding_disabled=1
 
 " -----VimTeX Configuration-----
 " Set some options
@@ -154,4 +204,5 @@ augroup myVimTex
     autocmd FileType tex,latex,plaintex nmap <silent> <leader>c <plug>(vimtex-compile)
     autocmd FileType tex,latex,plaintex nmap <silent> <leader>v <plug>(vimtex-view)
     autocmd FileType tex,latex,plaintex nmap <silent> <leader>e <plug>(vimtex-errors)
+    autocmd FileType tex,latex,plaintex nmap <silent> <leader>b call deoplete#auto_complete
 augroup END
