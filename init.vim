@@ -27,6 +27,7 @@ Plug 'preservim/vim-markdown'
 Plug 'kkoomen/vim-doge'
 Plug 'tpope/vim-surround'
 Plug 'airblade/vim-gitgutter'
+Plug 'axvr/org.vim'
 
 " deoplete only
 if has('nvim')
