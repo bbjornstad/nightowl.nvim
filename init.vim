@@ -19,16 +19,35 @@ Plug 'morhetz/gruvbox'
 Plug 'nanotech/jellybeans.vim'
 Plug 'w0ng/vim-hybrid'
 Plug 'dikiaap/minimalist'
+Plug 'NLKNguyen/papercolor-theme'
 Plug 'lervag/vimtex'
 Plug 'cjrh/vim-conda'
 Plug 'saltstack/salt-vim'
 Plug 'godlygeek/tabular'
 Plug 'preservim/vim-markdown'
 Plug 'kkoomen/vim-doge'
+Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'airblade/vim-gitgutter'
-Plug 'axvr/org.vim'
+Plug 'ervandew/supertab'
+Plug 'amrbashir/nvim-docs-view', { 'on': 'DocsViewToggle'}
+lua << EOF
+  require("docs-view").setup {
+    position = "right",
+    width = 60,
+  }
+EOF
+" ------------------------------------------------------------------------------
+" orgmode plugins
+" ------------------------------------------------------------------------------
+Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-orgmode/orgmode'
+Plug 'akinsho/org-bullets.nvim'
 
+Plug 'nvim-neorg/neorg' | Plug 'nvim-lua/plenary.nvim', { 'do': ':TSUpdate' }
+Plug 'esquires/neorg-gtd-project-tags'
+Plug 'max397574/neorg-contexts'
+Plug 'max397574/neorg-kanban'
 " deoplete only
 if has('nvim')
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -106,8 +125,8 @@ endif
 
 let g:gruvbox_italic=1
 let g:gruvbox_contrast_dark='hard'
-set background=dark
-colorscheme gruvbox
+set background=light
+colorscheme PaperColor
 
 " for some plugins
 hi clear SignColumn
@@ -132,24 +151,33 @@ nnoremap <C-L> :nohl<CR><C-L>
 
 function CommentBreak()
     let l:commentcharlen=strlen(split(&commentstring, '%s')[0])
-    let l:breaklen=(&l:colorcolumn - l:commentcharlen - col('.'))
+    let l:breaklen=(&l:colorcolumn - l:commentcharlen)
     execute printf(":normal! %sa-\<ESC>\<CR>", l:breaklen)
 endfunction
 nnoremap <M-i><M-l> :call CommentBreak()<CR>
 inoremap <M-i><M-l> <C-O>:call CommentBreak()<CR>
+
+command SuperPlug PlugClean|PlugInstall|PlugUpgrade|PlugUpdate
+
+noremap <leader><[> <ESC>:bprevious<CR>
+noremap <F5> <ESC>:bprevious<CR>
+noremap <leader><]> <ESC>:bnext<CR>
+noremap <F6> <ESC>:bnext<CR>
+
+noremap <leader><q> <C-O>:bdelete<CR>
+
+noremap <leader><F3> <ESC> :vsplit<CR>
+noremap <leader><F4> <ESC> :split<CR>
 
 " -----------------------------------------------------------------------------
 " Language Configuration Sections
 " -----------------------------------------------------------------------------
 " -----ALE and deoplete-----
 let g:ale_linters = {'rust': ['analyzer', 'rls']}
-let g:auto_refresh_delay=20
-
-inoremap <leader><c> call deoplete#auto_complete()
+let g:auto_refresh_delay = 20
 
 " -----Rust Configuration-----
 let g:rust_recommended_style=0
-
 
 " -----------------------------------------------------------------------------
 " Plugin Configuration Sections
@@ -207,3 +235,29 @@ augroup myVimTex
     autocmd FileType tex,latex,plaintex nmap <silent> <leader>e <plug>(vimtex-errors)
     autocmd FileType tex,latex,plaintex nmap <silent> <leader>b call deoplete#auto_complete
 augroup END
+
+" ------------------------------------------------------------------------------
+" orgmode setup and configuration
+" ------------------------------------------------------------------------------
+" setup from installation guide
+
+lua << EOF
+require('orgmode_rs')
+EOF
+
+" -----------------------------------------------------------------------------
+" end setup
+" -----------------------------------------------------------------------------
+
+augroup orgmodeconf
+    autocmd!
+    autocmd FileType org imap <C><CR> <ESC><leader><CR>
+augroup END
+
+
+" ------------------------------------------------------------------------------
+" neorg configuration and setup
+" ------------------------------------------------------------------------------ 
+lua << EOF
+require('neorg_rs')
+EOF
