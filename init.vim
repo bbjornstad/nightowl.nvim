@@ -7,7 +7,7 @@ set nocompatible              " be iMproved, required
 " NeoVIM Configuration. Could be symlinked to .vimrc
 " -----------------------------------------------------------------------------
 call plug#begin('~/.local/share/nvim/site/plugged')
-Plug 'sheerun/vim-polyglot'
+" Plug 'sheerun/vim-polyglot'
 Plug 'bling/vim-airline'
 Plug 'chriskempson/base16-vim'
 Plug 'kyazdani42/nvim-web-devicons'
@@ -20,6 +20,19 @@ Plug 'nanotech/jellybeans.vim'
 Plug 'w0ng/vim-hybrid'
 Plug 'dikiaap/minimalist'
 Plug 'NLKNguyen/papercolor-theme'
+
+Plug 'nvim-lua/plenary.nvim'
+Plug 'jose-elias-alvarez/null-ls.nvim'
+Plug 'lukas-reineke/indent-blankline.nvim'
+
+Plug 'williamboman/mason.nvim'
+Plug 'williamboman/mason-lspconfig.nvim'
+Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+Plug 'neovim/nvim-lspconfig'
+
+Plug 'mfussenegger/nvim-dap'
+Plug 'simrat39/rust-tools.nvim'
+
 Plug 'lervag/vimtex'
 Plug 'cjrh/vim-conda'
 Plug 'saltstack/salt-vim'
@@ -29,43 +42,43 @@ Plug 'kkoomen/vim-doge'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'airblade/vim-gitgutter'
-Plug 'ervandew/supertab'
-Plug 'amrbashir/nvim-docs-view', { 'on': 'DocsViewToggle'}
-lua << EOF
-  require("docs-view").setup {
-    position = "right",
-    width = 60,
-  }
-EOF
+" Plug 'amrbashir/nvim-docs-view', { 'on': 'DocsViewToggle'}
+
+" ------------------------------------------------------------------------------
+" ddc - Deoplete Replacement
+" ------------------------------------------------------------------------------
+Plug 'Shougo/ddc.vim'
+Plug 'vim-denops/denops.vim'
+
+Plug 'Shougo/pum.vim'
+Plug 'Shougo/ddc-ui-pum'
+Plug 'Shougo/ddc-source-around'
+Plug 'Shougo/ddc-source-nvim-lsp'
+Plug 'Shougo/ddc-source-line'
+Plug 'matsui54/denops-popup-preview.vim'
+Plug 'matsui54/denops-signature_help'
+Plug 'delphinus/ddc-treesitter'
+
+Plug 'Shougo/ddc-matcher_head'
+Plug 'Shougo/ddc-sorter_rank'
+
+
 " ------------------------------------------------------------------------------
 " orgmode plugins
 " ------------------------------------------------------------------------------
-Plug 'nvim-treesitter/nvim-treesitter'
 Plug 'nvim-orgmode/orgmode'
 Plug 'akinsho/org-bullets.nvim'
 
-Plug 'nvim-neorg/neorg' | Plug 'nvim-lua/plenary.nvim', { 'do': ':TSUpdate' }
+Plug 'nvim-neorg/neorg'
 Plug 'esquires/neorg-gtd-project-tags'
 Plug 'max397574/neorg-contexts'
 Plug 'max397574/neorg-kanban'
-" deoplete only
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-endif
-let g:deoplete#enable_at_startup = 1
-
-" Load ALE
-Plug 'dense-analysis/ale'
 
 
 " All of your Plugins must be added before the following line
 " 
 " - This already sets `filetype plugin indent on` and `syntax enable`
-" 
+"
 call plug#end()
 
 " -----------------------------------------------------------------------------
@@ -113,7 +126,6 @@ set number
 set textwidth=79
 set colorcolumn=80
 set rnu
-" set nofoldenable -> probably should go in a different place
 
 " -----------------------------------------------------------------------------
 " Colors and Themes
@@ -141,7 +153,6 @@ augroup default_vertical_split
 augroup END
 
 
-
 " -----------------------------------------------------------------------------
 " Custom Mappings
 " -----------------------------------------------------------------------------
@@ -157,7 +168,7 @@ endfunction
 nnoremap <M-i><M-l> :call CommentBreak()<CR>
 inoremap <M-i><M-l> <C-O>:call CommentBreak()<CR>
 
-command SuperPlug PlugClean|PlugInstall|PlugUpgrade|PlugUpdate
+command SuperPlug PlugClean|PlugUpgrade|PlugInstall|PlugUpdate
 
 noremap <leader><[> <ESC>:bprevious<CR>
 noremap <F5> <ESC>:bprevious<CR>
@@ -172,10 +183,6 @@ noremap <leader><F4> <ESC> :split<CR>
 " -----------------------------------------------------------------------------
 " Language Configuration Sections
 " -----------------------------------------------------------------------------
-" -----ALE and deoplete-----
-let g:ale_linters = {'rust': ['analyzer', 'rls']}
-let g:auto_refresh_delay = 20
-
 " -----Rust Configuration-----
 let g:rust_recommended_style=0
 
@@ -224,40 +231,77 @@ let g:vimtex_compiler_latexmk_engines = {
         \ 'xelatex'          : '-xelatex',
         \ 'context (pdftex)' : '-pdf -pdflatex=texexec',
         \ 'context (luatex)' : '-pdf -pdflatex=context',
-        \ 'context (xetex)'  : '-pdf -pdflatex=''texexec --xtx''',
         \}
 
-" Do some wrapping and mapping controls
-augroup myVimTex
-    autocmd!
-    autocmd FileType tex,latex,plaintex nmap <silent> <leader>c <plug>(vimtex-compile)
-    autocmd FileType tex,latex,plaintex nmap <silent> <leader>v <plug>(vimtex-view)
-    autocmd FileType tex,latex,plaintex nmap <silent> <leader>e <plug>(vimtex-errors)
-    autocmd FileType tex,latex,plaintex nmap <silent> <leader>b call deoplete#auto_complete
+autocmd FileType tex,latex,plaintex nmap <silent> <leader>b call deoplete#auto_complete
 augroup END
 
-" ------------------------------------------------------------------------------
-" orgmode setup and configuration
-" ------------------------------------------------------------------------------
-" setup from installation guide
 
-lua << EOF
-require('orgmode_rs')
-EOF
+" Customize global settings
 
-" -----------------------------------------------------------------------------
-" end setup
-" -----------------------------------------------------------------------------
+" You must set the default ui.
+" Note: native ui
+" https://github.com/Shougo/ddc-ui-native
+call ddc#custom#patch_global('ui', 'pum')
+
+" Use around source.
+" https://github.com/Shougo/ddc-source-around
+call ddc#custom#patch_global('sources', ['around', 'nvim-lsp', 'treesitter', 'line'])
+
+" Use matcher_head and sorter_rank.
+" https://github.com/Shougo/ddc-matcher_head
+" https://github.com/Shougo/ddc-sorter_rank
+call ddc#custom#patch_global('sourceOptions', {
+      \ '_': {
+      \   'matchers': ['matcher_head'],
+      \   'sorters': ['sorter_rank']},
+      \ })
+
+" Change source options
+call ddc#custom#patch_global('sourceOptions', {
+      \ 'around': {'mark': 'a'},
+      \ 'nvim-lsp': {'mark': 'l', 'forceCompletionPattern': '\.\w*|:\w*|->\w*' },
+      \ 'treesitter': {'mark': 't'},
+      \ 'line': {'mark': '-.-'}
+      \ })
+call ddc#custom#patch_global('sourceParams', {
+      \ 'around': {'maxSize': 500},
+      \ 'nvim-lsp': {'maxSize': 500},
+      \ 'line': {'maxSize': 500},
+      \ })
+
+" Mappings
+inoremap <C-n>   <Cmd>call pum#map#insert_relative(+1)<CR>
+inoremap <C-p>   <Cmd>call pum#map#insert_relative(-1)<CR>
+inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
+inoremap <C-e>   <Cmd>call pum#map#cancel()<CR>
+inoremap <PageDown> <Cmd>call pum#map#insert_relative_page(+1)<CR>
+inoremap <PageUp>   <Cmd>call pum#map#insert_relative_page(-1)<CR>
+
+" <TAB>: completion.
+inoremap <silent><expr> <TAB>
+\ pumvisible() ? '<C-n>' :
+\ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
+\ '<TAB>' : pum#map#insert_relative(+1)
+
+" <S-TAB>: completion back.
+inoremap <expr><S-TAB>  pumvisible() ? '<C-p>' : pum#map#insert_relative(-1)
+
+" Use ddc.
+call signature_help#enable()
+call popup_preview#enable()
+call ddc#enable()
+
+lua require('treesitter_rs')
+lua require('null-ls_rs')
+lua require('lspconfig_rs')
+lua require('indentblankline_rs')
+
+lua require('orgmode_rs')
+lua require('neorg_rs')
 
 augroup orgmodeconf
     autocmd!
     autocmd FileType org imap <C><CR> <ESC><leader><CR>
 augroup END
 
-
-" ------------------------------------------------------------------------------
-" neorg configuration and setup
-" ------------------------------------------------------------------------------ 
-lua << EOF
-require('neorg_rs')
-EOF

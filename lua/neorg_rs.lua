@@ -1,12 +1,10 @@
-require('nvim-treesitter.configs').setup {
-    ensure_installed = { 'norg' },
-    highlight = {
-        enable = true,
-    }
-}
 require('neorg').setup {
     load = {
-        ['core.defaults'] = {},
+        ['core.defaults'] = {
+            config = {
+                disable = { 'core.norg.completion' }
+            },
+        },
         ['core.norg.dirman'] = {
             config = {
                 workspaces = {
@@ -45,6 +43,6 @@ require('neorg').setup {
         ['core.export.markdown'] = {},
         ['external.gtd-project-tags'] = {},
         ['external.context'] = {},
-        ['external.kanban'] = {}
+        ['external.kanban'] = {},
     }
 }
