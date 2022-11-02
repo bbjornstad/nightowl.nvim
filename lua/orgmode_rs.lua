@@ -15,13 +15,17 @@ require('orgmode').setup({
   org_agenda_files = {'~/.todo/agenda/**/*'},
   org_default_notes_file = '~/.todo/notes/org/refile.org',
   win_split_mode = 'vertical',
-  org_todo_keywords = {'TODO(t)', 'URGENT', 'SUPER', 'AWAIT', '|', 'DONE'},
+  org_todo_keywords = {'TODO(t)', 'URGENT', 'SUPER', 'AWAIT', 'PROGRESSING', 'CHECK', '|', 'DONE', 'REPEATED', 'GOTITALL'},
   org_todo_keyword_faces = {
     TODO = ':background #D9DADF :foreground blue :slant italic',
     DONE = ':background #D9DADF :foreground green :underline on',
     URGENT = ':background #D9DADF :foreground red :slant italic :underline on :weight bold',
     SUPER = ':background DarkRed :foreground #e8a7a7 :slant italic :weight bold :underline on',
-    AWAIT = ':background #4c3757 :foreground #21032b :slant italic'
+    AWAIT = ':background #D9DADF :foreground #4c3757 :slant italic', -- :foreground #21032b :slant italic',
+    REPEATED = ':background #D9DADF :foreground green :underline on',
+    PROGRESSING = ':background #D9DADF :foreground purple :slant italic',
+    CHECK = ':background #D9DADF :foreground NavyBlue :slant italic',
+    GOTITALL = ':background #D9DADF :foreground black :slant italic :underline on'
   },
   org_capture_templates = {
     t = 'Task',
