@@ -30,18 +30,17 @@ Plug 'williamboman/mason-lspconfig.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
 Plug 'neovim/nvim-lspconfig'
 
+Plug 'godlygeek/tabular'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'airblade/vim-gitgutter'
 Plug 'mfussenegger/nvim-dap'
 Plug 'simrat39/rust-tools.nvim'
 
 Plug 'lervag/vimtex'
 Plug 'cjrh/vim-conda'
 Plug 'saltstack/salt-vim'
-Plug 'godlygeek/tabular'
 Plug 'preservim/vim-markdown'
-Plug 'kkoomen/vim-doge'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-surround'
-Plug 'airblade/vim-gitgutter'
 " Plug 'amrbashir/nvim-docs-view', { 'on': 'DocsViewToggle'}
 
 " ------------------------------------------------------------------------------
@@ -50,15 +49,22 @@ Plug 'airblade/vim-gitgutter'
 Plug 'Shougo/ddc.vim'
 Plug 'vim-denops/denops.vim'
 
+" UI Settings
 Plug 'Shougo/pum.vim'
 Plug 'Shougo/ddc-ui-pum'
+
+" Sources for DDC
 Plug 'Shougo/ddc-source-around'
 Plug 'Shougo/ddc-source-nvim-lsp'
 Plug 'Shougo/ddc-source-line'
+Plug 'delphinus/ddc-treesitter'
+Plug 'LumaKernel/ddc-tabnine'
+
+" Usability Upgrades
 Plug 'matsui54/denops-popup-preview.vim'
 Plug 'matsui54/denops-signature_help'
-Plug 'delphinus/ddc-treesitter'
 
+" Filters
 Plug 'Shougo/ddc-matcher_head'
 Plug 'Shougo/ddc-sorter_rank'
 
@@ -246,7 +252,7 @@ call ddc#custom#patch_global('ui', 'pum')
 
 " Use around source.
 " https://github.com/Shougo/ddc-source-around
-call ddc#custom#patch_global('sources', ['around', 'nvim-lsp', 'treesitter', 'line'])
+call ddc#custom#patch_global('sources', ['around', 'nvim-lsp', 'treesitter', 'line', 'tabnine'])
 
 " Use matcher_head and sorter_rank.
 " https://github.com/Shougo/ddc-matcher_head
@@ -262,12 +268,14 @@ call ddc#custom#patch_global('sourceOptions', {
       \ 'around': {'mark': 'a'},
       \ 'nvim-lsp': {'mark': 'l', 'forceCompletionPattern': '\.\w*|:\w*|->\w*' },
       \ 'treesitter': {'mark': 't'},
-      \ 'line': {'mark': '-.-'}
+      \ 'line': {'mark': '-.-'},
+      \ 'tabnine': {'mark': '9'},
       \ })
 call ddc#custom#patch_global('sourceParams', {
       \ 'around': {'maxSize': 500},
       \ 'nvim-lsp': {'maxSize': 500},
       \ 'line': {'maxSize': 500},
+      \ 'tabnine': {'maxSize': 500},
       \ })
 
 " Mappings
