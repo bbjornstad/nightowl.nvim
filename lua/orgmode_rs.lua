@@ -18,7 +18,7 @@ require('orgmode').setup({
     org_priority_lowest = 'L',
     org_priority_default = 'B',
     win_split_mode = 'vertical',
-    org_todo_keywords = {'TODO(t)', 'URGENT', 'SUPER', 'AWAIT', 'PROGRESSING', 'CHECK', '|', 'DONE', 'REPEATED', 'GOTITALL'},
+    org_todo_keywords = {'TODO(t)', 'URGENT', 'SUPER', 'AWAIT', 'PROGRESSING', 'CHECK', '|', 'DONE', 'REPEATED', 'GOTITALL', 'NIXED'},
     org_todo_keyword_faces = {
         TODO = ':background #D9DADF :foreground blue :slant italic',
         DONE = ':background #D9DADF :foreground green :underline on',
@@ -28,7 +28,8 @@ require('orgmode').setup({
         REPEATED = ':background #D9DADF :foreground green :underline on',
         PROGRESSING = ':background #D9DADF :foreground purple :slant italic',
         CHECK = ':background #D9DADF :foreground NavyBlue :slant italic',
-        GOTITALL = ':background #D9DADF :foreground black :slant italic :underline on'
+        GOTITALL = ':background #D9DADF :foreground black :underline on',
+        NIXED = ':background #D9DADF :foreground DarkGrey :underline on'
     },
     org_capture_templates = {
         t = 'Task',
