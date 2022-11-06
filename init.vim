@@ -3,75 +3,91 @@
 " -----------------------------------------------------------------------------
 set nocompatible              " be iMproved, required
 
+
 " -----------------------------------------------------------------------------
-" NeoVIM Configuration. Could be symlinked to .vimrc
+" Plugin Configuration
 " -----------------------------------------------------------------------------
 call plug#begin('~/.local/share/nvim/site/plugged')
-" Plug 'sheerun/vim-polyglot'
+" --- Base Plugins
+"  - Color Schemes
+"  - Component Pieces (airline, tagbar, bufferline)
 Plug 'bling/vim-airline'
 Plug 'chriskempson/base16-vim'
-Plug 'kyazdani42/nvim-web-devicons'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
 Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }
 Plug 'Raimondi/delimitmate'
 Plug 'majutsushi/tagbar'
+Plug 'folke/which-key.nvim'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'morhetz/gruvbox'
-Plug 'nanotech/jellybeans.vim'
-Plug 'w0ng/vim-hybrid'
-Plug 'dikiaap/minimalist'
+" Plug 'morhetz/gruvbox'
+" Plug 'nanotech/jellybeans.vim'
+" Plug 'w0ng/vim-hybrid'
+" Plug 'dikiaap/minimalist'
 Plug 'NLKNguyen/papercolor-theme'
-
-Plug 'nvim-lua/plenary.nvim'
-Plug 'jose-elias-alvarez/null-ls.nvim'
-Plug 'lukas-reineke/indent-blankline.nvim'
-
-Plug 'williamboman/mason.nvim'
-Plug 'williamboman/mason-lspconfig.nvim'
-Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
-Plug 'neovim/nvim-lspconfig'
-
 Plug 'godlygeek/tabular'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-Plug 'airblade/vim-gitgutter'
+Plug 'lewis6991/gitsigns.nvim'
+Plug 'jose-elias-alvarez/null-ls.nvim'
+Plug 'lukas-reineke/indent-blankline.nvim'
+Plug 'nvim-tree/nvim-tree.lua'
+Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+Plug 'lotabout/skim.vim'
+Plug 'yamatsum/nvim-cursorline'
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.0' }
+Plug 'folke/trouble.nvim'
+Plug 'folke/noice.nvim'
+Plug 'MunifTanjim/nui.nvim'
+
+" --- Language Server Setup 
+"  - LSP Config
+"  - Mason
+"  - DAP
+Plug 'williamboman/mason.nvim'
+Plug 'williamboman/mason-lspconfig.nvim'
+Plug 'neovim/nvim-lspconfig'
 Plug 'mfussenegger/nvim-dap'
 Plug 'simrat39/rust-tools.nvim'
+Plug 'folke/lsp-colors.nvim'
 
+" --- Language Specific Plugins for Certain Functionality
 Plug 'lervag/vimtex'
 Plug 'cjrh/vim-conda'
 Plug 'saltstack/salt-vim'
 Plug 'preservim/vim-markdown'
+Plug 'danymat/neogen'
 " Plug 'amrbashir/nvim-docs-view', { 'on': 'DocsViewToggle'}
 
-" ------------------------------------------------------------------------------
-" ddc - Deoplete Replacement
-" ------------------------------------------------------------------------------
+" --- ddc - Deoplete Replacement
+"  - DDC Specific Stuff
+"  - See github.com/Shougo/ddc.vim
 Plug 'Shougo/ddc.vim'
 Plug 'vim-denops/denops.vim'
 
-" UI Settings
+"  - UI Settings
 Plug 'Shougo/pum.vim'
 Plug 'Shougo/ddc-ui-pum'
 
-" Sources for DDC
+"  - Sources for DDC
 Plug 'Shougo/ddc-source-around'
 Plug 'Shougo/ddc-source-nvim-lsp'
 Plug 'Shougo/ddc-source-line'
-Plug 'delphinus/ddc-treesitter'
 Plug 'LumaKernel/ddc-tabnine'
+Plug 'delphinus/ddc-treesitter'
+Plug 'delphinus/ddc-ctags'
 
-" Usability Upgrades
+"  - Usability Upgrades
 Plug 'matsui54/denops-popup-preview.vim'
 Plug 'matsui54/denops-signature_help'
 
-" Filters
+"  - Filters
 Plug 'Shougo/ddc-matcher_head'
 Plug 'Shougo/ddc-sorter_rank'
 
-
-" ------------------------------------------------------------------------------
-" orgmode plugins
-" ------------------------------------------------------------------------------
+" --- orgmode plugins
+"  - nvim-orgmode
+"  - neorg
 Plug 'nvim-orgmode/orgmode'
 Plug 'akinsho/org-bullets.nvim'
 
@@ -79,7 +95,6 @@ Plug 'nvim-neorg/neorg'
 Plug 'esquires/neorg-gtd-project-tags'
 Plug 'max397574/neorg-contexts'
 Plug 'max397574/neorg-kanban'
-
 
 " All of your Plugins must be added before the following line
 " 
@@ -101,7 +116,9 @@ set autoindent
 set nostartofline
 set confirm
 set visualbell
-set notimeout ttimeout ttimeoutlen=200
+" set notimeout
+set ttimeout ttimeoutlen=200
+set timeoutlen=500
 
 "   - cmd input -
 set showcmd
@@ -131,7 +148,10 @@ set ruler
 set number
 set textwidth=79
 set colorcolumn=80
-set rnu
+set relativenumber
+set cursorline
+
+set spelllang=en_us
 
 " -----------------------------------------------------------------------------
 " Colors and Themes
@@ -141,8 +161,8 @@ if has('termguicolors')
     set termguicolors
 endif
 
-let g:gruvbox_italic=1
-let g:gruvbox_contrast_dark='hard'
+" let g:gruvbox_italic=1
+" let g:gruvbox_contrast_dark='hard'
 set background=light
 colorscheme PaperColor
 
@@ -176,21 +196,34 @@ inoremap <M-i><M-l> <C-O>:call CommentBreak()<CR>
 
 command SuperPlug PlugClean|PlugUpgrade|PlugInstall|PlugUpdate
 
-noremap <leader><[> <ESC>:bprevious<CR>
+nnoremap <leader>[ <ESC>:bprevious<CR>
 noremap <F5> <ESC>:bprevious<CR>
-noremap <leader><]> <ESC>:bnext<CR>
+nnoremap <leader>] <ESC>:bnext<CR>
 noremap <F6> <ESC>:bnext<CR>
 
-noremap <leader><q> <C-O>:bdelete<CR>
+nnoremap <leader>q <C-O>:bdelete<CR>
 
-noremap <leader><F3> <ESC> :vsplit<CR>
-noremap <leader><F4> <ESC> :split<CR>
+nnoremap <leader><F3> <ESC> :vsplit<CR>
+nnoremap <leader><F4> <ESC> :split<CR>
+
+nnoremap <leader>so <CMD>set spell!<CR>
+
+" nnoremap <leader>wk <CMD>:WhichKey<CR>
+" inoremap <M-leader>k <CMD>:WhichKey<CR>
+
+" command! -nargs+ -complete=customlist,UserTelescopeCompletePickers UserTelescopeExt Telescope <args>
+" function UserTelescopeCompletePickers(A, L, P)
+"     return lua require('telescope.builtin').builtin
+"     
+" endfunction
+
+nnoremap <leader>tt <CMD>Telescope<CR>
 
 " -----------------------------------------------------------------------------
 " Language Configuration Sections
 " -----------------------------------------------------------------------------
 " -----Rust Configuration-----
-let g:rust_recommended_style=0
+let g:rust_recommended_style=1
 
 " -----------------------------------------------------------------------------
 " Plugin Configuration Sections
@@ -201,7 +234,7 @@ let g:tagbar_width=0
 "
 " -----Airline Configuration-----
 let g:airline#extensions#tabline#enabled=1
-let g:airline_theme='gruvbox'
+let g:airline_theme='papercolor'
 let g:airline_powerline_fonts=1
 
 " -----Vim-Doge Configuration-----
@@ -239,10 +272,6 @@ let g:vimtex_compiler_latexmk_engines = {
         \ 'context (luatex)' : '-pdf -pdflatex=context',
         \}
 
-autocmd FileType tex,latex,plaintex nmap <silent> <leader>b call deoplete#auto_complete
-augroup END
-
-
 " Customize global settings
 
 " You must set the default ui.
@@ -252,7 +281,7 @@ call ddc#custom#patch_global('ui', 'pum')
 
 " Use around source.
 " https://github.com/Shougo/ddc-source-around
-call ddc#custom#patch_global('sources', ['around', 'nvim-lsp', 'treesitter', 'line', 'tabnine'])
+call ddc#custom#patch_global('sources', ['nvim-lsp', 'around', 'treesitter', 'tabnine', 'ctags', 'line'])
 
 " Use matcher_head and sorter_rank.
 " https://github.com/Shougo/ddc-matcher_head
@@ -265,11 +294,12 @@ call ddc#custom#patch_global('sourceOptions', {
 
 " Change source options
 call ddc#custom#patch_global('sourceOptions', {
-      \ 'around': {'mark': 'a'},
-      \ 'nvim-lsp': {'mark': 'l', 'forceCompletionPattern': '\.\w*|:\w*|->\w*' },
-      \ 'treesitter': {'mark': 't'},
-      \ 'line': {'mark': '-.-'},
-      \ 'tabnine': {'mark': '9'},
+      \ 'around': {'mark': 'a', 'maxItems': 10},
+      \ 'nvim-lsp': {'mark': 'l', 'forceCompletionPattern': '\.\w*|:\w*|->\w*', 'maxItems': 10},
+      \ 'treesitter': {'mark': 't', 'maxItems': 10},
+      \ 'line': {'mark': '-', 'maxItems': 10},
+      \ 'ctags': {'mark': 'c', 'maxItems': 10},
+      \ 'tabnine': {'mark': '9', 'maxItems': 10},
       \ })
 call ddc#custom#patch_global('sourceParams', {
       \ 'around': {'maxSize': 500},
@@ -279,12 +309,12 @@ call ddc#custom#patch_global('sourceParams', {
       \ })
 
 " Mappings
-inoremap <C-n>   <Cmd>call pum#map#insert_relative(+1)<CR>
-inoremap <C-p>   <Cmd>call pum#map#insert_relative(-1)<CR>
-inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
-inoremap <C-e>   <Cmd>call pum#map#cancel()<CR>
-inoremap <PageDown> <Cmd>call pum#map#insert_relative_page(+1)<CR>
-inoremap <PageUp>   <Cmd>call pum#map#insert_relative_page(-1)<CR>
+inoremap <C-n>   <CMD>call pum#map#insert_relative(+1)<CR>
+inoremap <C-p>   <CMD>call pum#map#insert_relative(-1)<CR>
+inoremap <C-y>   <CMD>call pum#map#confirm()<CR>
+inoremap <C-e>   <CMD>call pum#map#cancel()<CR>
+inoremap <PageDown> <CMD>call pum#map#insert_relative_page(+1)<CR>
+inoremap <PageUp>   <CMD>call pum#map#insert_relative_page(-1)<CR>
 
 " <TAB>: completion.
 inoremap <silent><expr> <TAB>
@@ -295,21 +325,24 @@ inoremap <silent><expr> <TAB>
 " <S-TAB>: completion back.
 inoremap <expr><S-TAB>  pumvisible() ? '<C-p>' : pum#map#insert_relative(-1)
 
+
 " Use ddc.
 call signature_help#enable()
 call popup_preview#enable()
 call ddc#enable()
 
+lua require('which-key_rs')
+lua require('nvim-cursorline_rs')
+lua require('gitsigns_rs')
+lua require('nvim-tree_rs')
 lua require('treesitter_rs')
 lua require('null-ls_rs')
 lua require('lspconfig_rs')
+lua require('trouble_rs')
 lua require('indentblankline_rs')
+lua require('neogen_rs')
+lua require('noice').setup()
 
 lua require('orgmode_rs')
 lua require('neorg_rs')
-
-augroup orgmodeconf
-    autocmd!
-    autocmd FileType org imap <C><CR> <ESC><leader><CR>
-augroup END
 

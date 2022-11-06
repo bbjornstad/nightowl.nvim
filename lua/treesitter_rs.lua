@@ -1,5 +1,5 @@
 require('nvim-treesitter.configs').setup {
-    ensure_installed = { 
+    ensure_installed = {
         'bash',
         'python',
         'c',

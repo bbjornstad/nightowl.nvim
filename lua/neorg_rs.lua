@@ -1,10 +1,6 @@
-require('neorg').setup {
+require('neorg').setup({
     load = {
-        ['core.defaults'] = {
-            config = {
-                disable = { 'core.norg.completion' }
-            },
-        },
+        ['core.defaults'] = {},
         ['core.norg.dirman'] = {
             config = {
                 workspaces = {
@@ -45,4 +41,4 @@ require('neorg').setup {
         ['external.context'] = {},
         ['external.kanban'] = {},
     }
-}
+})
