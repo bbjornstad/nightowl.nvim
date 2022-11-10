@@ -1,7 +1,8 @@
 " -----------------------------------------------------------------------------
 " NeoVIM Configuration. Could be symlinked to .vimrc
 " -----------------------------------------------------------------------------
-set nocompatible              " be iMproved, required
+" -- The following is deprecated for nvim
+" set nocompatible              " be iMproved, required
 
 
 " -----------------------------------------------------------------------------
@@ -12,7 +13,6 @@ call plug#begin('~/.local/share/nvim/site/plugged')
 "  - Color Schemes
 "  - Component Pieces (airline, tagbar, bufferline)
 Plug 'bling/vim-airline'
-Plug 'chriskempson/base16-vim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-tree/nvim-web-devicons'
 Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }
@@ -22,7 +22,7 @@ Plug 'folke/which-key.nvim'
 Plug 'vim-airline/vim-airline-themes'
 " Plug 'morhetz/gruvbox'
 " Plug 'nanotech/jellybeans.vim'
-" Plug 'w0ng/vim-hybrid'
+Plug 'w0ng/vim-hybrid'
 " Plug 'dikiaap/minimalist'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'godlygeek/tabular'
@@ -39,6 +39,7 @@ Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.0' }
 Plug 'folke/trouble.nvim'
 Plug 'folke/noice.nvim'
 Plug 'MunifTanjim/nui.nvim'
+Plug 'rcarriga/nvim-notify'
 
 " --- Language Server Setup 
 "  - LSP Config
@@ -51,19 +52,24 @@ Plug 'mfussenegger/nvim-dap'
 Plug 'simrat39/rust-tools.nvim'
 Plug 'folke/lsp-colors.nvim'
 
-" --- Language Specific Plugins for Certain Functionality
-Plug 'lervag/vimtex'
-Plug 'cjrh/vim-conda'
-Plug 'saltstack/salt-vim'
-Plug 'preservim/vim-markdown'
-Plug 'danymat/neogen'
-" Plug 'amrbashir/nvim-docs-view', { 'on': 'DocsViewToggle'}
+"  --- nvim-cmp temporarily testing
+"" - nvim-cmp specific stuff
+"Plug 'hrsh7th/cmp-nvim-lsp'
+"Plug 'hrsh7th/cmp-buffer'
+"Plug 'hrsh7th/cmp-path'
+"Plug 'hrsh7th/cmp-cmdline'
+"Plug 'hrsh7th/nvim-cmp'
+
+" For snippy users.
+" Plug 'dcampos/nvim-snippy'
+" Plug 'dcampos/cmp-snippy'
 
 " --- ddc - Deoplete Replacement
 "  - DDC Specific Stuff
 "  - See github.com/Shougo/ddc.vim
 Plug 'Shougo/ddc.vim'
 Plug 'vim-denops/denops.vim'
+Plug 'Shougo/deoppet.nvim', { 'do': ':UpdateRemotePlugins' }
 
 "  - UI Settings
 Plug 'Shougo/pum.vim'
@@ -84,6 +90,14 @@ Plug 'matsui54/denops-signature_help'
 "  - Filters
 Plug 'Shougo/ddc-matcher_head'
 Plug 'Shougo/ddc-sorter_rank'
+
+" --- Language Specific Plugins for Certain Functionality
+Plug 'lervag/vimtex'
+Plug 'cjrh/vim-conda'
+Plug 'jmcantrell/vim-virtualenv'
+Plug 'saltstack/salt-vim'
+Plug 'preservim/vim-markdown'
+Plug 'danymat/neogen'
 
 " --- orgmode plugins
 "  - nvim-orgmode
@@ -164,6 +178,7 @@ endif
 " let g:gruvbox_italic=1
 " let g:gruvbox_contrast_dark='hard'
 set background=light
+" colorscheme hybrid
 colorscheme PaperColor
 
 " for some plugins
@@ -208,16 +223,9 @@ nnoremap <leader><F4> <ESC> :split<CR>
 
 nnoremap <leader>so <CMD>set spell!<CR>
 
-" nnoremap <leader>wk <CMD>:WhichKey<CR>
-" inoremap <M-leader>k <CMD>:WhichKey<CR>
-
-" command! -nargs+ -complete=customlist,UserTelescopeCompletePickers UserTelescopeExt Telescope <args>
-" function UserTelescopeCompletePickers(A, L, P)
-"     return lua require('telescope.builtin').builtin
-"     
-" endfunction
-
 nnoremap <leader>tt <CMD>Telescope<CR>
+
+nnoremap <leader>nt <CMD>NvimTreeToggle<CR>
 
 " -----------------------------------------------------------------------------
 " Language Configuration Sections
@@ -272,6 +280,20 @@ let g:vimtex_compiler_latexmk_engines = {
         \ 'context (luatex)' : '-pdf -pdflatex=context',
         \}
 
+" ------------------------------------------------------------------------------
+" --- deoppet snippets
+" ------------------------------------------------------------------------------
+call deoppet#initialize()
+call deoppet#custom#option('snippets',
+\ map(globpath(&runtimepath, 'neosnippets', 1, 1),
+\     { _, val -> { 'path': val } }))
+
+imap <C-k>  <Plug>(deoppet_expand)
+imap <C-f>  <Plug>(deoppet_jump_forward)
+imap <C-b>  <Plug>(deoppet_jump_backward)
+smap <C-f>  <Plug>(deoppet_jump_forward)
+smap <C-b>  <Plug>(deoppet_jump_backward)
+
 " Customize global settings
 
 " You must set the default ui.
@@ -281,7 +303,7 @@ call ddc#custom#patch_global('ui', 'pum')
 
 " Use around source.
 " https://github.com/Shougo/ddc-source-around
-call ddc#custom#patch_global('sources', ['nvim-lsp', 'around', 'treesitter', 'tabnine', 'ctags', 'line'])
+call ddc#custom#patch_global('sources', ['nvim-lsp', 'deoppet', 'around', 'treesitter', 'tabnine', 'ctags', 'line'])
 
 " Use matcher_head and sorter_rank.
 " https://github.com/Shougo/ddc-matcher_head
@@ -295,7 +317,8 @@ call ddc#custom#patch_global('sourceOptions', {
 " Change source options
 call ddc#custom#patch_global('sourceOptions', {
       \ 'around': {'mark': 'a', 'maxItems': 10},
-      \ 'nvim-lsp': {'mark': 'l', 'forceCompletionPattern': '\.\w*|:\w*|->\w*', 'maxItems': 10},
+      \ 'nvim-lsp': {'mark': 'l', 'forceCompletionPattern': '\.\w*|:\w*|->\w*', 'maxItems': 20},
+      \ 'deoppet': {'mark': 's', 'maxItems': 20},
       \ 'treesitter': {'mark': 't', 'maxItems': 10},
       \ 'line': {'mark': '-', 'maxItems': 10},
       \ 'ctags': {'mark': 'c', 'maxItems': 10},
@@ -324,7 +347,6 @@ inoremap <silent><expr> <TAB>
 
 " <S-TAB>: completion back.
 inoremap <expr><S-TAB>  pumvisible() ? '<C-p>' : pum#map#insert_relative(-1)
-
 
 " Use ddc.
 call signature_help#enable()

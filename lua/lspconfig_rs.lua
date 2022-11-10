@@ -67,4 +67,5 @@ require('lspconfig').salt_ls.setup{}
 require('lspconfig').yamlls.setup{}
 require('lspconfig').diagnosticls.setup{}
 require('lspconfig').marksman.setup{}
+require('lspconfig').taplo.setup{}
 
