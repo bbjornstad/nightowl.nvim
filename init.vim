@@ -39,7 +39,7 @@ Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.0' }
 Plug 'folke/trouble.nvim'
 Plug 'folke/noice.nvim'
 Plug 'MunifTanjim/nui.nvim'
-Plug 'rcarriga/nvim-notify'
+" Plug 'rcarriga/nvim-notify'
 
 " --- Language Server Setup 
 "  - LSP Config
