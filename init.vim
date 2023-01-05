@@ -227,6 +227,10 @@ nnoremap <leader>tt <CMD>Telescope<CR>
 
 nnoremap <leader>nt <CMD>NvimTreeToggle<CR>
 
+augroup org_insert_mappings
+    autocmd FileType org inoremap <buffer> <C-CR> <C-O>v:lua.org_meta_return
+augroup END
+
 " -----------------------------------------------------------------------------
 " Language Configuration Sections
 " -----------------------------------------------------------------------------
