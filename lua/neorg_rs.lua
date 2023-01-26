@@ -1,6 +1,7 @@
 require('neorg').setup({
     load = {
         ['core.defaults'] = {},
+        ['core.fs'] = {},
         ['core.norg.dirman'] = {
             config = {
                 workspaces = {
@@ -14,12 +15,6 @@ require('neorg').setup({
                 },
                 index = 'rsn_index.norg'
             },
-        },
-        ['core.gtd.base'] = {
-            config = {
-                workspace = 'tasks'
-            },
-            exclude = { 'notes' }
         },
         ['core.norg.manoeuvre'] = {},
         ['core.norg.concealer'] = {
@@ -37,8 +32,6 @@ require('neorg').setup({
             }
         },
         ['core.export.markdown'] = {},
-        ['external.gtd-project-tags'] = {},
         ['external.context'] = {},
-        ['external.kanban'] = {},
     }
 })
