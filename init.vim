@@ -187,12 +187,22 @@ hi clear SignColumn
 " -----------------------------------------------------------------------------
 " Complex Behavior Overrides
 " -----------------------------------------------------------------------------
-" -----Vertical Split Default----
+" ----- Vertical Split Default -----
 augroup default_vertical_split
     autocmd WinNew * wincmd L
     autocmd BufWinEnter <buffer> wincmd L
 augroup END
 
+" ----- NETRW replacement behavior for NERDTree -----
+" let g:netrw_banner = 0
+" let g:netrw_liststyle = 3
+" let g:netrw_browse_split = 4
+" let g:netrw_altv = 1
+" let g:netrw_winsize = 25
+" augroup ProjectDrawer
+"   autocmd!
+"   autocmd VimEnter * :Vexplore
+" augroup END
 
 " -----------------------------------------------------------------------------
 " Custom Mappings
@@ -236,6 +246,11 @@ augroup END
 " -----------------------------------------------------------------------------
 " -----Rust Configuration-----
 let g:rust_recommended_style=1
+
+augroup rs_tmp_colguide
+    autocmd FileType rs setlocal textwidth=99
+    autocmd FileType rs setlocal colorcolumn=100
+augroup END
 
 " -----------------------------------------------------------------------------
 " Plugin Configuration Sections
