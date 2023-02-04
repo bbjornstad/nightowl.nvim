@@ -248,8 +248,8 @@ augroup END
 let g:rust_recommended_style=1
 
 augroup rs_tmp_colguide
-    autocmd FileType rs setlocal textwidth=99
-    autocmd FileType rs setlocal colorcolumn=100
+    autocmd FileType rust setlocal textwidth=99
+    autocmd FileType rust setlocal colorcolumn=100
 augroup END
 
 " -----------------------------------------------------------------------------
