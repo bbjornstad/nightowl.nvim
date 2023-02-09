@@ -4,7 +4,6 @@
 " -- The following is deprecated for nvim
 " set nocompatible              " be iMproved, required
 
-
 " -----------------------------------------------------------------------------
 " Plugin Configuration
 " -----------------------------------------------------------------------------
@@ -20,10 +19,7 @@ Plug 'Raimondi/delimitmate'
 Plug 'majutsushi/tagbar'
 Plug 'folke/which-key.nvim'
 Plug 'vim-airline/vim-airline-themes'
-" Plug 'morhetz/gruvbox'
-" Plug 'nanotech/jellybeans.vim'
 Plug 'w0ng/vim-hybrid'
-" Plug 'dikiaap/minimalist'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'godlygeek/tabular'
 Plug 'tpope/vim-repeat'
@@ -39,7 +35,6 @@ Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.0' }
 Plug 'folke/trouble.nvim'
 Plug 'folke/noice.nvim'
 Plug 'MunifTanjim/nui.nvim'
-" Plug 'rcarriga/nvim-notify'
 
 " --- Language Server Setup 
 "  - LSP Config
@@ -104,8 +99,7 @@ Plug 'danymat/neogen'
 "  - neorg
 Plug 'nvim-orgmode/orgmode'
 Plug 'akinsho/org-bullets.nvim'
-
-Plug 'nvim-neorg/neorg'
+Plug 'nvim-neorg/neorg''
 Plug 'esquires/neorg-gtd-project-tags'
 Plug 'max397574/neorg-contexts'
 Plug 'max397574/neorg-kanban'
@@ -133,6 +127,7 @@ set visualbell
 " set notimeout
 set ttimeout ttimeoutlen=200
 set timeoutlen=500
+set whichwrap+=<,>,h,l
 
 "   - cmd input -
 set showcmd
@@ -146,6 +141,7 @@ set incsearch
 set hlsearch
 set hidden
 set smartcase
+set wrapscan
 
 " -----------------------------------------------------------------------------
 " Basic Behavioral Settings
@@ -156,17 +152,19 @@ set smartcase
 "   - tab behavior - 
 set softtabstop=4
 set shiftwidth=4
-set expandtab
+"set expandtab
 "   - page indicators -
 set ruler
 set number
-set textwidth=79
-set colorcolumn=80
+set textwidth=80
+set wrap
 set relativenumber
 set cursorline
 
 set spelllang=en_us
-
+set formatoptions=tcro/qabj
+let maplocalleader = '|'
+let mapleader = '\'
 " -----------------------------------------------------------------------------
 " Colors and Themes
 " -----------------------------------------------------------------------------
@@ -193,43 +191,73 @@ augroup default_vertical_split
     autocmd BufWinEnter <buffer> wincmd L
 augroup END
 
-" ----- NETRW replacement behavior for NERDTree -----
-" let g:netrw_banner = 0
-" let g:netrw_liststyle = 3
-" let g:netrw_browse_split = 4
-" let g:netrw_altv = 1
-" let g:netrw_winsize = 25
-" augroup ProjectDrawer
-"   autocmd!
-"   autocmd VimEnter * :Vexplore
-" augroup END
+" ----- Color column now is computed from textwidth unless not set ------
+function! s:SetColorColumn()
+    if &l:textwidth == 0
+        setlocal colorcolumn=80
+    else
+        setlocal colorcolumn=+0
+    endif
+endfunction;
+
+augroup colorcol
+    autocmd!
+    autocmd OptionSet textwidth call s:SetColorColumn()
+    autocmd BufEnter * call s:SetColorColumn()
+augroup END
 
 " -----------------------------------------------------------------------------
 " Custom Mappings
 " -----------------------------------------------------------------------------
 " -----User Mappings-----
 map Y y$
-nnoremap <C-L> :nohl<CR><C-L>
+nnoremap <C-L> <CMD>nohl<CR><C-L>
 
 function CommentBreak()
     let l:commentcharlen=strlen(split(&commentstring, '%s')[0])
-    let l:breaklen=(&l:colorcolumn - l:commentcharlen)
-    execute printf(":normal! %sa-\<ESC>\<CR>", l:breaklen)
+    let l:breaklen=(&colorcolumn - l:commentcharlen)
+    execute printf('normal! %da-\<ESC>\<CR>', l:breaklen)
+endfunction;
+
+" -----------------------------------------------------------------------------
+" REMINDER: There is a distinction between options, whose values are retrieved
+" with a prefix of &, and variables, which are user or internally set storage
+" references for a value but which do not directly affect behavior as an option
+" does
+" -----------------------------------------------------------------------------
+function InsertDashBreak(colstop, dashchar)
+    if a:colstop == 0
+	let l:firststop=&colorcolumn
+    else
+	let l:firststop=a:colstop
+    endif
+    let l:secondstop=(l:firststop + 1)
+    let l:dashcharacter=get(a:, 1, '-')
+    execute printf('<CMD>set ri<CR><CMD>%dA%c<ESC>%d<BAR>d$0<CMD>set nori<CR>', l:firststop, l:dashcharacter, l:secondstop)
+endfunction;
+
+function InsertCommentBreak(colstop, dashchar)
+    let l:comment_linestart=split(&commentstring, '%s')[0]
+    execute printf('normal! i%s', l:comment_linestart)
+    execute printf('normal! call InsertDashBreak(%d, %c)', a:colstop, a:dashchar)
 endfunction
-nnoremap <M-i><M-l> :call CommentBreak()<CR>
-inoremap <M-i><M-l> <C-O>:call CommentBreak()<CR>
+
+noremap <M-I><M-L> @=printf('call InsertCommentBreak(%d, "-")', v:count)<CR>
+noremap <M-i><M-l> @=printf('call InsertDashBreak(%d, "-")', v:count)<CR>
+" nnoremap <M-i><M-l> :call CommentBreak()<CR>
+" inoremap <M-i><M-l> <C-O>:call CommentBreak()<CR>
 
 command SuperPlug PlugClean|PlugUpgrade|PlugInstall|PlugUpdate
 
-nnoremap <leader>[ <ESC>:bprevious<CR>
-noremap <F5> <ESC>:bprevious<CR>
-nnoremap <leader>] <ESC>:bnext<CR>
-noremap <F6> <ESC>:bnext<CR>
+nnoremap <leader>[ <CMD>bprevious<CR>
+noremap <F5> <CMD>bprevious<CR>
+nnoremap <leader>] <CMD>bnext<CR>
+noremap <F6> <CMD>bnext<CR>
 
-nnoremap <leader>q <C-O>:bdelete<CR>
+nnoremap <leader>q <CMD>bdelete<CR>
 
-nnoremap <leader><F3> <ESC> :vsplit<CR>
-nnoremap <leader><F4> <ESC> :split<CR>
+nnoremap <leader><F3> <CMD>vsplit<CR>
+nnoremap <leader><F4> <CMD>split<CR>
 
 nnoremap <leader>so <CMD>set spell!<CR>
 
@@ -248,8 +276,7 @@ augroup END
 let g:rust_recommended_style=1
 
 augroup rs_tmp_colguide
-    autocmd FileType rust setlocal textwidth=99
-    autocmd FileType rust setlocal colorcolumn=100
+    autocmd FileType rust setlocal textwidth=100
 augroup END
 
 " -----------------------------------------------------------------------------
@@ -263,9 +290,6 @@ let g:tagbar_width=0
 let g:airline#extensions#tabline#enabled=1
 let g:airline_theme='papercolor'
 let g:airline_powerline_fonts=1
-
-" -----Vim-Doge Configuration-----
-" nmap <silent> <leader>h call doge#generate
 
 " -----Vim-Markdown Configuration-----
 let g:vim_markdown_folding_disabled=1

@@ -1,7 +1,10 @@
+neorgroot = os.getenv('NVIM_NEORG_ROOT')
+-- set up a config file that designates everything needed.
+--
+
 require('neorg').setup({
     load = {
         ['core.defaults'] = {},
-        ['core.fs'] = {},
         ['core.norg.dirman'] = {
             config = {
                 workspaces = {
@@ -16,7 +19,6 @@ require('neorg').setup({
                 index = 'rsn_index.norg'
             },
         },
-        ['core.norg.manoeuvre'] = {},
         ['core.norg.concealer'] = {
             config = {
                 icon_preset = 'basic'
@@ -26,12 +28,7 @@ require('neorg').setup({
                 zen_mode = 'zen-mode'
             }
         },
-        ['core.export'] = {
-            config = {
-
-            }
-        },
+        ['core.export'] = {},
         ['core.export.markdown'] = {},
-        ['external.context'] = {},
     }
 })
