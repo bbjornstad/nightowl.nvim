@@ -1,14 +1,21 @@
+local keymaps = require('keymappings').scope_mappings
+local finalmaps = {}
+finalmaps.insert = keymaps
+finalmaps.normal = keymaps
+finalmaps.nomode = keymaps
+
 require('telescope').setup{
     defaults = {
         -- Default configuration for telescope goes here:
         -- config_key = value,
+	layout_strategy = 'cursor',
+	layout_config = { height = 0.75 },
         mappings = {
-            i = {
+            i = finalmaps.insert,
                 -- map actions.which_key to <C-h> (default: <C-/>)
                 -- actions.which_key shows the mappings for your picker,
                 -- e.g. git_{create, delete, ...}_branch for the git_branches picker
-                ["<C-h>"] = "which_key"
-            }
+	    n = finalmaps.normal,
         }
     },
     pickers = {

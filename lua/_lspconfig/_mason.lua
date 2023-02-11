@@ -1,7 +1,7 @@
-local _mason = {}
+uutils = require('uutils.mod')
+master_setup = uutils.reload('lsp-setup')
 
-package.loaded['lsp-setup'] = nil
-local master_setup = require('lsp-setup')
+local _mason = {}
 
 _mason.sources = master_setup.mason_servers
 _mason.config = {

@@ -1,10 +1,14 @@
 -- ----- The basic settings from init.vim
 
 HOME = os.getenv('HOME')
+CANDY_MOOD = os.getenv('DOTCANDYD_MOOD')
 
 -- leader key specification
-vim.g.mapleader = '\\'
-vim.g.maplocalleader = ','
+vim.g.mapleader = ' '-- '\\'
+vim.g.maplocalleader = ',' -- '<leader><space>'
+-- disable netrw so that nerd-tree can do its thing later.
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 vim.opt.mouse = 'a'
 vim.opt.backspace = 'indent,eol,start'
@@ -32,7 +36,7 @@ vim.opt.hidden = true
 vim.opt.smartcase = true
 vim.opt.wrapscan = true
 
-vim.opt.softtabstop = 4
+vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.textwidth = 80
 
@@ -47,7 +51,7 @@ vim.opt.formatoptions = 'tcroqb'
 if vim.fn.has('termguicolors') == 1 then
     vim.opt.termguicolors = true
 end
-vim.opt.background = 'light'
+vim.opt.background = CANDY_MOOD or 'light'
 
 vim.cmd.hi('clear SignColumns')
 
