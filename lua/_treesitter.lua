@@ -13,6 +13,7 @@ require('nvim-treesitter.configs').setup {
         'norg',
         'org',
         'markdown',
+		'markdown_inline',
         'make',
         'regex',
         'sql',

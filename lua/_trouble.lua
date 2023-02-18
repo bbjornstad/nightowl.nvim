@@ -1,21 +1,19 @@
-require('trouble').setup({})
+local mapk = require("uutils.key").mapk
+local wk = require('uutils.key').wkreg
+local namer = require('uutils.key').wknamer
+
+require("trouble").setup({
+	position = "right",
+	width = math.floor(0.5 * vim.opt.columns:get()),
+})
 
 -- Lua
-vim.keymap.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>",
-    {silent = true, noremap = true}
-)
-vim.keymap.set("n", "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>",
-    {silent = true, noremap = true}
-)
-vim.keymap.set("n", "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>",
-    {silent = true, noremap = true}
-)
-vim.keymap.set("n", "<leader>xl", "<cmd>TroubleToggle loclist<cr>",
-    {silent = true, noremap = true}
-)
-vim.keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>",
-    {silent = true, noremap = true}
-)
-vim.keymap.set("n", "gR", "<cmd>TroubleToggle lsp_references<cr>",
-    {silent = true, noremap = true}
-)
+local mname = 'trouble'
+local stem = 'Xtended diagnostics'
+wk({['<localleader>x'] = { name = namer(mname, stem, true) }})
+mapk("n", "<localleader>xx", "<cmd>TroubleToggle<cr>", { silent = true, noremap = true })
+mapk("n", "<localleader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", { silent = true, noremap = true })
+mapk("n", "<localleader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", { silent = true, noremap = true })
+mapk("n", "<localleader>xl", "<cmd>TroubleToggle loclist<cr>", { silent = true, noremap = true })
+mapk("n", "<localleader>xq", "<cmd>TroubleToggle quickfix<cr>", { silent = true, noremap = true })
+mapk("n", "gR", "<cmd>TroubleToggle lsp_references<cr>", { silent = true, noremap = true })

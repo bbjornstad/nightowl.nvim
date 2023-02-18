@@ -5,64 +5,112 @@
 -- We have also upgraded many of the interface materials in the process of
 -- migrating to the new system.
 -- ----------------------------------------------------------------------------
-
 -- need to do something to set up the color schemes by light vs dark
-CANDY_MOOD = os.getenv('DOTCANDYD_MOOD')
--- ...
+local CANDY_MOOD = os.getenv("CANDY_MOOD")
 
+-------------------------------------------------------------------------------
+-- ----- Installation of lazy.nvim package manager -----
+--
+-- We are required to do this here to hopefully have access to lazy commands on
+-- the flipside.
+--
+-- Other important notes:
+-- 	- The setup function for lazy.nvim should only be called once. I seemed to
+-- 	  run into some trouble when I split off the initial configuration of color
+-- 	  scheme and theme, along with the lazy installation below, into a new file
+-- 	  supposed to handle just initialization of those two pieces at program
+-- 	  start
+--
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable", -- latest stable release
+		lazypath,
+	})
+end
+vim.opt.rtp:prepend(lazypath)
+
+-------------------------------------------------------------------------------
+--- the following is not currently functional, for some reason
+--[[
+local catt = require("_catppuccin")
+local cattheme = catt.cat_themer('nvim-test1', {
+		background = { light = "latte", dark = "macchiato" },
+		dim_inactive = { enabled = true, shade = CANDY_MOOD, percentage = 0.04 },
+		integrations = { notify = true },
+		})
+print(cattheme)
+
+--cattheme = {
+--	'catppuccin/nvim',
+--	lazy = false,
+--	opts = {
+--		background = { light = "latte", dark = "macchiato" },
+--		dim_inactive = { enabled = true, shade = CANDY_MOOD, percentage = 0.04 },
+--		integrations = { notify = true },
+--	}
+--}
+--]]
+
+-------------------------------------------------------------------------------
 -- Main configuration for Lazy.nvim
 require("lazy").setup({
+	-- catppuccino setup was handled in the other file for no particularly good
+	-- reason.
 	{
-		"NLKNguyen/papercolor-theme",
+		"rebelot/kanagawa.nvim",
 		lazy = false,
 		priority = 1000,
 		config = function()
-			vim.cmd([[colorscheme PaperColor]])
+			require('kanagawa').setup()
+			vim.cmd('colorscheme kanagawa')
 		end,
+	}, -- {
+	--	'catppuccin/nvim',
+	--	name = 'catppuccin',
+	--	priority = 1000,
+	--	config = function()
+	--		require('catppuccin').setup({
+	--			background = {
+	--				light = 'latte',
+	--				dark = 'macchiato'
+	--			},
+	--			color_overrides = {
+	--				macchiato = {
+	--					base = '#3f4250',
+	--					mantle = '#282a33',
+	--					crust = '#1e1f26',
+	--				},
+	--			},
+	--		})
+	--		vim.cmd.colorscheme('catppuccin')
+	--	end
+	-- },
+	{
+		"nvim-lualine/lualine.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 	},
 	{
-		"bling/vim-airline",
-		lazy = false,
-		dependencies = {
-			"vim-airline/vim-airline-themes",
-		},
-		config = function()
-			vim.g.airline_theme = "papercolor"
-			vim.g.airline_statusline_ontop = true
-			vim.g.airline_powerline_fonts = true
-			vim.g["airline#extensions#tabline#enabled"] = 0
-		end,
+		'SmiteshP/nvim-navic',
+		dependencies = { 'neovim/nvim-lspconfig' },
 	},
-	{
-		"akinsho/bufferline.nvim",
-		lazy = false,
-		tag = "v3.*",
-		dependencies = {
-			"nvim-tree/nvim-web-devicons",
-		},
-	},
-	"Raimondi/delimitmate",
-	"majutsushi/tagbar",
-	"folke/which-key.nvim",
-	-- 'vim-airline/vim-airline-themes',
+	{ "folke/which-key.nvim", config = true, event = "BufRead" },
 	"godlygeek/tabular",
-	"tpope/vim-repeat",
-	"tpope/vim-surround",
+	{ "tpope/vim-repeat", lazy = false },
+	{ "tpope/vim-surround", lazy = false },
 	"lewis6991/gitsigns.nvim",
 	"lukas-reineke/indent-blankline.nvim",
 	"yamatsum/nvim-cursorline",
 	{
 		"nvim-tree/nvim-tree.lua",
-		dependencies = {
-			"nvim-tree/nvim-web-devicons",
-		},
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = true,
 	},
-	{
-		"nvim-treesitter/nvim-treesitter",
-		lazy = true,
-		build = ":TSUpdate",
-	},
+	{ "nvim-treesitter/nvim-treesitter", lazy = true, build = ":TSUpdate" },
 	-- --- Language Server Setup ---
 	{
 		"neovim/nvim-lspconfig",
@@ -137,24 +185,27 @@ require("lazy").setup({
 		},
 	},
 	{
-		"nvim-lua/popup.nvim",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-		},
+		"mfussenegger/nvim-dap",
+		dependencies = { "jbyuki/one-small-step-for-vimkind" },
 	},
+	{ "nvim-lua/popup.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
 	{
 		"folke/trouble.nvim",
-		dependencies = {
-			"nvim-tree/nvim-web-devicons",
-			"folke/lsp-colors.nvim",
-		},
+		dependencies = { "nvim-tree/nvim-web-devicons", "folke/lsp-colors.nvim" },
 	},
 	{
 		"folke/noice.nvim",
+		lazy = false,
 		dependencies = {
 			"MunifTanjim/nui.nvim",
 			"nvim-treesitter/nvim-treesitter",
+			"rcarriga/nvim-notify",
 		},
+	},
+	{
+		"L3MON4D3/LuaSnip",
+		tag = "v1",
+		build = "make install_jsregexp"
 	},
 	{
 		"glepnir/lspsaga.nvim",
@@ -171,19 +222,9 @@ require("lazy").setup({
 		config = function()
 			require("alpha").setup(require("alpha.themes.startify").config)
 		end,
-		dependencies = {
-			"nvim-tree/nvim-web-devicons",
-		},
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 	},
-	-- {
-	--     'glepnir/dashboard-nvim',
-	--     event = 'VimEnter',
-	--     config = true,
-	--     dependencies = {
-	--         'nvim-tree/nvim-web-devicons',
-	--     },
-	-- },
-	"liuchengxu/vista.vim",
+	{ "liuchengxu/vista.vim", cmd = "Vista" },
 	{
 		"sudormrfbin/cheatsheet.nvim",
 		dependencies = {
@@ -193,11 +234,12 @@ require("lazy").setup({
 		},
 	},
 	{
-		"lotabout/skim.vim",
+		"lotabout/skim",
 		build = "./install",
 		dir = "~/.skim",
-	},
-	-- ----- Autocompletion Settings - Previously on DDC, now nvim-cmp --
+		dependencies = { "lotabout/skim.vim" },
+		cmd = { "SkimRG", "SkimAG" },
+	}, -- ----- Autocompletion Settings - Previously on DDC, now nvim-cmp --
 	{
 		"hrsh7th/nvim-cmp",
 		dependencies = {
@@ -223,10 +265,7 @@ require("lazy").setup({
 				build = "./install.sh",
 				dependencies = {
 					"hrsh7th/nvim-cmp",
-					{
-						"codota/tabnine-nvim",
-						build = "./dl_binaries.sh",
-					},
+					{ "codota/tabnine-nvim", build = "./dl_binaries.sh" },
 				},
 			},
 			"bydlw98/cmp-env",
@@ -244,46 +283,49 @@ require("lazy").setup({
 	},
 	{
 		"jose-elias-alvarez/null-ls.nvim",
+		dependencies = { "nvim-lua/plenary.nvim" },
+	}, -- ---	Language Specific Plugins
+	{ "simrat39/rust-tools.nvim", ft = { "rust" } },
+	{ "lervag/vimtex", ft = { "tex" } },
+	{ "jmcantrell/vim-virtualenv", ft = { "python" } },
+	{
+		"saltstack/salt-vim",
+		ft = { "Saltfile", "sls", "top" },
 		dependencies = {
-			"nvim-lua/plenary.nvim",
+			"Glench/Vim-Jinja2-Syntax",
+			ft = { "jinja2", "j2", "jinja" },
 		},
 	},
-	-- ---	Language Specific Plugins
-	"simrat39/rust-tools.nvim",
-	"lervag/vimtex",
-	"jmcantrell/vim-virtualenv",
-	"saltstack/salt-vim",
-	"preservim/vim-markdown",
+	{ "preservim/vim-markdown", ft = { "markdown", "md", "rmd" } },
 	"danymat/neogen",
 	{
 		"toppair/peek.nvim",
 		build = "deno task --quiet build:fast",
-		config = function()
-			require("peek").setup({
-				auto_load = true, -- whether to automatically load preview when
-				-- entering another markdown buffer
-				close_on_bdelete = true, -- close preview window on buffer delete
+		opts = {
+			auto_load = true,
+			-- entering another markdown buffer
+			-- close preview window on buffer delete
+			close_on_bdelete = true,
+			-- enable syntax highlighting, affects performance
+			syntax = true,
 
-				syntax = true, -- enable syntax highlighting, affects performance
+			theme = CANDY_MOOD, -- 'dark' or 'light'
 
-				theme = "dark", -- 'dark' or 'light'
+			update_on_change = true,
 
-				update_on_change = true,
-
-				-- relevant if update_on_change is true
-				throttle_at = 200000, -- start throttling when file exceeds this
-				-- amount of bytes in size
-				throttle_time = "auto", -- minimum amount of time in milliseconds
-				-- that has to pass before starting new render
-			})
-		end,
-	},
-	-- Orgmode Specific
+			-- relevant if update_on_change is true
+			throttle_at = 200000, -- start throttling when file exceeds this
+			-- amount of bytes in size
+			throttle_time = "auto", -- minimum amount of time in milliseconds
+			-- that has to pass before starting new render
+		},
+		ft = { "markdown", "rmd", "md" },
+		dependencies = { "preservim/vim-markdown" },
+	}, -- Orgmode Specific
 	{
 		"nvim-orgmode/orgmode",
-		dependencies = {
-			"akinsho/org-bullets.nvim",
-		},
+		dependencies = { "akinsho/org-bullets.nvim" },
+		ft = { "org" },
 	},
 	{
 		"nvim-neorg/neorg",
@@ -293,26 +335,18 @@ require("lazy").setup({
 			"nvim-neorg/neorg-telescope",
 		},
 		build = ":Neorg sync-parsers",
-		ft = "norg",
+		ft = { "norg" },
 	},
 	{
 		"quarto-dev/quarto-nvim",
-		dependencies = {
-			"jmbuhr/otter.nvim",
-			"neovim/nvim-lspconfig",
-		},
+		dependencies = { "jmbuhr/otter.nvim", "neovim/nvim-lspconfig" },
 	},
 	{
-		'nvim-colortils/colortils.nvim',
-		cmd = 'Colortils',
-		config = {
-			register = '+',
-			default_format = 'hex',
-			border = 'solid'
-		}
-	}
-}, {
-	defaults = {
-		lazy = true,
+		"nvim-colortils/colortils.nvim",
+		cmd = "Colortils",
+		opts = { register = "+", default_format = "hex", border = "solid" },
 	},
-})
+	{ "j-hui/fidget.nvim", lazy = false, config = true },
+	{ "windwp/nvim-autopairs", lazy = false, config = true },
+	{ "gbprod/substitute.nvim", lazy = false, config = true },
+}, { defaults = { lazy = true } })

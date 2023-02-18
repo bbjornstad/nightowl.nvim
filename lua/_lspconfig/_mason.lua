@@ -1,5 +1,5 @@
-uutils = require('uutils.mod')
-master_setup = uutils.reload('lsp-setup')
+local uutils = require('uutils.mod')
+local master_setup = uutils.reload('lsp-setup')
 
 local _mason = {}
 

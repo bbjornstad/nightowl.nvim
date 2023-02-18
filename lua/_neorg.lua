@@ -1,4 +1,4 @@
-neorgroot = os.getenv('NVIM_NEORG_ROOT')
+local neorgroot = os.getenv('NVIM_NEORG_ROOT')
 -- set up a config file that designates everything needed.
 --
 

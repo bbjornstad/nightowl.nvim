@@ -1,22 +1,22 @@
-local keymaps = require('keymappings').scope_mappings
+local keymaps = require("keymappings").scope_mappings
 local finalmaps = {}
 finalmaps.insert = keymaps
 finalmaps.normal = keymaps
 finalmaps.nomode = keymaps
 
-require('telescope').setup{
+require("telescope").setup({
     defaults = {
         -- Default configuration for telescope goes here:
         -- config_key = value,
-	layout_strategy = 'cursor',
-	layout_config = { height = 0.75 },
+        layout_strategy = "cursor",
+        layout_config = {height = 0.75},
         mappings = {
             i = finalmaps.insert,
-                -- map actions.which_key to <C-h> (default: <C-/>)
-                -- actions.which_key shows the mappings for your picker,
-                -- e.g. git_{create, delete, ...}_branch for the git_branches picker
-	    n = finalmaps.normal,
-        }
+            -- map actions.which_key to <C-h> (default: <C-/>)
+            -- actions.which_key shows the mappings for your picker,
+            -- e.g. git_{create, delete, ...}_branch for the git_branches picker
+            n = finalmaps.normal,
+        },
     },
     pickers = {
         -- Default configuration for builtin pickers goes here:
@@ -34,4 +34,4 @@ require('telescope').setup{
         -- }
         -- please take a look at the readme of the extension you want to configure
     }
-}
+})

@@ -17,10 +17,38 @@ local _nvim_cmp = require("_lspconfig._nvim-cmp")
 local lsp = require("lsp-zero")
 lsp.preset("recommended")
 
+lsp.nvim_workspace()
+
 -- wraps the mason command of the same name
 lsp.ensure_installed(_mason.sources)
 
 lsp.setup_nvim_cmp(_nvim_cmp.config)
+
+-- finally let's pin the keymaps for the lsp commands that are commonly used.
+lsp.on_attach(function(client, bufnr)
+	local wk = require("uutils.key").wkreg
+	local namer = require("uutils.key").wknamer
+	local bufopts = { noremap = true, silent = true, buffer = bufnr }
+	local mapk = require("uutils.key").mapk
+
+	local mname = "Language server"
+	local stem = "defaults"
+
+	mapk("n", "gD", vim.lsp.buf.declaration, bufopts)
+	mapk("n", "gd", vim.lsp.buf.definition, bufopts)
+	mapk("n", "K", vim.lsp.buf.hover, bufopts)
+	mapk("n", "gi", vim.lsp.buf.implementation, bufopts)
+	mapk("n", "<C-k>", vim.lsp.buf.signature_help, bufopts)
+	mapk("n", ";wa", vim.lsp.buf.add_workspace_folder, bufopts)
+	mapk("n", ";wr", vim.lsp.buf.remove_workspace_folder, bufopts)
+	mapk("n", ";wl", function()
+		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+	end, bufopts)
+	mapk("n", "<localleader>lD", vim.lsp.buf.type_definition, bufopts)
+	mapk("n", "<localleader>rn", vim.lsp.buf.rename, bufopts)
+	mapk("n", "<localleader>ca", vim.lsp.buf.code_action, bufopts)
+	mapk("n", "gr", vim.lsp.buf.references, bufopts)
+end)
 
 lsp.setup()
 
@@ -50,3 +78,8 @@ require("mason-null-ls").setup_handlers()
 
 -- lastly set the unified UI options
 vim.diagnostic.config(require("lsp-setup").uiconfig)
+
+-- If you want insert `(` after select function or method item
+local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+local cmp = require("cmp")
+cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
