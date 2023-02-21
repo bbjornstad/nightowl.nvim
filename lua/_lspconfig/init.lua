@@ -24,33 +24,20 @@ lsp.ensure_installed(_mason.sources)
 
 lsp.setup_nvim_cmp(_nvim_cmp.config)
 
+-- lsp-status linkage
+local lsp_status = require('lsp-status')
+lsp_status.register_progress()
+
 -- finally let's pin the keymaps for the lsp commands that are commonly used.
 lsp.on_attach(function(client, bufnr)
-	local wk = require("uutils.key").wkreg
-	local namer = require("uutils.key").wknamer
-	local bufopts = { noremap = true, silent = true, buffer = bufnr }
-	local mapk = require("uutils.key").mapk
-
-	local mname = "Language server"
-	local stem = "defaults"
-
-	mapk("n", "gD", vim.lsp.buf.declaration, bufopts)
-	mapk("n", "gd", vim.lsp.buf.definition, bufopts)
-	mapk("n", "K", vim.lsp.buf.hover, bufopts)
-	mapk("n", "gi", vim.lsp.buf.implementation, bufopts)
-	mapk("n", "<C-k>", vim.lsp.buf.signature_help, bufopts)
-	mapk("n", ";wa", vim.lsp.buf.add_workspace_folder, bufopts)
-	mapk("n", ";wr", vim.lsp.buf.remove_workspace_folder, bufopts)
-	mapk("n", ";wl", function()
-		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-	end, bufopts)
-	mapk("n", "<localleader>lD", vim.lsp.buf.type_definition, bufopts)
-	mapk("n", "<localleader>rn", vim.lsp.buf.rename, bufopts)
-	mapk("n", "<localleader>ca", vim.lsp.buf.code_action, bufopts)
-	mapk("n", "gr", vim.lsp.buf.references, bufopts)
+	client.config.capabilities = vim.tbl_extend('keep', client.config.capabilities or {}, lsp_status.capabilities)
+	lsp_status.on_attach(client)
+	require('lsp-setup').on_attach_user(client, bufnr)
 end)
 
 lsp.setup()
+
+
 
 -- get null_ls
 local _null_ls = require("_lspconfig._null-ls")

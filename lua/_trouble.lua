@@ -4,7 +4,7 @@ local namer = require('uutils.key').wknamer
 
 require("trouble").setup({
 	position = "right",
-	width = math.floor(0.5 * vim.opt.columns:get()),
+	width = math.floor(0.35 * vim.opt.columns:get()),
 })
 
 -- Lua

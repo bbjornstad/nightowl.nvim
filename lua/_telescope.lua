@@ -10,6 +10,7 @@ require("telescope").setup({
         -- config_key = value,
         layout_strategy = "cursor",
         layout_config = {height = 0.75},
+		theme = "ivy",
         mappings = {
             i = finalmaps.insert,
             -- map actions.which_key to <C-h> (default: <C-/>)

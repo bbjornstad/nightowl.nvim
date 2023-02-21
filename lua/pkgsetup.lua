@@ -35,73 +35,40 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -------------------------------------------------------------------------------
---- the following is not currently functional, for some reason
---[[
-local catt = require("_catppuccin")
-local cattheme = catt.cat_themer('nvim-test1', {
-		background = { light = "latte", dark = "macchiato" },
-		dim_inactive = { enabled = true, shade = CANDY_MOOD, percentage = 0.04 },
-		integrations = { notify = true },
-		})
-print(cattheme)
-
---cattheme = {
---	'catppuccin/nvim',
---	lazy = false,
---	opts = {
---		background = { light = "latte", dark = "macchiato" },
---		dim_inactive = { enabled = true, shade = CANDY_MOOD, percentage = 0.04 },
---		integrations = { notify = true },
---	}
---}
---]]
-
--------------------------------------------------------------------------------
 -- Main configuration for Lazy.nvim
+--
+-- It should be further noted that the order here is not so important as the
+-- lazy.nvim plugin manager is more than capable of figuring out an optimal
+-- order to load things based on the complex conditions of file opening and
+-- other startup behavior. Generally aim to default to lazy loading everything
+-- since I use so many plugins...
 require("lazy").setup({
-	-- catppuccino setup was handled in the other file for no particularly good
-	-- reason.
+	-----------------------------------------------------------------------
+	-- Colorscheme Configuration and very basic visual elements should be
+	-- initialized first. Hence the lazy = false and high priority (directly
+	-- from the lazy.nvim docs.
 	{
 		"rebelot/kanagawa.nvim",
 		lazy = false,
 		priority = 1000,
 		config = function()
-			require('kanagawa').setup()
-			vim.cmd('colorscheme kanagawa')
+			require("kanagawa").setup({ globalStatus = true, dimInactive = true })
+			vim.cmd("colorscheme kanagawa")
 		end,
-	}, -- {
-	--	'catppuccin/nvim',
-	--	name = 'catppuccin',
-	--	priority = 1000,
-	--	config = function()
-	--		require('catppuccin').setup({
-	--			background = {
-	--				light = 'latte',
-	--				dark = 'macchiato'
-	--			},
-	--			color_overrides = {
-	--				macchiato = {
-	--					base = '#3f4250',
-	--					mantle = '#282a33',
-	--					crust = '#1e1f26',
-	--				},
-	--			},
-	--		})
-	--		vim.cmd.colorscheme('catppuccin')
-	--	end
-	-- },
+	},
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 	},
 	{
-		'SmiteshP/nvim-navic',
-		dependencies = { 'neovim/nvim-lspconfig' },
-	},
+		"SmiteshP/nvim-navic",
+		dependencies = { "neovim/nvim-lspconfig" },
+		config = true,
+	}, -----------------------------------------------------------------------
+	-- Basic behavioral configuration and which-key
 	{ "folke/which-key.nvim", config = true, event = "BufRead" },
-	"godlygeek/tabular",
-	{ "tpope/vim-repeat", lazy = false },
-	{ "tpope/vim-surround", lazy = false },
+	{ "echasnovski/mini.surround", version = false, lazy = false },
+	{ "echasnovski/mini.jump", version = false, lazy = false },
 	"lewis6991/gitsigns.nvim",
 	"lukas-reineke/indent-blankline.nvim",
 	"yamatsum/nvim-cursorline",
@@ -111,6 +78,14 @@ require("lazy").setup({
 		config = true,
 	},
 	{ "nvim-treesitter/nvim-treesitter", lazy = true, build = ":TSUpdate" },
+	{
+		"goolord/alpha-nvim",
+		lazy = false,
+		config = function()
+			require("alpha").setup(require("alpha.themes.startify").config)
+		end,
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+	}, -----------------------------------------------------------------------
 	-- --- Language Server Setup ---
 	{
 		"neovim/nvim-lspconfig",
@@ -121,7 +96,6 @@ require("lazy").setup({
 			"folke/lsp-colors.nvim",
 			"ray-x/lsp_signature.nvim",
 			"nvim-lua/lsp-status.nvim",
-			"glepnir/lspsaga.nvim",
 		},
 	},
 	{
@@ -202,28 +176,7 @@ require("lazy").setup({
 			"rcarriga/nvim-notify",
 		},
 	},
-	{
-		"L3MON4D3/LuaSnip",
-		tag = "v1",
-		build = "make install_jsregexp"
-	},
-	{
-		"glepnir/lspsaga.nvim",
-		event = "BufRead",
-		dependencies = {
-			"neovim/nvim-lspconfig",
-			"VonHeikemen/lsp-zero.nvim",
-			"nvim-tree/nvim-web-devicons",
-		},
-	},
-	{
-		"goolord/alpha-nvim",
-		lazy = false,
-		config = function()
-			require("alpha").setup(require("alpha.themes.startify").config)
-		end,
-		dependencies = { "nvim-tree/nvim-web-devicons" },
-	},
+	{ "L3MON4D3/LuaSnip", build = "make install_jsregexp" },
 	{ "liuchengxu/vista.vim", cmd = "Vista" },
 	{
 		"sudormrfbin/cheatsheet.nvim",
@@ -269,8 +222,22 @@ require("lazy").setup({
 				},
 			},
 			"bydlw98/cmp-env",
-			"quarto-dev/quarto-nvim",
 			"nat-418/cmp-color-names.nvim",
+		},
+	},
+	{
+		-- This is a package for scientific coding ala RMarkdown or ipython
+		-- notebooks.
+		"quarto-dev/quarto-nvim",
+		ft = { "python", "r", "julia" },
+		dependencies = { "jmbuhr/otter.nvim", "neovim/nvim-lspconfig" },
+		opts = {
+			lspFeatures = {
+				enabled = true,
+				languages = { "r", "python", "julia" },
+				diagnostics = { enabled = true, triggers = { "BufWrite" } },
+				completion = { enabled = true },
+			},
 		},
 	},
 	{
@@ -338,15 +305,12 @@ require("lazy").setup({
 		ft = { "norg" },
 	},
 	{
-		"quarto-dev/quarto-nvim",
-		dependencies = { "jmbuhr/otter.nvim", "neovim/nvim-lspconfig" },
-	},
-	{
 		"nvim-colortils/colortils.nvim",
 		cmd = "Colortils",
 		opts = { register = "+", default_format = "hex", border = "solid" },
 	},
 	{ "j-hui/fidget.nvim", lazy = false, config = true },
 	{ "windwp/nvim-autopairs", lazy = false, config = true },
-	{ "gbprod/substitute.nvim", lazy = false, config = true },
+	{ "kevinhwang91/nvim-ufo", dependencies = "kevinhwang91/promise-async" },
+	{ "junegunn/fzf", lazy = false },
 }, { defaults = { lazy = true } })

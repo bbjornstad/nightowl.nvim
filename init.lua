@@ -9,12 +9,11 @@
 -- related to neovim package/update/plugin distribution. It will install
 -- Lazy.nvim if it does not already exist, and will update otherwise assuming
 -- that option is correctly set (which I think is true by default)
-require('_catppuccin')
+--require('_catppuccin')
 
 -- Main requirements for vim setup below
 require('pkgsetup')
 require('vimsettings')
-require('_nvim-lualine')
 require('_nvim-dap')
 
 -- plugin specific stuff
@@ -26,13 +25,14 @@ require('_trouble')
 require('_indentblankline')
 require('_nvim-cursorline')
 require('_vista')
-require('_lspsaga')
+require('_mini')
 require('_gitsigns')
+require('_colortils')
 require('_neorg')
 require('_orgmode')
--- removed and absorbed into pkgsetup call to lazy.
--- require('_which-key')
 require('_neogen')
+require('_ufo')
+require('_nvim-lualine')
 require('autocmd')
 require('keymappings')
 

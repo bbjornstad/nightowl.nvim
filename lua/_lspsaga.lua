@@ -11,9 +11,12 @@ mod.saga_options = {
 		theme = 'round',
 		title = true,
 		border = 'solid',
-		winblend = 0.5,
+		winblend = 5,
 		code_action = '',
 		diagnostic = '',
+	},
+	symbol_in_winbar = {
+		enable = true
 	}
 }
 
