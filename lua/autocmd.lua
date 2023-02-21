@@ -116,7 +116,7 @@ local help_rebind_cmdspec = {
 	{
 		event = { "FileType" },
 		pattern = { "help" },
-		command = "noremap <buffer> q <CMD>quit<CR>",
+		command = "noremap <buffer> q <CMD>quit<CR><Ctrl-C>",
 		opts = {}
 	},
 }
