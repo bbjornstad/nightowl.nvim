@@ -37,4 +37,11 @@ function mod.wknamer(stem, additional, affix_plus)
 end
 mod.wkreg = require("which-key").register
 
+function mod.nmmap(name, mode, lhs, rhs, useropts)
+	mod.wkreg({[lhs] = { name = mod.wknamer(name, "", true) } })
+	local _name = useropts.desc or ""
+	useropts.desc = name .. _name
+	return mod.mapk(mode, lhs, rhs, useropts)
+end
+
 return mod

@@ -10,14 +10,14 @@ require("telescope").setup({
         -- config_key = value,
         layout_strategy = "cursor",
         layout_config = {height = 0.75},
-		theme = "ivy",
+        theme = "ivy",
         mappings = {
             i = finalmaps.insert,
             -- map actions.which_key to <C-h> (default: <C-/>)
             -- actions.which_key shows the mappings for your picker,
             -- e.g. git_{create, delete, ...}_branch for the git_branches picker
-            n = finalmaps.normal,
-        },
+            n = finalmaps.normal
+        }
     },
     pickers = {
         -- Default configuration for builtin pickers goes here:

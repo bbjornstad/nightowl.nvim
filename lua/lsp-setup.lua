@@ -85,14 +85,14 @@ function lsp_setup.on_attach_user(client, bufnr)
     mapk("n", "<C-k>", vim.lsp.buf.signature_help,
          vim.tbl_extend("force", bufopts, {desc = "function signature help"}))
 
-	wk({ [";"] = { name = namer("workspace actions", "", true)}})
+    wk({[";"] = {name = namer("workspace actions", "", true)}})
     mapk("n", ";wa", vim.lsp.buf.add_workspace_folder,
          vim.tbl_extend("force", bufopts, {desc = "add folder to workspace"}))
     mapk("n", ";wr", vim.lsp.buf.remove_workspace_folder, vim.tbl_extend(
              "force", bufopts, {desc = "remove folder from workspace"}))
     mapk("n", ";wl", function()
         print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, vim.tbl_extend('force', bufopts, { desc = "list folders in workspace" }))
+    end, vim.tbl_extend("force", bufopts, {desc = "list folders in workspace"}))
     mapk("n", "gT", vim.lsp.buf.type_definition,
          vim.tbl_extend("force", bufopts, {desc = "go to type definition"}))
     wk({["gc"] = {name = "go with change"}})

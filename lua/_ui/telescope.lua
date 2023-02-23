@@ -14,7 +14,12 @@ end
 
 function mod.fcrs(picker_name, force_dropdown)
 	force_dropdown = force_dropdown or false
-	local crs = themes.get_ivy(theme_config)
+	local crs
+	if force_dropdown then
+		crs = themes.get_dropdown(theme_config)
+	else
+		crs = themes.get_ivy(theme_config)
+	end
 	local actionable = function()
 		return mod.themebind(picker_name, crs)
 	end

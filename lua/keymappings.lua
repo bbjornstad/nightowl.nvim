@@ -37,10 +37,12 @@ mod.which_key_registration_name = namer
 ---
 -- @keymaps:vim.help: 		remap help from F1
 ----------------------------------------------
-mappings.help_to_jump = mapk("", "<F1>", "",
-                             {remap = true, desc = "repeat last jump motion"})
-mappings.help_to_jump = mapk("i", "<F1>", "<Esc>",
-                             {remap = true, desc = "repeat last jump motion"})
+mappings.help_to_jump_n = mapk("", "<F1>", "",
+                               {remap = true, desc = "repeat last jump motion"})
+mappings.help_to_jump_i = mapk("i", "<F1>", "<Esc>",
+                               {remap = true, desc = "escape to normal mode"})
+mappings.help_to_jump_r = mapk("", "<Shift><F1>", "<CMD>help<CR>",
+                               {remap = true, desc = "help menu"})
 
 ---
 -- @keymaps:nvim-tree: 		nvim-tree bindings
@@ -50,10 +52,9 @@ mname = "nvim-tree"
 stem = "Explore"
 
 wk({[";t"] = {name = namer(mname, stem, true)}})
-mappings.leader_nvim_tree =
-    mapk("n", ";T", treeapi.tree.toggle, {silent = true})
 mappings.leader_nvim_tree = mapk("n", ";to", treeapi.tree.open, {silent = true})
-
+mappings.leader_nvim_tree =
+    mapk("n", ";t", treeapi.tree.toggle, {silent = true})
 ---
 -- @keymaps:vim.wm: 		window management bindings to standard-ish keys
 -----------------------------------------------------------------------
@@ -132,10 +133,13 @@ mappings.dquitall = mapk("n", "<leader>bqQ", "<cmd>qa!<CR>", {})
 mname = "lazy (Package manager)"
 stem = "leader key"
 wk({["<leader>p"] = {name = namer(mname, stem, true)}})
-mappings.lazyopen = mapk("n", "<leader>po", "<cmd>Lazy<CR>", {})
-mappings.lazysync = mapk("n", "<leader>ps", "<cmd>Lazy sync<CR>", {})
-mappings.lazyclean = mapk("n", "<leader>pc", "<cmd>Lazy clean<CR>", {})
-mappings.lazyhome = mapk("n", "<leader>ph", "<cmd>Lazy clean<CR>", {})
+mappings.lazysync = mapk("n", "<leader>ps", "<cmd>Lazy sync<CR>",
+                         {desc = "sync package manager"})
+mappings.lazyclean = mapk("n", "<leader>pc", "<cmd>Lazy clean<CR>",
+                          {desc = "clean package manager"})
+mappings.lazyhome = mapk("n", "<leader>ph", "<cmd>Lazy home<CR>", {})
+mappings.lazyopen = mapk("n", "<leader>p", "<cmd>Lazy<CR>",
+                         {desc = "lazy package manager"})
 
 ---
 --  @subgroup the next one is for spellcheck toggles
@@ -262,6 +266,9 @@ mapk("n", "<localleader>li", scope_api.fcrs("lsp_implementations"),
      {desc = "Search for implementations in language server"})
 mapk("n", "<localleader>lt", scope_api.fcrs("lsp_type_definitions"),
      {desc = "Search for type definitions"})
+-- top level
+mapk("n", "<localleader>", scope_api.fcrs("lsp_type_definitions"),
+     {desc = "Search for type definitions"})
 
 ---
 -- @keymaps:null-ls: 	null-ls neovim lsp injection (formatting, etc)
@@ -310,15 +317,12 @@ stem = "mapping"
 mname = "Vista"
 stem = "ctags"
 wk({["<localleader>v"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>V", "<CMD>Vista!!<CR>",
-     {desc = "Vista: browse tags (toggle)"})
-mapk("n", "<localleader>vf", "<CMD>Vista finder<CR>",
-     {desc = "Vista: Fzf finder"})
 mapk("n", "<localleader>vs", "<CMD>Vista show<CR>",
      {desc = "Vista: jump to nearest and Show"})
 mapk("n", "<localleader>vf", "<CMD>Vista finder<CR>",
      {desc = "Vista: Fzf finder"})
-
+mapk("n", "<localleader>v", "<CMD>Vista!!<CR>",
+     {desc = "Vista: browse tags (toggle)"})
 ---
 -- @keymaps:ccc.nvim: 	color utilities
 ---------------------------------------
@@ -329,7 +333,7 @@ mapk("n", "<localleader>cp", "<CMD>CccPick<CR>", {desc = "color picker"})
 mapk("n", "<localleader>ch", "<CMD>CccHighlighterToggle<CR>",
      {desc = "toggle color highlighting for recognized colors"})
 mapk("n", "<localleader>c", "<CMD>CccHighlighterEnable<CR>",
-     {desc = "turn on color highlighting for recognized colors"})
+     {desc = "turn on color highlighting for recognized colors", silent = true})
 
 ---
 -- @module Now we attach everything to mod to return

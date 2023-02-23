@@ -65,6 +65,7 @@ require("lazy").setup({
     {"folke/which-key.nvim", config = true, event = "BufRead"},
     {"echasnovski/mini.surround", version = false, lazy = false},
     {"echasnovski/mini.jump", version = false, lazy = false},
+    {"echasnovski/mini.bracketed", version = false, lazy = false},
     "lewis6991/gitsigns.nvim", "lukas-reineke/indent-blankline.nvim",
     "yamatsum/nvim-cursorline", {
         "nvim-tree/nvim-tree.lua",
@@ -258,10 +259,7 @@ require("lazy").setup({
             },
             preserve = true,
             highlighter = {auto_enable = true},
-			recognize = {
-				input = true,
-				output = true,
-			}
+            recognize = {input = true, output = true}
         }
     }, {"j-hui/fidget.nvim", lazy = false, config = true},
     {"windwp/nvim-autopairs", lazy = false, config = true},

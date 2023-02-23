@@ -1,6 +1,3 @@
 local ccc = require("ccc")
 
-
-ccc.setup({
-
-})
+ccc.setup({})
