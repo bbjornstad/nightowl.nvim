@@ -198,7 +198,26 @@ require("lazy").setup({
     {
         "jose-elias-alvarez/null-ls.nvim",
         dependencies = {"nvim-lua/plenary.nvim"}
-    }, -- ---	Language Specific Plugins
+    }, {
+        "uga-rosa/ccc.nvim",
+        cmd = {
+            "CccPick", "CccConvert", "CccHighlighterEnable",
+            "CccHighlighterToggle"
+        },
+        opts = {
+            win_opts = {
+                relative = "cursor",
+                border = "single",
+                style = "minimal"
+            },
+            preserve = true,
+            highlighter = {auto_enable = true},
+            recognize = {input = true, output = true}
+        }
+    }, {"j-hui/fidget.nvim", lazy = false, config = true},
+    {"windwp/nvim-autopairs", lazy = false, config = true},
+    {"kevinhwang91/nvim-ufo", dependencies = "kevinhwang91/promise-async"},
+    {"junegunn/fzf", lazy = false}, -- ---	Language Specific Plugins
     {"simrat39/rust-tools.nvim", ft = {"rust"}},
     {"lervag/vimtex", ft = {"tex"}},
     {"jmcantrell/vim-virtualenv", ft = {"python"}}, {
@@ -246,23 +265,11 @@ require("lazy").setup({
         build = ":Neorg sync-parsers",
         ft = {"norg"}
     }, {
-        "uga-rosa/ccc.nvim",
-        cmd = {
-            "CccPick", "CccConvert", "CccHighlighterEnable",
-            "CccHighlighterToggle"
-        },
-        opts = {
-            win_opts = {
-                relative = "cursor",
-                border = "single",
-                style = "minimal"
-            },
-            preserve = true,
-            highlighter = {auto_enable = true},
-            recognize = {input = true, output = true}
-        }
-    }, {"j-hui/fidget.nvim", lazy = false, config = true},
-    {"windwp/nvim-autopairs", lazy = false, config = true},
-    {"kevinhwang91/nvim-ufo", dependencies = "kevinhwang91/promise-async"},
-    {"junegunn/fzf", lazy = false}
+		"vlime/vlime",
+		rtp = "vim/",
+		ft = {"lisp"}
+	}, {
+		"elkowar/yuck.vim",
+		ft = {"yuck"}
+	}
 }, {defaults = {lazy = true}})
