@@ -1,17 +1,16 @@
 -- ----- The basic settings from init.vim
-
-local HOME = os.getenv('HOME')
-local CANDY_MOOD = os.getenv('CANDY_MOOD')
+local HOME = os.getenv("HOME")
+local CANDY_MOOD = os.getenv("CANDY_MOOD")
 
 -- leader key specification
-vim.g.mapleader = '\\'
-vim.g.maplocalleader = ' '
+vim.g.mapleader = "\\"
+vim.g.maplocalleader = " "
 -- disable netrw so that nerd-tree can do its thing later.
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-vim.opt.mouse = 'a'
-vim.opt.backspace = 'indent,eol,start'
+vim.opt.mouse = "a"
+vim.opt.backspace = "indent,eol,start"
 vim.opt.autoindent = true
 vim.opt.startofline = false
 vim.opt.confirm = true
@@ -22,7 +21,7 @@ vim.opt.ttimeoutlen = 200
 vim.opt.timeoutlen = 500
 
 vim.opt.wrap = true
-vim.opt.whichwrap:append('<,>,h,l')
+vim.opt.whichwrap:append("<,>,h,l")
 
 vim.opt.showcmd = true
 vim.opt.wildmenu = true
@@ -45,11 +44,20 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true
 
-vim.opt.spelllang = 'en_us'
-vim.opt.formatoptions = 'tcroqb'
+vim.opt.spelllang = "en_us"
+vim.opt.formatoptions = "tcroqb"
+vim.opt.laststatus = 3
+vim.opt.fillchars:append({
+    horiz = "━",
+    horizup = "┻",
+    horizdown = "┳",
+    vert = "┃",
+    vertleft = "┨",
+    vertright = "┣",
+    verthoriz = "╋"
+})
 
---vim.opt.termguicolors = true
-vim.opt.background = (CANDY_MOOD or 'light')
+-- vim.opt.termguicolors = true
+vim.opt.background = (CANDY_MOOD or "dark")
 
-vim.cmd.hi('clear SignColumns')
-
+vim.cmd.hi("clear SignColumns")

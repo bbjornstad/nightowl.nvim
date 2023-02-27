@@ -331,9 +331,13 @@ stem = "color utilities"
 wk({["<localleader>c"] = {name = namer(mname, stem, true)}})
 mapk("n", "<localleader>cp", "<CMD>CccPick<CR>", {desc = "color picker"})
 mapk("n", "<localleader>ch", "<CMD>CccHighlighterToggle<CR>",
-     {desc = "toggle color highlighting for recognized colors"})
+     {desc = "toggle inline color highlighting for recognized colors"})
+mapk("n", "<localleader>cv", "<CMD>CccConvert<CR>",
+	{ desc = "convert color to another format"})
+mapk("n", "<localleader>cf", "<CMD>CccHighlighterDisable<CR>",
+	{ desc = "turn off inline color highlighting for recognized colors"})
 mapk("n", "<localleader>c", "<CMD>CccHighlighterEnable<CR>",
-     {desc = "turn on color highlighting for recognized colors", silent = true})
+     {desc = "turn on inline color highlighting for recognized colors", silent = true})
 
 ---
 -- @module Now we attach everything to mod to return

@@ -8,3 +8,5 @@ require("mini.jump").setup({
         repeat_jump = "<F1>"
     }
 })
+require("mini.bracketed").setup()
+require("mini.align").setup()

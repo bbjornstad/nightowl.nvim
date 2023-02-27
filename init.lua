@@ -32,6 +32,7 @@ require('_orgmode')
 require('_neogen')
 require('_ufo')
 require('_nvim-lualine')
+require('_ccc')
 require('autocmd')
 require('keymappings')
 

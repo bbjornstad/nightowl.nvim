@@ -52,7 +52,9 @@ require("lazy").setup({
             require("kanagawa").setup({globalStatus = true, dimInactive = true})
             vim.cmd("colorscheme kanagawa")
         end
-    },
+    }, -- for funsies
+    {"lewpoly/sherbet.nvim", lazy = false, priority = 999},
+    {"ozkanonur/nimda.vim", lazy = false, priority = 998},
     {
         "nvim-lualine/lualine.nvim",
         dependencies = {"nvim-tree/nvim-web-devicons"}
@@ -66,6 +68,7 @@ require("lazy").setup({
     {"echasnovski/mini.surround", version = false, lazy = false},
     {"echasnovski/mini.jump", version = false, lazy = false},
     {"echasnovski/mini.bracketed", version = false, lazy = false},
+    {"echasnovski/mini.align", version = false, lazy = false},
     "lewis6991/gitsigns.nvim", "lukas-reineke/indent-blankline.nvim",
     "yamatsum/nvim-cursorline", {
         "nvim-tree/nvim-tree.lua",
@@ -141,7 +144,7 @@ require("lazy").setup({
             "MunifTanjim/nui.nvim", "nvim-treesitter/nvim-treesitter",
             "rcarriga/nvim-notify"
         }
-    }, {"L3MON4D3/LuaSnip", build = "make install_jsregexp"},
+    }, {"L3MON4D3/LuaSnip", version = "1.*", build = "make install_jsregexp"},
     {"liuchengxu/vista.vim", cmd = "Vista"}, {
         "sudormrfbin/cheatsheet.nvim",
         dependencies = {
@@ -203,16 +206,6 @@ require("lazy").setup({
         cmd = {
             "CccPick", "CccConvert", "CccHighlighterEnable",
             "CccHighlighterToggle"
-        },
-        opts = {
-            win_opts = {
-                relative = "cursor",
-                border = "single",
-                style = "minimal"
-            },
-            preserve = true,
-            highlighter = {auto_enable = true},
-            recognize = {input = true, output = true}
         }
     }, {"j-hui/fidget.nvim", lazy = false, config = true},
     {"windwp/nvim-autopairs", lazy = false, config = true},
@@ -264,12 +257,6 @@ require("lazy").setup({
         },
         build = ":Neorg sync-parsers",
         ft = {"norg"}
-    }, {
-		"vlime/vlime",
-		rtp = "vim/",
-		ft = {"lisp"}
-	}, {
-		"elkowar/yuck.vim",
-		ft = {"yuck"}
-	}
+    }, {"vlime/vlime", rtp = "vim/", ft = {"lisp"}},
+    {"elkowar/yuck.vim", ft = {"yuck"}}, {"Fymyte/rasi.vim", ft = {"rasi"}}
 }, {defaults = {lazy = true}})

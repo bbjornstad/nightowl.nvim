@@ -9,7 +9,7 @@ lsp_setup.uiconfig = {float = {border = "single"}}
 lsp_setup.mason_servers = {
     "jedi_language_server", "rust_analyzer", "vimls", "sqlls", "bashls",
     "clangd", "jsonls", "lua_ls", "salt_ls", "yamlls", "diagnosticls",
-    "marksman", "taplo", "spectral"
+    "marksman", "taplo"
 }
 
 -- Mason UI Settings
