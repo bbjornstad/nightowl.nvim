@@ -35,4 +35,5 @@ require('_nvim-lualine')
 require('_ccc')
 require('autocmd')
 require('keymappings')
+require('modelineset')
 

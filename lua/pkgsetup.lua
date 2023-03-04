@@ -137,7 +137,9 @@ require("lazy").setup({
     }, {"nvim-lua/popup.nvim", dependencies = {"nvim-lua/plenary.nvim"}}, {
         "folke/trouble.nvim",
         dependencies = {"nvim-tree/nvim-web-devicons", "folke/lsp-colors.nvim"}
-    }, {
+    },
+    {"rcarriga/nvim-notify", opts = {top_down = "false", render = "compact"}},
+    {"folke/todo-comments.nvim", dependencies = {"nvim-lua/plenary.nvim"}}, {
         "folke/noice.nvim",
         lazy = false,
         dependencies = {

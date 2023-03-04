@@ -170,6 +170,17 @@ local cmp_mappings = {
 }
 
 ---
+-- @keymaps:notify 		nvim-notify mappings, namely to open in telescope and/or
+-- get notification history
+--------------------------------------------------------------------------------
+mname = "Notify"
+stem = "Notification history"
+wk({['<localleader>n'] = {name = namer(mname, stem, true)}})
+mapk("n", "<localleader>n", require('notify').history, {desc="Notification History"})
+mapk("n", "<localleader>no", require('notify').history, {desc="Notification History"})
+mapk("n", "<localleader>nt", require('telescope').extensions.notify.notify, {desc="telescoper notifications"})
+
+---
 -- @keymaps:telescope: 	Telescope keymappings
 ---------------------------------------------
 mname = "Telescope"

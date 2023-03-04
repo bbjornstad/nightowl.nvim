@@ -87,6 +87,7 @@ end
 
 local config = {
     view = {
+		width = 20,
         mappings = {
             list = {
                 {key = "l", action = "edit_or_open", action_cb = edit_or_open},
@@ -106,7 +107,7 @@ local config = {
                     action = "swap_then_open_tab",
                     action_cb = swap_then_open_tab
                 }
-            }
+            },
         },
         signcolumn = "yes"
     },
