@@ -49,7 +49,11 @@ require("lazy").setup({
         lazy = false,
         priority = 1000,
         config = function()
-            require("kanagawa").setup({globalStatus = true, dimInactive = true})
+            require("kanagawa").setup({
+                globalStatus = true,
+                dimInactive = true,
+                background = {dark = "dragon", light = "lotus"}
+            })
             vim.cmd("colorscheme kanagawa")
         end
     }, -- for funsies
@@ -216,12 +220,16 @@ require("lazy").setup({
     {"simrat39/rust-tools.nvim", ft = {"rust"}},
     {"lervag/vimtex", ft = {"tex"}},
     {"jmcantrell/vim-virtualenv", ft = {"python"}}, {
-        "saltstack/salt-vim",
-        ft = {"Saltfile", "sls", "top"},
+        "lepture/vim-jinja",
+        ft = {"jinja", "j2", "jinja2", "tfy"},
         dependencies = {
             "Glench/Vim-Jinja2-Syntax",
-            ft = {"jinja2", "j2", "jinja"}
+            ft = {"jinja", "j2", "jinja2", "tfy"}
         }
+    }, {
+        "saltstack/salt-vim",
+        ft = {"Saltfile", "sls", "top"},
+        dependencies = {"Glench/Vim-Jinja2-Syntax", "lepture/vim-jinja"}
     }, {"preservim/vim-markdown", ft = {"markdown", "md", "rmd"}},
     "danymat/neogen", {
         "toppair/peek.nvim",

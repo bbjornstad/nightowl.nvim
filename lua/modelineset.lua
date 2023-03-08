@@ -1,5 +1,6 @@
 vim.opt.modeline = true
 vim.opt.modelines = 10
+vim.opt.modelineexpr = true
 
 local mapk = require("uutils.key").mapk
 local wk = require("uutils.key").wkreg
