@@ -21,7 +21,7 @@ require("lualine").setup({
         lualine_a = {"mode"},
         lualine_b = {{"b:gitsigns_head", icon = ""}, "diff", "diagnostics"},
         lualine_c = {"filename"},
-        lualine_x = {require("lsp-status").status()},
+        lualine_x = {require("lsp-status").status(), require('pomodoro').statusline, require('orgmode').statusline},
         lualine_y = {"progress"},
         lualine_z = {"location"}
     },
@@ -31,7 +31,7 @@ require("lualine").setup({
         lualine_c = {"filename"},
         lualine_x = {"location"},
         lualine_y = {},
-        lualine_z = {}
+        lualine_z = {require('pomodoro').statusline, require('orgmode').statusline}
     },
     tabline = {
         lualine_a = {{"os.date('%a: %Y-%m-%d')"}},

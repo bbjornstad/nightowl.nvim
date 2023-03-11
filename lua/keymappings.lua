@@ -62,12 +62,12 @@ mappings.leader_nvim_tree =
 mname = "(Metatext)"
 stem = "Insert"
 wk({["<M-i>"] = {name = namer(mname, stem, true)}})
-mappings.cmtbreak = mapk("n", "<M-i><M-c>",
-                         require("uutils.edit").InsertCommentBreak,
-                         {desc = "comment break"})
-mappings.dashbreak = mapk("n", "<M-i><M-d>",
-                          require("uutils.edit").InsertDashBreak,
-                          {desc = "dash break"})
+mappings.cmtbreak = mapk("n", "<M-i><M-c>", function()
+    require("uutils.edit").InsertCommentBreak(tonumber(vim.o.textwidth), "-")
+end, {desc = "comment break"})
+mappings.dashbreak = mapk("n", "<M-i><M-d>", function()
+    require("uutils.edit").InsertDashBreak(tonumber(vim.o.textwidth), "-")
+end, {desc = "dash break"})
 
 ---
 -- @keymaps:vim.wm: 		window management bindings to standard-ish keys
@@ -175,10 +175,13 @@ local cmp_mappings = {
 --------------------------------------------------------------------------------
 mname = "Notify"
 stem = "Notification history"
-wk({['<localleader>n'] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>n", require('notify').history, {desc="Notification History"})
-mapk("n", "<localleader>no", require('notify').history, {desc="Notification History"})
-mapk("n", "<localleader>nt", require('telescope').extensions.notify.notify, {desc="telescoper notifications"})
+wk({["<localleader>n"] = {name = namer(mname, stem, true)}})
+mapk("n", "<localleader>n", require("notify").history,
+     {desc = "Notification History"})
+mapk("n", "<localleader>no", require("notify").history,
+     {desc = "Notification History"})
+mapk("n", "<localleader>nt", require("telescope").extensions.notify.notify,
+     {desc = "telescoper notifications"})
 
 ---
 -- @keymaps:telescope: 	Telescope keymappings
@@ -344,11 +347,33 @@ mapk("n", "<localleader>cp", "<CMD>CccPick<CR>", {desc = "color picker"})
 mapk("n", "<localleader>ch", "<CMD>CccHighlighterToggle<CR>",
      {desc = "toggle inline color highlighting for recognized colors"})
 mapk("n", "<localleader>cv", "<CMD>CccConvert<CR>",
-	{ desc = "convert color to another format"})
+     {desc = "convert color to another format"})
 mapk("n", "<localleader>cf", "<CMD>CccHighlighterDisable<CR>",
-	{ desc = "turn off inline color highlighting for recognized colors"})
-mapk("n", "<localleader>c", "<CMD>CccHighlighterEnable<CR>",
-     {desc = "turn on inline color highlighting for recognized colors", silent = true})
+     {desc = "turn off inline color highlighting for recognized colors"})
+mapk("n", "<localleader>c", "<CMD>CccHighlighterEnable<CR>", {
+    desc = "turn on inline color highlighting for recognized colors",
+    silent = true
+})
+
+---
+-- @keymaps:pomodoro.nvim 	time tracking
+-- @keymaps:orgmode.nvim  	time tracking within orgmode to sync with pomodoro.
+-------------------------------------------------------------------------------
+mname = "time tracking"
+stem = "pomodoro and orgmode"
+wk({["<localleader>o"] = {name = namer(mname, stem, true)}})
+mapk("n", "<localleader>op", "<CMD>PomodoroStart<CR>",
+     {desc = "start pomodoro timer"})
+mapk("n", "<localleader>oP", "<CMD>PomodoroStart<CR>",
+     {desc = "start pomodoro timer (sync orgmode)"})
+mapk("n", "<localleader>oq", "<CMD>PomodoroStop<CR>",
+     {silent = true, desc = "stop pomodoro timer"})
+mapk("n", "<localleader>oQ", "<CMD>PomodoroStop<CR>",
+     {silent = true, desc = "stop pomodoro timer (cancel orgmode)"})
+mapk("n", "<localleader>os", "<CMD>PomodoroStatus<CR>",
+     {desc = "pomodoro status"})
+mapk("n", "<localleader>o", "<CMD>PomodoroStatus<CR>",
+     {desc = "pomodoro status"})
 
 ---
 -- @module Now we attach everything to mod to return

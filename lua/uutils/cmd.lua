@@ -18,6 +18,11 @@ local lcs = require("uutils.string").maximal_common_substring
 local clone = require("uutils.tbl").clone
 mod.tmap = require("uutils.tbl").tmap
 
+function mod.chain(...)
+    local _cmds = {...}
+    return function() vim.tbl_map(vim.fn.execute, _cmds) end
+end
+
 -- force that table is input
 function mod.autocmd(cname, events, opts, specopts)
     specopts = (specopts or {})
@@ -27,19 +32,20 @@ function mod.autocmd(cname, events, opts, specopts)
 end
 
 function mod.dopt(opt, def)
-	if opt == nil then
-		return def
-	else
-		return opt
-	end
+    if opt == nil then
+        return def
+    else
+        return opt
+    end
 end
 
 function mod.autogroup(grpspec, mod_opts)
     mod_opts = (mod_opts or {})
 
-	local gname = mod.dopt(grpspec.name,
-		-- if no name is given, we will generate a random id string in UUID form
-		string.format('augroupID-%s', require('uutils.fn').uuid()))
+    local gname = mod.dopt(grpspec.name,
+    -- if no name is given, we will generate a random id string in UUID form
+                           string.format("augroupID-%s",
+                                         require("uutils.fn").uuid()))
     -- we need function bindings to the nvim api section for autocmds
     local grpr = vim.api.nvim_create_augroup
 
@@ -94,9 +100,9 @@ function mod.autogroup(grpspec, mod_opts)
     -- finally, make the actual remapping with the local api binding for
     -- autocmds
     local remapped = mod.tmap(function(cmd_arg_table)
-		local cname = cmd_arg_table.name
-		local events = cmd_arg_table.event
-		local fopts = cmd_arg_table.opts
+        local cname = cmd_arg_table.name
+        local events = cmd_arg_table.event
+        local fopts = cmd_arg_table.opts
         return mod.autocmd(cname, events, fopts)
     end, repacked, {}, {})
 
@@ -105,9 +111,7 @@ function mod.autogroup(grpspec, mod_opts)
 end
 
 local function setColorColumn()
-    if vim.opt.textwidth == 0 then
-        vim.opt.colorcolumn = 80
-    end
+    if vim.opt.textwidth == 0 then vim.opt.colorcolumn = 80 end
 end
 
 return mod

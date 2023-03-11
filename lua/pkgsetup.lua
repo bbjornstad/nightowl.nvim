@@ -85,7 +85,22 @@ require("lazy").setup({
             require("alpha").setup(require("alpha.themes.startify").config)
         end,
         dependencies = {"nvim-tree/nvim-web-devicons"}
-    }, -----------------------------------------------------------------------
+    },
+	{
+		"wthollingsworth/pomodoro.nvim",
+		dependencies = "MunifTanjim/nui.nvim",
+		opts = {
+			time_work = 25,
+			time_break_short = 5,
+			time_break_long = 20,
+			timers_to_long_break = 4,
+		},
+	},
+	{
+		"wakatime/vim-wakatime",
+		lazy = false
+	},
+	-----------------------------------------------------------------------
     -- --- Language Server Setup ---
     {
         "neovim/nvim-lspconfig",
