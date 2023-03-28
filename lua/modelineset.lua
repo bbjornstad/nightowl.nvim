@@ -6,12 +6,12 @@ local mapk = require("uutils.key").mapk
 local wk = require("uutils.key").wkreg
 local namer = require("uutils.key").wknamer
 
-mname = "modelines"
-stem = "toggle or control"
+local mname = "modelines"
+local stem = "toggle or control"
 wk({[";m"] = namer(mname, stem, true)})
-mapk("n", ";mt", function() vim.opt.modeline = not vim.opt.modeline end,
+mapk("n", ";mt", function() vim.opt.modeline = not vim.opt.modeline:get() end,
      {desc = "Toggle Modelines"})
-mapk("n", ";mn", function() vim.opt.modelines = (vim.opt.modelines - 1) end,
+mapk("n", ";mn", function() vim.opt.modelines = (vim.opt.modelines:get() - 1) end,
      {desc = "Decrease N Modelines"})
-mapk("n", ";mN", function() vim.opt.modelines = (vim.opt.modelines + 1) end,
+mapk("n", ";mN", function() vim.opt.modelines = (vim.opt.modelines:get() + 1) end,
      {desc = "Increase N Modelines"})

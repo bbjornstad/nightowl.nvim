@@ -73,6 +73,7 @@ require("lazy").setup({
     {"echasnovski/mini.jump", version = false, lazy = false},
     {"echasnovski/mini.bracketed", version = false, lazy = false},
     {"echasnovski/mini.align", version = false, lazy = false},
+	{"echasnovski/mini.comment", version = false, lazy = false},
     "lewis6991/gitsigns.nvim", "lukas-reineke/indent-blankline.nvim",
     "yamatsum/nvim-cursorline", {
         "nvim-tree/nvim-tree.lua",
@@ -85,22 +86,24 @@ require("lazy").setup({
             require("alpha").setup(require("alpha.themes.startify").config)
         end,
         dependencies = {"nvim-tree/nvim-web-devicons"}
-    },
-	{
-		"wthollingsworth/pomodoro.nvim",
-		dependencies = "MunifTanjim/nui.nvim",
-		opts = {
-			time_work = 25,
-			time_break_short = 5,
-			time_break_long = 20,
-			timers_to_long_break = 4,
-		},
+    }, -- {"camspiers/lens.vim", lazy = false},
+    {
+        "wthollingsworth/pomodoro.nvim",
+        dependencies = "MunifTanjim/nui.nvim",
+        opts = {
+            time_work = 25,
+            time_break_short = 5,
+            time_break_long = 20,
+            timers_to_long_break = 4
+        }
+    }, {"wakatime/vim-wakatime", lazy = false}, {
+		"JellyApple102/easyread.nvim",
+		cmd = {"EasyreadToggle"}
+	}, {
+		'VidocqH/lsp-lens.nvim',
+		lazy = false,
 	},
-	{
-		"wakatime/vim-wakatime",
-		lazy = false
-	},
-	-----------------------------------------------------------------------
+    -----------------------------------------------------------------------
     -- --- Language Server Setup ---
     {
         "neovim/nvim-lspconfig",
@@ -141,7 +144,12 @@ require("lazy").setup({
             "sudormrfbin/cheatsheet.nvim", "LinArcX/telescope-env.nvim",
             "LinArcX/telescope-changes.nvim", "tsakirist/telescope-lazy.nvim",
             "octarect/telescope-menu.nvim", "smartpde/telescope-recent-files",
-            "axkirillov/easypick.nvim", "MaximilianLloyd/adjacent.nvim"
+            "MaximilianLloyd/adjacent.nvim", "benfowler/telescope-luasnip.nvim",
+            "crispgm/telescope-heading.nvim",
+            "nvim-telescope/telescope-project.nvim",
+            "jvgrootveld/telescope-zoxide", "nvim-telescope/telescope-dap.nvim",
+            "nvim-telescope/telescope-symbols.nvim",
+            "ghassan0/telescope-glyph.nvim",
         }
     }, {
         "nvim-telescope/telescope-dap.nvim",
@@ -282,6 +290,8 @@ require("lazy").setup({
         },
         build = ":Neorg sync-parsers",
         ft = {"norg"}
-    }, {"vlime/vlime", rtp = "vim/", ft = {"lisp"}},
+    }, {"vlime/vlime", config = function(plugin)
+			vim.opt.rtp:append(plugin.dir .. "/vim")
+		end, ft = {"lisp"}},
     {"elkowar/yuck.vim", ft = {"yuck"}}, {"Fymyte/rasi.vim", ft = {"rasi"}}
 }, {defaults = {lazy = true}})

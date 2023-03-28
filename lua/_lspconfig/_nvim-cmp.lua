@@ -18,6 +18,10 @@ else
     _nvim_cmp.config.preselect = cmp_itempreselect
 end
 
+local function test()
+	
+end
+
 local src_t1 = uutils.tbl.clone(lsp_defaults.cmp_sources())
 _nvim_cmp.sources = uutils.tbl.merge(src_t1, _nvim_cmp.sources)
 
@@ -26,6 +30,11 @@ _nvim_cmp.config = lsp_defaults.cmp_config(_nvim_cmp.config)
 
 _nvim_cmp.keymaps = lsp_defaults.cmp_mappings(_nvim_cmp.usr_keymaps)
 _nvim_cmp.config.mapping = _nvim_cmp.keymaps
+
+require('cmp').event:on(
+	'confirm_done',
+	require('nvim-autopairs.completion.cmp').on_confirm_done()
+)
 
 return _nvim_cmp
 

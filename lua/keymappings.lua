@@ -55,6 +55,14 @@ wk({[";t"] = {name = namer(mname, stem, true)}})
 mappings.leader_nvim_tree = mapk("n", ";to", treeapi.tree.open, {silent = true})
 mappings.leader_nvim_tree =
     mapk("n", ";t", treeapi.tree.toggle, {silent = true})
+
+mname = "easyread"
+stem = "Bionic Reading"
+wk({[";r"] = {name = namer(mname, stem, true)}})
+mappings.easyread = mapk("n", ";r", "<CMD>EasyreadToggle<CR>",
+	{desc = "toggle easyread"})
+
+
 ---
 -- @keymaps:vim.wm: 		window management bindings to standard-ish keys
 -----------------------------------------------------------------------
@@ -183,11 +191,17 @@ mapk("n", "<localleader>no", require("notify").history,
 mapk("n", "<localleader>nt", require("telescope").extensions.notify.notify,
      {desc = "telescoper notifications"})
 
+
+local function deftree(base, arg)
+
+end
+
 ---
 -- @keymaps:telescope: 	Telescope keymappings
 ---------------------------------------------
 mname = "Telescope"
-local scope_api = require("_ui.telescope")
+local scope = require("telescope")
+local scope_api = require("_ui._telescope")
 local theme_config = {
     -- put theme configuration materials here if they exist
 }
@@ -202,41 +216,49 @@ wk({["<localleader>t"] = {name = namer(mname, "", true)}})
 mapk("n", "<localleader><localleader>", "<CMD>Telescope<CR>")
 stem = "Files"
 wk({["<localleader>tf"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>tff", scope_api.fcrs("find_files"), {})
 mapk("n", "<localleader>tfo", scope_api.fcrs("oldfiles"),
      {desc = "Search for old files"})
+mapk("n", "<localleader>tf", scope_api.fcrs("find_files"))
 stem = "Buffers"
 wk({["<localleader>tb"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>tbb", scope_api.fcrs("buffers"),
+mapk("n", "<localleader>tb", scope_api.fcrs("buffers"),
      {desc = "Search within buffers"})
 stem = "treeSitter"
-wk({["<localleader>ts"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>tsr", scope_api.fcrs("treesitter"),
+wk({["<localleader>tr"] = {name = namer(mname, stem, true)}})
+mapk("n", "<localleader>tr", scope_api.fcrs("treesitter"),
      {desc = "Search within treesitter metadata"})
 stem = "taGs"
 wk({["<localleader>tg"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>tgs", scope_api.fcrs("tags"), {desc = "Search for tags"})
+mapk("n", "<localleader>tgc", scope_api.fcrs("current_buffer_tags"),
+     {desc = "Search for tags in the current buffer"})
+mapk("n", "<localleader>tg", scope_api.fcrs("tags"), {desc = "Search for tags"})
 stem = "Commands"
 wk({["<localleader>tc"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>tcm", scope_api.fcrs("commands"),
+mapk("n", "<localleader>tc", scope_api.fcrs("commands"),
      {desc = "Search for shell commands"})
-stem = "Help"
+stem = "Help/History"
 wk({["<localleader>th"] = {name = namer(mname, stem, true)}})
 mapk("n", "<localleader>tht", scope_api.fcrs("help_tags"),
      {desc = "Search for help_tags"})
 mapk("n", "<localleader>thm", scope_api.fcrs("man_pages"),
      {desc = "Search for manual pages"})
+mapk("n", "<localleader>ths", scope_api.fcrs("search_history"),
+     {desc = "Search for search history"})
+mapk("n", "<localleader>thc", scope_api.fcrs("command_history"),
+     {desc = "Search for command history"})
+mapk("n", "<localleader>th", scope_api.fcrs("man_pages"),
+     {desc = "Search for manual pages"})
 stem = "Marks (vim)"
 wk({["<localleader>tm"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>tms", scope_api.fcrs("marks"),
+mapk("n", "<localleader>tm", scope_api.fcrs("marks"),
      {desc = "Search for vim marks"})
 stem = "Loclist"
 wk({["<localleader>ty"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>tyl", scope_api.fcrs("loclist"),
+mapk("n", "<localleader>ty", scope_api.fcrs("loclist"),
      {desc = "Search for loclist"})
 stem = "Keymappings"
 wk({["<localleader>tk"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>tkm", scope_api.fcrs("keymaps"),
+mapk("n", "<localleader>tk", scope_api.fcrs("keymaps"),
      {desc = "Search for keymaps"})
 stem = "Telescope"
 wk({["<localleader>tt"] = {name = namer(mname, stem, true)}})
@@ -244,17 +266,16 @@ mapk("n", "<localleader>ttp", scope_api.fcrs("pickers"),
      {desc = "Search for telescope pickers"})
 stem = "Options (Vim)"
 wk({["<localleader>tv"] = {name = namer(mname, stem, true)}})
-mapk("n", "<localleader>tvo", scope_api.fcrs("vim_options"),
+mapk("n", "<localleader>tv", scope_api.fcrs("vim_options"),
      {desc = "Search for vim options"})
-stem = "taGs"
-mapk("n", "<localleader>tgc", scope_api.fcrs("current_buffer_tags"),
-     {desc = "Search for tags in the current buffer"})
-stem = "Help"
-mapk("n", "<localleader>ths", scope_api.fcrs("search_history"),
-     {desc = "Search for search history"})
-mapk("n", "<localleader>thc", scope_api.fcrs("command_history"),
-     {desc = "Search for command history"})
+stem = "Snippets"
+mapk("n", "<localleader>tsl", scope.extensions.luasnip.luasnip)
+mapk("n", "<localleader>ts", scope.extensions.luasnip.luasnip, {desc="Snippets"})
 
+
+---
+-- @keymaps:languageserver: 	LSP keymappings
+-----------------------------------------------
 mname = "lsp"
 stem = "Language server"
 wk({["<localleader>l"] = {name = namer(mname, stem, true)}})
@@ -270,19 +291,15 @@ mapk("n", "<localleader>lsd", scope_api.fcrs("lsp_document_symbols"),
 mapk("n", "<localleader>lsw", scope_api.fcrs("lsp_workspace_symbols"),
      {desc = "Search for symbols in language server over whole workspace"})
 
+
+---
+-- @keymaps:languageserver: 	LSP keymappings
+-----------------------------------------------
 stem = "Diagnostics"
 wk({["<localleader>d"] = {name = namer(mname, stem, true)}})
 mapk("n", "<localleader>dd", scope_api.fcrs("diagnostics"),
      {desc = "Search within diagnostic output"})
-mapk("n", "<localleader>ld", scope_api.fcrs("lsp_definitions"),
-     {desc = "Search for definitions in language server"})
-mapk("n", "<localleader>li", scope_api.fcrs("lsp_implementations"),
-     {desc = "Search for implementations in language server"})
-mapk("n", "<localleader>lt", scope_api.fcrs("lsp_type_definitions"),
-     {desc = "Search for type definitions"})
--- top level
-mapk("n", "<localleader>", scope_api.fcrs("lsp_type_definitions"),
-     {desc = "Search for type definitions"})
+
 
 ---
 -- @keymaps:null-ls: 	null-ls neovim lsp injection (formatting, etc)
@@ -318,12 +335,6 @@ mapk("n", "<localleader>af", function()
     operator({"a"})
 end, {desc = "Toggle autoformatting"})
 
----
--- @keymaps:which-key: 	which-key keymappings
-----------------------------------------
-mname = "which-key"
-stem = "mapping"
--- mapk("n", "<Ctrl-H>", "<cmd>WhichKey<CR>", { desc = "which-key: find key mappings" })
 
 ---
 -- @keymaps:Vista: 	enable vista menus
@@ -337,6 +348,8 @@ mapk("n", "<localleader>vf", "<CMD>Vista finder<CR>",
      {desc = "Vista: Fzf finder"})
 mapk("n", "<localleader>v", "<CMD>Vista!!<CR>",
      {desc = "Vista: browse tags (toggle)"})
+
+
 ---
 -- @keymaps:ccc.nvim: 	color utilities
 ---------------------------------------
@@ -354,6 +367,7 @@ mapk("n", "<localleader>c", "<CMD>CccHighlighterEnable<CR>", {
     desc = "turn on inline color highlighting for recognized colors",
     silent = true
 })
+
 
 ---
 -- @keymaps:pomodoro.nvim 	time tracking
@@ -374,6 +388,7 @@ mapk("n", "<localleader>os", "<CMD>PomodoroStatus<CR>",
      {desc = "pomodoro status"})
 mapk("n", "<localleader>o", "<CMD>PomodoroStatus<CR>",
      {desc = "pomodoro status"})
+
 
 ---
 -- @module Now we attach everything to mod to return

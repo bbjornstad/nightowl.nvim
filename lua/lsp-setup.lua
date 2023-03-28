@@ -43,10 +43,10 @@ lsp_setup.cmp_sources = {
 }
 
 lsp_setup.cmp_configuration = {
-    preselect = false,
+    preselect = true,
     completion = {
         autocomplete = false,
-        completeopt = "menu,menuone,noinsert,noselect"
+        completeopt = "menu,menuone,noinsert"
     },
     window = {documentation = {border = "solid"}}
 }
@@ -129,6 +129,8 @@ function lsp_setup.null_ls_attach(client, bufnr)
     --  Do some stuff with client, bufnr
     --  e.g. user function can go here
 end
+
+vim.diagnostic.config(lsp_setup.uiconfig)
 
 -- turn into a module
 return lsp_setup
