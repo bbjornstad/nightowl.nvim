@@ -1,0 +1,20 @@
+* Neovim: ursa-neovim
+** Author: ursa-major
+   Bailey Bjornstad, bailey.bjornstad@fastmail.com, bailey@bjornstad.dev
+** Description:
+   My personal neovim configuration, written in lua and built on
+   the back of the great LazyVim starting template. For rationale on why I chose to
+   go with a base template instead of starting from scratch, see the README
+   file.
+   
+* Main Milestones Needed
+  The main milestones needed to complete this project are:
+  - [ ] Finish Keymappings
+  - [ ] Finish autocommands
+  - [ ] Expose recording message somewhere that is more visible than it
+    currently is, since I can't tell if I'm actually recording macros. Maybe
+    also start using a different keybind?
+  - [ ] Write documentation for all important functions, followed by remaining
+    functions.
+  - [ ] Clean up the codebase with generally accepted idiomatic lua conventions
+    in mind. 
