@@ -9,6 +9,8 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(vim.env.LAZY or lazypath)
 
+local uienv = require("environment.ui")
+
 require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
@@ -50,4 +52,6 @@ require("lazy").setup({
       },
     },
   },
+  ui = { border = uienv.borders.main_accent },
+  diff = "diffview.nvim",
 })

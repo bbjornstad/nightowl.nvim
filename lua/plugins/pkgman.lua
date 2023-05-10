@@ -2,15 +2,11 @@ local env = require("environment.ui")
 
 return {
   {
-    "folke/lazy.nvim",
-    opts = { defaults = { lazy = true }, ui = { border = env.borders.alt } },
-  },
-  {
     "williamboman/mason.nvim",
     build = function()
       pcall(vim.cmd, "MasonUpdate")
     end,
-    opts = { ui = { border = env.borders.alt } },
+    opts = { ui = { border = env.borders.main_accent } },
   },
   ---------------------------------------------------------------------------
   -- if we want to use this (lsp-zero) we need to be a bit more careful about

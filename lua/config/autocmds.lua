@@ -23,23 +23,23 @@ mod.setup_augroup = require("uutils.cmd").autogroup
 
 ---
 -- @augroup orgmode.nvim Language Settings
-local orgmode_cmdspec = {
-  name = "orgmodeAU",
-  -- {
-  --    event = {"FileType"},
-  --    pattern = {"org"},
-  --    command = "inoremap <buffer> <C-CR> <C-O>v:lua.org_meta_return",
-  --    opts = {}
-  -- },
-  { event = { "FileType" }, pattern = { "org" }, command = "UfoDetach", opts = {} },
-  {
-    event = { "FileType" },
-    pattern = { "org" },
-    command = "set tabstop=2",
-    opts = {},
-  },
-}
-local orgmode_au = mod.setup_augroup(orgmode_cmdspec)
+-- local orgmode_cmdspec = {
+--  name = "orgmodeAU",
+--  -- {
+--  --    event = {"FileType"},
+--  --    pattern = {"org"},
+--  --    command = "inoremap <buffer> <C-CR> <C-O>v:lua.org_meta_return",
+--  --    opts = {}
+--  -- },
+--  { event = { "FileType" }, pattern = { "org" }, command = "UfoDetach", opts = {} },
+--  {
+--    event = { "FileType" },
+--    pattern = { "org" },
+--    command = "set tabstop=2",
+--    opts = {},
+--  },
+-- }
+-- local orgmode_au = mod.setup_augroup(orgmode_cmdspec)
 
 -----
 ---- @augroup vista window management
@@ -55,29 +55,31 @@ local orgmode_au = mod.setup_augroup(orgmode_cmdspec)
 
 ---
 -- @augroup help rebind quit
-local help_rebind_cmdspec = {
-  name = "helpRebindAU",
-  {
-    event = { "FileType" },
-    pattern = { "help" },
-    command = "noremap <buffer> q <CMD>quit<CR><Ctrl-C>",
-    opts = {},
-  },
-}
-mod.setup_augroup(help_rebind_cmdspec)
+-- obsoleted by LazyVim handling of the same feature.
+-- local help_rebind_cmdspec = {
+--  name = "helpRebindAU",
+--  {
+--    event = { "FileType" },
+--    pattern = { "help" },
+--    command = "noremap <buffer> q <CMD>quit<CR><Ctrl-C>",
+--    opts = {},
+--  },
+-- }
+-- mod.setup_augroup(help_rebind_cmdspec)
 
 ---
 -- @augroup otter md
 local otter = require("otter")
+local mapx = vim.keymap.set
+local mapn = require("plenary").functional.partial(mapx, "n")
 local otter_md_activate = {
   name = "otterMDActivateAU",
   {
     event = { "BufEnter" },
     pattern = { "*.qmd" },
     callback = function()
-      local mapx = require("uutils.key").mapx
-      mapx.nnoremap("n", "gd", otter.ask_definition, { silent = true })
-      mapx.nnoremap("n", "K", otter.ask_hover, { silent = true })
+      mapn("gd", otter.ask_definition, { silent = true })
+      mapn("K", otter.ask_hover, { silent = true })
       otter.activate({ "r", "python", "lua", "julia", "rust" }, true)
     end,
     opts = {},

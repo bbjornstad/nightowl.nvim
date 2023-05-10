@@ -10,6 +10,9 @@ env.borders.main = "shadow"
 env.borders.alt = "solid"
 env.borders.main_accent = "double"
 
+env.telescope = {}
+env.telescope.theme = "ivy"
+
 env.navic = {}
 env.navic.opts = nil
 
@@ -54,7 +57,6 @@ env.colorscheme.setup = {
       PmenuThumb = { bg = theme.ui.bg_p2 },
     }
   end,
-  }
-
+}
 
 return env

@@ -1,5 +1,5 @@
 local env = require("environment.alpha")
---print(string.format("env: %s", env))
+-- print(string.format("env: %s", env))
 
 local function select_random_item(possible)
   possible = possible or {}
@@ -45,8 +45,6 @@ end
 -- ursa-major
 -------------
 
-print("alpha.nvim keymaps:\n" .. vim.inspect(require("environment.keys").alpha))
-
 return {
   {
     "goolord/alpha-nvim",
@@ -58,6 +56,20 @@ return {
       return dashboard
     end,
     enabled = not env.disable_alpha or true,
-    keys = require("environment.keys").alpha,
+    -- keys = require("environment.keys").alpha,
+    keys = {
+      {
+        "n",
+        "<Home>",
+        "<CMD>Alpha<CR>",
+        { desc = "א.α:>> return to alpha state" },
+      },
+      {
+        "v",
+        "<Home>",
+        "<CMD>Alpha<CR>",
+        { desc = "א.α:>> return to alpha state" },
+      },
+    },
   },
 }

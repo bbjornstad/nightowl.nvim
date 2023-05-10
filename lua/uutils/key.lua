@@ -14,23 +14,23 @@ function mod.desc(body, prompt, sep, prompt_def, sep_def)
 end
 
 function mod.describe(body, prompt)
+  body = body or ""
+  prompt = prompt or ""
   return mod.desc(body, prompt, ":|", "comp", ":|")
 end
 
 --- This function is for defining keymaps in the traditional, global sense which
 -- makes use of the mapx plugin ultimately through the lua module config.keymaps
 function mod.cfg_replug(maptbl, extra_opts)
-  extra_opts = extra_opts or {}
+  extra_opts = merge({ remap = false }, extra_opts or {})
   local res = function()
-    local mapx = require("mapx").setup({ global = false, whichkey = true })
-    local thismode = maptbl.mode or ""
+    -- local mapx = require("mapx").setup({ global = false, whichkey = true })
+    local mapper = vim.keymap.set
+    local thismode = maptbl.mode or { "n", "v", "o" }
 
-    mapx[thismode .. "map"](
-      maptbl.idkey,
-      maptbl.action,
-      extra_opts,
-      maptbl.desc or "indescribeable"
-    )
+    local final_opts =
+      merge({ desc = maptbl.desc or "indescribeable" }, extra_opts)
+    mapper(thismode, maptbl.idkey, maptbl.action, final_opts)
   end
 
   return res
@@ -41,12 +41,19 @@ end
 -- plugin configuration
 function mod.lazy_replug(maptbl, extra_opts)
   extra_opts = extra_opts or {}
-  local res = {
-    maptbl.mode or "",
-    maptbl.idkey,
-    maptbl.action,
-    merge({ desc = maptbl.desc or "indescribable", remap = false }, extra_opts),
-  }
+  local thismode = maptbl.mode or "n"
+  --print("Lazy >> mode: " .. thismode)
+  local res = function()
+    return {
+      thismode,
+      maptbl.idkey,
+      maptbl.action,
+      merge(
+        { desc = maptbl.desc or "indescribeable", remap = false },
+        extra_opts
+      ),
+    }
+  end
   return res
 end
 
@@ -60,37 +67,42 @@ function mod.plugmap(maptbl, replug, extra_opts)
   replug = replug or "lazy"
   replug = replug_registry[replug]
   if replug == nil then
-    error("Unknown ")
-    -- for k, v in pairs(maptbl) do
-    --  print("Value " .. k .. ": " .. v)
-    -- end
-    -- print("In plug map:")
-    if type(maptbl) ~= "table" then
-      error("maptbl must be a table with content")
-    end
-    local groupbase
-    local groupname
-    local groupmaps
-    groupbase, groupname, groupmaps = unpack(maptbl)
-
-    local thismap
-    local thisdesc
-    local final = {}
-    for k, mapping in pairs(groupmaps) do
-      -- get the key and the description from the mapping table
-      -- we need these to be separate so we can overwrite the table fields.
-      thismap = mapping.idkey
-      thisdesc = mapping.desc
-      -- stick the base and the identifying keys together to form the final
-      -- keymapping.
-      mapping.idkey = groupbase .. thismap
-      mapping.desc = mod.describe(thisdesc, groupname)
-      final[k] = replug(mapping, extra_opts)
-      -- print(final[k])
-    end
-
-    return final
+    error(
+      "Unknown replug type: "
+        .. replug
+        .. "\nExpected from: "
+        .. vim.inspect(replug_registry)
+    )
   end
+  -- for k, v in pairs(maptbl) do
+  --  print("Value " .. k .. ": " .. v)
+  -- end
+  -- print("In plug map:")
+  if type(maptbl) ~= "table" then
+    error("maptbl must be a table with content")
+  end
+  --print("table of mapping descriptions: " .. vim.inspect(maptbl))
+  local groupbase = maptbl.groupbase
+  local groupname = maptbl.groupname
+  local groupmaps = maptbl.groupmaps
+
+  local thismap
+  local thisdesc
+  local final = {}
+  for k, mapping in pairs(groupmaps) do
+    -- get the key and the description from the mapping table
+    -- we need these to be separate so we can overwrite the table fields.
+    thismap = mapping.idkey
+    thisdesc = mapping.desc
+    -- stick the base and the identifying keys together to form the final
+    -- keymapping.
+    mapping.idkey = groupbase .. thismap
+    mapping.desc = mod.describe(thisdesc, groupname)
+    final[k] = replug(mapping, extra_opts)()
+    -- print("Determined keymappings for " .. k .. ": " .. vim.inspect(final[k]))
+  end
+
+  return final
 end
 
 -- @section Keymap Definitions - `uutils.key`

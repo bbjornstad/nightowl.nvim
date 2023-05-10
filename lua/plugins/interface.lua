@@ -8,6 +8,11 @@ vim.diagnostic.config({
   float = { border = env.borders.main },
 })
 
+local stems = require("environment.keys").stems
+local key_notify = stems.notify
+local key_vista = stems.vista
+local key_negen = stems.neogen
+
 return {
   {
     "folke/noice.nvim",
@@ -191,7 +196,24 @@ return {
     dependencies = { "junegunn/fzf" },
     event = { "WinEnter", "VimEnter" },
   },
-  { "rcarriga/nvim-notify", opts = { top_down = false, render = "compact" } },
+  {
+    "rcarriga/nvim-notify",
+    opts = { top_down = false, render = "compact" },
+    keys = {
+      {
+        "n",
+        key_notify .. "n",
+        require("notify").history,
+        { desc = "noit:>> notification history" },
+      },
+      {
+        "n",
+        key_notify .. "t",
+        require("telescope").extensions.notify.notify,
+        { desc = "noit:>> telescope search notification history" },
+      },
+    },
+  },
   { "rcarriga/nvim-dap-ui", dependencies = { "mfussenegger/nvim-dap" } },
   { "nvim-lua/lsp-status.nvim" },
   {
@@ -235,7 +257,30 @@ return {
   },
   { "sindrets/diffview.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   { "ray-x/lsp_signature.nvim", dependencies = { "neovim/nvim-lspconfig" } },
-  { "liuchengxu/vista.vim", cmd = "Vista" },
+  {
+    "liuchengxu/vista.vim",
+    cmd = "Vista",
+    keys = {
+      {
+        "n",
+        key_vista .. "s",
+        "<CMD>Vista show<CR>",
+        { desc = "show vista tags" },
+      },
+      {
+        "n",
+        key_vista .. "f",
+        "<CMD>Vista finder<CR>",
+        { desc = "fzf over vista tags" },
+      },
+      {
+        "n",
+        key_vista .. "V",
+        "<CMD>Vista finder<CR>",
+        { desc = "fzf over vista tags" },
+      },
+    },
+  },
   {
     "SmiteshP/nvim-navic",
     dependencies = { "neovim/nvim-lspconfig" },
@@ -248,5 +293,18 @@ return {
         icons = require("lazyvim.config").icons.kinds,
       }
     end,
+  },
+  {
+    "Fildo7525/pretty_hover",
+    event = "LspAttach",
+    opts = { border = env.borders.main },
+    keys = {
+      {
+        "n",
+        "gK",
+        "<CMD>lua require'pretty_hover'.hover()<CR>",
+        { desc = "show hover--prettyfied" },
+      },
+    },
   },
 }

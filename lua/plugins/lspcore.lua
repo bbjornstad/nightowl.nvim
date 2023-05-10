@@ -1,4 +1,3 @@
--- local lsp = require("lsp-zero").preset({ name = "minimal" })
 return {
   {
     "neovim/nvim-lspconfig",

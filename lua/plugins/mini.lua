@@ -15,5 +15,5 @@ return {
   { "echasnovski/mini.bracketed", unpack(opts) },
   { "echasnovski/mini.align", unpack(opts) },
   { "echasnovski/mini.comment", unpack(opts) },
-  { "echasnovski/mini.sessions" },
+  { "echasnovski/mini.sessions", unpack(opts) },
 }

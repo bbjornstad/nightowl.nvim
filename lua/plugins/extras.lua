@@ -1,4 +1,9 @@
 local env = require("environment.ui")
+local stems = require("environment.keys").stems
+
+local key_pomodoro = stems.pomodoro
+local key_easyread = stems.easyread
+local key_ccc = stems.ccc
 
 return {
   {
@@ -11,13 +16,41 @@ return {
       timers_to_long_break = 4,
       border = { style = env.borders.main },
     },
-    keys = require("environment.keys").pomodoro,
+    keys = {
+      {
+        "n",
+        key_pomodoro .. "p",
+        "<CMD>PomodoroStart<CR>",
+        { desc = "pomorg:>> start pomodoro timer" },
+      },
+      {
+        "n",
+        key_pomodoro .. "q",
+        "<CMD>PomodoroStop<CR>",
+        { desc = "pomorg:>> stop pomodoro timer" },
+      },
+      {
+        "n",
+        key_pomodoro .. "s",
+        "<CMD>PomodoroStatus<CR>",
+        { desc = "pomorg:>> pomodoro timer status" },
+      },
+    },
+    --keys = require("environment.keys").pomodoro,
   },
   { "wakatime/vim-wakatime", event = "BufEnter" },
   {
     "JellyApple102/easyread.nvim",
     cmd = { "EasyreadToggle" },
-    keys = require("environment.keys").easyread,
+    keys = {
+      {
+        "n",
+        key_easyread .. "r",
+        "<CMD>EasyreadToggle<CR>",
+        { desc = "bionic:>> toggle easyread bionic reading" },
+      },
+    },
+    --keys = require("environment.keys").easyread,
   },
   {
     "uga-rosa/ccc.nvim",
@@ -27,7 +60,39 @@ return {
       "CccHighlighterEnable",
       "CccHighlighterToggle",
     },
-    keys = require("environment.keys").ccc,
+    keys = {
+      {
+        "n",
+        key_ccc .. "c",
+        "<CMD>CccPick<CR>",
+        { desc = "ccc:>> pick color interface" },
+      },
+      {
+        "n",
+        key_ccc .. "h",
+        "<CMD>CccHighlighterToggle<CR>",
+        { desc = "ccc:>> toggle inline color highlighting" },
+      },
+      {
+        "n",
+        key_ccc .. "v",
+        "<CMD>CccConvert<CR>",
+        { desc = "ccc:>> convert color to another format" },
+      },
+      {
+        "n",
+        key_ccc .. "f",
+        "<CMD>CccHighlighterDisable<CR>",
+        { desc = "ccc:>> turn off inline color highlighting" },
+      },
+      {
+        "n",
+        key_ccc .. "o",
+        "<CMD>CccHighlighterEnable<CR>",
+        { desc = "ccc:>> turn on inline color highlighting" },
+      },
+    },
+    -- keys = require("environment.keys").ccc,
   },
   {
     -- <leader>i mappings for ASCII
@@ -42,7 +107,14 @@ return {
       "FigSelect",
       "FigSelectComment",
     },
-    keys = require("environment.keys").figlet,
+    keys = {
+      {
+        "n",
+        stems.figlet .. "f",
+        "<CMD>Figlet<CR>",
+        { desc = "figlet:>> figlet interface" },
+      },
+    },
   },
   {
     "sudormrfbin/cheatsheet.nvim",
@@ -57,7 +129,16 @@ return {
     opts = { border = env.borders.main, style = vim.env.CANDY_NVIM_MOOD },
     cmd = "Glow",
     ft = { "markdown", "mkd", "md", "rmd", "qmd" },
-    keys = require("environment.keys").glow,
+    keys = {
+      {
+        "n",
+        key_glow,
+        "<CMD>Glow!<CR>",
+        { desc = "glow:>> glow markdown preview" },
+      },
+    },
+
+    --keys = require("environment.keys").glow,
   },
   {
     "LudoPinelli/comment-box.nvim",

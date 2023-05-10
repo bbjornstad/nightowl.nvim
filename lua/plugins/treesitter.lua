@@ -10,9 +10,7 @@ return {
       autotag = { enable = true },
       endwise = { enable = true },
     },
-    build = function()
-      return ":TSUpdate"
-    end,
+    build = ":TSUpdate",
   },
   {
     "RRethy/nvim-treesitter-endwise",

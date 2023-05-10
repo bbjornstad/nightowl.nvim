@@ -36,7 +36,7 @@ local vsplit_help_cmdspec = {
 local vsplithelp_au = mod.setup_augroup(vsplit_help_cmdspec)
 
 ---nvim pairs
--- @augroup Vertical Split Default
+-- @augroup Vertical Split Defaultloading
 local vsplit_cmdspec = {
   name = "vsplitsAU",
   -- need to take a chunk like this and map it down to the correct signature

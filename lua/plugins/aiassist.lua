@@ -1,13 +1,72 @@
 local env = require("environment.ui")
 
-local keymaps = require("environment.keys")
+local stems = require("environment.keys").stems
+
+local key_copilot = stems.copilot
+local key_hfcc = stems.hfcc
+local key_neural = stems.neural
+local key_gpt = stems.chatgpt
+local key_neoai = stems.neoai
 
 return {
   {
+    "huggingface/hfcc.nvim",
+    event = { "BufReadPre" },
+    opts = {
+      api_token = vim.env.HUGFACE_API_TOKEN,
+      model = "bigcode/starcoder",
+    },
+    keys = {
+      {
+        "n",
+        key_hfcc,
+        "<CMD>HFccSuggestion<CR>",
+        { desc = "ai.hfcc:>> suggest huggingface completion" },
+      },
+    },
+  },
+  {
     "zbirenbaum/copilot.lua",
-    event = { "InsertEnter", "BufEnter", "BufWinEnter" },
+    event = { "BufReadPre" },
     opts = { suggestion = { enabled = false }, panel = { enabled = false } },
-    keys = keymaps.copilot,
+    keys = {
+      {
+        "n",
+        key_copilot .. "a",
+        "<CMD>Copilot auth<CR>",
+        { desc = "ai.copilot:>> authenticate copilot" },
+      },
+      {
+        "n",
+        key_copilot .. "t",
+        "<CMD>Copilot toggle<CR>",
+        { desc = "ai.copilot:>> toggle copilot" },
+      },
+      {
+        "n",
+        key_copilot .. "s",
+        "<CMD>Copilot status<CR>",
+        { desc = "ai.copilot:>> copilot status" },
+      },
+      {
+        "n",
+        key_copilot .. "t",
+        "<CMD>Copilot attach<CR>",
+        { desc = "ai.copilot:>> attach copilot" },
+      },
+      {
+        "n",
+        key_copilot .. "d",
+        "<CMD>Copilot detach<CR>",
+        { desc = "ai.copilot:>> detach copilot" },
+      },
+      {
+        "n",
+        ";C",
+        "<CMD>Copilot status<CR>",
+        { desc = "ai.copilot:>> copilot status" },
+      },
+    },
   },
   {
     "zbirenbaum/copilot-cmp",
@@ -50,7 +109,15 @@ return {
     "dense-analysis/neural",
     opts = { source = { openai = { apiKey = "OPENAI_API_KEY" } } },
     cmd = "Neural",
-    keys = require("environment.keys").neural,
+    -- keys = require("environment.keys").neural,
+    keys = {
+      {
+        "n",
+        key_neural,
+        "<CMD>Neural<CR>",
+        { desc = "ai.nrl:>> chatgpt neural interface" },
+      },
+    },
   },
   {
     "jackMort/ChatGPT.nvim",
@@ -67,7 +134,29 @@ return {
       popup_window = { border = { style = env.borders.alt } },
       popup_input = { border = { style = env.borders.alt } },
     },
-    keys = require("environment.keys").chatgpt,
+    -- keys = require("environment.keys").chatgpt,
+    keys = {
+      { "n", key_gpt .. "gg", "<CMD>ChatGPT<CR>", { desc = "chatgpt" } },
+      {
+        "n",
+        key_gpt .. "gr",
+        "<CMD>ChatGPTActAs<CR>",
+        { desc = "chatgpt role prompts" },
+      },
+      {
+        "n",
+        key_gpt .. "ge",
+        "<CMD>ChatGPTEditWithInstructions<CR>",
+        { desc = "chatgpt edit with instructions" },
+      },
+      {
+        "n",
+        key_gpt .. "ga",
+        "<CMD>ChatGPTCustomCodeAction<CR>",
+        { desc = "chatgpt code actions" },
+      },
+      { "n", ";G", "<CMD>ChatGPT<CR>", { desc = "chatgpt" } },
+    },
   },
   {
     "Bryley/neoai.nvim",
@@ -117,7 +206,7 @@ return {
       shortcuts = {
         {
           name = "textify",
-          key = ";at",
+          key = key_neoai .. "t",
           desc = "fix text with AI",
           use_context = true,
           prompt = [[
@@ -130,7 +219,7 @@ return {
         },
         {
           name = "gitcommit",
-          key = ";ag",
+          key = key_neoai .. "g",
           desc = "generate git commit message",
           use_context = false,
           prompt = function()
@@ -145,7 +234,7 @@ return {
         },
         {
           name = "professional email (affirm)",
-          key = ";ama",
+          key = key_neoai .. "ma",
           desc = "generate professional email in response (affirm)",
           use_context = true,
           prompt = function()
@@ -164,7 +253,7 @@ return {
         },
         {
           name = "professional email (decline)",
-          key = ";amd",
+          key = key_neoai .. "md",
           desc = "generate professional email in response (decline)",
           use_context = true,
           prompt = function()
@@ -185,7 +274,7 @@ return {
         },
         {
           name = "professional email (cold-contact)",
-          key = ";amc",
+          key = key_neoai .. "mc",
           desc = "generate professional email to send (cold-contact)",
           use_context = true,
           prompt = function()
@@ -207,7 +296,7 @@ return {
         },
         {
           name = "The Spacebar (from Outline)",
-          key = ";aso",
+          key = key_neoai .. "so",
           desc = "Generate a blog post for a blog called 'The Spacebar'",
           use_context = true,
           prompt = function()
@@ -228,7 +317,7 @@ return {
         },
         {
           name = "The Spacebar (from Existing)",
-          key = ";ast",
+          key = key_neoai .. "st",
           desc = "Generate or reformulate a blog post for a blog called 'The Spacebar'",
           use_context = true,
           prompt = function()

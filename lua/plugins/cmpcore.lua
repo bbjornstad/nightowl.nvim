@@ -1,12 +1,7 @@
 local cmp = "hrsh7th/nvim-cmp"
 
 return {
-  {
-    "L3MON4D3/LuaSnip",
-    keys = function()
-      return {}
-    end,
-  },
+  { "L3MON4D3/LuaSnip" },
   {
     -- this needs to be original plugin
     -- but we want to mix and match.
@@ -29,6 +24,32 @@ return {
 
       require("luasnip.loaders.from_vscode").lazy_load()
       require("luasnip.loaders.from_snipmate").lazy_load()
+
+      opts.sources = ucmp.config.sources(vim.list_extend(
+        opts.sources,
+        -- this is ok, we now put our sources and configuration for such sources
+        -- in this list item below
+        {
+          { name = "copilot", max_item_count = 10 },
+          { name = "hfcc", max_item_count = 10 },
+          { name = "nvim-lsp", max_item_count = 5 },
+          { name = "buffer", max_item_count = 5 },
+          { name = "path", max_item_count = 4 },
+          { name = "env", max_item_count = 4 },
+          { name = "rg", max_item_count = 3 },
+          { name = "luasnip", max_item_count = 3 },
+          { name = "snippy", max_item_count = 4 },
+          { name = "dap", max_item_count = 5 },
+          { name = "calc", max_item_count = 3 },
+          { name = "cmp_tabnine", max_item_count = 3 },
+          { name = "cmdline", max_item_count = 3 },
+          { name = "treesitter", max_item_count = 4 },
+          { name = "ctags", max_item_count = 3 },
+          { name = "otter", max_item_count = 3 },
+          { name = "color_names", max_item_count = 3 },
+          { name = "nvim_lsp_signature_help", max_item_count = 3 },
+        }
+      ))
 
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
         -- Remap carriage return to be the selection behavior of nvim-cmp.

@@ -1,6 +1,8 @@
 -- local env = require("environment.scope")
 -- print(string.format("Telescope environment found:\n{}", vim.inspect(env)))
 
+local key_scope = require("environment.keys").stems.telescope
+
 local target_pickers = {
   "find_files",
   "git_files",
@@ -173,6 +175,101 @@ return {
       "LinArcX/telescope-ports.nvim",
     },
     opts = { defaults = {}, pickers = pickspec, extensions = extspec },
-    keys = require("environment.keys").telescope,
+    keys = {
+      {
+        key_scope .. "ff",
+        require("telescope.builtin").find_files,
+        { desc = "scope:>> scope:>> search local files" },
+      },
+      {
+        key_scope .. "fo",
+        require("telescope.builtin").oldfiles,
+        { desc = "scope:>> scope:>> search oldfiles" },
+      },
+      {
+        key_scope .. "g",
+        require("telescope.builtin").tags,
+        { desc = "scope:>> scope:>> search tags" },
+      },
+      {
+        key_scope .. "c",
+        require("telescope.builtin").commands,
+        { desc = "scope:>> scope:>> scope through vim commands" },
+      },
+      {
+        key_scope .. "ht",
+        require("telescope.builtin").help_tags,
+        { desc = "scope:>> scope:>> search help tags" },
+      },
+      {
+        key_scope .. "hm",
+        require("telescope.builtin").man_pages,
+        { desc = "scope:>> scope:>> search man pages" },
+      },
+      {
+        key_scope .. "hs",
+        require("telescope.builtin").search_history,
+        { desc = "scope:>> scope:>> scope history" },
+      },
+      {
+        key_scope .. "hc",
+        require("telescope.builtin").command_history,
+        { desc = "scope:>> scope:>> you're not my real dad!" },
+      },
+      {
+        key_scope .. "H",
+        require("telescope.builtin").builtins,
+        { desc = "scope:>> search telescope" },
+      },
+      {
+        key_scope .. "b",
+        require("telescope.builtin").buffers,
+        { desc = "scope:>> search open buffers" },
+      },
+      {
+        key_scope .. "e",
+        require("telescope.builtin").treesitter,
+        { desc = "scope:>> search treesitter nodes" },
+      },
+      {
+        key_scope .. "t",
+        require("telescope.builtin").current_buffer_tags,
+        { desc = "scope:>> search current buffer's tags" },
+      },
+      {
+        key_scope .. "m",
+        require("telescope.builtin").marks,
+        { desc = "scope:>> search marks" },
+      },
+      {
+        key_scope .. "y",
+        require("telescope.builtin").loclist,
+        { desc = "scope:>> search loclist" },
+      },
+      {
+        key_scope .. "k",
+        require("telescope.builtin").keymappings,
+        { desc = "scope:>> search defined keymappings" },
+      },
+      {
+        key_scope .. "o",
+        require("telescope.builtin").pickers,
+        { desc = "scope:>> search telescope" },
+      },
+      {
+        key_scope .. "v",
+        require("telescope.builtin").vim_options,
+        { desc = "scope:>> search vim options" },
+      }, -- {
+      --  key_scope .. "s",
+      --  require("telescope").extensions.luasnip.luasnip,
+      --  desc = "scope:>> search defined snippets",
+      -- },
+      {
+        key_scope .. "n",
+        require("telescope").extensions.notify.notify,
+        { desc = "scope:>> search modern area for further tickle evidence" },
+      },
+    },
   },
 }
