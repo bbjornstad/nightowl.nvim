@@ -1,5 +1,7 @@
 local mod = {}
 
+mod.mapn = require("plenary.functional").partial(vim.keymap.set, "n")
+
 mod.stems = {}
 
 mod.stems.ccc = "<leader>uh"
@@ -10,11 +12,12 @@ mod.stems.neural = ";n"
 mod.stems.copilot = ";c"
 mod.stems.neoai = ";a"
 mod.stems.hfcc = ";h"
-mod.stems.telescope = "<leader>8"
+mod.stems.telescope = "<leader>i"
 mod.stems.glow = "<leader>p"
 mod.stems.notify = "<leader>n"
 mod.stems.vista = "<leader>v"
 mod.stems.chatgpt = ";g"
-mod.stems.neogen = "<leader>d"
+mod.stems.neogen = "<leader>D"
+mod.stems.lens = "<leader>ue"
 
 return mod

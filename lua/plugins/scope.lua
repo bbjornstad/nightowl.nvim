@@ -1,7 +1,7 @@
 -- local env = require("environment.scope")
 -- print(string.format("Telescope environment found:\n{}", vim.inspect(env)))
-
 local key_scope = require("environment.keys").stems.telescope
+local mapn = require("environment.keys").mapn
 
 local target_pickers = {
   "find_files",
@@ -175,101 +175,102 @@ return {
       "LinArcX/telescope-ports.nvim",
     },
     opts = { defaults = {}, pickers = pickspec, extensions = extspec },
-    keys = {
-      {
+    init = function()
+      mapn(
         key_scope .. "ff",
         require("telescope.builtin").find_files,
-        { desc = "scope:>> scope:>> search local files" },
-      },
-      {
+        { desc = "scope:>> search local files" }
+      )
+      mapn(
         key_scope .. "fo",
         require("telescope.builtin").oldfiles,
-        { desc = "scope:>> scope:>> search oldfiles" },
-      },
-      {
+        { desc = "scope:>> search oldfiles" }
+      )
+      mapn(
         key_scope .. "g",
         require("telescope.builtin").tags,
-        { desc = "scope:>> scope:>> search tags" },
-      },
-      {
+        { desc = "scope:>> search tags" }
+      )
+      mapn(
         key_scope .. "c",
         require("telescope.builtin").commands,
-        { desc = "scope:>> scope:>> scope through vim commands" },
-      },
-      {
+        { desc = "scope:>> scope through vim commands" }
+      )
+      mapn(
         key_scope .. "ht",
         require("telescope.builtin").help_tags,
-        { desc = "scope:>> scope:>> search help tags" },
-      },
-      {
+        { desc = "scope:>> search help tags" }
+      )
+      mapn(
         key_scope .. "hm",
         require("telescope.builtin").man_pages,
-        { desc = "scope:>> scope:>> search man pages" },
-      },
-      {
+        { desc = "scope:>> search man pages" }
+      )
+      mapn(
         key_scope .. "hs",
         require("telescope.builtin").search_history,
-        { desc = "scope:>> scope:>> scope history" },
-      },
-      {
+        { desc = "scope:>> scope history" }
+      )
+      mapn(
         key_scope .. "hc",
         require("telescope.builtin").command_history,
-        { desc = "scope:>> scope:>> you're not my real dad!" },
-      },
-      {
-        key_scope .. "H",
-        require("telescope.builtin").builtins,
-        { desc = "scope:>> search telescope" },
-      },
-      {
+        { desc = "scope:>> command history" }
+      )
+      -- mapn(
+      --  key_scope .. "H",
+      --  require("telescope.builtin").builtins,
+      --  { desc = "scope:>> search telescope" }
+      -- )
+      mapn(
         key_scope .. "b",
         require("telescope.builtin").buffers,
-        { desc = "scope:>> search open buffers" },
-      },
-      {
+        { desc = "scope:>> search open buffers" }
+      )
+      mapn(
         key_scope .. "e",
         require("telescope.builtin").treesitter,
-        { desc = "scope:>> search treesitter nodes" },
-      },
-      {
+        { desc = "scope:>> search treesitter nodes" }
+      )
+      mapn(
         key_scope .. "t",
         require("telescope.builtin").current_buffer_tags,
-        { desc = "scope:>> search current buffer's tags" },
-      },
-      {
+        { desc = "scope:>> search current buffer's tags" }
+      )
+      mapn(
         key_scope .. "m",
         require("telescope.builtin").marks,
-        { desc = "scope:>> search marks" },
-      },
-      {
+        { desc = "scope:>> search marks" }
+      )
+      mapn(
         key_scope .. "y",
         require("telescope.builtin").loclist,
-        { desc = "scope:>> search loclist" },
-      },
-      {
-        key_scope .. "k",
-        require("telescope.builtin").keymappings,
-        { desc = "scope:>> search defined keymappings" },
-      },
-      {
+        { desc = "scope:>> search loclist" }
+      )
+      -- mapn(
+      --  key_scope .. "k",
+      --  require("telescope.builtin").keymappings,
+      --  { desc = "scope:>> search defined keymappings" }
+      -- )
+      mapn(
         key_scope .. "o",
         require("telescope.builtin").pickers,
-        { desc = "scope:>> search telescope" },
-      },
-      {
+        { desc = "scope:>> search telescope" }
+      )
+      mapn(
         key_scope .. "v",
         require("telescope.builtin").vim_options,
-        { desc = "scope:>> search vim options" },
-      }, -- {
+        { desc = "scope:>> search vim options" }
+      )
+      -- mapn(
       --  key_scope .. "s",
       --  require("telescope").extensions.luasnip.luasnip,
-      --  desc = "scope:>> search defined snippets",
-      -- },
-      {
+      --  { desc = "scope:>> search defined snippets" }
+      -- )
+      mapn(
         key_scope .. "n",
         require("telescope").extensions.notify.notify,
-        { desc = "scope:>> search modern area for further tickle evidence" },
-      },
-    },
+        { desc = "scope:>> search notifications" }
+      )
+    end,
   },
 }

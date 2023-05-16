@@ -9,9 +9,10 @@ vim.diagnostic.config({
 })
 
 local stems = require("environment.keys").stems
+local mapn = require("environment.keys").mapn
 local key_notify = stems.notify
 local key_vista = stems.vista
-local key_negen = stems.neogen
+local key_lens = stems.lens
 
 return {
   {
@@ -100,95 +101,98 @@ return {
     },
     event = { "VimEnter", "WinEnter" },
   },
-  { "b0o/incline.nvim", opts = env.incline.opts, event = { "BufReadPre" } },
-  { "b0o/mapx.nvim", config = true, dependencies = { "folke/which-key.nvim" } },
+  {
+    "b0o/incline.nvim",
+    config = function(_, opts)
+      require("incline").setup(opts)
+    end,
+    event = { "BufReadPre" },
+  },
+  {
+    "b0o/incline.nvim",
+    opts = {
+      render = function(props)
+        local filename =
+          vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
+        local icon, color =
+          require("nvim-web-devicons").get_icon_color(filename)
+        return { { icon, guifg = color }, { " " }, { filename } }
+      end,
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    opts = { window = { border = env.borders.main } },
+    -- function(_, opts)
+    --  opts.window = opts.window or {}
+    --  table.insert(opts.window, { border = env.borders.main })
+    -- end,
+  },
+  -- { "b0o/mapx.nvim", config = true, dependencies = { "folke/which-key.nvim" } },
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons", "b0o/incline.nvim" },
-    opts = function(_, opts)
-      local Util = require("lazyvim.util")
-      local colors = {
-        [""] = Util.fg("Special"),
-        ["Normal"] = Util.fg("Special"),
-        ["Warning"] = Util.fg("DiagnosticError"),
-        ["InProgress"] = Util.fg("DiagnosticWarn"),
-      }
-      table.insert(opts.sections.lualine_x, 2, {
-        function()
-          local icon = require("lazyvim.config").icons.kinds.Copilot
-          local status = require("copilot.api").status.data
-          return icon .. (status.message or "")
-        end,
-        cond = function()
-          local ok, clients =
-            pcall(vim.lsp.get_active_clients, { name = "copilot", bufnr = 0 })
-          return ok and #clients > 0
-        end,
-        color = function()
-          local status = require("copilot.api").status.data
-          return colors[status.status] or colors[""]
-        end,
-      })
-    end,
-    config = function()
-      local navic = require("nvim-navic")
-      require("lualine").setup({
-        tabline = {
-          lualine_a = { "buffers" },
-          lualine_x = {
-            {
-              function()
-                return navic.get_location()
-              end,
-              cond = function()
-                return navic.is_available()
-              end,
-            },
-          },
-        },
-        winbar = {
-          lualine_a = {},
-          lualine_b = {},
-          lualine_c = {
-            "filename >>",
-            {
-              "navic",
-              color_correction = "dynamic",
-              navic_opts = env.navic.opts,
-            },
-          },
-          lualine_x = {},
-          lualine_y = {},
-          lualine_z = {},
-        },
-        inactive_winbar = {
-          lualine_a = {},
-          lualine_b = {},
-          lualine_c = { "filename" },
-          lualine_x = {},
-          lualine_y = {},
-          lualine_z = {},
-        },
-      })
-    end,
-  },
-  {
-    "simrat39/inlay-hints.nvim",
-    event = "BufEnter",
     opts = {
-      hints = {
-        parameter = { show = true, highlight = "Comment" },
-        type = { show = true, highlight = "Comment" },
+      tabline = {
+        lualine_a = { "buffers" },
+        lualine_x = {
+          {
+            function()
+              return require("nvim-navic").get_location()
+            end,
+            cond = function()
+              return require("nvim-navic").is_available()
+            end,
+          },
+        },
+      },
+      winbar = {
+        lualine_a = {},
+        lualine_b = {},
+        lualine_c = {
+          { "filename >>" },
+          {
+            "navic",
+            color_correction = "dynamic",
+            navic_opts = env.navic.opts,
+          },
+        },
+        lualine_x = {},
+        lualine_y = {},
+        lualine_z = {},
+      },
+      inactive_winbar = {
+        lualine_a = {},
+        lualine_b = {},
+        lualine_c = { "filename" },
+        lualine_x = {},
+        lualine_y = {},
+        lualine_z = {},
       },
     },
   },
   {
-    "kevinhwang91/nvim-ufo",
-    dependencies = {
-      "kevinhwang91/promise-async",
-      "VonHeikemen/lsp-zero.nvim",
-    },
-    event = { "BufReadPre" },
+    "lvimuser/lsp-inlayhints.nvim",
+    event = "LspAttach",
+    -- opts = {
+    --  hints = {
+    --    parameter = { show = true, highlight = "Comment" },
+    --    type = { show = true, highlight = "Comment" },
+    --  },
+    -- },
+    config = function(_, opts)
+      require("lsp-inlayhints").setup(opts)
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("LspAttach_inlayhints", {}),
+        callback = function(args)
+          if not (args.data and args.data.client_id) then
+            return
+          end
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          require("lsp-inlayhints").on_attach(client, args.buf, false)
+        end,
+      })
+    end,
   },
   { "junegunn/fzf", build = "make" },
   {
@@ -199,20 +203,18 @@ return {
   {
     "rcarriga/nvim-notify",
     opts = { top_down = false, render = "compact" },
-    keys = {
-      {
-        "n",
+    init = function()
+      mapn(
         key_notify .. "n",
         require("notify").history,
-        { desc = "noit:>> notification history" },
-      },
-      {
-        "n",
+        { desc = "noit:>> notification history" }
+      )
+      mapn(
         key_notify .. "t",
         require("telescope").extensions.notify.notify,
-        { desc = "noit:>> telescope search notification history" },
-      },
-    },
+        { desc = "noit:>> telescope search notification history" }
+      )
+    end,
   },
   { "rcarriga/nvim-dap-ui", dependencies = { "mfussenegger/nvim-dap" } },
   { "nvim-lua/lsp-status.nvim" },
@@ -228,6 +230,16 @@ return {
       ignore_filetype = { "prisma" },
     },
     cmd = { "LspLensOn", "LspLensOff", "LspLensToggle" },
+    init = function()
+      mapn(
+        key_lens .. "t",
+        "<CMD>LspLensToggle<CR>",
+        { desc = "lens:>> toggle" }
+      )
+      mapn(key_lens .. "o", "<CMD>LspLensOn<CR>", { desc = "lens:>> on" })
+      mapn(key_lens .. "f", "<CMD>LspLensOff<CR>", { desc = "lens:>> off" })
+      mapn("<leader>uE", "<CMD>LspLensToggle<CR>", { desc = "lens:>> toggle" })
+    end,
   },
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -242,7 +254,6 @@ return {
       show_current_context_start = true,
     },
   },
-  { "nvim-tree/nvim-web-devicons" },
   { "karb94/neoscroll.nvim", event = "BufEnter" },
   {
     "yamatsum/nvim-cursorline",
@@ -260,32 +271,29 @@ return {
   {
     "liuchengxu/vista.vim",
     cmd = "Vista",
-    keys = {
-      {
-        "n",
+    init = function()
+      mapn(
         key_vista .. "s",
         "<CMD>Vista show<CR>",
-        { desc = "show vista tags" },
-      },
-      {
-        "n",
+        { desc = "show vista tags" }
+      )
+      mapn(
         key_vista .. "f",
         "<CMD>Vista finder<CR>",
-        { desc = "fzf over vista tags" },
-      },
-      {
-        "n",
+        { desc = "fzf over vista tags" }
+      )
+      mapn(
         key_vista .. "V",
         "<CMD>Vista finder<CR>",
-        { desc = "fzf over vista tags" },
-      },
-    },
+        { desc = "fzf over vista tags" }
+      )
+    end,
   },
   {
     "SmiteshP/nvim-navic",
     dependencies = { "neovim/nvim-lspconfig" },
     event = { "BufEnter", "BufWinEnter" },
-    opts = function(_, opts)
+    opts = function()
       return {
         separator = " ",
         highlight = true,
@@ -298,13 +306,5 @@ return {
     "Fildo7525/pretty_hover",
     event = "LspAttach",
     opts = { border = env.borders.main },
-    keys = {
-      {
-        "n",
-        "gK",
-        "<CMD>lua require'pretty_hover'.hover()<CR>",
-        { desc = "show hover--prettyfied" },
-      },
-    },
   },
 }

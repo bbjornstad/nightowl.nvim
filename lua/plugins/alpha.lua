@@ -48,28 +48,30 @@ end
 return {
   {
     "goolord/alpha-nvim",
-    opts = function()
-      local dashboard = startdash(
-        env.preferred_alpha_layout or "",
-        env.preferred_alpha_header or nil
+    opts = function(_, opts)
+      table.insert(
+        opts,
+        startdash(
+          env.preferred_alpha_layout or "",
+          env.preferred_alpha_header or nil
+        )
       )
-      return dashboard
     end,
     enabled = not env.disable_alpha or true,
     -- keys = require("environment.keys").alpha,
-    keys = {
-      {
+    init = function()
+      vim.keymap.set(
         "n",
         "<Home>",
         "<CMD>Alpha<CR>",
-        { desc = "א.α:>> return to alpha state" },
-      },
-      {
+        { desc = "א.α:>> return to alpha state" }
+      )
+      vim.keymap.set(
         "v",
         "<Home>",
         "<CMD>Alpha<CR>",
-        { desc = "א.α:>> return to alpha state" },
-      },
-    },
+        { desc = "א.α:>> return to alpha state" }
+      )
+    end,
   },
 }

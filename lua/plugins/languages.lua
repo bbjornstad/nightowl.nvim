@@ -1,4 +1,5 @@
 local key_neogen = require("environment.keys").stems.neogen
+local mapn = require("environment.keys").mapn
 
 return {
   { "simrat39/rust-tools.nvim", ft = { "rust" } },
@@ -23,36 +24,20 @@ return {
     event = { "VeryLazy" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     opts = { snippet_engine = "luasnip" },
-    keys = {
-      {
-        key_neogen .. "d",
-        function()
-          return require("neogen").generate({ type = "func" })
-        end,
-        { desc = "generate docstring for function" },
-      },
-      {
-        key_neogen .. "c",
-        function()
-          return require("neogen").generate({ type = "class" })
-        end,
-        { desc = "generate docstring for class" },
-      },
-      {
-        key_neogen .. "t",
-        function()
-          return require("neogen").generate({ type = "type" })
-        end,
-        { desc = "generate docstring for type" },
-      },
-      {
-        key_neogen .. "f",
-        function()
-          return require("neogen").generate({ type = "func" })
-        end,
-        { desc = "generate docstring for function" },
-      },
-    },
+    init = function()
+      mapn(key_neogen .. "d", function()
+        return require("neogen").generate({ type = "func" })
+      end, { desc = "generate docstring for function" })
+      mapn(key_neogen .. "c", function()
+        return require("neogen").generate({ type = "class" })
+      end, { desc = "generate docstring for class" })
+      mapn(key_neogen .. "t", function()
+        return require("neogen").generate({ type = "type" })
+      end, { desc = "generate docstring for type" })
+      mapn(key_neogen .. "f", function()
+        return require("neogen").generate({ type = "func" })
+      end, { desc = "generate docstring for function" })
+    end,
   },
   { "Fymyte/rasi.vim", ft = { "rasi" } },
   {
@@ -67,7 +52,6 @@ return {
       },
       keymaps = {},
     },
-    -- config = true,
   },
   {
     "quarto-dev/quarto-nvim",

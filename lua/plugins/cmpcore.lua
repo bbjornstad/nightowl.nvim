@@ -1,29 +1,48 @@
 local cmp = "hrsh7th/nvim-cmp"
+local env = require("environment.ui")
 
 return {
-  { "L3MON4D3/LuaSnip" },
+  {
+    "L3MON4D3/LuaSnip",
+    keys = function()
+      return {}
+    end,
+  },
   {
     -- this needs to be original plugin
     -- but we want to mix and match.
     cmp,
-    dependencies = "VonHeikemen/lsp-zero.nvim",
+    dependencies = { "VonHeikemen/lsp-zero.nvim" },
     opts = function(_, opts)
-      local has_words_before = function()
-        local unpack = unpack or table.unpack
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0
-          and vim.api
-              .nvim_buf_get_lines(0, line - 1, line, true)[1]
-              :sub(col, col)
-              :match("%s")
-            == nil
-      end
+      -- local has_words_before = function()
+      --  local unpack = unpack or table.unpack
+      --  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+      --  return col ~= 0
+      --    and vim.api
+      --        .nvim_buf_get_lines(0, line - 1, line, true)[1]
+      --        :sub(col, col)
+      --        :match("%s")
+      --      == nil
+      -- end
 
-      local luasnip = require("luasnip")
+      -- local luasnip = require("luasnip")
       local ucmp = require("cmp")
+      local cmp_action = require("lsp-zero").cmp_action()
 
       require("luasnip.loaders.from_vscode").lazy_load()
       require("luasnip.loaders.from_snipmate").lazy_load()
+
+      opts.window = {
+        completion = ucmp.config.window.bordered({
+          border = env.borders.main,
+          padding = { 1, 2 },
+        }),
+        documentation = ucmp.config.window.bordered({
+          border = env.borders.main,
+          padding = { 1, 2 },
+        }),
+      }
+      opts.view = { entries = { separator = " | " } }
 
       opts.sources = ucmp.config.sources(vim.list_extend(
         opts.sources,
@@ -71,28 +90,30 @@ return {
           s = ucmp.mapping.confirm({ select = true }),
         }),
         -- enables supertab-like control of the popup completion window.
-        ["<Tab>"] = ucmp.mapping(function(fallback)
-          if ucmp.visible() then
-            ucmp.select_next_item()
-            -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-            -- they way you will only jump inside the snippet region
-          elseif luasnip.expand_or_locally_jumpable() then
-            luasnip.expand_or_jump()
-          elseif has_words_before() then
-            ucmp.complete()
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<S-Tab>"] = ucmp.mapping(function(fallback)
-          if ucmp.visible() then
-            ucmp.select_prev_item()
-          elseif luasnip.jumpable(-1) then
-            luasnip.jump(-1)
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
+        ["<Tab>"] = cmp_action.luasnip_supertab(),
+        -- ucmp.mapping(function(fallback)
+        -- if ucmp.visible() then
+        --  ucmp.select_next_item()
+        --  -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
+        --  -- they way you will only jump inside the snippet region
+        -- elseif luasnip.expand_or_locally_jumpable() then
+        --  luasnip.expand_or_jump()
+        -- elseif has_words_before() then
+        --  ucmp.complete()
+        -- else
+        --  fallback()
+        -- end
+        -- end, { "i", "s" }),
+        ["<S-Tab>"] = cmp_action.luasnip_shift_supertab(),
+        -- ucmp.mapping(function(fallback)
+        -- if ucmp.visible() then
+        --  ucmp.select_prev_item()
+        -- elseif luasnip.jumpable(-1) then
+        --  luasnip.jump(-1)
+        -- else
+        --  fallback()
+        -- end
+        -- end, { "i", "s" }),
       })
     end,
   },

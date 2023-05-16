@@ -16,9 +16,6 @@ env.telescope.theme = "ivy"
 env.navic = {}
 env.navic.opts = nil
 
-env.incline = {}
-env.incline.opts = {}
-
 env.bufferline = {}
 env.bufferline.tab_format = "slant"
 --------------------------------------------------------------------------------
@@ -26,7 +23,6 @@ env.bufferline.tab_format = "slant"
 -- ===========
 --
 env.colorscheme = {}
-env.colorscheme.name = "kanagawa"
 env.colorscheme.setup = {
   globalStatus = true,
   dimInactive = true,

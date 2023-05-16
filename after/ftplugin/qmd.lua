@@ -10,3 +10,4 @@ mapn(
   otter.ask_hover,
   { desc = "otter:>> ask for item hover", silent = true }
 )
+otter.activate({ "r", "python", "lua", "julia", "rust" }, true)

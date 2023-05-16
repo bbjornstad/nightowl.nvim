@@ -3,17 +3,28 @@
 -- Add any additional keymaps here
 -- ---------------------------------------------------------------------------------------------------------------
 local mapx = vim.keymap.set
-
+local function map(mode, lhs, rhs, opts)
+  local keys = require("lazy.core.handler").handlers.keys
+  ---@cast keys LazyKeysHandler
+  -- do not create the keymap if a lazy keys handler exists
+  if not keys.active[keys.parse({ lhs, mode = mode }).id] then
+    opts = opts or {}
+    opts.silent = opts.silent ~= false
+    vim.keymap.set(mode, lhs, rhs, opts)
+  end
+end
 -------------------------------------------------------------------------------
 -- Rebinding of the <F1> key to stop opening help windows on my fat-fingered
 -- mistakes that I seem to make while coding.
 -----
-mapx("n", "<F1>", "<Esc>", { desc = "esc >> to normal mode" })
+-- vim.cmd([[unmap ;]])
 
-mapx("v", "<F1>", "<Esc>", { desc = "esc >> to normal mode" })
+mapx("n", "<F1>", "<Esc>", { desc = "esc >> to normal mode", remap = false })
 
-mapx("o", "<F1>", "<Esc>", { desc = "esc >> to normal mode" })
-mapx("i", "<F1>", "<Esc>", { desc = "esc >> to normal mode" })
+mapx("v", "<F1>", "<Esc>", { desc = "esc >> to normal mode", remap = false })
+
+mapx("o", "<F1>", "<Esc>", { desc = "esc >> to normal mode", remap = false })
+mapx("i", "<F1>", "<Esc>", { desc = "esc >> to normal mode", remap = false })
 
 mapx("n", "g?", "<CMD>help<CR>", { desc = "got >> get help", remap = false })
 mapx("v", "g?", "<CMD>help<CR>", { desc = "got >> get help", remap = false })

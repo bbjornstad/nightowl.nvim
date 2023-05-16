@@ -1,9 +1,11 @@
 local env = require("environment.ui")
 local stems = require("environment.keys").stems
+local mapn = require("environment.keys").mapn
 
 local key_pomodoro = stems.pomodoro
 local key_easyread = stems.easyread
 local key_ccc = stems.ccc
+local key_glow = stems.glow
 
 return {
   {
@@ -16,41 +18,37 @@ return {
       timers_to_long_break = 4,
       border = { style = env.borders.main },
     },
-    keys = {
-      {
-        "n",
+    init = function()
+      mapn(
         key_pomodoro .. "p",
         "<CMD>PomodoroStart<CR>",
-        { desc = "pomorg:>> start pomodoro timer" },
-      },
-      {
-        "n",
+        { desc = "pomorg:>> start pomodoro timer" }
+      )
+      mapn(
         key_pomodoro .. "q",
         "<CMD>PomodoroStop<CR>",
-        { desc = "pomorg:>> stop pomodoro timer" },
-      },
-      {
-        "n",
+        { desc = "pomorg:>> stop pomodoro timer" }
+      )
+      mapn(
         key_pomodoro .. "s",
         "<CMD>PomodoroStatus<CR>",
-        { desc = "pomorg:>> pomodoro timer status" },
-      },
-    },
-    --keys = require("environment.keys").pomodoro,
+        { desc = "pomorg:>> pomodoro timer status" }
+      )
+    end,
+    -- keys = require("environment.keys").pomodoro,
   },
   { "wakatime/vim-wakatime", event = "BufEnter" },
   {
     "JellyApple102/easyread.nvim",
     cmd = { "EasyreadToggle" },
-    keys = {
-      {
-        "n",
+    init = function()
+      mapn(
         key_easyread .. "r",
         "<CMD>EasyreadToggle<CR>",
-        { desc = "bionic:>> toggle easyread bionic reading" },
-      },
-    },
-    --keys = require("environment.keys").easyread,
+        { desc = "bionic:>> toggle easyread bionic reading" }
+      )
+    end,
+    -- keys = require("environment.keys").easyread,
   },
   {
     "uga-rosa/ccc.nvim",
@@ -60,38 +58,33 @@ return {
       "CccHighlighterEnable",
       "CccHighlighterToggle",
     },
-    keys = {
-      {
-        "n",
+    init = function()
+      mapn(
         key_ccc .. "c",
         "<CMD>CccPick<CR>",
-        { desc = "ccc:>> pick color interface" },
-      },
-      {
-        "n",
+        { desc = "ccc:>> pick color interface" }
+      )
+      mapn(
         key_ccc .. "h",
         "<CMD>CccHighlighterToggle<CR>",
-        { desc = "ccc:>> toggle inline color highlighting" },
-      },
-      {
-        "n",
+        { desc = "ccc:>> toggle inline color highlighting" }
+      )
+      mapn(
         key_ccc .. "v",
         "<CMD>CccConvert<CR>",
-        { desc = "ccc:>> convert color to another format" },
-      },
-      {
-        "n",
+        { desc = "ccc:>> convert color to another format" }
+      )
+      mapn(
         key_ccc .. "f",
         "<CMD>CccHighlighterDisable<CR>",
-        { desc = "ccc:>> turn off inline color highlighting" },
-      },
-      {
-        "n",
+        { desc = "ccc:>> turn off inline color highlighting" }
+      )
+      mapn(
         key_ccc .. "o",
         "<CMD>CccHighlighterEnable<CR>",
-        { desc = "ccc:>> turn on inline color highlighting" },
-      },
-    },
+        { desc = "ccc:>> turn on inline color highlighting" }
+      )
+    end,
     -- keys = require("environment.keys").ccc,
   },
   {
@@ -107,14 +100,13 @@ return {
       "FigSelect",
       "FigSelectComment",
     },
-    keys = {
-      {
-        "n",
+    init = function()
+      mapn(
         stems.figlet .. "f",
-        "<CMD>Figlet<CR>",
-        { desc = "figlet:>> figlet interface" },
-      },
-    },
+        "<CMD>FigSelect<CR>",
+        { desc = "figlet:>> figlet interface" }
+      )
+    end,
   },
   {
     "sudormrfbin/cheatsheet.nvim",
@@ -129,16 +121,14 @@ return {
     opts = { border = env.borders.main, style = vim.env.CANDY_NVIM_MOOD },
     cmd = "Glow",
     ft = { "markdown", "mkd", "md", "rmd", "qmd" },
-    keys = {
-      {
-        "n",
+    init = function()
+      mapn(
         key_glow,
         "<CMD>Glow!<CR>",
-        { desc = "glow:>> glow markdown preview" },
-      },
-    },
-
-    --keys = require("environment.keys").glow,
+        { desc = "glow:>> glow markdown preview" }
+      )
+    end,
+    -- keys = require("environment.keys").glow,
   },
   {
     "LudoPinelli/comment-box.nvim",
@@ -150,26 +140,19 @@ return {
   },
   {
     "eandrju/cellular-automaton.nvim",
-    opts = {},
     cmd = { "CellularAutomaton" },
-    keys = {
-      {
+    init = function()
+      mapn(
         "<leader>fml",
         "<CMD>CellularAutomaton make_it_rain<CR>",
-        { desc = "here be automatous dragons [rainy]" },
-      },
-      {
+        { desc = "here be automatous dragons [rainy]" }
+      )
+      mapn(
         "<leader>FML",
         "<CMD>CellularAutomaton make_it_rain<CR>",
-        { desc = "here be automatous dragons [gamey]" },
-      },
-    },
-    -- config = function()
-    --  require("cellular-automaton").setup()
-    --  local mapx = require("uutils.key").mapx
-    --  mapx.nnoremap("<leader>fml", "<CMD>CellularAutomaton make_it_rain<CR>")
-    --  mapx.nnoremap("<leader>FML", "<CMD>CellularAutomaton game_of_life<CR>")
-    -- end,
+        { desc = "here be automatous dragons [gamey]" }
+      )
+    end,
   },
-  { "alec-gibson/nvim-tetris", cmd = "Tetris", config = true },
+  { "alec-gibson/nvim-tetris", cmd = "Tetris", opts = {} },
 }

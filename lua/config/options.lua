@@ -61,5 +61,11 @@ vim.opt.background = (CANDY_MOOD or "dark")
 
 vim.cmd.hi("clear SignColumns")
 
---vim.opt.do_filetype_lua = 1
-vim.opt.completeopt = "menuone,menu,noselect"
+-- vim.opt.do_filetype_lua = 1
+vim.opt.completeopt = "menuone,menu,noinsert"
+
+-- for nvim-ufo
+vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+vim.o.foldcolumn = "0"

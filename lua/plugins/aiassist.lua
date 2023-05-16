@@ -8,7 +8,19 @@ local key_neural = stems.neural
 local key_gpt = stems.chatgpt
 local key_neoai = stems.neoai
 
+local mapn = require("environment.keys").mapn
+
 return {
+  {
+    "folke/which-key.nvim",
+    opts = {
+      defaults = {
+        [";"] = { name = "+ai" },
+        -- TODO Add a few more of these baseline name mappings
+        -- directly onto the which-key configuration here.
+      },
+    },
+  },
   {
     "huggingface/hfcc.nvim",
     event = { "BufReadPre" },
@@ -16,70 +28,91 @@ return {
       api_token = vim.env.HUGFACE_API_TOKEN,
       model = "bigcode/starcoder",
     },
-    keys = {
-      {
-        "n",
+    init = function()
+      vim.api.nvim_create_user_command("StarCoder", function()
+        require("hfcc.completion").complete()
+      end, {})
+      mapn(
         key_hfcc,
         "<CMD>HFccSuggestion<CR>",
-        { desc = "ai.hfcc:>> suggest huggingface completion" },
-      },
-    },
+        { desc = "ai.hfcc:>> suggest huggingface completion" }
+      )
+    end,
+    -- keys = {
+    --  {
+    --    "n",
+    --    key_hfcc,
+    --    "<CMD>HFccSuggestion<CR>",
+    --    { desc = "ai.hfcc:>> suggest huggingface completion" },
+    --  },
+    -- },
   },
   {
     "zbirenbaum/copilot.lua",
-    event = { "BufReadPre" },
+    enabled = true,
+    cmd = "Copilot",
+    event = { "InsertEnter" },
     opts = { suggestion = { enabled = false }, panel = { enabled = false } },
-    keys = {
-      {
-        "n",
+    init = function()
+      mapn(
         key_copilot .. "a",
         "<CMD>Copilot auth<CR>",
-        { desc = "ai.copilot:>> authenticate copilot" },
-      },
-      {
-        "n",
+        { desc = "ai.copilot:>> authenticate copilot" }
+      )
+      mapn(
         key_copilot .. "t",
         "<CMD>Copilot toggle<CR>",
-        { desc = "ai.copilot:>> toggle copilot" },
-      },
-      {
-        "n",
+        { desc = "ai.copilot:>> toggle copilot" }
+      )
+      mapn(
         key_copilot .. "s",
         "<CMD>Copilot status<CR>",
-        { desc = "ai.copilot:>> copilot status" },
-      },
-      {
-        "n",
-        key_copilot .. "t",
-        "<CMD>Copilot attach<CR>",
-        { desc = "ai.copilot:>> attach copilot" },
-      },
-      {
-        "n",
+        { desc = "ai.copilot:>> copilot status" }
+      )
+      mapn(
         key_copilot .. "d",
         "<CMD>Copilot detach<CR>",
-        { desc = "ai.copilot:>> detach copilot" },
-      },
-      {
-        "n",
-        ";C",
+        { desc = "ai.copilot:>> detach copilot" }
+      )
+      mapn(
+        key_copilot .. "C",
         "<CMD>Copilot status<CR>",
-        { desc = "ai.copilot:>> copilot status" },
-      },
-    },
+        { desc = "ai.copilot:>> copilot status" }
+      )
+    end,
+  },
+  {
+    "nvim-lualine/lualine.nvim",
+    opts = function(_, opts)
+      local Util = require("lazyvim.util")
+      local colors = {
+        [""] = Util.fg("Special"),
+        ["Normal"] = Util.fg("Special"),
+        ["Warning"] = Util.fg("DiagnosticError"),
+        ["InProgress"] = Util.fg("DiagnosticWarn"),
+      }
+      table.insert(opts.sections.lualine_x, 2, {
+        function()
+          local icon = require("lazyvim.config").icons.kinds.Copilot
+          local status = require("copilot.api").status.data
+          return icon .. (status.message or "")
+        end,
+        cond = function()
+          local ok, clients =
+            pcall(vim.lsp.get_active_clients, { name = "copilot", bufnr = 0 })
+          return ok and #clients > 0
+        end,
+        color = function()
+          local status = require("copilot.api").status.data
+          return colors[status.status] or colors[""]
+        end,
+      })
+    end,
   },
   {
     "zbirenbaum/copilot-cmp",
     dependencies = { "zbirenbaum/copilot.lua" },
-    config = function(_, opts)
-      local copilot_cmp = require("copilot_cmp")
-      copilot_cmp.setup(opts)
-      require("lazyvim.util").on_attach(function(client)
-        if client.name == "copilot" then
-          copilot_cmp._on_insert_enter()
-        end
-      end)
-    end,
+    opts = {},
   },
   {
     "codota/tabnine-nvim",
@@ -110,14 +143,13 @@ return {
     opts = { source = { openai = { apiKey = "OPENAI_API_KEY" } } },
     cmd = "Neural",
     -- keys = require("environment.keys").neural,
-    keys = {
-      {
-        "n",
+    init = function()
+      mapn(
         key_neural,
         "<CMD>Neural<CR>",
-        { desc = "ai.nrl:>> chatgpt neural interface" },
-      },
-    },
+        { desc = "ai.nrl:>> chatgpt neural interface" }
+      )
+    end,
   },
   {
     "jackMort/ChatGPT.nvim",
@@ -134,29 +166,25 @@ return {
       popup_window = { border = { style = env.borders.alt } },
       popup_input = { border = { style = env.borders.alt } },
     },
-    -- keys = require("environment.keys").chatgpt,
-    keys = {
-      { "n", key_gpt .. "gg", "<CMD>ChatGPT<CR>", { desc = "chatgpt" } },
-      {
-        "n",
+    init = function()
+      mapn(key_gpt .. "gg", "<CMD>ChatGPT<CR>", { desc = "chatgpt" })
+      mapn(
         key_gpt .. "gr",
         "<CMD>ChatGPTActAs<CR>",
-        { desc = "chatgpt role prompts" },
-      },
-      {
-        "n",
+        { desc = "chatgpt role prompts" }
+      )
+      mapn(
         key_gpt .. "ge",
         "<CMD>ChatGPTEditWithInstructions<CR>",
-        { desc = "chatgpt edit with instructions" },
-      },
-      {
-        "n",
+        { desc = "chatgpt edit with instructions" }
+      )
+      mapn(
         key_gpt .. "ga",
         "<CMD>ChatGPTCustomCodeAction<CR>",
-        { desc = "chatgpt code actions" },
-      },
-      { "n", ";G", "<CMD>ChatGPT<CR>", { desc = "chatgpt" } },
-    },
+        { desc = "chatgpt code actions" }
+      )
+      mapn(";G", "<CMD>ChatGPT<CR>", { desc = "chatgpt" })
+    end,
   },
   {
     "Bryley/neoai.nvim",
