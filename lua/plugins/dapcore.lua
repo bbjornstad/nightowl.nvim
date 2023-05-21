@@ -12,14 +12,14 @@ return {
       -- which key integration
       {
         "folke/which-key.nvim",
-        opts = {
-          defaults = {
+        opts = function(_, opts)
+          opts.defaults = vim.tbl_extend("force", opts.defaults or {}, {
             ["<leader>d"] = { name = "+debug" },
             ["<leader>da"] = { name = "+adapters" },
             -- TODO Add a few more of these baseline name mappings
             -- directly onto the which-key configuration here.
-          },
-        },
+          })
+        end,
       }, -- mason.nvim integration
       {
         "jay-babu/mason-nvim-dap.nvim",

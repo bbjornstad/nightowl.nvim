@@ -1,4 +1,4 @@
-local mapn = require("plenary").functional.partial(vim.keymap.set, "n")
+local mapn = require("environment.keys").mapn
 local otter = require("otter")
 mapn(
   "gd",

@@ -17,7 +17,7 @@ return {
       endwise = { enable = true },
       matchup = { enable = true },
     },
-    build = ":TSUpdate",
+    build = pcall(vim.cmd, "TSUpdate"),
   },
   {
     "RRethy/nvim-treesitter-endwise",
@@ -29,8 +29,6 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
-    event = "BufReadPre",
-    enabled = true,
     opts = { mode = "cursor" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },

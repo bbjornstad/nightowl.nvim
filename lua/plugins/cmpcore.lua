@@ -1,4 +1,5 @@
-local cmp = "hrsh7th/nvim-cmp"
+-- vim: set ft=lua ts=2 sts=2 sw=2 et:
+local ncmp = "hrsh7th/nvim-cmp"
 local env = require("environment.ui")
 
 return {
@@ -9,133 +10,94 @@ return {
     end,
   },
   {
-    -- this needs to be original plugin
-    -- but we want to mix and match.
-    cmp,
-    dependencies = { "VonHeikemen/lsp-zero.nvim" },
+    ncmp,
+    dependencies = {
+      "VonHeikemen/lsp-zero.nvim",
+      "onsails/lspkind.nvim",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline",
+      "hrsh7th/cmp-nvim-lua",
+      "hrsh7th/cmp-nvim-lsp-signature-help",
+      "hrsh7th/cmp-nvim-lsp-document-symbol",
+      "petertriho/cmp-git",
+      "lukas-reineke/cmp-rg",
+      "tamago324/cmp-zsh",
+      "delphinus/cmp-ctags",
+      "rcarriga/cmp-dap",
+      "hrsh7th/cmp-calc",
+      "ray-x/cmp-treesitter",
+      "Saecki/crates.nvim",
+      "bydlw98/cmp-env",
+      "nat-418/cmp-color-names.nvim",
+      "jc-doyle/cmp-pandoc-references",
+      "saadparwaiz1/cmp_luasnip",
+    },
     opts = function(_, opts)
-      -- local has_words_before = function()
-      --  local unpack = unpack or table.unpack
-      --  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-      --  return col ~= 0
-      --    and vim.api
-      --        .nvim_buf_get_lines(0, line - 1, line, true)[1]
-      --        :sub(col, col)
-      --        :match("%s")
-      --      == nil
-      -- end
-
-      -- local luasnip = require("luasnip")
-      local ucmp = require("cmp")
-      local cmp_action = require("lsp-zero").cmp_action()
-
-      require("luasnip.loaders.from_vscode").lazy_load()
+      local cmp = require("cmp")
+      -- we don't want to include the next part because it is already included
+      -- in the call to friendly-snippets configuration via LazyVim
+      -- require("luasnip.loaders.from_vscode").lazy_load()
+      -- This one is ok because it is not loaded afaict by way of LazyVim
       require("luasnip.loaders.from_snipmate").lazy_load()
-
-      opts.window = {
-        completion = ucmp.config.window.bordered({
-          border = env.borders.main,
-          padding = { 1, 2 },
+      -- this is ok, we now put our sources and configuration for such sources
+      -- in this list item below
+      --opts.window = opts.window or {}
+      --table.insert(opts.window, {
+      --  completion = cmp.config.window.bordered(),
+      --  documentation = cmp.config.window.bordered(),
+      --})
+      opts.view = opts.view or {}
+      table.insert(opts.view, { entries = { separator = " | " } })
+      opts.sources = cmp.config.sources(vim.list_extend(opts.sources, {
+        { name = "nvim-lsp", max_item_count = 5 },
+        { name = "luasnip", max_item_count = 3 },
+        { name = "treesitter", max_item_count = 4 },
+        { name = "nvim_lsp_signature_help", max_item_count = 3 },
+        { name = "dap", max_item_count = 5 },
+        { name = "rg", max_item_count = 3 },
+        { name = "env", max_item_count = 4 },
+        { name = "buffer", max_item_count = 5 },
+        { name = "path", max_item_count = 4 },
+        { name = "otter", max_item_count = 3 },
+        { name = "snippy", max_item_count = 4 },
+        { name = "calc", max_item_count = 3 },
+        { name = "cmdline", max_item_count = 3 },
+        { name = "ctags", max_item_count = 3 },
+        { name = "color_names", max_item_count = 3 },
+      }))
+      opts.formatting = opts.formatting or {}
+      table.insert(opts.formatting, {
+        fields = { "abbr", "kind", "menu" },
+        format = require("lspkind").cmp_format({
+          mode = "symbol_text",
+          maxwidth = 50,
+          ellipsis_char = "...",
         }),
-        documentation = ucmp.config.window.bordered({
-          border = env.borders.main,
-          padding = { 1, 2 },
-        }),
-      }
-      opts.view = { entries = { separator = " | " } }
-
-      opts.sources = ucmp.config.sources(vim.list_extend(
-        opts.sources,
-        -- this is ok, we now put our sources and configuration for such sources
-        -- in this list item below
-        {
-          { name = "copilot", max_item_count = 10 },
-          { name = "hfcc", max_item_count = 10 },
-          { name = "nvim-lsp", max_item_count = 5 },
-          { name = "buffer", max_item_count = 5 },
-          { name = "path", max_item_count = 4 },
-          { name = "env", max_item_count = 4 },
-          { name = "rg", max_item_count = 3 },
-          { name = "luasnip", max_item_count = 3 },
-          { name = "snippy", max_item_count = 4 },
-          { name = "dap", max_item_count = 5 },
-          { name = "calc", max_item_count = 3 },
-          { name = "cmp_tabnine", max_item_count = 3 },
-          { name = "cmdline", max_item_count = 3 },
-          { name = "treesitter", max_item_count = 4 },
-          { name = "ctags", max_item_count = 3 },
-          { name = "otter", max_item_count = 3 },
-          { name = "color_names", max_item_count = 3 },
-          { name = "nvim_lsp_signature_help", max_item_count = 3 },
-        }
-      ))
-
-      opts.mapping = vim.tbl_extend("force", opts.mapping, {
-        -- Remap carriage return to be the selection behavior of nvim-cmp.
-        ["<CR>"] = ucmp.mapping({
-          i = function(fallback)
-            if ucmp.visible() and ucmp.get_active_entry() then
-              ucmp.confirm({
-                behavior = ucmp.ConfirmBehavior.Replace,
-                select = false,
-              })
-            else
-              fallback()
-            end
-          end,
-          c = ucmp.mapping.confirm({
-            behavior = ucmp.ConfirmBehavior.Replace,
-            select = true,
-          }),
-          s = ucmp.mapping.confirm({ select = true }),
-        }),
-        -- enables supertab-like control of the popup completion window.
-        ["<Tab>"] = cmp_action.luasnip_supertab(),
-        -- ucmp.mapping(function(fallback)
-        -- if ucmp.visible() then
-        --  ucmp.select_next_item()
-        --  -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-        --  -- they way you will only jump inside the snippet region
-        -- elseif luasnip.expand_or_locally_jumpable() then
-        --  luasnip.expand_or_jump()
-        -- elseif has_words_before() then
-        --  ucmp.complete()
-        -- else
-        --  fallback()
-        -- end
-        -- end, { "i", "s" }),
-        ["<S-Tab>"] = cmp_action.luasnip_shift_supertab(),
-        -- ucmp.mapping(function(fallback)
-        -- if ucmp.visible() then
-        --  ucmp.select_prev_item()
-        -- elseif luasnip.jumpable(-1) then
-        --  luasnip.jump(-1)
-        -- else
-        --  fallback()
-        -- end
-        -- end, { "i", "s" }),
+      })
+      opts.completion = vim.tbl_extend("force", opts.completion or {}, {
+        completeopt = "menuone,menu,noselect,noinsert",
       })
     end,
   },
-  { "hrsh7th/cmp-nvim-lsp", dependencies = { cmp } },
-  { "hrsh7th/cmp-buffer", dependencies = { cmp } },
-  { "hrsh7th/cmp-path", dependencies = { cmp } },
-  { "hrsh7th/cmp-cmdline", dependencies = { cmp } },
-  { "hrsh7th/cmp-nvim-lua", dependencies = { cmp }, ft = "lua" },
-  { "hrsh7th/cmp-nvim-lsp-signature-help", dependencies = { cmp } },
-  { "hrsh7th/cmp-nvim-lsp-document-symbol", dependencies = { cmp } },
-  { "petertriho/cmp-git", dependencies = { cmp } },
-  { "lukas-reineke/cmp-rg", dependencies = { cmp } },
-  { "tamago324/cmp-zsh", dependencies = { cmp }, ft = "zsh" },
-  { "delphinus/cmp-ctags", dependencies = { cmp } },
-  { "rcarriga/cmp-dap", dependencies = { cmp } },
-  { "hrsh7th/cmp-calc", dependencies = { cmp } },
-  { "ray-x/cmp-treesitter", dependencies = { cmp } },
-  { "onsails/lspkind.nvim", dependencies = { cmp } },
-  { "Saecki/crates.nvim", dependencies = { cmp }, ft = "rust" },
-  { "tzachar/cmp-tabnine", dependencies = { cmp } },
-  { "bydlw98/cmp-env", dependencies = { cmp } },
-  { "nat-418/cmp-color-names.nvim", dependencies = { cmp } },
-  { "jc-doyle/cmp-pandoc-references", dependencies = { cmp } },
-  { "saadparwaiz1/cmp_luasnip", dependencies = { cmp } },
+  { "hrsh7th/cmp-nvim-lsp", dependencies = { ncmp } },
+  { "hrsh7th/cmp-buffer", dependencies = { ncmp } },
+  { "hrsh7th/cmp-path", dependencies = { ncmp } },
+  { "hrsh7th/cmp-cmdline", dependencies = { ncmp } },
+  { "hrsh7th/cmp-nvim-lua", dependencies = { ncmp }, ft = "lua" },
+  { "hrsh7th/cmp-nvim-lsp-signature-help", dependencies = { ncmp } },
+  { "hrsh7th/cmp-nvim-lsp-document-symbol", dependencies = { ncmp } },
+  { "petertriho/cmp-git", dependencies = { ncmp } },
+  { "lukas-reineke/cmp-rg", dependencies = { ncmp } },
+  { "tamago324/cmp-zsh", dependencies = { ncmp }, ft = "zsh" },
+  { "delphinus/cmp-ctags", dependencies = { ncmp } },
+  { "rcarriga/cmp-dap", dependencies = { ncmp } },
+  { "hrsh7th/cmp-calc", dependencies = { ncmp } },
+  { "ray-x/cmp-treesitter", dependencies = { ncmp } },
+  { "Saecki/crates.nvim", dependencies = { ncmp }, ft = "rust" },
+  { "bydlw98/cmp-env", dependencies = { ncmp } },
+  { "nat-418/cmp-color-names.nvim", dependencies = { ncmp } },
+  { "jc-doyle/cmp-pandoc-references", dependencies = { ncmp } },
+  { "saadparwaiz1/cmp_luasnip", dependencies = { ncmp } },
 }

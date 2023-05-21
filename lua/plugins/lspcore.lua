@@ -22,12 +22,7 @@ return {
     dependencies = {
       -- LSP Support
       { "neovim/nvim-lspconfig" }, -- Required
-      -- { -- Optional
-      --  "williamboman/mason.nvim",
-      --  build = function()
-      --    pcall(vim.cmd, "MasonUpdate")
-      --  end,
-      -- },
+      { "williamboman/mason.nvim" }, -- Optional
       {
         "williamboman/mason-lspconfig.nvim",
         dependencies = {
@@ -35,6 +30,7 @@ return {
           "VonHeikemen/lsp-zero.nvim",
         },
       }, -- Optional
+      { "jay-babu/mason-null-ls.nvim" },
       -- Autocompletion
       { "hrsh7th/nvim-cmp" }, -- Required
       { "hrsh7th/cmp-nvim-lsp" }, -- Required
@@ -42,12 +38,15 @@ return {
       -- Required when using LazyVim, in order to prevent
       -- startup warnings related to incorrect plugin load order.
       { "folke/neoconf.nvim" },
+      { "folke/neodev.nvim" },
     },
-    config = function()
+    config = function(_, opts)
       -- print(string.format("LSPZero Config: {}", vim.inspect(opts)))
-      local lsp = require("lsp-zero").preset(vim.tbl_deep_extend("force", {}, {
+      local lsp = require("lsp-zero").preset({
+        name = "minimal",
         set_lsp_keymaps = { preserve_mappings = true },
         float_border = env.borders.main,
+        configure_diagnostics = true,
         manage_nvim_cmp = {
           set_basic_mappings = true,
           set_extra_mappings = true,
@@ -56,9 +55,9 @@ return {
           set_format = true,
           documentation_window = true,
         },
-      }))
+      })
       lsp.on_attach(function(client, bufnr)
-        lsp.default_keymaps({ buffer = bufnr, preserve_mappings = false })
+        lsp.default_keymaps({ buffer = bufnr, preserve_mappings = true })
         if client.server_capabilities.documentSymbolProvider then
           require("nvim-navic").attach(client, bufnr)
         end
@@ -71,7 +70,6 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre" },
     init = function()
       local keys = require("lazyvim.plugins.lsp.keymaps").get()
       keys[#keys + 1] = {
@@ -79,17 +77,16 @@ return {
         vim.lsp.buf.format,
         "lsp-format current buffer",
       }
-      keys[#keys + 1] = {
-        "K",
-        "<CMD>lua require'pretty_hover'.hover()<CR>",
-        -- vim.lsp.buf.hover,
-        "lsp hover item information",
-      }
       keys[#keys + 1] = { "gK", vim.lsp.buf.hover, "hover (unprettified)" }
+      keys[#keys + 1] = {
+        "gS",
+        vim.lsp.buf.signature_help,
+        "signature help",
+      }
       keys[#keys + 1] = {
         "g?",
         function()
-          vim.cmd([[help]])
+          vim.cmd([[help ]] .. vim.fn.expand("<cword>"))
         end,
       }
     end,
@@ -101,34 +98,14 @@ return {
   },
   {
     "jose-elias-alvarez/null-ls.nvim",
-    event = { "BufReadPre" },
-    dependencies = {
-      "jay-babu/mason-null-ls.nvim",
-      {
-        "williamboman/mason-lspconfig.nvim",
-        dependencies = "williamboman/mason.nvim",
-      },
-      "VonHeikemen/lsp-zero.nvim",
-    },
+    dependencies = { "VonHeikemen/lsp-zero.nvim" },
   },
   {
     "jay-babu/mason-null-ls.nvim",
-    event = { "BufReadPre" },
     dependencies = {
-      "jose-elias-alvarez/null-ls.nvim",
       "williamboman/mason.nvim",
+      "jose-elias-alvarez/null-ls.nvim",
       "VonHeikemen/lsp-zero.nvim",
-    },
-    opts = {
-      ensure_installed = nil,
-      automatic_installation = true, -- You can still set this to `true`
-      handlers = {
-        -- Here you can add functions to register sources.
-        -- See https://github.com/jay-babu/mason-null-ls.nvim#handlers-usage
-        --
-        -- If left empty, mason-null-ls will  use a "default handler"
-        -- to register all sources
-      },
     },
   },
 }

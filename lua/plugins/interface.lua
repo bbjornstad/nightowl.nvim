@@ -10,6 +10,7 @@ vim.diagnostic.config({
 
 local stems = require("environment.keys").stems
 local mapn = require("environment.keys").mapn
+local mapx = vim.keymap.set
 local key_notify = stems.notify
 local key_vista = stems.vista
 local key_lens = stems.lens
@@ -25,11 +26,14 @@ return {
           ["vim.lsp.util.stylize_markdown"] = true,
           ["cmp.entry.get_documentation"] = true,
         },
+        progress = {},
       },
       presets = {
         bottom_search = false, -- use a classic bottom cmdline for search
         command_palette = true, -- position the cmdline and popupmenu together
         long_message_to_split = true, -- long messages will be sent to a split
+        inc_rename = true,
+        lsp_doc_border = true,
       },
       views = {
         cmdline_popup = {
@@ -59,7 +63,6 @@ return {
         },
         notify = {
           relative = "editor",
-          border = { style = env.borders.main, padding = { 1, 2 } },
         },
       },
       routes = {
@@ -80,17 +83,23 @@ return {
   },
   {
     "stevearc/dressing.nvim",
+    event = "VimEnter",
     opts = { input = { enabled = true, border = env.borders.main } },
   },
   {
     "nvim-neo-tree/neo-tree.nvim",
+    opts = {},
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-tree/nvim-web-devicons",
       "MunifTanjim/nui.nvim",
     },
   },
-  { "stevearc/oil.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
+  {
+    "stevearc/oil.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {},
+  },
   {
     "beauwilliams/focus.nvim",
     opts = {
@@ -103,59 +112,64 @@ return {
   },
   {
     "b0o/incline.nvim",
-    config = function(_, opts)
-      require("incline").setup(opts)
-    end,
-    event = { "BufReadPre" },
-  },
-  {
-    "b0o/incline.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       render = function(props)
         local filename =
           vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
+
         local icon, color =
           require("nvim-web-devicons").get_icon_color(filename)
-        return { { icon, guifg = color }, { " " }, { filename } }
+        return {
+          { icon .. " ", guifg = color },
+          { "  " },
+          { filename },
+          { require("lsp-status").status() },
+          { " 󰅓: " .. require("pomodoro").statusline() },
+        }
       end,
+      window = {
+        margin = { vertical = 0, horizontal = 1 },
+        padding = 2,
+        placement = { horizontal = "right", vertical = "top" },
+        width = "fit",
+        options = { winblend = 10, signcolumn = "yes", wrap = false },
+      },
     },
   },
-  {
-    "folke/which-key.nvim",
-    opts = { window = { border = env.borders.main } },
-    -- function(_, opts)
-    --  opts.window = opts.window or {}
-    --  table.insert(opts.window, { border = env.borders.main })
-    -- end,
-  },
-  -- { "b0o/mapx.nvim", config = true, dependencies = { "folke/which-key.nvim" } },
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons", "b0o/incline.nvim" },
     opts = {
+      options = {
+        icons_enabled = true,
+        globalstatus = true,
+        -- component_separators = { left = "" , right = "" },
+        -- section_separators = { left = "\u{e0d2}", right = "\u{e0d4}" },
+      },
       tabline = {
         lualine_a = { "buffers" },
-        lualine_x = {
-          {
-            function()
-              return require("nvim-navic").get_location()
-            end,
-            cond = function()
-              return require("nvim-navic").is_available()
-            end,
-          },
-        },
+        -- lualine_x = {
+        --  {
+        --    function()
+        --      return require("nvim-navic").get_location()
+        --    end,
+        --    cond = function()
+        --      return require("nvim-navic").is_available()
+        --    end,
+        --  },
+        -- },
       },
       winbar = {
         lualine_a = {},
         lualine_b = {},
         lualine_c = {
-          { "filename >>" },
-          {
-            "navic",
-            color_correction = "dynamic",
-            navic_opts = env.navic.opts,
-          },
+          { "filename" },
+          -- {
+          --  "navic",
+          --  color_correction = "dynamic",
+          --  navic_opts = env.navic.opts,
+          -- },
         },
         lualine_x = {},
         lualine_y = {},
@@ -172,6 +186,12 @@ return {
     },
   },
   {
+    "code-biscuits/nvim-biscuits",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    opts = {},
+    event = { "LspAttach" },
+  },
+  {
     "lvimuser/lsp-inlayhints.nvim",
     event = "LspAttach",
     -- opts = {
@@ -180,7 +200,7 @@ return {
     --    type = { show = true, highlight = "Comment" },
     --  },
     -- },
-    config = function(_, opts)
+    opts = function(_, opts)
       require("lsp-inlayhints").setup(opts)
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("LspAttach_inlayhints", {}),
@@ -194,15 +214,21 @@ return {
       })
     end,
   },
-  { "junegunn/fzf", build = "make" },
+  { "junegunn/fzf", dependencies = { "junegunn/fzf.vim" }, build = "make" },
   {
     "junegunn/fzf.vim",
     dependencies = { "junegunn/fzf" },
-    event = { "WinEnter", "VimEnter" },
+    event = { "VeryLazy" },
   },
   {
     "rcarriga/nvim-notify",
-    opts = { top_down = false, render = "compact" },
+    opts = function(_, opts)
+      opts.top_down = true
+      opts.render = "compact"
+      opts.on_open = function(win)
+        vim.api.nvim_win_set_config(win, { border = env.borders.main })
+      end
+    end,
     init = function()
       mapn(
         key_notify .. "n",
@@ -217,7 +243,12 @@ return {
     end,
   },
   { "rcarriga/nvim-dap-ui", dependencies = { "mfussenegger/nvim-dap" } },
-  { "nvim-lua/lsp-status.nvim" },
+  {
+    "nvim-lua/lsp-status.nvim",
+    event = "LspAttach",
+    opts = {},
+    config = function() end,
+  },
   {
     "VidocqH/lsp-lens.nvim",
     opts = {
@@ -254,9 +285,10 @@ return {
       show_current_context_start = true,
     },
   },
-  { "karb94/neoscroll.nvim", event = "BufEnter" },
+  { "karb94/neoscroll.nvim", event = "VeryLazy" },
   {
     "yamatsum/nvim-cursorline",
+    event = "VeryLazy",
     opts = {
       cursorline = { enable = true, timeout = 1000, number = false },
       cursorword = {
@@ -267,7 +299,11 @@ return {
     },
   },
   { "sindrets/diffview.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
-  { "ray-x/lsp_signature.nvim", dependencies = { "neovim/nvim-lspconfig" } },
+  {
+    "ray-x/lsp_signature.nvim",
+    dependencies = { "neovim/nvim-lspconfig" },
+    event = "LspAttach",
+  },
   {
     "liuchengxu/vista.vim",
     cmd = "Vista",
@@ -292,19 +328,83 @@ return {
   {
     "SmiteshP/nvim-navic",
     dependencies = { "neovim/nvim-lspconfig" },
-    event = { "BufEnter", "BufWinEnter" },
-    opts = function()
-      return {
-        separator = " ",
-        highlight = true,
-        depth_limit = 5,
-        icons = require("lazyvim.config").icons.kinds,
-      }
-    end,
+    event = "LspAttach",
+    opts = {
+      separator = "  ",
+      highlight = false,
+      depth_limit = 7,
+      icons = require("lazyvim.config").icons.kinds,
+    },
   },
   {
     "Fildo7525/pretty_hover",
     event = "LspAttach",
     opts = { border = env.borders.main },
+    init = function()
+      local keys = require("lazyvim.plugins.lsp.keymaps").get()
+      keys[#keys + 1] = {
+        "K",
+        require("pretty_hover").hover,
+        "hover:>> show hover",
+      }
+    end,
+  },
+  {
+    "johann2357/nvim-smartbufs",
+    opts = {},
+    event = "VeryLazy",
+    config = function() end,
+    init = function()
+      mapx(
+        { "n", "v" },
+        "<leader>b[",
+        "<CMD>lua require('nvim-smartbufs').goto_prev_buffer()<CR>",
+        { desc = "buf:>> previous buffer" }
+      )
+
+      mapx(
+        { "n", "v" },
+        "<leader>b]",
+        "<CMD>lua require('nvim-smartbufs').goto_next_buffer()<CR>",
+        { desc = "buf:>> next buffer" }
+      )
+      mapx(
+        { "n", "v", "i" },
+        "<C-S-Left>",
+        "<CMD>lua require('nvim-smartbufs').goto_prev_buffer()<CR>",
+        { desc = "buf:>> previous buffer" }
+      )
+      mapx(
+        { "n", "v", "i" },
+        "<C-S-Right>",
+        "<CMD>lua require('nvim-smartbufs').goto_next_buffer()<CR>",
+        { desc = "buf:>> next buffer" }
+      )
+      for i = 1, 9, 1 do
+        local keynum = i
+        mapn(
+          "<leader>" .. keynum,
+          string.format(
+            "<CMD>lua require('nvim-smartbufs').goto_buffer(%d)<CR>",
+            keynum
+          ),
+          { desc = string.format("buf:>> goto buffer %d", keynum) }
+        )
+        mapn(
+          "<leader>q" .. keynum,
+          string.format(
+            "<CMD>lua require('nvim-smartbufs').close_buffer(%d)<CR>",
+            keynum
+          ),
+          { desc = string.format("buf:>> leave buffer %d", keynum) }
+        )
+      end
+      mapx(
+        { "n", "v" },
+        "<leader>bq",
+        "<CMD>lua require('nvim-smartbufs').close_current_buffer()<CR>",
+        { desc = "buf:>> intelligently close current buffer" }
+      )
+    end,
   },
 }

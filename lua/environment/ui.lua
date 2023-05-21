@@ -14,10 +14,12 @@ env.telescope = {}
 env.telescope.theme = "ivy"
 
 env.navic = {}
-env.navic.opts = nil
+env.navic.opts = {}
 
 env.bufferline = {}
 env.bufferline.tab_format = "slant"
+
+env.enable_vim_strict = false
 --------------------------------------------------------------------------------
 -- UI: Colorscheme Options
 -- ===========

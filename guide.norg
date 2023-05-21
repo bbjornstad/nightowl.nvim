@@ -16,7 +16,7 @@
   - ( ) Determine why the <localleader> key is not being obeyed properly.
   - ( ) Determine why the semicolon key is not being obeyed properly, despite the fact that
     other set keymappings in the lazyvim fashion seem to be functional.
-   
+
 * Main Milestones Needed
   The main milestones needed to complete this project are:
   - ( ) Finish keymappings
@@ -27,4 +27,4 @@
   - ( ) Write documentation for all important functions, followed by remaining
     functions.
   - ( ) Clean up the codebase with generally accepted idiomatic lua conventions
-    in mind. 
+    in mind.

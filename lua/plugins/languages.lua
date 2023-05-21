@@ -1,4 +1,5 @@
 local key_neogen = require("environment.keys").stems.neogen
+local key_iron = require("environment.keys").stems.iron
 local mapn = require("environment.keys").mapn
 
 return {
@@ -52,6 +53,27 @@ return {
       },
       keymaps = {},
     },
+    init = function()
+      mapn(key_iron .. "s", function()
+        local core = require("iron.core")
+        local ft = vim.bo.filetype
+        core.repl_here(ft)
+      end, { desc = "iron:>> open repl" })
+      mapn(key_iron .. "r", function()
+        local core = require("iron.core")
+        core.repl_restart()
+      end, { desc = "iron:>> restart repl" })
+      mapn(key_iron .. "f", function()
+        local core = require("iron.core")
+        local ft = vim.bo.filetype
+        core.focus_on(ft)
+      end, { desc = "iron:>> focus" })
+      mapn(key_iron .. "h", function()
+        local core = require("iron.core")
+        local ft = vim.bo.filetype
+        core.close_repl(ft)
+      end, { desc = "iron:>> hide" })
+    end,
   },
   {
     "quarto-dev/quarto-nvim",
@@ -61,6 +83,6 @@ return {
       "neovim/nvim-lspconfig",
       "nvim-treesitter/nvim-treesitter",
     },
-    ft = { "quarto", ".qmd" },
+    ft = { "quarto", "qmd" },
   },
 }
