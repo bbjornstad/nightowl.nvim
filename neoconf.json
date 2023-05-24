@@ -1,18 +1,18 @@
 {
-  "neodev": {
-    "library": {
-      "enabled": true,
-      "plugins": true
+    "neodev": {
+        "library": {
+            "enabled": true,
+            "plugins": true
+        }
+    },
+    "neoconf": {
+        "plugins": {
+            "lua_ls": {
+                "enabled": true
+            },
+            "editorconfig": {
+                "enabled": true
+            }
+        }
     }
-  },
-  "neoconf": {
-    "plugins": {
-      "lua_ls": {
-        "enabled": true
-      },
-      "editorconfig": {
-        "enabled": true
-      }
-    }
-  }
 }

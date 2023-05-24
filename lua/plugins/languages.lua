@@ -85,4 +85,15 @@ return {
     },
     ft = { "quarto", "qmd" },
   },
+  {
+    "hrsh7th/nvim-cmp",
+    opts = function(_, opts)
+      if vim.fn.has("otter") then
+        local cmp = require("cmp")
+        opts.sources = vim.list_extend({
+          { name = "otter", max_item_count = 8 },
+        }, opts.sources or {})
+      end
+    end,
+  },
 }

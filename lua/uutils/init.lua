@@ -7,12 +7,12 @@ local api = vim.api
 --  lua for neovim configuration.
 local uutils = {}
 
-uutils.tbl = require('uutils.tbl')
-uutils.key = require('uutils.key')
-uutils.edit = require('uutils.edit')
-uutils.mod = require('uutils.mod')
-uutils.string = require('uutils.string')
-uutils.fn = require('uutils.fn')
-uutils.cmd = require('uutils.cmd')
+uutils.tbl = require("uutils.tbl")
+uutils.key = require("uutils.key")
+uutils.edit = require("uutils.edit")
+uutils.mod = require("uutils.mod")
+uutils.string = require("uutils.string")
+uutils.fn = require("uutils.fn")
+uutils.cmd = require("uutils.cmd")
 
 return uutils

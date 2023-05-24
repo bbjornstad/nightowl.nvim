@@ -10,6 +10,19 @@ env.borders.main = "shadow"
 env.borders.alt = "solid"
 env.borders.main_accent = "double"
 
+env.ai = {}
+env.ai.enabled = {
+  copilot = true,
+  cmp_ai = false,
+  chatgpt = true,
+  codegpt = true,
+  neural = true,
+  neoai = true,
+  hfcc = true,
+  tabnine = true,
+  codeium = true,
+}
+
 env.telescope = {}
 env.telescope.theme = "ivy"
 
@@ -20,12 +33,16 @@ env.bufferline = {}
 env.bufferline.tab_format = "slant"
 
 env.enable_vim_strict = false
+
+env.enable_lsp_signature = false
 --------------------------------------------------------------------------------
 -- UI: Colorscheme Options
 -- ===========
 --
 env.colorscheme = {}
 env.colorscheme.setup = {
+  --function(_, opts)
+  --  opts = vim.tbl_deep_extend("force", {
   globalStatus = true,
   dimInactive = true,
   commentStyle = { italic = true },
@@ -56,5 +73,7 @@ env.colorscheme.setup = {
     }
   end,
 }
+--opts)
+--end
 
 return env

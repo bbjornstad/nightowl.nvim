@@ -4,8 +4,8 @@ local scope_theme = "ivy"
 function mod.setup_extension(extension, opts, theme, config)
   config[extension] = vim.tbl_deep_extend(
     "force",
-    opts,
-    { theme = (theme or scope_theme) or "ivy" }
+    { theme = (theme or scope_theme) or "ivy" },
+    opts
   )
 end
 

@@ -90,11 +90,11 @@ local target_extensions = {
 local scopeutils = require("uutils.scope")
 local pickspec = scopeutils.setup_pickers(target_pickers, {
   layout_strategy = "bottom_pane",
-  layout_config = { height = 0.7 },
+  layout_config = { height = 0.85 },
 }, "ivy")
 local extspec = scopeutils.setup_extensions(target_extensions, {
   layout_strategy = "bottom_pane",
-  layout_config = { height = 0.7 },
+  layout_config = { height = 0.85 },
   fzf = {
     fuzzy = true,
     override_generic_sorter = true,
@@ -117,7 +117,6 @@ return {
   },
   {
     "nvim-telescope/telescope.nvim",
-    branch = "0.1.x",
     dependencies = {
       {
         "nvim-telescope/telescope-fzf-native.nvim",
@@ -177,11 +176,22 @@ return {
       "barrett-ruth/telescope-http.nvim",
       "LinArcX/telescope-ports.nvim",
     },
-    opts = { defaults = {}, pickers = pickspec, extensions = extspec },
+    opts = {
+      defaults = {
+        layout_stragegy = "bottom_pane",
+      },
+      pickers = pickspec,
+      extensions = extspec,
+    },
     init = function()
       ---
       -- @module telescope.core: core keymappings.
       -- telescope.core: Find Files
+      mapn(
+        "<leader><leader>",
+        require("telescope.builtin").builtin,
+        { desc = "test_search telescope" }
+      )
       mapn(
         key_scope .. "ff",
         require("telescope.builtin").find_files,
@@ -303,7 +313,7 @@ return {
       mapnv(
         "q:",
         require("telescope.builtin").command_history,
-        { desc = "scope:>> command history", remap = true }
+        { desc = "scope:>> command history", remap = false }
       )
     end,
   },

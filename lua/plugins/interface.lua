@@ -4,8 +4,7 @@ vim.diagnostic.config({
   signs = true,
   underline = true,
   update_in_insert = true,
-  severity_sort = true,
-  float = { border = env.borders.main },
+  -- float = { border = env.borders.main },
 })
 
 local stems = require("environment.keys").stems
@@ -14,8 +13,24 @@ local mapx = vim.keymap.set
 local key_notify = stems.notify
 local key_vista = stems.vista
 local key_lens = stems.lens
+local key_oil = stems.oil
+
+local function format_lsp_signature(opts)
+  if vim.fn.has("lsp_signature") then
+    if not pcall(require, "lsp_signature") then
+      return
+    end
+    local sig = require("lsp_signature").status_line(opts)
+    return string.format("%s [ %s ]", sig.label, sig.hint)
+  end
+end
 
 return {
+  {
+    "akinsho/bufferline.nvim",
+    enabled = false,
+    module = false,
+  },
   {
     "folke/noice.nvim",
     opts = {
@@ -27,18 +42,24 @@ return {
           ["cmp.entry.get_documentation"] = true,
         },
         progress = {},
+        signature = {
+          enabled = not env.enable_lsp_signature,
+        },
       },
       presets = {
         bottom_search = false, -- use a classic bottom cmdline for search
         command_palette = true, -- position the cmdline and popupmenu together
         long_message_to_split = true, -- long messages will be sent to a split
         inc_rename = true,
-        lsp_doc_border = true,
+        --lsp_doc_border = true,
       },
       views = {
         cmdline_popup = {
           position = { row = 16, col = "50%" },
-          size = { width = vim.opt.textwidth:get(), height = "auto" },
+          size = {
+            width = math.max(80, vim.opt.textwidth:get()),
+            height = "auto",
+          },
           border = { style = env.borders.main, padding = { 1, 2 } },
           win_options = {
             winhighlight = {
@@ -61,6 +82,20 @@ return {
             },
           },
         },
+        hover = {
+          view = "popup",
+          size = {
+            max_height = 30,
+            max_width = 120,
+          },
+          border = {
+            style = env.borders.main,
+            padding = { 1, 2 },
+          },
+        },
+        popup = {
+          border = { style = env.borders.main },
+        },
         notify = {
           relative = "editor",
         },
@@ -78,13 +113,16 @@ return {
           },
           opts = { skip = true },
         },
+        {
+          filter = {
+            event = "msg_show",
+            find = "nvim-biscuits",
+            kind = "",
+          },
+          opts = { skip = true },
+        },
       },
     },
-  },
-  {
-    "stevearc/dressing.nvim",
-    event = "VimEnter",
-    opts = { input = { enabled = true, border = env.borders.main } },
   },
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -97,8 +135,24 @@ return {
   },
   {
     "stevearc/oil.nvim",
+    event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {},
+    keymaps = {
+      ["."] = "actions.cd",
+    },
+    opts = {
+      delete_to_trash = true,
+      float = {
+        border = env.borders.main,
+      },
+      preview = {
+        border = env.borders.main,
+      },
+      progress = {
+        border = env.borders.main,
+        minimized_border = env.borders.main,
+      },
+    },
   },
   {
     "beauwilliams/focus.nvim",
@@ -108,38 +162,60 @@ return {
       absolutenumber_unfocussed = true,
       treewidth = 14,
     },
-    event = { "VimEnter", "WinEnter" },
+    event = "VeryLazy",
   },
   {
     "b0o/incline.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       render = function(props)
-        local filename =
-          vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
-
-        local icon, color =
-          require("nvim-web-devicons").get_icon_color(filename)
-        return {
-          { icon .. " ", guifg = color },
-          { "  " },
-          { filename },
-          { require("lsp-status").status() },
-          { " 󰅓: " .. require("pomodoro").statusline() },
-        }
+        local navic = function(props)
+          return require("nvim-navic").get_location({}, props.buf)
+        end
+        if require("nvim-navic").is_available(props.buf) then
+          return { navic(props) }
+        else
+          return {}
+        end
       end,
       window = {
         margin = { vertical = 0, horizontal = 1 },
         padding = 2,
         placement = { horizontal = "right", vertical = "top" },
         width = "fit",
-        options = { winblend = 10, signcolumn = "yes", wrap = false },
+        options = { winblend = 10, signcolumn = "no", wrap = false },
       },
     },
   },
   {
+    "ray-x/lsp_signature.nvim",
+    event = "LspAttach",
+    opts = {
+      debug = true,
+      bind = true,
+      verbose = true,
+      noice = true,
+      always_trigger = false,
+      transparency = 10,
+      shadow_blend = 36,
+      shadow_guibg = require("kanagawa.colors").setup({ theme = "wave" }).theme.ui.bg_dim,
+    },
+    enabled = env.enable_lsp_signature,
+  },
+  {
+    "TimUntersberger/neogit",
+    dependencies = { "VeryLazy" },
+    cmd = {},
+    opts = {},
+    integrations = { diffview = true },
+  },
+  {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons", "b0o/incline.nvim" },
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+      "b0o/incline.nvim",
+      "nvim-lua/lsp-status.nvim",
+    },
     opts = {
       options = {
         icons_enabled = true,
@@ -147,6 +223,31 @@ return {
         -- component_separators = { left = "" , right = "" },
         -- section_separators = { left = "\u{e0d2}", right = "\u{e0d4}" },
       },
+      sections = {
+        lualine_c = {
+          {
+            "diagnostics",
+            symbols = {
+              error = require("lazyvim.config").icons.diagnostics.Error,
+              warn = require("lazyvim.config").icons.diagnostics.Warn,
+              info = require("lazyvim.config").icons.diagnostics.Info,
+              hint = require("lazyvim.config").icons.diagnostics.Hint,
+            },
+          },
+          {
+            "filetype",
+            icon_only = true,
+            separator = "",
+            padding = { left = 2, right = 1 },
+          },
+          {
+            "filename",
+            path = 1,
+            symbols = { modified = "  ", readonly = "", unnamed = "" },
+          },
+        },
+      },
+
       tabline = {
         lualine_a = { "buffers" },
         -- lualine_x = {
@@ -159,26 +260,45 @@ return {
         --    end,
         --  },
         -- },
+        lualine_x = {
+          {
+            vim.b.lsp_current_function,
+          },
+        },
       },
       winbar = {
         lualine_a = {},
         lualine_b = {},
         lualine_c = {
-          { "filename" },
-          -- {
-          --  "navic",
-          --  color_correction = "dynamic",
-          --  navic_opts = env.navic.opts,
-          -- },
+          {
+            "filetype",
+            icon_only = false,
+            separator = "  ",
+            padding = { left = 1, right = 1 },
+          },
+          {
+            "diagnostics",
+            symbols = {
+              error = require("lazyvim.config").icons.diagnostics.Error,
+              warn = require("lazyvim.config").icons.diagnostics.Warn,
+              info = require("lazyvim.config").icons.diagnostics.Info,
+              hint = require("lazyvim.config").icons.diagnostics.Hint,
+            },
+          },
+          --
         },
-        lualine_x = {},
+        lualine_x = {
+          -- { require("lsp-status").status() },
+          { "filename" },
+        },
         lualine_y = {},
         lualine_z = {},
       },
       inactive_winbar = {
         lualine_a = {},
         lualine_b = {},
-        lualine_c = { "filename" },
+        lualine_c = {},
+        -- lualine_c = { "filename" },
         lualine_x = {},
         lualine_y = {},
         lualine_z = {},
@@ -188,18 +308,14 @@ return {
   {
     "code-biscuits/nvim-biscuits",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    opts = {},
+    opts = {
+      cursor_line_only = true,
+    },
     event = { "LspAttach" },
   },
   {
     "lvimuser/lsp-inlayhints.nvim",
     event = "LspAttach",
-    -- opts = {
-    --  hints = {
-    --    parameter = { show = true, highlight = "Comment" },
-    --    type = { show = true, highlight = "Comment" },
-    --  },
-    -- },
     opts = function(_, opts)
       require("lsp-inlayhints").setup(opts)
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -214,7 +330,25 @@ return {
       })
     end,
   },
-  { "junegunn/fzf", dependencies = { "junegunn/fzf.vim" }, build = "make" },
+  {
+    "junegunn/fzf",
+    dependencies = { "junegunn/fzf.vim" },
+    build = "make",
+    init = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "fzf" },
+        group = vim.api.nvim_create_augroup("fzf quit on q", {}),
+        callback = function()
+          vim.keymap.set(
+            "n",
+            "q",
+            "<CMD>quit<CR>",
+            { desc = "quit", remap = false }
+          )
+        end,
+      })
+    end,
+  },
   {
     "junegunn/fzf.vim",
     dependencies = { "junegunn/fzf" },
@@ -243,12 +377,11 @@ return {
     end,
   },
   { "rcarriga/nvim-dap-ui", dependencies = { "mfussenegger/nvim-dap" } },
-  {
-    "nvim-lua/lsp-status.nvim",
-    event = "LspAttach",
-    opts = {},
-    config = function() end,
-  },
+  --{
+  --  "nvim-lua/lsp-status.nvim",
+  --  opts = {},
+  --  config = function() end,
+  --},
   {
     "VidocqH/lsp-lens.nvim",
     opts = {
@@ -300,28 +433,23 @@ return {
   },
   { "sindrets/diffview.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   {
-    "ray-x/lsp_signature.nvim",
-    dependencies = { "neovim/nvim-lspconfig" },
-    event = "LspAttach",
-  },
-  {
-    "liuchengxu/vista.vim",
-    cmd = "Vista",
+    "simrat39/symbols-outline.nvim",
+    cmd = { "SymbolsOutline", "SymbolsOutlineOpen", "SymbolsOutlineClose" },
     init = function()
       mapn(
         key_vista .. "s",
-        "<CMD>Vista show<CR>",
-        { desc = "show vista tags" }
+        "<CMD>SymbolsOutline<CR>",
+        { desc = "toggle symbols outline" }
       )
       mapn(
-        key_vista .. "f",
-        "<CMD>Vista finder<CR>",
-        { desc = "fzf over vista tags" }
+        key_vista .. "q",
+        "<CMD>SymbolsOutlineClose<CR>",
+        { desc = "close symbols outline (force)" }
       )
       mapn(
-        key_vista .. "V",
-        "<CMD>Vista finder<CR>",
-        { desc = "fzf over vista tags" }
+        key_vista .. "o",
+        "<CMD>SymbolsOutlineOpen<CR>",
+        { desc = "open symbols outline (force)" }
       )
     end,
   },
@@ -330,24 +458,11 @@ return {
     dependencies = { "neovim/nvim-lspconfig" },
     event = "LspAttach",
     opts = {
-      separator = "  ",
+      separator = "  ",
       highlight = false,
       depth_limit = 7,
       icons = require("lazyvim.config").icons.kinds,
     },
-  },
-  {
-    "Fildo7525/pretty_hover",
-    event = "LspAttach",
-    opts = { border = env.borders.main },
-    init = function()
-      local keys = require("lazyvim.plugins.lsp.keymaps").get()
-      keys[#keys + 1] = {
-        "K",
-        require("pretty_hover").hover,
-        "hover:>> show hover",
-      }
-    end,
   },
   {
     "johann2357/nvim-smartbufs",

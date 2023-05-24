@@ -1,35 +1,4 @@
 local env = require("environment.alpha")
--- print(string.format("env: %s", env))
-
--- local function select_random_item(possible)
---  possible = possible or {}
---  if type(possible) == "string" then
---    possible = { possible }
---  end
---  local maxlen = #possible
---  local randi = 0
---  if maxlen == 1 then
---    return possible
---  else
---    randi = math.random(1, maxlen)
---    return possible[randi]
---  end
--- end
--- local function divalpha(possible_text)
---  local selected
---  if possible_text == nil then
---    selected = select_random_item(env.fallback_headers)
---  elseif type(possible_text) == "table" then
---    selected = select_random_item(possible_text)
---  else
---    if type(possible_text ~= "string") then
---      error("this is a problematic spot to have hit")
---    end
---    selected = env.fallback_headers[possible_text]
---  end
---  return selected
--- end
-
 local function startdash(layout, header)
   layout = layout or "alpha.themes.dashboard"
   header = env.fallback_headers[header]
@@ -43,7 +12,8 @@ return {
   {
     "goolord/alpha-nvim",
     opts = function(_, opts)
-      table.insert(
+      opts = vim.tbl_deep_extend(
+        "force",
         opts,
         startdash(
           env.preferred_alpha_layout or "",

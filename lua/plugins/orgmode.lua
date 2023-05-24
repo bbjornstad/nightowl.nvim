@@ -4,6 +4,11 @@ return {
     "nvim-orgmode/orgmode",
     dependencies = { "akinsho/org-bullets.nvim", opts = {} },
     ft = { "org" },
+    init = function()
+      if vim.fn.has("ufo") then
+        pcall(vim.cmd, [[UfoDetatch]])
+      end
+    end,
     config = function(_, opts)
       -- Load custom tree-sitter grammar for org filetype
       require("orgmode").setup_ts_grammar()
@@ -46,7 +51,8 @@ return {
         DONE = ":background #D9DADF :foreground green :underline on",
         URGENT = ":background #D9DADF :foreground red :slant italic :underline on :weight bold",
         SUPER = ":background DarkRed :foreground #e8a7a7 :slant italic :weight bold :underline on",
-        AWAIT = ":background #D9DADF :foreground #4c3757 :slant italic", -- :foreground #21032b :slant italic',
+        -- :foreground #21032b :slant italic',
+        AWAIT = ":background #D9DADF :foreground #4c3757 :slant italic",
         REPEATED = ":background #D9DADF :foreground green :underline on",
         PROGRESSING = ":background #D9DADF :foreground purple :slant italic",
         CHECK = ":background #D9DADF :foreground NavyBlue :slant italic",
@@ -103,6 +109,7 @@ return {
         ["core.dirman"] = {
           config = { workspaces = { my_workspace = "~/." } },
         },
+        ["core.completion"] = { engine = "nvim-cmp" },
       },
     },
   },

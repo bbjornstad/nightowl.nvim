@@ -48,9 +48,9 @@ vim.opt.smartcase = true
 vim.opt.wrapscan = true
 
 -- >>> these are overwritten by our .editorconfig file in this directory.
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.textwidth = 80
+--vim.opt.tabstop = 4
+--vim.opt.shiftwidth = 4
+--vim.opt.textwidth = 80
 -- >>>
 
 vim.opt.ruler = true
@@ -62,13 +62,13 @@ vim.opt.spelllang = "en_us"
 vim.opt.formatoptions = "tcroqb"
 vim.opt.laststatus = 3
 vim.opt.fillchars:append({
-    horiz = "━",
-    horizup = "┻",
-    horizdown = "┳",
-    vert = "┃",
-    vertleft = "┨",
-    vertright = "┣",
-    verthoriz = "╋"
+  horiz = "━",
+  horizup = "┻",
+  horizdown = "┳",
+  vert = "┃",
+  vertleft = "┨",
+  vertright = "┣",
+  verthoriz = "╋",
 })
 
 vim.opt.background = (CANDY_MOOD or "dark")
@@ -76,13 +76,9 @@ vim.opt.background = (CANDY_MOOD or "dark")
 vim.cmd.hi("clear SignColumns")
 
 -- vim.opt.do_filetype_lua = 1
--- vim.opt.completeopt = "menuone,menu,noselect"
+vim.opt.completeopt = "menuone,menu,noselect,noinsert"
 
 -- for nvim-ufo
-vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
-vim.o.foldlevelstart = 99
-vim.o.foldenable = true
-vim.o.foldcolumn = "0"
 
 vim.opt.encoding = "utf-8"
 

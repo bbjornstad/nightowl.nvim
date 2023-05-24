@@ -24,7 +24,7 @@ return {
     cmd = { "PomodoroStart", "PomodoroStop", "PomodoroStatus" },
     init = function()
       mapn(
-        key_pomodoro .. "p",
+        key_pomodoro .. "s",
         "<CMD>PomodoroStart<CR>",
         { desc = "pomorg:>> start pomodoro timer" }
       )
@@ -34,14 +34,24 @@ return {
         { desc = "pomorg:>> stop pomodoro timer" }
       )
       mapn(
-        key_pomodoro .. "s",
+        key_pomodoro .. "u",
         "<CMD>PomodoroStatus<CR>",
         { desc = "pomorg:>> pomodoro timer status" }
       )
     end,
     -- keys = require("environment.keys").pomodoro,
   },
-  { "wakatime/vim-wakatime", event = "VeryLazy", enabled = true, lazy = false },
+  {
+    "nvim-lualine/lualine.nvim",
+    opts = function(_, opts)
+      opts.tabline = opts.tabline or {}
+      opts.tabline.lualine_x = opts.tabline.lualine_x or {}
+      table.insert(opts.tabline.lualine_x, {
+        require("pomodoro").statusline(),
+      })
+    end,
+  },
+  { "wakatime/vim-wakatime", event = "VeryLazy", enabled = true },
   {
     "nullchilly/fsread.nvim",
     cmd = { "FSRead", "FSClear", "FSToggle" },
@@ -61,6 +71,15 @@ return {
       "CccConvert",
       "CccHighlighterEnable",
       "CccHighlighterToggle",
+    },
+    opts = {
+      win_opts = {
+        style = "minimal",
+        border = env.borders.main,
+      },
+      auto_close = true,
+      preserve = true,
+      default_color = require("kanagawa.colors").setup({ theme = "wave" }).theme.ui.fg_dim,
     },
     init = function()
       mapn(
@@ -127,6 +146,7 @@ return {
       )
     end,
   },
+  -- this is a test of figlet
   {
     "sudormrfbin/cheatsheet.nvim",
     dependencies = {
@@ -134,12 +154,16 @@ return {
       "nvim-lua/popup.nvim",
       "nvim-lua/plenary.nvim",
     },
+    opts = {
+      bundled_cheatsheets = true,
+      bundled_plugin_cheatsheets = true,
+      include_only_installed_plugins = true,
+    },
     init = function()
-      mapn(
-        "g/",
-        require("telescope").extensions.cheatsheet.cheatsheet,
-        { desc = "cheatsheet:>> cheatsheet interface" }
-      )
+      require("telescope").load_extension("cheatsheet")
+      mapnv("g/", function()
+        require("telescope").extensions.cheatsheet.cheatsheet()
+      end, { desc = "cheatsheet:>> cheatsheet interface" })
     end,
   },
   {
@@ -237,8 +261,8 @@ return {
         { desc = "here be automatous dragons [rainy]" }
       )
       mapn(
-        "<leader>FML",
-        "<CMD>CellularAutomaton make_it_rain<CR>",
+        "<leader>fmd",
+        "<CMD>CellularAutomaton game_of_life<CR>",
         { desc = "here be automatous dragons [gamey]" }
       )
     end,

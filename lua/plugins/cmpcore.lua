@@ -1,6 +1,7 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local ncmp = "hrsh7th/nvim-cmp"
 local env = require("environment.ui")
+local mapd = require("environment.keys").mapd
 
 return {
   {
@@ -32,6 +33,8 @@ return {
       "bydlw98/cmp-env",
       "nat-418/cmp-color-names.nvim",
       "jc-doyle/cmp-pandoc-references",
+      "amarakon/nvim-cmp-fonts",
+      "davidmh/cmp-nerdfonts",
       "saadparwaiz1/cmp_luasnip",
     },
     opts = function(_, opts)
@@ -43,42 +46,85 @@ return {
       require("luasnip.loaders.from_snipmate").lazy_load()
       -- this is ok, we now put our sources and configuration for such sources
       -- in this list item below
-      --opts.window = opts.window or {}
-      --table.insert(opts.window, {
-      --  completion = cmp.config.window.bordered(),
-      --  documentation = cmp.config.window.bordered(),
-      --})
-      opts.view = opts.view or {}
-      table.insert(opts.view, { entries = { separator = " | " } })
+      opts.window = vim.tbl_deep_extend("force", {
+        completion = cmp.config.window.bordered({
+          border = env.borders.main,
+          side_padding = 2,
+        }),
+        documentation = cmp.config.window.bordered({
+          border = env.borders.main,
+          side_padding = 2,
+        }),
+      }, opts.window or {})
       opts.sources = cmp.config.sources(vim.list_extend(opts.sources, {
-        { name = "nvim-lsp", max_item_count = 5 },
-        { name = "luasnip", max_item_count = 3 },
-        { name = "treesitter", max_item_count = 4 },
-        { name = "nvim_lsp_signature_help", max_item_count = 3 },
-        { name = "dap", max_item_count = 5 },
-        { name = "rg", max_item_count = 3 },
-        { name = "env", max_item_count = 4 },
+        { name = "nvim-lsp", max_item_count = 10 },
+        { name = "nvim_lsp_signature_help", max_item_count = 8 },
+        { name = "treesitter", max_item_count = 8 },
+        { name = "luasnip", max_item_count = 8 },
+        { name = "dap", max_item_count = 8 },
+        { name = "rg", max_item_count = 8 },
+        { name = "env", max_item_count = 5 },
         { name = "buffer", max_item_count = 5 },
-        { name = "path", max_item_count = 4 },
-        { name = "otter", max_item_count = 3 },
-        { name = "snippy", max_item_count = 4 },
+        { name = "path", max_item_count = 5 },
         { name = "calc", max_item_count = 3 },
-        { name = "cmdline", max_item_count = 3 },
-        { name = "ctags", max_item_count = 3 },
-        { name = "color_names", max_item_count = 3 },
+        { name = "cmdline", max_item_count = 5 },
+        { name = "ctags", max_item_count = 5 },
+        {
+          name = "fonts",
+          option = { space_filter = "-" },
+          max_item_count = 8,
+        },
+        { name = "emoji", max_item_count = 10 },
+        { name = "nerdfonts", max_item_count = 8 },
+        { name = "color_names", max_item_count = 5 },
       }))
-      opts.formatting = opts.formatting or {}
-      table.insert(opts.formatting, {
-        fields = { "abbr", "kind", "menu" },
+      opts.formatting = vim.tbl_extend("force", {
+        fields = { "kind", "abbr", "menu" },
         format = require("lspkind").cmp_format({
-          mode = "symbol_text",
+          mode = "symbol",
+          preset = "codicons",
           maxwidth = 50,
           ellipsis_char = "...",
         }),
-      })
-      opts.completion = vim.tbl_extend("force", opts.completion or {}, {
-        completeopt = "menuone,menu,noselect,noinsert",
-      })
+      }, opts.formatting or {})
+      opts.completion = vim.tbl_extend("force", {
+        autocomplete = false,
+        --completeopt = "menuone,menu,noselect,noinsert",
+      }, opts.completion or {})
+    end,
+  },
+  {
+    "hrsh7th/nvim-cmp",
+    -- we are going to make a mapping that will allow us to access focused
+    -- groups of the completion menu with certain keystrokes. In particular, we
+    -- have that Ctrl+Space should be the way that we bring up a completion
+    -- menu. If we remap this so that it includes a submenu, we can have
+    -- individual keymappings to access, say for instance, the fonts completion
+    -- options specifically (C+S+f).
+    init = function()
+      local key_cmp = "<Ctrl-Space>"
+      local function kf(key)
+        return string.format("%s%s", key_cmp, key)
+      end
+      local cmp = require("cmp")
+      mapd(kf("f"), function()
+        cmp.complete({
+          config = {
+            sources = {
+              { name = "fonts", option = { space_filter = "-" } },
+            },
+          },
+        })
+      end, { desc = "cmp:>> fonts completion menu" })
+      mapd(kf(";"), function()
+        cmp.complete({
+          config = {
+            sources = {
+              { name = "copilot", option = {} },
+            },
+          },
+        })
+      end)
     end,
   },
   { "hrsh7th/cmp-nvim-lsp", dependencies = { ncmp } },
@@ -100,4 +146,5 @@ return {
   { "nat-418/cmp-color-names.nvim", dependencies = { ncmp } },
   { "jc-doyle/cmp-pandoc-references", dependencies = { ncmp } },
   { "saadparwaiz1/cmp_luasnip", dependencies = { ncmp } },
+  { "hrsh7th/cmp-emoji", dependencies = { ncmp } },
 }

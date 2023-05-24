@@ -39,12 +39,14 @@ return {
       -- startup warnings related to incorrect plugin load order.
       { "folke/neoconf.nvim" },
       { "folke/neodev.nvim" },
+      { "nvim-lua/lsp-status.nvim" },
     },
     config = function(_, opts)
       -- print(string.format("LSPZero Config: {}", vim.inspect(opts)))
       local lsp = require("lsp-zero").preset({
         name = "minimal",
         set_lsp_keymaps = { preserve_mappings = true },
+        setup_servers_on_start = true,
         float_border = env.borders.main,
         configure_diagnostics = true,
         manage_nvim_cmp = {
@@ -57,6 +59,7 @@ return {
         },
       })
       lsp.on_attach(function(client, bufnr)
+        require("lsp-status").register_progress()
         lsp.default_keymaps({ buffer = bufnr, preserve_mappings = true })
         if client.server_capabilities.documentSymbolProvider then
           require("nvim-navic").attach(client, bufnr)
@@ -77,9 +80,9 @@ return {
         vim.lsp.buf.format,
         "lsp-format current buffer",
       }
-      keys[#keys + 1] = { "gK", vim.lsp.buf.hover, "hover (unprettified)" }
+      keys[#keys + 1] = { "K", vim.lsp.buf.hover, "hover" }
       keys[#keys + 1] = {
-        "gS",
+        "gk",
         vim.lsp.buf.signature_help,
         "signature help",
       }
@@ -91,9 +94,11 @@ return {
       }
     end,
     dependencies = {
+      "VonHeikemen/lsp-zero.nvim",
       "jose-elias-alvarez/null-ls.nvim",
       "williamboman/mason-lspconfig.nvim",
       "jay-babu/mason-null-ls.nvim",
+      "nvim-lua/lsp-status.nvim",
     },
   },
   {

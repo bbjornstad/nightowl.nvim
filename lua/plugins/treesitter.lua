@@ -6,6 +6,16 @@ return {
       "nvim-treesitter/nvim-treesitter-textobjects",
       "nvim-treesitter/nvim-treesitter-context",
       "windwp/nvim-ts-autotag",
+      {
+        "andymass/vim-matchup",
+        event = "BufReadPost",
+        config = function()
+          vim.g.matchup_matchparen_deferred = 1
+          vim.g.matchup_matchparen_offscreen = {
+            method = "status_manual",
+          }
+        end,
+      },
     },
     opts = {
       ensure_installed = "all",
