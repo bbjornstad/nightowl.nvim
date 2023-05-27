@@ -7,7 +7,6 @@ return {
     opts = {
       debug = true,
       experimental = { pathStrict = true },
-      library = { runtime = "~/projects/neovim/runtime/" },
     },
   },
   ---------------------------------------------------------------------------
@@ -66,7 +65,7 @@ return {
         end
       end)
 
-      require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls())
+      require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls(opts))
 
       lsp.setup()
     end,
@@ -78,19 +77,21 @@ return {
       keys[#keys + 1] = {
         "gF",
         vim.lsp.buf.format,
-        "lsp-format current buffer",
+        desc = "lsp:>> format current buffer",
       }
-      keys[#keys + 1] = { "K", vim.lsp.buf.hover, "hover" }
+      keys[#keys + 1] =
+        { "K", vim.lsp.buf.hover, "hover", desc = "lsp:>> hover information" }
       keys[#keys + 1] = {
         "gk",
         vim.lsp.buf.signature_help,
-        "signature help",
+        desc = "lsp:>> symbol signature help",
       }
       keys[#keys + 1] = {
         "g?",
         function()
           vim.cmd([[help ]] .. vim.fn.expand("<cword>"))
         end,
+        desc = "lsp:>> find symbol help",
       }
     end,
     dependencies = {

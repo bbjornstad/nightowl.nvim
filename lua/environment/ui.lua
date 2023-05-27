@@ -12,7 +12,7 @@ env.borders.main_accent = "double"
 
 env.ai = {}
 env.ai.enabled = {
-  copilot = true,
+  copilot = os.getenv("NVIM_ENABLE_COPILOT"),
   cmp_ai = false,
   chatgpt = true,
   codegpt = true,
@@ -45,7 +45,7 @@ env.colorscheme.setup = {
   --  opts = vim.tbl_deep_extend("force", {
   globalStatus = true,
   dimInactive = true,
-  commentStyle = { italic = true },
+  commentStyle = { italic = false },
   keywordStyle = { italic = false },
   statementStyle = { bold = true },
   typeStyle = { italic = false },
@@ -70,6 +70,8 @@ env.colorscheme.setup = {
       PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
       PmenuSbar = { bg = theme.ui.bg_m1 },
       PmenuThumb = { bg = theme.ui.bg_p2 },
+      InclineNormal = { bg = colors.palette.lotusInk2 },
+      InclineNormalNC = { bg = colors.palette.lotusViolet2 },
     }
   end,
 }

@@ -54,12 +54,18 @@ return { -- add folding range to capabilities
       vim.o.foldenable = true
       vim.o.foldcolumn = "0"
       -- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
-      vim.keymap.set("n", "zR", function()
-        require("ufo").openAllFolds()
-      end, { desc = "ufo:>> open all ultrafolded" })
-      vim.keymap.set("n", "zM", function()
-        require("ufo").closeAllFolds()
-      end, { desc = "ufo:>> close all ultrafolded" })
+      vim.keymap.set(
+        "n",
+        "zR",
+        require("ufo").openAllFolds,
+        { desc = "ufo:>> open all ultrafolded" }
+      )
+      vim.keymap.set(
+        "n",
+        "zM",
+        require("ufo").closeAllFolds,
+        { desc = "ufo:>> close all ultrafolded" }
+      )
       vim.keymap.set(
         "n",
         "zr",
@@ -78,9 +84,12 @@ return { -- add folding range to capabilities
         require("ufo").inspect,
         { desc = "ufo:>> inspect current buffer" }
       )
-      vim.keymap.set("n", "zp", function()
-        return require("ufo").peekFoldedLinesUnderCursor(true, true)
-      end, { desc = "ufo:>> peek under fold" })
+      vim.keymap.set(
+        "n",
+        "zp",
+        require("ufo").peekFoldedLinesUnderCursor,
+        { desc = "ufo:>> peek under fold" }
+      )
     end,
   },
 }

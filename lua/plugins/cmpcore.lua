@@ -1,7 +1,7 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local ncmp = "hrsh7th/nvim-cmp"
 local env = require("environment.ui")
-local mapd = require("environment.keys").mapd
+local mapd = require("environment.keys").map({ "n", "v", "i", "o" })
 
 return {
   {
@@ -29,7 +29,7 @@ return {
       "rcarriga/cmp-dap",
       "hrsh7th/cmp-calc",
       "ray-x/cmp-treesitter",
-      "Saecki/crates.nvim",
+      -- "Saecki/crates.nvim",
       "bydlw98/cmp-env",
       "nat-418/cmp-color-names.nvim",
       "jc-doyle/cmp-pandoc-references",
@@ -56,7 +56,7 @@ return {
           side_padding = 2,
         }),
       }, opts.window or {})
-      opts.sources = cmp.config.sources(vim.list_extend(opts.sources, {
+      opts.sources = vim.list_extend(opts.sources, {
         { name = "nvim-lsp", max_item_count = 10 },
         { name = "nvim_lsp_signature_help", max_item_count = 8 },
         { name = "treesitter", max_item_count = 8 },
@@ -68,17 +68,17 @@ return {
         { name = "path", max_item_count = 5 },
         { name = "calc", max_item_count = 3 },
         { name = "cmdline", max_item_count = 5 },
-        { name = "ctags", max_item_count = 5 },
+        -- { name = "ctags", max_item_count = 5 },
         {
           name = "fonts",
           option = { space_filter = "-" },
           max_item_count = 8,
         },
         { name = "emoji", max_item_count = 10 },
-        { name = "nerdfonts", max_item_count = 8 },
+        -- { name = "nerdfonts", max_item_count = 8 },
         { name = "color_names", max_item_count = 5 },
-      }))
-      opts.formatting = vim.tbl_extend("force", {
+      })
+      opts.formatting = vim.tbl_deep_extend("force", {
         fields = { "kind", "abbr", "menu" },
         format = require("lspkind").cmp_format({
           mode = "symbol",
@@ -87,7 +87,7 @@ return {
           ellipsis_char = "...",
         }),
       }, opts.formatting or {})
-      opts.completion = vim.tbl_extend("force", {
+      opts.completion = vim.tbl_deep_extend("force", {
         autocomplete = false,
         --completeopt = "menuone,menu,noselect,noinsert",
       }, opts.completion or {})
@@ -102,7 +102,7 @@ return {
     -- individual keymappings to access, say for instance, the fonts completion
     -- options specifically (C+S+f).
     init = function()
-      local key_cmp = "<Ctrl-Space>"
+      local key_cmp = ";"
       local function kf(key)
         return string.format("%s%s", key_cmp, key)
       end
@@ -117,13 +117,15 @@ return {
         })
       end, { desc = "cmp:>> fonts completion menu" })
       mapd(kf(";"), function()
-        cmp.complete({
-          config = {
-            sources = {
-              { name = "copilot", option = {} },
+        if vim.fn.has("copilot") then
+          cmp.complete({
+            config = {
+              sources = {
+                { name = "copilot", option = {} },
+              },
             },
-          },
-        })
+          })
+        end
       end)
     end,
   },
@@ -141,7 +143,7 @@ return {
   { "rcarriga/cmp-dap", dependencies = { ncmp } },
   { "hrsh7th/cmp-calc", dependencies = { ncmp } },
   { "ray-x/cmp-treesitter", dependencies = { ncmp } },
-  { "Saecki/crates.nvim", dependencies = { ncmp }, ft = "rust" },
+  -- { "Saecki/crates.nvim", dependencies = { ncmp }, ft = "rust" },
   { "bydlw98/cmp-env", dependencies = { ncmp } },
   { "nat-418/cmp-color-names.nvim", dependencies = { ncmp } },
   { "jc-doyle/cmp-pandoc-references", dependencies = { ncmp } },

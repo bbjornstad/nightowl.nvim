@@ -11,7 +11,7 @@ vim.opt.rtp:prepend(vim.env.LAZY or lazypath)
 
 local uienv = require("environment.ui")
 
-require("lazy").setup({
+local lazyconf = {
   spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
@@ -19,7 +19,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.lang.typescript" },
     { import = "lazyvim.plugins.extras.lang.json" },
     { import = "lazyvim.plugins.extras.ui.mini-animate" },
-    { import = "lazyvim.plugins.extras.coding.copilot" },
+    -- { import = "lazyvim.plugins.extras.coding.copilot" },
     { import = "lazyvim.plugins.extras.dap.core" },
     { import = "lazyvim.plugins.extras.dap.nlua" },
     { import = "lazyvim.plugins.extras.lang.json" },
@@ -56,4 +56,17 @@ require("lazy").setup({
   ui = { border = uienv.borders.main_accent },
   diff = "diffview.nvim",
   debug = false,
-})
+}
+
+local function genspec(lazyconf)
+  if uienv.ai.enabled.copilot then
+    table.insert(
+      lazyconf.spec,
+      { { import = "lazyvim.plugins.extras.coding.copilot" } }
+    )
+  end
+end
+
+genspec(lazyconf)
+
+require("lazy").setup(lazyconf)

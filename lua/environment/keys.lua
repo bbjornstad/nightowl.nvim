@@ -2,14 +2,13 @@ local mod = {}
 
 local aistem = ";"
 
-mod.mapn = require("plenary.functional").partial(vim.keymap.set, "n")
-mod.mapv = require("plenary.functional").partial(vim.keymap.set, "v")
-mod.mapo = require("plenary.functional").partial(vim.keymap.set, "o")
-mod.mapi = require("plenary.functional").partial(vim.keymap.set, "i")
-mod.mapnv = require("plenary.functional").partial(vim.keymap.set, { "n", "v" })
+function mod.map(modes)
+  local function returnable(lhs, rhs, opts)
+    vim.keymap.set(modes, lhs, rhs, opts)
+  end
 
-mod.mapd =
-  require("plenary.functional").partial(vim.keymap.set, { "n", "v", "i", "o" })
+  return returnable
+end
 
 mod.keymap_style = "bind_api_init" -- or "bind_lazy"
 
@@ -35,7 +34,6 @@ function mod.prime_wk(plugspec)
 end
 
 mod.stems = {}
-
 mod.stems.ccc = "<leader>uh"
 mod.stems.pomodoro = "<leader>t"
 mod.stems.easyread = "<leader>ub"
@@ -53,7 +51,9 @@ mod.stems.neogen = "<leader>D"
 mod.stems.lens = "<leader>ue"
 mod.stems.iron = "<leader>r"
 -- cannot use o key for oil, since orgmode has the binding
-mod.stems.oil = "<leader>l"
+-- also not the l key because lazy has that one.
+mod.stems.oil = "<leader>`"
+mod.stems.git = "<leader>g"
 
 mod.stems.figlet = "<localleader>i"
 mod.stems.textgen = "<localleader>t"

@@ -1,6 +1,6 @@
 local key_scope = require("environment.keys").stems.telescope
-local mapn = require("environment.keys").mapn
-local mapnv = require("environment.keys").mapnv
+local mapn = require("environment.keys").map("n")
+local mapnv = require("environment.keys").map({"n", "v"})
 
 local target_pickers = {
   "find_files",

@@ -8,21 +8,54 @@ vim.diagnostic.config({
 })
 
 local stems = require("environment.keys").stems
-local mapn = require("environment.keys").mapn
+local mapn = require("environment.keys").map("n")
 local mapx = vim.keymap.set
 local key_notify = stems.notify
 local key_vista = stems.vista
 local key_lens = stems.lens
 local key_oil = stems.oil
+local key_git = stems.git
 
-local function format_lsp_signature(opts)
-  if vim.fn.has("lsp_signature") then
-    if not pcall(require, "lsp_signature") then
-      return
-    end
-    local sig = require("lsp_signature").status_line(opts)
-    return string.format("%s [ %s ]", sig.label, sig.hint)
+--────────────────────────────────────────────────────────────-----------------
+-- This is to change filename color in the window bar based on the git status.
+-- Modified is now a nice purple color (defined directly from the kanagawa theme)
+-- New will be green, as would be typical.
+--
+-- TODO: Change the below so that it uses git status via gitsigns instead of the
+-- simple file status locally. Or, mayhaps, we can put in the local status as a
+-- fallback in cases where the git status isn't available.
+-- ----
+local custom_fname = require("lualine.components.filename"):extend()
+local highlight = require("lualine.highlight")
+local kanacolor = require("kanagawa.colors").setup({ theme = "wave" }).palette
+local default_status_colors =
+  { saved = kanacolor.lotusBlue3, modified = kanacolor.lotusGreen }
+
+function custom_fname:init(options)
+  custom_fname.super.init(self, options)
+  self.status_colors = {
+    saved = highlight.create_component_highlight_group(
+      { fg = default_status_colors.saved },
+      "filename_status_saved",
+      self.options
+    ),
+    modified = highlight.create_component_highlight_group(
+      { fg = default_status_colors.modified },
+      "filename_status_modified",
+      self.options
+    ),
+  }
+  if self.options.color == nil then
+    self.options.color = ""
   end
+end
+
+function custom_fname:update_status()
+  local data = custom_fname.super.update_status(self)
+  data = highlight.component_format_highlight(
+    vim.bo.modified and self.status_colors.modified or self.status_colors.saved
+  ) .. data
+  return data
 end
 
 return {
@@ -34,6 +67,7 @@ return {
   {
     "folke/noice.nvim",
     opts = {
+      -- debug = true,
       lsp = {
         -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
         override = {
@@ -41,7 +75,6 @@ return {
           ["vim.lsp.util.stylize_markdown"] = true,
           ["cmp.entry.get_documentation"] = true,
         },
-        progress = {},
         signature = {
           enabled = not env.enable_lsp_signature,
         },
@@ -51,7 +84,7 @@ return {
         command_palette = true, -- position the cmdline and popupmenu together
         long_message_to_split = true, -- long messages will be sent to a split
         inc_rename = true,
-        --lsp_doc_border = true,
+        -- lsp_doc_border = true,
       },
       views = {
         cmdline_popup = {
@@ -137,22 +170,44 @@ return {
     "stevearc/oil.nvim",
     event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    keymaps = {
-      ["."] = "actions.cd",
-    },
+
     opts = {
       delete_to_trash = true,
       float = {
+        padding = 2,
         border = env.borders.main,
       },
       preview = {
         border = env.borders.main,
+        win_options = {
+          winblend = 10,
+        },
       },
       progress = {
         border = env.borders.main,
         minimized_border = env.borders.main,
+        win_options = {
+          winblend = 10,
+        },
+      },
+      keymaps = {
+        ["."] = "actions.cd",
+        ["`"] = false,
+        ["<C-t>"] = false,
       },
     },
+    --keys = {
+    --  {
+    --    key_oil .. "o",
+    --    require("oil").open_float,
+    --    desc = "oil=> open oil (float)",
+    --  },
+    --  {
+    --    key_oil .. "q",
+    --    require("oil").close,
+    --    desc = "oil=> close oil",
+    --  },
+    --},
   },
   {
     "beauwilliams/focus.nvim",
@@ -183,7 +238,15 @@ return {
         padding = 2,
         placement = { horizontal = "right", vertical = "top" },
         width = "fit",
-        options = { winblend = 10, signcolumn = "no", wrap = false },
+        options = { winblend = 20, signcolumn = "no", wrap = false },
+        winhighlight = {
+          InclineNormal = {
+            guibg = require("kanagawa.colors").setup({ theme = "wave" }).palette.lotusInk2,
+          },
+          InclineNormalNC = {
+            guibg = require("kanagawa.colors").setup({ theme = "wave" }).palette.lotusViolet2,
+          },
+        },
       },
     },
   },
@@ -204,10 +267,20 @@ return {
   },
   {
     "TimUntersberger/neogit",
-    dependencies = { "VeryLazy" },
-    cmd = {},
-    opts = {},
-    integrations = { diffview = true },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    event = { "VeryLazy" },
+    cmd = { "Neogit" },
+    opts = {
+      integrations = { diffview = true },
+    },
+    init = function()
+      mapx(
+        { "n", "v" },
+        key_git .. "n",
+        "<CMD>Neogit<CR>",
+        { desc = "git=> neogit" }
+      )
+    end,
   },
   {
     "nvim-lualine/lualine.nvim",
@@ -243,7 +316,11 @@ return {
           {
             "filename",
             path = 1,
-            symbols = { modified = "  ", readonly = "", unnamed = "" },
+            symbols = {
+              modified = "",
+              readonly = "󱪛",
+              unnamed = "",
+            },
           },
         },
       },
@@ -255,15 +332,15 @@ return {
         --    function()
         --      return require("nvim-navic").get_location()
         --    end,
-        --    cond = function()
+        --    enabled = function()
         --      return require("nvim-navic").is_available()
         --    end,
         --  },
         -- },
         lualine_x = {
-          {
-            vim.b.lsp_current_function,
-          },
+          --{
+          --  vim.b.lsp_current_function,
+          --},
         },
       },
       winbar = {
@@ -289,7 +366,14 @@ return {
         },
         lualine_x = {
           -- { require("lsp-status").status() },
-          { "filename" },
+          {
+            custom_fname,
+            symbols = {
+              modified = "",
+              readonly = "󱪛",
+              unnamed = "",
+            },
+          },
         },
         lualine_y = {},
         lualine_z = {},
@@ -367,12 +451,12 @@ return {
       mapn(
         key_notify .. "n",
         require("notify").history,
-        { desc = "noit:>> notification history" }
+        { desc = "noit=> notification history" }
       )
       mapn(
         key_notify .. "t",
         require("telescope").extensions.notify.notify,
-        { desc = "noit:>> telescope search notification history" }
+        { desc = "noit=> telescope search notification history" }
       )
     end,
   },
@@ -398,11 +482,11 @@ return {
       mapn(
         key_lens .. "t",
         "<CMD>LspLensToggle<CR>",
-        { desc = "lens:>> toggle" }
+        { desc = "lens=> toggle" }
       )
-      mapn(key_lens .. "o", "<CMD>LspLensOn<CR>", { desc = "lens:>> on" })
-      mapn(key_lens .. "f", "<CMD>LspLensOff<CR>", { desc = "lens:>> off" })
-      mapn("<leader>uE", "<CMD>LspLensToggle<CR>", { desc = "lens:>> toggle" })
+      mapn(key_lens .. "o", "<CMD>LspLensOn<CR>", { desc = "lens=> on" })
+      mapn(key_lens .. "f", "<CMD>LspLensOff<CR>", { desc = "lens=> off" })
+      mapn("<leader>uE", "<CMD>LspLensToggle<CR>", { desc = "lens=> toggle" })
     end,
   },
   {
@@ -435,30 +519,30 @@ return {
   {
     "simrat39/symbols-outline.nvim",
     cmd = { "SymbolsOutline", "SymbolsOutlineOpen", "SymbolsOutlineClose" },
-    init = function()
-      mapn(
+    keys = {
+      {
         key_vista .. "s",
         "<CMD>SymbolsOutline<CR>",
-        { desc = "toggle symbols outline" }
-      )
-      mapn(
+        { desc = "toggle symbols outline" },
+      },
+      {
         key_vista .. "q",
         "<CMD>SymbolsOutlineClose<CR>",
-        { desc = "close symbols outline (force)" }
-      )
-      mapn(
+        { desc = "close symbols outline (force)" },
+      },
+      {
         key_vista .. "o",
         "<CMD>SymbolsOutlineOpen<CR>",
-        { desc = "open symbols outline (force)" }
-      )
-    end,
+        { desc = "open symbols outline (force)" },
+      },
+    },
   },
   {
     "SmiteshP/nvim-navic",
     dependencies = { "neovim/nvim-lspconfig" },
     event = "LspAttach",
     opts = {
-      separator = "  ",
+      separator = " 󰁕 ",
       highlight = false,
       depth_limit = 7,
       icons = require("lazyvim.config").icons.kinds,
@@ -474,26 +558,26 @@ return {
         { "n", "v" },
         "<leader>b[",
         "<CMD>lua require('nvim-smartbufs').goto_prev_buffer()<CR>",
-        { desc = "buf:>> previous buffer" }
+        { desc = "buf=> previous buffer" }
       )
 
       mapx(
         { "n", "v" },
         "<leader>b]",
         "<CMD>lua require('nvim-smartbufs').goto_next_buffer()<CR>",
-        { desc = "buf:>> next buffer" }
+        { desc = "buf=> next buffer" }
       )
       mapx(
         { "n", "v", "i" },
         "<C-S-Left>",
         "<CMD>lua require('nvim-smartbufs').goto_prev_buffer()<CR>",
-        { desc = "buf:>> previous buffer" }
+        { desc = "buf=> previous buffer" }
       )
       mapx(
         { "n", "v", "i" },
         "<C-S-Right>",
         "<CMD>lua require('nvim-smartbufs').goto_next_buffer()<CR>",
-        { desc = "buf:>> next buffer" }
+        { desc = "buf=> next buffer" }
       )
       for i = 1, 9, 1 do
         local keynum = i
@@ -503,7 +587,7 @@ return {
             "<CMD>lua require('nvim-smartbufs').goto_buffer(%d)<CR>",
             keynum
           ),
-          { desc = string.format("buf:>> goto buffer %d", keynum) }
+          { desc = string.format("buf=> goto buffer %d", keynum) }
         )
         mapn(
           "<leader>q" .. keynum,
@@ -511,14 +595,20 @@ return {
             "<CMD>lua require('nvim-smartbufs').close_buffer(%d)<CR>",
             keynum
           ),
-          { desc = string.format("buf:>> leave buffer %d", keynum) }
+          { desc = string.format("buf=> leave buffer %d", keynum) }
         )
       end
       mapx(
         { "n", "v" },
         "<leader>bq",
         "<CMD>lua require('nvim-smartbufs').close_current_buffer()<CR>",
-        { desc = "buf:>> intelligently close current buffer" }
+        { desc = "buf=> intelligently close current buffer" }
+      )
+      mapx(
+        { "n", "v" },
+        "<leader>bq",
+        "<CMD>lua require('nvim-smartbufs').close_current_buffer()<CR>",
+        { desc = "buf=> intelligently close current buffer" }
       )
     end,
   },

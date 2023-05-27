@@ -1,4 +1,6 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
+local colors = require("kanagawa.colors").setup({ theme = "wave" })
+
 return {
   {
     "nvim-orgmode/orgmode",
@@ -6,7 +8,7 @@ return {
     ft = { "org" },
     init = function()
       if vim.fn.has("ufo") then
-        pcall(vim.cmd, [[UfoDetatch]])
+        require("ufo").detach()
       end
     end,
     config = function(_, opts)
@@ -31,7 +33,7 @@ return {
       org_default_notes_file = "~/.todo/daily/daily.org",
       org_priority_highest = "A",
       org_priority_lowest = "L",
-      org_priority_default = "B",
+      org_priority_default = "E",
       win_split_mode = "vertical",
       org_todo_keywords = {
         "TODO(t)",
@@ -47,7 +49,7 @@ return {
         "NIXED",
       },
       org_todo_keyword_faces = {
-        TODO = ":background #D9DADF :foreground blue :slant italic",
+        TODO = ":background #D9DADF :foreground blue :weight bold",
         DONE = ":background #D9DADF :foreground green :underline on",
         URGENT = ":background #D9DADF :foreground red :slant italic :underline on :weight bold",
         SUPER = ":background DarkRed :foreground #e8a7a7 :slant italic :weight bold :underline on",
@@ -109,7 +111,11 @@ return {
         ["core.dirman"] = {
           config = { workspaces = { my_workspace = "~/." } },
         },
-        ["core.completion"] = { engine = "nvim-cmp" },
+        ["core.completion"] = {
+          config = {
+            engine = "nvim-cmp",
+          },
+        },
       },
     },
   },

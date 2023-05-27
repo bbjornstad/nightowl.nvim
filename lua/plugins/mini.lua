@@ -12,11 +12,16 @@ return {
     "echasnovski/mini.jump",
     event = "VeryLazy",
     opts = {
-      mappings = { repeat_jump = "'" },
-      delay = {
-        highlight = 500,
-        idle_stop = 10000000,
+      mappings = {
+        repeat_jump = "",
       },
     },
+    --{
+    --  mappings = { repeat_jump = "'" },
+    --  delay = {
+    --    highlight = 500,
+    --    idle_stop = 10000000,
+    --  },
+    --},
   },
 }

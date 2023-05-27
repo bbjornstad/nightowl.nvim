@@ -5,7 +5,6 @@
 local edit_tools = require("uutils.edit")
 local key_cline = require("environment.keys").stems.cline
 local mapx = vim.keymap.set
-local mapn = require("environment.keys").mapn
 local function toggle_fmtopt(char)
   local currentopts = vim.opt.formatoptions:get()
   if currentopts[char] then
@@ -33,7 +32,6 @@ mapx(
   "<CMD>help<CR>",
   { desc = "got >> get help", remap = false }
 )
-
 mapx(
   { "n", "v" },
   "<leader>bs",
@@ -46,7 +44,6 @@ mapx(
   "<CMD>writeall<CR>",
   { desc = "buf:>> save buffer" }
 )
-mapx("n", "<leader>Q", "<CMD>quit<CR>", { desc = "quit" })
 mapx("n", "<leader>uF", function()
   toggle_fmtopt("a")
 end, { desc = "toggle insert autoformat" })

@@ -1,7 +1,7 @@
 local env = require("environment.ui")
 local stems = require("environment.keys").stems
-local mapn = require("environment.keys").mapn
-local mapnv = require("environment.keys").mapnv
+local mapn = require('environment.keys').map("n")
+local mapnv = require('environment.keys').map({"n", "v"})
 
 local key_pomodoro = stems.pomodoro
 local key_easyread = stems.easyread
@@ -165,6 +165,24 @@ return {
         require("telescope").extensions.cheatsheet.cheatsheet()
       end, { desc = "cheatsheet:>> cheatsheet interface" })
     end,
+  },
+  {
+    "Djancyp/cheat-sheet",
+    opts = {
+      auto_fill = {
+        filetype = true,
+        current_word = true,
+      },
+      main_win = {
+        style = "minimal",
+        border = env.borders.main,
+      },
+      input_win = {
+        style = "minimal",
+        border = env.borders.main,
+      },
+    },
+    cmd = { "CheatSH" },
   },
   {
     "ellisonleao/glow.nvim",

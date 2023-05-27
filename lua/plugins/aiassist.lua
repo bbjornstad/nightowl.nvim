@@ -11,7 +11,8 @@ local key_gpt = stems.chatgpt
 local key_neoai = stems.neoai
 local key_codegpt = stems.codegpt
 
-local mapn = require("environment.keys").mapn
+local mapn = require("environment.keys").map("n")
+local mapnv = require("environment.keys").map({ "n", "v" })
 --- Determines if the given mapping of enabled conditions can be ANDed to
 --- produce a single boolean indicating if something should happen when all
 --- things are enabled.
@@ -64,7 +65,7 @@ return {
       api_token = vim.env.HUGFACE_API_TOKEN,
       model = "bigcode/starcoder",
     },
-    cond = enb.hfcc,
+    enabled = enb.hfcc,
     cmd = { "StarCoder", "HFccCompletion" },
     init = function()
       vim.api.nvim_create_user_command("StarCoder", function()
@@ -73,13 +74,13 @@ return {
       mapn(
         key_hfcc,
         "<CMD>HFccSuggestion<CR>",
-        { desc = "ai.hfcc:>> suggest huggingface completion" }
+        { desc = "ai.hfcc=> suggest huggingface completion" }
       )
     end,
   },
   {
     "zbirenbaum/copilot.lua",
-    cond = enb.copilot,
+    enabled = enb.copilot,
     cmd = "Copilot",
     -- event = { "InsertEnter" },
     opts = { suggestion = { enabled = false }, panel = { enabled = false } },
@@ -87,27 +88,27 @@ return {
       mapn(
         key_copilot .. "a",
         "<CMD>Copilot auth<CR>",
-        { desc = "ai.copilot:>> authenticate copilot" }
+        { desc = "ai.copilot=> authenticate copilot" }
       )
       mapn(
         key_copilot .. "t",
         "<CMD>Copilot toggle<CR>",
-        { desc = "ai.copilot:>> toggle copilot" }
+        { desc = "ai.copilot=> toggle copilot" }
       )
       mapn(
         key_copilot .. "s",
         "<CMD>Copilot status<CR>",
-        { desc = "ai.copilot:>> copilot status" }
+        { desc = "ai.copilot=> copilot status" }
       )
       mapn(
         key_copilot .. "d",
         "<CMD>Copilot detach<CR>",
-        { desc = "ai.copilot:>> detach copilot" }
+        { desc = "ai.copilot=> detach copilot" }
       )
       mapn(
         key_copilot .. "C",
         "<CMD>Copilot status<CR>",
-        { desc = "ai.copilot:>> copilot status" }
+        { desc = "ai.copilot=> copilot status" }
       )
     end,
   },
@@ -124,12 +125,13 @@ return {
   },
   {
     "zbirenbaum/copilot-cmp",
+    enabled = vim.fn.has("copilot"),
     dependencies = { "zbirenbaum/copilot.lua" },
     opts = {},
   },
   {
     "tzachar/cmp-ai",
-    cond = enb.cmp_ai,
+    enabled = enb.cmp_ai,
     config = function(_, opts)
       require("cmp_ai.config"):setup(vim.tbl_deep_extend("force", {
         max_lines = 1000,
@@ -150,7 +152,7 @@ return {
   },
   {
     "codota/tabnine-nvim",
-    cond = enb.tabnine,
+    enabled = enb.tabnine,
     build = "./dl_binaries.sh",
     config = function()
       require("tabnine").setup({
@@ -172,7 +174,7 @@ return {
   },
   {
     "tzachar/cmp-tabnine",
-    cond = vim.fn.has("tabnine"),
+    enabled = vim.fn.has("tabnine"),
     build = "./install.sh",
     dependencies = { "codota/tabnine-nvim", "hrsh7th/nvim-cmp" },
   },
@@ -186,7 +188,7 @@ return {
   },
   {
     "dpayne/CodeGPT.nvim",
-    cond = enb.codegpt,
+    enabled = enb.codegpt,
     dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
     config = function()
       require("codegpt.config")
@@ -196,27 +198,27 @@ return {
       mapn(
         key_codegpt .. "c",
         "<CMD>CodeGPT<CR>",
-        { desc = "ai.codegpt:>> codegpt interface" }
+        { desc = "ai.codegpt=> codegpt interface" }
       )
     end,
   },
   {
     "dense-analysis/neural",
-    cond = enb.neural,
+    enabled = enb.neural,
     opts = { source = { openai = { apiKey = "OPENAI_API_KEY" } } },
     cmd = "Neural",
     -- keys = require("environment.keys").neural,
     init = function()
-      mapn(
+      mapnv(
         key_neural,
         "<CMD>Neural<CR>",
-        { desc = "ai.nrl:>> chatgpt neural interface" }
+        { desc = "ai.nrl=> chatgpt neural interface" }
       )
     end,
   },
   {
     "jackMort/ChatGPT.nvim",
-    cond = enb.chatgpt,
+    enabled = enb.chatgpt,
     cmd = {
       "ChatGPT",
       "ChatGPTAsCode",
@@ -266,7 +268,7 @@ return {
       "NeoAIInjectContext",
       "NeoAIInjectContextCode",
     },
-    cond = enb.neoai,
+    enabled = enb.neoai,
     opts = {
       ui = {
         output_popup_text = "neoai",

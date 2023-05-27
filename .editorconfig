@@ -11,7 +11,7 @@ trim_trailing_whitespace=true
 [*.{org,norg}]
 indent_style = space
 indent_size = 2
-max_line_length = 88
+max_line_length = 80
 
 # -----------------------------------------------------------------------------
 # Markdown Derivative Filetypes

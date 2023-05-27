@@ -1,9 +1,19 @@
 local key_neogen = require("environment.keys").stems.neogen
 local key_iron = require("environment.keys").stems.iron
-local mapn = require("environment.keys").mapn
+local mapn = require("environment.keys").map("n")
 
 return {
-  { "simrat39/rust-tools.nvim", ft = { "rust" } },
+  {
+    "simrat39/rust-tools.nvim",
+    ft = { "rust" },
+    opts = {
+      tools = {
+        inlay_hints = {
+          auto = false,
+        },
+      },
+    },
+  },
   { "lervag/vimtex", ft = { "tex" } },
   { "jmcantrell/vim-virtualenv", ft = { "python" } },
   {
@@ -58,21 +68,21 @@ return {
         local core = require("iron.core")
         local ft = vim.bo.filetype
         core.repl_here(ft)
-      end, { desc = "iron:>> open repl" })
+      end, { desc = "iron=> open repl" })
       mapn(key_iron .. "r", function()
         local core = require("iron.core")
         core.repl_restart()
-      end, { desc = "iron:>> restart repl" })
+      end, { desc = "iron=> restart repl" })
       mapn(key_iron .. "f", function()
         local core = require("iron.core")
         local ft = vim.bo.filetype
         core.focus_on(ft)
-      end, { desc = "iron:>> focus" })
+      end, { desc = "iron=> focus" })
       mapn(key_iron .. "h", function()
         local core = require("iron.core")
         local ft = vim.bo.filetype
         core.close_repl(ft)
-      end, { desc = "iron:>> hide" })
+      end, { desc = "iron=> hide" })
     end,
   },
   {
