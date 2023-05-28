@@ -53,7 +53,7 @@ return {
           set_extra_mappings = true,
           set_sources = "recommended",
           use_luasnip = true,
-          set_format = true,
+          set_format = false,
           documentation_window = true,
         },
       })

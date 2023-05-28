@@ -241,10 +241,10 @@ return {
         options = { winblend = 20, signcolumn = "no", wrap = false },
         winhighlight = {
           InclineNormal = {
-            guibg = require("kanagawa.colors").setup({ theme = "wave" }).palette.lotusInk2,
+            guibg = require("kanagawa.colors").setup({ theme = "wave" }).palette.sumiInk2,
           },
           InclineNormalNC = {
-            guibg = require("kanagawa.colors").setup({ theme = "wave" }).palette.lotusViolet2,
+            guibg = require("kanagawa.colors").setup({ theme = "wave" }).palette.sumiInk1,
           },
         },
       },
@@ -293,8 +293,8 @@ return {
       options = {
         icons_enabled = true,
         globalstatus = true,
-        -- component_separators = { left = "" , right = "" },
-        -- section_separators = { left = "\u{e0d2}", right = "\u{e0d4}" },
+        omponent_separators = { left = "", right = "" },
+        section_separators = { left = "", right = "" },
       },
       sections = {
         lualine_c = {

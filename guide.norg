@@ -31,14 +31,19 @@
   Debugging of any components that are still acting finnicky is going to be the big
   thing.
 
-** TODO fix nvim-cmp completion menu keybindings
 
-** Move to different dashboard function
+** TODO fix nvim-cmp completion menu keybindings
+   Still having a minor bit of trouble with the submenu on ;, although that may
+   not be the case depending on how additional testing fairs.
+
+** TODO Move to different dashboard function
    glepnir's rendition. In particular, seems more performant.
 
 ** TODO fix the completion menu settings
    - ( ) Want the LSP settings back to normal.
-   - ( ) Want to make sure codicons are showing up correctly
+   - (x) Want to make sure codicons are showing up correctly
+     - Most of the time this is happening, but for some reason in lua files the
+       completion menu does not show the correct thing.
    - ( ) make sure color and borders remain, along with nice Noice formatting for all of
          the important parts.
-
+A

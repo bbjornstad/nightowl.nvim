@@ -13,18 +13,8 @@ local key_codegpt = stems.codegpt
 
 local mapn = require("environment.keys").map("n")
 local mapnv = require("environment.keys").map({ "n", "v" })
---- Determines if the given mapping of enabled conditions can be ANDed to
---- produce a single boolean indicating if something should happen when all
---- things are enabled.
----@param ai_conds table|list<string>
----@return boolean
-local function batch_condition(ai_conds)
-  local passed = true
-  for _, cond in pairs(ai_conds) do
-    passed = passed and cond
-  end
-  return passed
-end
+
+print("Enabled copilot: %s", enb.copilot)
 
 return {
   {
@@ -115,7 +105,7 @@ return {
   {
     "hrsh7th/nvim-cmp",
     opts = function(_, opts)
-      if vim.fn.has("copilot") then
+      if vim.fn.has("copilot") and enb.copilot then
         opts.sources = vim.list_extend(opts.sources, {
           name = "copilot",
           max_item_count = 10,

@@ -4,6 +4,7 @@ local env = require("environment.ui")
 local mapd = require("environment.keys").map({ "n", "v", "i", "o" })
 
 return {
+
   {
     "L3MON4D3/LuaSnip",
     keys = function()
@@ -57,7 +58,7 @@ return {
         }),
       }, opts.window or {})
       opts.sources = vim.list_extend(opts.sources, {
-        { name = "nvim-lsp", max_item_count = 10 },
+        { name = "nvim_lsp", max_item_count = 10 },
         { name = "nvim_lsp_signature_help", max_item_count = 8 },
         { name = "treesitter", max_item_count = 8 },
         { name = "luasnip", max_item_count = 8 },
@@ -75,18 +76,88 @@ return {
           max_item_count = 8,
         },
         { name = "emoji", max_item_count = 10 },
-        -- { name = "nerdfonts", max_item_count = 8 },
+        { name = "nerdfonts", max_item_count = 8 },
         { name = "color_names", max_item_count = 5 },
       })
+
+      -- ────────────────────────────────────────────────────────────----------
+      -- The following changes the appearance of the menu. Noted changes:
+      -- - different row field order
+      -- - vscode codicons
+      -- - vscode-styled colors
       opts.formatting = vim.tbl_deep_extend("force", {
-        fields = { "kind", "abbr", "menu" },
+        -- fields = { cmp.ItemField.Kind, cmp.ItemField.Abbr, cmp.ItemField.Menu },
         format = require("lspkind").cmp_format({
-          mode = "symbol",
+          mode = "text_symbol",
           preset = "codicons",
-          maxwidth = 50,
+          maxwidth = 80,
           ellipsis_char = "...",
         }),
       }, opts.formatting or {})
+
+      local colorizer =
+        require("kanagawa.colors").setup({ theme = "wave" }).palette
+      -- gray
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemAbbrDeprecated",
+        { bg = "NONE", strikethrough = true, fg = colorizer.lotusGrey3 }
+      )
+      -- blue
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemAbbrMatch",
+        { bg = "NONE", fg = colorizer.lotusBlue4 }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemAbbrMatchFuzzy",
+        { link = "CmpIntemAbbrMatch" }
+      )
+      -- light blue
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemKindVariable",
+        { bg = "NONE", fg = colorizer.lotusTeal1 }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemKindInterface",
+        { link = "CmpItemKindVariable" }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemKindText",
+        { link = "CmpItemKindVariable" }
+      )
+      -- pink
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemKindFunction",
+        { bg = "NONE", fg = colorizer.lotusPink } -- colorizer.lotusPink }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemKindMethod",
+        { link = "CmpItemKindFunction" }
+      )
+      -- front
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemKindKeyword",
+        { bg = "NONE", fg = colorizer.lotusViolet2 }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        "CmpItemKindProperty",
+        { link = "CmpItemKindKeyword" }
+      )
+      vim.api.nvim_set_hl(0, "CmpItemKindUnit", { link = "CmpItemKindKeyword" })
+
+      -- -────────────────────────────────────────────────────────────---------
+      -- The following changes the behavior of the menu. Noteably, we are
+      -- turning off autocompletion on insert, in other words we need to hit one
+      -- of the configured keys to be able to use the completion menu.
       opts.completion = vim.tbl_deep_extend("force", {
         autocomplete = false,
         --completeopt = "menuone,menu,noselect,noinsert",
@@ -116,8 +187,8 @@ return {
           },
         })
       end, { desc = "cmp:>> fonts completion menu" })
-      mapd(kf(";"), function()
-        if vim.fn.has("copilot") then
+      if vim.fn.has("copilot") and os.getenv("NVIM_ENABLE_COPILOT") then
+        mapd(kf(";"), function()
           cmp.complete({
             config = {
               sources = {
@@ -125,11 +196,10 @@ return {
               },
             },
           })
-        end
-      end)
+        end)
+      end
     end,
   },
-  { "hrsh7th/cmp-nvim-lsp", dependencies = { ncmp } },
   { "hrsh7th/cmp-buffer", dependencies = { ncmp } },
   { "hrsh7th/cmp-path", dependencies = { ncmp } },
   { "hrsh7th/cmp-cmdline", dependencies = { ncmp } },

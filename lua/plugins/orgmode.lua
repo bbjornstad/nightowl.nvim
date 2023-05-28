@@ -1,10 +1,28 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
-local colors = require("kanagawa.colors").setup({ theme = "wave" })
+local colors = require("kanagawa.colors").setup({ theme = "wave" }).palette
 
-return {
+local function colorize(bg, fg, opts)
+  opts = opts or {}
+
+  local retstr = string.format(":background %s :foreground %s", bg, fg)
+  for name, val in pairs(opts) do
+    retstr = string.format("%s :%s %s", retstr, name, val)
+  end
+  return retstr
+end
+
+local organization_tools = {
   {
     "nvim-orgmode/orgmode",
-    dependencies = { "akinsho/org-bullets.nvim", opts = {} },
+    dependencies = {
+      { "akinsho/org-bullets.nvim", opts = {} },
+      {
+        "joaomsa/telescope-orgmode.nvim",
+        config = function()
+          require("telescope").load_extension("orgmode")
+        end,
+      },
+    },
     ft = { "org" },
     init = function()
       if vim.fn.has("ufo") then
@@ -49,17 +67,48 @@ return {
         "NIXED",
       },
       org_todo_keyword_faces = {
-        TODO = ":background #D9DADF :foreground blue :weight bold",
-        DONE = ":background #D9DADF :foreground green :underline on",
-        URGENT = ":background #D9DADF :foreground red :slant italic :underline on :weight bold",
-        SUPER = ":background DarkRed :foreground #e8a7a7 :slant italic :weight bold :underline on",
-        -- :foreground #21032b :slant italic',
-        AWAIT = ":background #D9DADF :foreground #4c3757 :slant italic",
-        REPEATED = ":background #D9DADF :foreground green :underline on",
-        PROGRESSING = ":background #D9DADF :foreground purple :slant italic",
-        CHECK = ":background #D9DADF :foreground NavyBlue :slant italic",
-        GOTITALL = ":background #D9DADF :foreground black :underline on",
-        NIXED = ":background #D9DADF :foreground DarkGrey :underline on",
+        TODO = colorize(colors.sumiInk4, colors.crystalBlue, {
+          weight = "bold",
+        }),
+        DONE = colorize(colors.sumiInk4, colors.lotusGreen2, {
+          underline = "on",
+        }),
+        URGENT = colorize(colors.sumiInk4, colors.dragonRed, {
+          underline = "on",
+          weight = "bold",
+        }),
+        SUPER = colorize(colors.sumiInk4, colors.autumnRed, {
+          slant = "italic",
+          underline = "on",
+        }),
+        AWAIT = colorize(colors.sumiInk4, colors.dragonPink, {
+          slant = "italic",
+        }),
+        REPEATED = colorize(
+          colors.sumiInk4,
+          colors.lotusGreen3,
+          { underline = "on" }
+        ),
+        PROGRESSING = colorize(
+          colors.sumiInk4,
+          colors.dragonPink,
+          { slant = "italic" }
+        ),
+        CHECK = colorize(
+          colors.sumiInk4,
+          colors.lotusBlue4,
+          { slant = "italic" }
+        ),
+        GOTITALL = colorize(
+          colors.sumiInk4,
+          colors.sumiInk0,
+          { underline = "on" }
+        ),
+        NIXED = colorize(
+          colors.sumiInk4,
+          colors.fujiGray,
+          { underline = "on" }
+        ),
       },
       org_capture_templates = {
         t = "Task",
@@ -88,6 +137,11 @@ return {
         er = {
           description = "Range",
           template = "* TODO %? | [%]\n  <%^{Start: |%<%Y-%m-%d %a>}>--<%^{End: |%<%Y-%m-%d %a>}>",
+        },
+      },
+      mappings = {
+        org = {
+          org_toggle_checkbox = "cc",
         },
       },
     },
@@ -120,3 +174,17 @@ return {
     },
   },
 }
+
+if vim.fn.has("orgmode") or vim.fn.has("neorg") then
+  table.insert(organization_tools, {
+    {
+      "lukas-reineke/headlines.nvim",
+      dependencies = {
+        "nvim-treesitter/nvim-treesitter",
+      },
+      opts = {},
+    },
+  })
+end
+
+return organization_tools
