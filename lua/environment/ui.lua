@@ -20,16 +20,17 @@ env.borders.main_accent = "double"
 
 env.ai = {}
 env.ai.enabled = {
-  copilot = toboolean(tonumber(os.getenv("NVIM_ENABLE_COPILOT"))), -- false, -- os.getenv("NVIM_ENABLE_COPILOT"),
-  cmp_ai = false,
+  copilot = false,
+  cmp_ai = true,
   chatgpt = true,
   codegpt = true,
   neural = true,
   neoai = true,
   hfcc = true,
-  tabnine = true,
+  tabnine = false,
   codeium = true,
 }
+env.ai.configured_notify = false
 
 env.telescope = {}
 env.telescope.theme = "ivy"
@@ -46,44 +47,9 @@ env.enable_lsp_signature = false
 --------------------------------------------------------------------------------
 -- UI: Colorscheme Options
 -- ===========
---
+env.default_colorscheme = "kanagawa"
 env.colorscheme = {}
-env.colorscheme.setup = {
-  --function(_, opts)
-  --  opts = vim.tbl_deep_extend("force", {
-  globalStatus = true,
-  dimInactive = true,
-  commentStyle = { italic = false },
-  keywordStyle = { italic = false },
-  statementStyle = { bold = true },
-  typeStyle = { italic = false },
-  background = { dark = "wave", light = "lotus" },
-  transparent = false,
-  -- overrides some highlighting colors to get a more modern output for some
-  -- views.
-  overrides = function(colors)
-    local theme = colors.theme
-    return {
-      TelescopeTitle = { fg = theme.ui.special, bold = true },
-      TelescopePromptNormal = { bg = theme.ui.bg_p1 },
-      TelescopePromptBorder = { fg = theme.ui.bg_p1, bg = theme.ui.bg_p1 },
-      TelescopeResultsNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m1 },
-      TelescopeResultsBorder = { fg = theme.ui.bg_m1, bg = theme.ui.bg_m1 },
-      TelescopePreviewNormal = { bg = theme.ui.bg_dim },
-      TelescopePreviewBorder = {
-        bg = theme.ui.bg_dim,
-        fg = theme.ui.bg_dim,
-      },
-      Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 },
-      PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
-      PmenuSbar = { bg = theme.ui.bg_m1 },
-      PmenuThumb = { bg = theme.ui.bg_p2 },
-      InclineNormal = { bg = colors.palette.sumiInk4 },
-      InclineNormalNC = { bg = colors.palette.sumiInk1 },
-    }
-  end,
-}
---opts)
---end
+
+env.lualine_theme = env.default_colorscheme
 
 return env

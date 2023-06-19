@@ -158,6 +158,11 @@ local organization_tools = {
     },
     build = ":Neorg sync-parsers",
     ft = { "norg" },
+    init = function()
+      if vim.fn.has("ufo") then
+        require("ufo").detach()
+      end
+    end,
     opts = {
       load = {
         ["core.defaults"] = {},

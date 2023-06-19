@@ -27,7 +27,7 @@ mapx(
   { "n", "v", "o", "i" },
   "<F1>",
   "<Esc>",
-  { desc = "esc >> to normal mode", remap = false }
+  { desc = "esc=> to normal mode", remap = false }
 )
 
 --------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ mapx(
   { "n", "v", "o" },
   "g?",
   "<CMD>help<CR>",
-  { desc = "got >> get help", remap = false }
+  { desc = "got=> get help", remap = false }
 )
 
 ---------------------------------------------------------------------------------
@@ -46,13 +46,13 @@ mapx(
   { "n", "v" },
   "<leader>bs",
   "<CMD>write<CR>",
-  { desc = "buf:>> save buffer" }
+  { desc = "buf=> save buffer" }
 )
 mapx(
   { "n", "v" },
   "<leader>bS",
   "<CMD>writeall<CR>",
-  { desc = "buf:>> save buffer" }
+  { desc = "buf=> save buffer" }
 )
 
 ---------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ mapx(
 -- the toggle_fmtopt function defined above.
 mapx("n", "<leader>uF", function()
   toggle_fmtopt("a")
-end, { desc = "toggle insert autoformat" })
+end, { desc = "ui=> toggle insert autoformat" })
 
 ---------------------------------------------------------------------------------
 -- Some basic line breaks using comment characters.
@@ -68,8 +68,8 @@ end, { desc = "toggle insert autoformat" })
 -- available using the figlet and comment-box plugins (in extras.lua)
 mapx("n", key_cline .. "b", function()
   edit_tools.InsertCommentBreak(tonumber(vim.o.textwidth), "-")
-end, { desc = "brk:>> insert comment break" })
+end, { desc = "brk=> insert comment break" })
 
 mapx("n", key_cline .. "d", function()
   edit_tools.InsertDashBreak(tonumber(vim.o.textwidth), "-")
-end, { desc = "brk:>> insert dash break" })
+end, { desc = "brk=> insert dash break" })

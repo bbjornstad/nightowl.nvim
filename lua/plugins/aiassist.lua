@@ -14,7 +14,42 @@ local key_codegpt = stems.codegpt
 local mapn = require("environment.keys").map("n")
 local mapnv = require("environment.keys").map({ "n", "v" })
 
-print("Enabled copilot: %s", enb.copilot)
+-- show a menu, but only if the user has selected the appropriate option.
+-- This menu is supposed to inform the user which plugins might send
+-- their code off to an external service for analysis.
+if env.ai.configured_notify then
+  vim.notify(
+    string.format(
+      [[
+AI Plugin Status:
+-----------------
+  -> *huggingface*: %s
+  -> *codeium*: %s
+  -> *tabnine*: %s
+  -> *cmp_ai*: %s
+  -> ***copilot***: %s
+  -> **neoai**: %s
+  -> **chatgpt**: %s
+  -> **codegpt**: %s
+  -> **neural**: %s
+
+* plugin is used during nvim-cmp autocompletion, and will therefore connect to an external service
+** plugin uses proprietary, non-free, non-open, or non-libre backend
+*** plugin has both of the attributes listed above.
+]],
+      enb.hfcc,
+      enb.codeium,
+      enb.tabnine,
+      enb.cmp_ai,
+      enb.copilot,
+      enb.neoai,
+      enb.chatgpt,
+      enb.codegpt,
+      enb.neural
+    ),
+    vim.log.levels.INFO
+  )
+end
 
 return {
   {
@@ -22,6 +57,12 @@ return {
     opts = {
       defaults = {
         [";"] = { name = "+ai" },
+        [";a"] = { name = "ai=> +neoai" },
+        [";g"] = { name = "ai=> +chatgpt (openai original)" },
+        [";c"] = { name = "ai=> +copilot" },
+        [";h"] = { name = "ai=> +huggingface" },
+        [";n"] = { name = "ai=> +neoai" },
+        [";o"] = { name = "ai=> +codegpt" },
         -- TODO Add a few more of these baseline name mappings
         -- directly onto the which-key configuration here.
       },
@@ -41,10 +82,10 @@ return {
   {
     "hrsh7th/nvim-cmp",
     opts = function(_, opts)
-      if vim.fn.has("codeium") then
+      if enb.codeium and vim.fn.has("codeium") then
         opts.sources = vim.list_extend(opts.sources, {
           name = "codeium",
-          max_item_count = 5,
+          max_item_count = 20,
         })
       end
     end,
@@ -52,19 +93,36 @@ return {
   {
     "huggingface/hfcc.nvim",
     opts = {
-      api_token = vim.env.HUGFACE_API_TOKEN,
       model = "bigcode/starcoder",
+      query_params = {
+        max_new_tokens = 60,
+        temperature = 0.2,
+        top_p = 0.95,
+        stop_token = "<|endoftext|>",
+      },
+      accept_keymap = "'",
+      dismiss_keymap = '"',
     },
     enabled = enb.hfcc,
-    cmd = { "StarCoder", "HFccCompletion" },
+    cmd = { "HugMyFace", "HFccSuggestion", "HFccToggleAutoSuggest" },
     init = function()
-      vim.api.nvim_create_user_command("StarCoder", function()
+      vim.api.nvim_create_user_command("HugMyFace", function()
         require("hfcc.completion").complete()
       end, {})
       mapn(
-        key_hfcc,
+        key_hfcc .. "f",
         "<CMD>HFccSuggestion<CR>",
         { desc = "ai.hfcc=> suggest huggingface completion" }
+      )
+      mapn(
+        key_hfcc .. "F",
+        "<CMD>HFccToggleAutoSuggest<CR>",
+        { desc = "ai.hfcc=> toggle insert mode autosuggest" }
+      )
+      mapn(
+        key_hfcc .. "a",
+        "<CMD>HFccToggleAutoSuggest<CR>",
+        { desc = "ai.hfcc=> toggle insert mode autosuggest" }
       )
     end,
   },
@@ -142,9 +200,10 @@ return {
   },
   {
     "codota/tabnine-nvim",
+    module = "tabnine",
     enabled = enb.tabnine,
     build = "./dl_binaries.sh",
-    config = function()
+    config = function(opts)
       require("tabnine").setup({
         disable_auto_comment = true,
         accept_keymap = "<C-9>",
@@ -156,6 +215,8 @@ return {
           "neo-tree",
           "neo-tree-popup",
           "notify",
+          "oil",
+          "Oil",
         },
         log_file_path = nil, -- absolute path to Tabnine log file
       })
@@ -163,18 +224,22 @@ return {
     dependencies = { "tzachar/cmp-tabnine" },
   },
   {
-    "tzachar/cmp-tabnine",
-    enabled = vim.fn.has("tabnine"),
-    build = "./install.sh",
-    dependencies = { "codota/tabnine-nvim", "hrsh7th/nvim-cmp" },
-  },
-  {
     "hrsh7th/nvim-cmp",
     opts = function(_, opts)
-      opts.sources = vim.list_extend(opts.sources, {
-        { name = "cmp_tabnine", max_item_count = 5 },
-      })
+      if enb.tabnine and vim.fn.has("tabnine") then
+        opts.sources = vim.list_extend(opts.sources, {
+          { name = "cmp_tabnine", max_item_count = 20 },
+        })
+      end
     end,
+    dependencies = {
+      {
+        "tzachar/cmp-tabnine",
+        enabled = vim.fn.has("tabnine") and enb.tabnine,
+        build = "./install.sh",
+        dependencies = { "codota/tabnine-nvim", "hrsh7th/nvim-cmp" },
+      },
+    },
   },
   {
     "dpayne/CodeGPT.nvim",
@@ -185,8 +250,8 @@ return {
     end,
     cmd = { "Chat" },
     init = function()
-      mapn(
-        key_codegpt .. "c",
+      mapnv(
+        key_codegpt,
         "<CMD>CodeGPT<CR>",
         { desc = "ai.codegpt=> codegpt interface" }
       )
@@ -227,19 +292,19 @@ return {
       mapn(
         key_gpt .. "gr",
         "<CMD>ChatGPTActAs<CR>",
-        { desc = "chatgpt role prompts" }
+        { desc = "ai.chatgpt=> role prompts" }
       )
       mapn(
         key_gpt .. "ge",
         "<CMD>ChatGPTEditWithInstructions<CR>",
-        { desc = "chatgpt edit with instructions" }
+        { desc = "ai.chatgpt=> edit with instructions" }
       )
       mapn(
         key_gpt .. "ga",
         "<CMD>ChatGPTCustomCodeAction<CR>",
-        { desc = "chatgpt code actions" }
+        { desc = "ai.chatgpt=> code actions" }
       )
-      mapn("'G", "<CMD>ChatGPT<CR>", { desc = "chatgpt" })
+      mapn("'G", "<CMD>ChatGPT<CR>", { desc = "ai.chatgpt=> interface" })
     end,
   },
   {
@@ -263,12 +328,12 @@ return {
       ui = {
         output_popup_text = "neoai",
         input_popup_text = "",
-        width = 30, -- As percentage eg. 30%
+        width = 60, -- As percentage eg. 30%
         output_popup_height = 80, -- As percentage eg. 80%
         submit = "<Enter>", -- Key binding to submit the prompt
       },
       models = {
-        { name = "openai", model = "gpt-3.5-turbo", params = nil },
+        { name = "openai", model = { "gpt-4", "gpt-3.5-turbo" }, params = nil },
       },
       register_output = {
         ["g"] = function(output)
@@ -294,7 +359,7 @@ return {
         {
           name = "textify",
           key = key_neoai .. "t",
-          desc = "fix text with AI",
+          desc = "ai.neoai=> fix text (textify)",
           use_context = true,
           prompt = function()
             return [[
@@ -309,7 +374,7 @@ return {
         {
           name = "gitcommit",
           key = key_neoai .. "g",
-          desc = "generate git commit message",
+          desc = "ai.neoai=> generate git commit message",
           use_context = false,
           prompt = function()
             return [[
@@ -324,7 +389,7 @@ return {
         {
           name = "professional email (affirm)",
           key = key_neoai .. "ma",
-          desc = "generate professional email in response (affirm)",
+          desc = "ai.neoai=> generate professional email (affirm)",
           use_context = true,
           prompt = function()
             return [[
@@ -343,7 +408,7 @@ return {
         {
           name = "professional email (decline)",
           key = key_neoai .. "md",
-          desc = "generate professional email in response (decline)",
+          desc = "ai.neoai=> generate professional email (decline)",
           use_context = true,
           prompt = function()
             return [[
@@ -364,7 +429,7 @@ return {
         {
           name = "professional email (cold-contact)",
           key = key_neoai .. "mc",
-          desc = "generate professional email to send (cold-contact)",
+          desc = "ai.neoai=> generate professional email (cold-contact)",
           use_context = true,
           prompt = function()
             return [[
@@ -386,7 +451,7 @@ return {
         {
           name = "The Spacebar (from Outline)",
           key = key_neoai .. "so",
-          desc = "Generate a blog post for a blog called 'The Spacebar'",
+          desc = "ai.neoai=> blog post for 'The Spacebar'",
           use_context = true,
           prompt = function()
             return [[
@@ -407,7 +472,7 @@ return {
         {
           name = "The Spacebar (from Existing)",
           key = key_neoai .. "st",
-          desc = "Generate or reformulate a blog post for a blog called 'The Spacebar'",
+          desc = "ai.neoai=> polish blog post rough draft for 'The Spacebar'",
           use_context = true,
           prompt = function()
             return [[
@@ -437,7 +502,7 @@ return {
             "n",
             "q",
             "<CMD>quit<CR>",
-            { desc = "quit", remap = false }
+            { desc = "quit", remap = false, buffer = true }
           )
         end,
       })

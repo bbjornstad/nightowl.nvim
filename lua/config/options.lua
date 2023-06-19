@@ -25,6 +25,7 @@ vim.opt.autoindent = true
 vim.opt.startofline = false
 vim.opt.confirm = true
 vim.opt.visualbell = true
+vim.opt.mousemoveevent = true
 
 -- timeout configuration for neovim mappings, affects WhichKey predominantly
 vim.opt.ttimeout = true
@@ -75,11 +76,6 @@ vim.opt.background = (CANDY_MOOD or "dark")
 
 vim.cmd.hi("clear SignColumns")
 
--- vim.opt.do_filetype_lua = 1
-vim.opt.completeopt = "menuone,menu,noselect,noinsert"
-
--- for nvim-ufo
-
 vim.opt.encoding = "utf-8"
 
-vim.g.loaded_perl_provider = false
+vim.g.loaded_perl_provider = 0
