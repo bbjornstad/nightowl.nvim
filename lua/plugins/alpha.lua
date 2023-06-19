@@ -1,4 +1,15 @@
 local env = require("environment.alpha")
+local function startdash2(header)
+  local opt_header = env.fallback_headers[header]
+  local opt_linelen = #opt_header[1]
+  if vim.api.nvim_win_get_width(0) < opt_linelen then
+    --header = env.fallback_headers[width_fallback]
+    return opt_header
+  else
+    return opt_header or env.fallback_headers["slant_relief_alt_dotted"]
+  end
+end
+
 local function startdash(layout, header, width_fallback)
   layout = layout or "alpha.themes.dashboard"
   local opt_header = env.fallback_headers[header]
@@ -18,27 +29,68 @@ end
 
 return {
   {
-    "goolord/alpha-nvim",
-    opts = function(_, opts)
-      opts = vim.tbl_deep_extend(
-        "force",
-        startdash(
-          env.preferred_alpha_layout or "",
-          env.preferred_alpha_header or nil,
-          env.preferred_fallback_header or nil
-        ),
-        opts
-      )
+    "glepnir/dashboard-nvim",
+    event = "VimEnter",
+    config = function()
+      require("dashboard").setup({
+        theme = "hyper",
+        shortcut_type = "letter",
+        hide = { statusline = true, tabline = true, winbar = true },
+        preview = {
+          file_path = true,
+          file_height = true,
+          file_width = true,
+        },
+
+        config = {
+          footer = "...Invisible Things are the Only Realities...",
+          -- header = startdash2("nightowl"),
+          week_header = {
+            enable = true,
+          },
+        },
+      })
     end,
-    enabled = not env.disable_alpha or true,
-    -- keys = require("environment.keys").alpha,
-    init = function()
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    init = function(_, opts)
+      local thisheader = startdash2(env.preferred_alpha_header)
+      -- vim.go.dashboard_custom_header = thisheader
       vim.keymap.set(
         { "n", "v" },
         "<Home>",
         "<CMD>Alpha<CR>",
-        { desc = "א.α:>> return to alpha state" }
+        { desc = "א.α => return to alpha state" }
       )
     end,
   },
+  {
+    "goolord/alpha-nvim",
+    enabled = false,
+  },
+  -- {
+  --   "goolord/alpha-nvim",
+  --   opts = function(_, opts)
+  --     opts = vim.tbl_deep_extend(
+  --       "force",
+  --       startdash(
+  --         env.preferred_alpha_layout or "",
+  --         env.preferred_alpha_header or nil,
+  --         env.preferred_fallback_header or nil
+  --       ),
+  --       opts
+  --     )
+  --   end,
+  --   enabled = not env.disable_alpha or true,
+  --   -- keys = require("environment.keys").alpha,
+  --   init = function(_, opts)
+  --     vim.keymap.set(
+  --       { "n", "v" },
+  --       "<Home>",
+  --       "<CMD>Alpha<CR>",
+  --       { desc = "א.α => return to alpha state" }
+  --     )
+  --   end,
+  -- },
 }

@@ -8,6 +8,19 @@ local mod = {}
 -- @section text manipulation functions - `uutils.edit`
 --  These should probably get split off in the long run.
 
+--- appends or removes a given character from the internal formatoptions vim
+--- option, which controls document formatting behavior; most often used in
+--- toggling autoformatting on insert behavior.
+---@param char string   the string value to toggle.
+function mod.toggle_fmtopt(char)
+  local currentopts = vim.opt.formatoptions:get()
+  if currentopts[char] then
+    vim.opt.formatoptions:remove(char)
+  else
+    vim.opt.formatoptions:append(char)
+  end
+end
+
 function mod.InsertDashBreak(colstop, dashchar)
   colstop = tonumber(colstop) or 0
   dashchar = tostring(dashchar) or "-"

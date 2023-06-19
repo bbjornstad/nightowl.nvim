@@ -7,6 +7,7 @@ function mod.setup_extension(extension, opts, theme, config)
     { theme = (theme or scope_theme) or "ivy" },
     opts
   )
+  -- require("telescope").load_extension(extension)
 end
 
 function mod.setup_picker(picker, opts, theme, config)

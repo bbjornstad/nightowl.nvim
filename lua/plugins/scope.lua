@@ -101,6 +101,9 @@ local extspec = scopeutils.setup_extensions(target_extensions, {
     override_file_sorter = true,
     case_mode = "smart_case",
   },
+  ["ui-select"] = {
+    require("telescope.themes").get_dropdown({}),
+  },
 }, "ivy")
 
 return {
@@ -118,6 +121,7 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     dependencies = {
+      "BurntSushi/ripgrep",
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
@@ -126,18 +130,72 @@ return {
           require("telescope").load_extension("fzf")
         end,
       },
-      "nvim-telescope/telescope-ui-select.nvim",
-      "nvim-telescope/telescope-file-browser.nvim",
-      "BurntSushi/ripgrep",
-      "cljoly/telescope-repo.nvim",
-      "chip/telescope-software-licenses.nvim",
-      "LinArcX/telescope-env.nvim",
-      "LinArcX/telescope-changes.nvim",
-      "LinArcX/telescope-command-palette.nvim",
-      "tsakirist/telescope-lazy.nvim",
-      "octarect/telescope-menu.nvim",
-      "smartpde/telescope-recent-files",
-      "MaximilianLloyd/adjacent.nvim",
+      {
+        "nvim-telescope/telescope-ui-select.nvim",
+        config = function()
+          require("telescope").load_extension("ui-select")
+        end,
+      },
+      {
+        "nvim-telescope/telescope-file-browser.nvim",
+        config = function()
+          require("telescope").load_extension("file_browser")
+        end,
+      },
+      {
+        "cljoly/telescope-repo.nvim",
+        config = function()
+          require("telescope").load_extension("repo")
+        end,
+      },
+      {
+        "chip/telescope-software-licenses.nvim",
+        config = function()
+          require("telescope").load_extension("software-licenses")
+        end,
+      },
+      {
+        "LinArcX/telescope-env.nvim",
+        config = function()
+          require("telescope").load_extension("env")
+        end,
+      },
+      {
+        "LinArcX/telescope-changes.nvim",
+        config = function()
+          require("telescope").load_extension("changes")
+        end,
+      },
+      {
+        "LinArcX/telescope-command-palette.nvim",
+        config = function()
+          require("telescope").load_extension("command_palette")
+        end,
+      },
+      {
+        "tsakirist/telescope-lazy.nvim",
+        config = function()
+          require("telescope").load_extension("lazy")
+        end,
+      },
+      {
+        "octarect/telescope-menu.nvim",
+        config = function()
+          require("telescope").load_extension("menu")
+        end,
+      },
+      {
+        "smartpde/telescope-recent-files",
+        config = function()
+          require("telescope").load_extension("recent_files")
+        end,
+      },
+      {
+        "MaximilianLloyd/adjacent.nvim",
+        config = function()
+          require("telescope").load_extension("recent_files")
+        end,
+      },
       {
         "benfowler/telescope-luasnip.nvim",
         module = "telescope._extensions.luasnip",
@@ -145,36 +203,156 @@ return {
           require("telescope").load_extension("luasnip")
         end,
       },
-      "crispgm/telescope-heading.nvim",
-      "nvim-telescope/telescope-project.nvim",
-      "jvgrootveld/telescope-zoxide",
-      "nvim-telescope/telescope-dap.nvim",
-      "nvim-telescope/telescope-symbols.nvim",
-      "ghassan0/telescope-glyph.nvim",
-      "nvim-telescope/telescope-ui-select.nvim",
+      {
+        "octarect/telescope-menu.nvim",
+        config = function()
+          require("telescope").load_extension("menu")
+        end,
+      },
+      {
+        "smartpde/telescope-recent-files",
+        config = function()
+          require("telescope").load_extension("recent_files")
+        end,
+      },
+      {
+        "MaximilianLloyd/adjacent.nvim",
+        config = function()
+          require("telescope").load_extension("adjacent")
+        end,
+      },
+      {
+        "benfowler/telescope-luasnip.nvim",
+        module = "telescope._extensions.luasnip",
+        config = function()
+          require("telescope").load_extension("luasnip")
+        end,
+      },
+      {
+        "crispgm/telescope-heading.nvim",
+        config = function()
+          require("telescope").load_extension("heading")
+        end,
+      },
+      {
+        "nvim-telescope/telescope-project.nvim",
+        config = function()
+          require("telescope").load_extension("project")
+        end,
+      },
+      {
+        "jvgrootveld/telescope-zoxide",
+        config = function()
+          require("telescope").load_extension("zoxide")
+        end,
+      },
+      {
+        "nvim-telescope/telescope-dap.nvim",
+        config = function()
+          require("telescope").load_extension("dap")
+        end,
+      },
+      {
+        "nvim-telescope/telescope-symbols.nvim",
+      },
+      {
+        "ghassan0/telescope-glyph.nvim",
+        config = function()
+          require("telescope").load_extension("glyph")
+        end,
+      },
       {
         "nvim-telescope/telescope-frecency.nvim",
         dependencies = {
           "kkharji/sqlite.lua",
           "nvim-tree/nvim-web-devicons",
         },
+        config = function()
+          require("telescope").load_extension("frecency")
+        end,
       },
-      "nvim-telescope/telescope-media-files.nvim",
-      "olacin/telescope-cc.nvim",
-      "HUAHUAI23/telescope-session.nvim",
-      "paopaol/telescope-git-diffs.nvim",
-      "debugloop/telescope-undo.nvim",
-      "princejoogie/dir-telescope.nvim",
-      "nat-418/telescope-color-names.nvim",
-      "keyvchan/telescope-find-pickers.nvim",
+      {
+        "nvim-telescope/telescope-media-files.nvim",
+        config = function()
+          require("telescope").load_extension("media_files")
+        end,
+      },
+      {
+        "olacin/telescope-cc.nvim",
+        config = function()
+          require("telescope").load_extension("conventional_commits")
+        end,
+      },
+      {
+        "HUAHUAI23/telescope-session.nvim",
+        config = function()
+          require("telescope").load_extension("xray23")
+        end,
+      },
+      {
+        "paopaol/telescope-git-diffs.nvim",
+        config = function()
+          require("telescope").load_extension("git_diffs")
+        end,
+      },
+      {
+        "debugloop/telescope-undo.nvim",
+        config = function()
+          require("telescope").load_extension("undo")
+        end,
+      },
+      {
+        "princejoogie/dir-telescope.nvim",
+        opts = {
+          hidden = true,
+          no_ignore = false,
+          show_preview = true,
+        },
+        config = true,
+      },
+      {
+        "nat-418/telescope-color-names.nvim",
+        config = function()
+          require("telescope").load_extension("color_names")
+        end,
+      },
+      {
+        "keyvchan/telescope-find-pickers.nvim",
+        config = function()
+          require("telescope").load_extension("find_pickers")
+        end,
+        init = function()
+          mapn(
+            "<leader><leader>",
+            require("telescope").extensions.find_pickers.find_pickers,
+            { desc = "scope=> extensions and pickers" }
+          )
+        end,
+      },
       {
         "adoyle-h/lsp-toggle.nvim",
         dependencies = "neovim/nvim-lspconfig",
         opts = { create_cmds = true, telescope = true },
+        config = true,
       },
-      "AckslD/nvim-neoclip.lua",
-      "barrett-ruth/telescope-http.nvim",
-      "LinArcX/telescope-ports.nvim",
+      {
+        "AckslD/nvim-neoclip.lua",
+        config = function()
+          require("telescope").load_extension("neoclip")
+        end,
+      },
+      {
+        "barrett-ruth/telescope-http.nvim",
+        config = function()
+          require("telescope").load_extension("http")
+        end,
+      },
+      {
+        "LinArcX/telescope-ports.nvim",
+        config = function()
+          require("telescope").load_extension("ports")
+        end,
+      },
     },
     opts = {
       defaults = {
@@ -188,122 +366,117 @@ return {
       -- @module telescope.core: core keymappings.
       -- telescope.core: Find Files
       mapn(
-        "<leader><leader>",
-        require("telescope.builtin").builtin,
-        { desc = "test_search telescope" }
-      )
-      mapn(
         key_scope .. "ff",
         require("telescope.builtin").find_files,
-        { desc = "scope:>> search local files" }
+        { desc = "scope=> search local files" }
       )
       -- telescope.core: Old Files
       mapn(
         key_scope .. "fo",
         require("telescope.builtin").oldfiles,
-        { desc = "scope:>> search oldfiles" }
+        { desc = "scope=> search oldfiles" }
       )
       -- telescope.core: Global Tags
       mapn(
         key_scope .. "g",
         require("telescope.builtin").tags,
-        { desc = "scope:>> search tags" }
+        { desc = "scope=> search tags" }
       )
       -- telescope.core: Vim Commands
       mapn(
         key_scope .. "c",
         require("telescope.builtin").commands,
-        { desc = "scope:>> scope through vim commands" }
+        { desc = "scope=> scope through vim commands" }
       )
       -- telescope.cort:. Help Tags
       mapn(
         key_scope .. "ht",
         require("telescope.builtin").help_tags,
-        { desc = "scope:>> search help tags" }
+        { desc = "scope=> search help tags" }
       )
       -- telescope.core: Manual Pages
       mapn(
         key_scope .. "hm",
         require("telescope.builtin").man_pages,
-        { desc = "scope:>> search man pages" }
+        { desc = "scope=> search man pages" }
       )
       -- telescope.core: Search History
       mapn(
         key_scope .. "hs",
         require("telescope.builtin").search_history,
-        { desc = "scope:>> scope history" }
+        { desc = "scope=> scope history" }
       )
       -- telescope.core: Command History
       mapn(
         key_scope .. "hc",
         require("telescope.builtin").command_history,
-        { desc = "scope:>> command history" }
+        { desc = "scope=> command history" }
       )
       -- telescope.core: telescope builtins
       mapn(
         key_scope .. "i",
         require("telescope.builtin").builtin,
-        { desc = "scope:>> search telescope" }
+        { desc = "scope=> search telescope" }
       )
       -- telescope.core: open buffers
       mapn(
         key_scope .. "b",
         require("telescope.builtin").buffers,
-        { desc = "scope:>> search open buffers" }
+        { desc = "scope=> search open buffers" }
       )
       -- telescope.core: treesitter nodes
       mapn(
         key_scope .. "e",
         require("telescope.builtin").treesitter,
-        { desc = "scope:>> search treesitter nodes" }
+        { desc = "scope=> search treesitter nodes" }
       )
       -- telescope.core: current buffer tags
       mapn(
         key_scope .. "t",
         require("telescope.builtin").current_buffer_tags,
-        { desc = "scope:>> search current buffer's tags" }
+        { desc = "scope=> search current buffer's tags" }
       )
       -- telescope.core: vim marks
       mapn(
         key_scope .. "m",
         require("telescope.builtin").marks,
-        { desc = "scope:>> search marks" }
+        { desc = "scope=> search marks" }
       )
       -- telescope.core: loclist
       mapn(
         key_scope .. "y",
         require("telescope.builtin").loclist,
-        { desc = "scope:>> search loclist" }
+        { desc = "scope=> search loclist" }
       )
       -- telescope.core: keymappings
       mapn(
         key_scope .. "k",
         require("telescope.builtin").keymaps,
-        { desc = "scope:>> search defined keymappings" }
+        { desc = "scope=> search defined keymappings" }
       )
       -- telescope.core: builtin pickers
       mapn(
         key_scope .. "o",
         require("telescope.builtin").pickers,
-        { desc = "scope:>> search telescope" }
+        { desc = "scope=> search telescope" }
       )
       -- telescope.core: vim options
       mapn(
         key_scope .. "v",
         require("telescope.builtin").vim_options,
-        { desc = "scope:>> search vim options" }
+        { desc = "scope=> search vim options" }
       )
       -- telescope.core: luasnip snippets
       mapn(
         key_scope .. "s",
         require("telescope").extensions.luasnip.luasnip,
-        { desc = "scope:>> search defined snippets" }
+        { desc = "scope=> search defined snippets" }
       )
       -- telescope.core: notifications
       mapn(
         key_scope .. "n",
         require("telescope").extensions.notify.notify,
-        { desc = "scope:>> search notifications" }
+        { desc = "scope=> search notifications" }
       )
       ---
       -- @module telescope.aux
@@ -313,7 +486,7 @@ return {
       mapnv(
         "q:",
         require("telescope.builtin").command_history,
-        { desc = "scope:>> command history", remap = false }
+        { desc = "scope=> command history", remap = false }
       )
     end,
   },

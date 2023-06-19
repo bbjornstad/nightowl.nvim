@@ -40,11 +40,18 @@ return { -- add folding range to capabilities
       },
     },
   },
+
   {
     "kevinhwang91/nvim-ufo",
     dependencies = {
       "kevinhwang91/promise-async",
       "VonHeikemen/lsp-zero.nvim",
+      {
+        "milisims/foldhue.nvim",
+        config = function(_, opts)
+          require("foldhue").enable()
+        end,
+      },
     },
     event = "VeryLazy",
     opts = { fold_virt_text_handler = handler },
@@ -58,37 +65,37 @@ return { -- add folding range to capabilities
         "n",
         "zR",
         require("ufo").openAllFolds,
-        { desc = "ufo:>> open all ultrafolded" }
+        { desc = "ufo=> open all ultrafolded" }
       )
       vim.keymap.set(
         "n",
         "zM",
         require("ufo").closeAllFolds,
-        { desc = "ufo:>> close all ultrafolded" }
+        { desc = "ufo=> close all ultrafolded" }
       )
       vim.keymap.set(
         "n",
         "zr",
         require("ufo").openFoldsExceptKinds,
-        { desc = "ufo:>> close all ultrafolded" }
+        { desc = "ufo=> open ultrafolded excepting" }
       )
       vim.keymap.set(
         "n",
         "zm",
         require("ufo").closeFoldsWith,
-        { desc = "ufo:>> close all ultrafolded" }
+        { desc = "ufo=> close this ultrafolded" }
       )
       vim.keymap.set(
         "n",
         "zI",
         require("ufo").inspect,
-        { desc = "ufo:>> inspect current buffer" }
+        { desc = "ufo=> inspect current buffer" }
       )
       vim.keymap.set(
         "n",
         "zp",
         require("ufo").peekFoldedLinesUnderCursor,
-        { desc = "ufo:>> peek under fold" }
+        { desc = "ufo=> peek under fold" }
       )
     end,
   },

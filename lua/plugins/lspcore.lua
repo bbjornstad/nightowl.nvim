@@ -37,11 +37,11 @@ return {
       -- Required when using LazyVim, in order to prevent
       -- startup warnings related to incorrect plugin load order.
       { "folke/neoconf.nvim" },
-      { "folke/neodev.nvim" },
       { "nvim-lua/lsp-status.nvim" },
+      { "folke/neodev.nvim" },
     },
+    ---@diagnostic disable-next-line: unused-local
     config = function(_, opts)
-      -- print(string.format("LSPZero Config: {}", vim.inspect(opts)))
       local lsp = require("lsp-zero").preset({
         name = "minimal",
         set_lsp_keymaps = { preserve_mappings = true },
@@ -57,16 +57,54 @@ return {
           documentation_window = true,
         },
       })
+      require("lsp-status").register_progress()
       lsp.on_attach(function(client, bufnr)
-        require("lsp-status").register_progress()
+        require("lsp-status").on_attach(client)
         lsp.default_keymaps({ buffer = bufnr, preserve_mappings = true })
         if client.server_capabilities.documentSymbolProvider then
-          require("nvim-navic").attach(client, bufnr)
+          local navic = require("nvim-navic") or {}
+          if navic ~= {} then
+            navic.attach(client, bufnr)
+          end
         end
       end)
 
-      require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls(opts))
+      if vim.fn.has("rust-tools") then
+        lsp.skip_server_setup("rust_analyzer")
+        local rust_tools = require("rust-tools")
+        rust_tools.setup({
+          server = {
+            on_attach = function()
+              vim.keymap.set(
+                { "n" },
+                "<leader>ca",
+                rust_tools.hover_actions.hover_actions,
+                {
+                  buffer = vim.nvim_get_current_buf(),
+                  desc = "lsp=> rust code actions for symbol",
+                }
+              )
+            end,
+          },
+        })
+      end
 
+      require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls({
+        on_attach = function(client, bufnr)
+          local hinter = require("inlay-hints") or {}
+          print(hinter)
+          if hinter ~= {} then
+            hinter.on_attach(client, bufnr)
+          end
+        end,
+        settings = {
+          Lua = {
+            hint = {
+              enabled = true,
+            },
+          },
+        },
+      }))
       lsp.setup()
     end,
   },
@@ -77,21 +115,31 @@ return {
       keys[#keys + 1] = {
         "gF",
         vim.lsp.buf.format,
-        desc = "lsp:>> format current buffer",
+        desc = "lsp=> format current buffer",
       }
       keys[#keys + 1] =
-        { "K", vim.lsp.buf.hover, "hover", desc = "lsp:>> hover information" }
+        { "K", vim.lsp.buf.hover, "hover", desc = "lsp=> hover information" }
       keys[#keys + 1] = {
         "gk",
         vim.lsp.buf.signature_help,
-        desc = "lsp:>> symbol signature help",
+        desc = "lsp=> symbol signature help",
+      }
+      keys[#keys + 1] = {
+        "gl",
+        vim.diagnostic.open_float,
+        desc = "lsp=> show line diagnostics",
+      }
+      keys[#keys + 1] = {
+        "ga",
+        vim.lsp.buf.code_action,
+        desc = "lsp=> show code actions",
       }
       keys[#keys + 1] = {
         "g?",
         function()
           vim.cmd([[help ]] .. vim.fn.expand("<cword>"))
         end,
-        desc = "lsp:>> find symbol help",
+        desc = "lsp=> find symbol help",
       }
     end,
     dependencies = {

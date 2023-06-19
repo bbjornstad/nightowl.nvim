@@ -58,26 +58,52 @@ return {
         }),
       }, opts.window or {})
       opts.sources = vim.list_extend(opts.sources, {
-        { name = "nvim_lsp", max_item_count = 10 },
-        { name = "nvim_lsp_signature_help", max_item_count = 8 },
-        { name = "treesitter", max_item_count = 8 },
-        { name = "luasnip", max_item_count = 8 },
-        { name = "dap", max_item_count = 8 },
-        { name = "rg", max_item_count = 8 },
-        { name = "env", max_item_count = 5 },
-        { name = "buffer", max_item_count = 5 },
-        { name = "path", max_item_count = 5 },
-        { name = "calc", max_item_count = 3 },
-        { name = "cmdline", max_item_count = 5 },
-        -- { name = "ctags", max_item_count = 5 },
+        {
+          name = "nvim_lsp",
+          max_item_count = 20,
+
+          entry_filter = function(entry, ctx)
+            local kind =
+              require("cmp.types").lsp.CompletionItemKind[entry:get_kind()]
+
+            if kind == "Text" then
+              return false
+            end
+            return true
+          end,
+          priority = 2,
+        },
+
+        {
+          name = "nvim_lsp_signature_help",
+          max_item_count = 20,
+          priority = 2,
+        },
+        {
+          name = "nvim_lsp_document_symbol",
+          max_item_count = 20,
+          priority = 2,
+        },
+        { name = "treesitter", max_item_count = 20 },
+        { name = "luasnip", max_item_count = 20, priority = 2 },
+        { name = "dap", max_item_count = 20 },
+        { name = "rg", max_item_count = 20, keyword_length = 5 },
+        { name = "git", max_item_count = 20, keyword_length = 3 },
+        --{ name = "env", max_item_count = 5, keyword_length = 5 },
+        --{ name = "buffer", max_item_count = 5, keyword_length = 7 },
+        { name = "path", max_item_count = 15, keyword_length = 5 },
+        { name = "calc", max_item_count = 10 },
+        { name = "cmdline", max_item_count = 15, keyword_length = 5 },
+        { name = "ctags", max_item_count = 10 },
+        { name = "emoji", max_item_count = 20, keyword_length = 3 },
+        { name = "nerdfonts", max_item_count = 20, keyword_length = 3 },
+        { name = "color_names", max_item_count = 10, keyword_length = 3 },
         {
           name = "fonts",
           option = { space_filter = "-" },
-          max_item_count = 8,
+          max_item_count = 20,
+          keyword_length = 3,
         },
-        { name = "emoji", max_item_count = 10 },
-        { name = "nerdfonts", max_item_count = 8 },
-        { name = "color_names", max_item_count = 5 },
       })
 
       -- ────────────────────────────────────────────────────────────----------
@@ -86,7 +112,7 @@ return {
       -- - vscode codicons
       -- - vscode-styled colors
       opts.formatting = vim.tbl_deep_extend("force", {
-        -- fields = { cmp.ItemField.Kind, cmp.ItemField.Abbr, cmp.ItemField.Menu },
+        fields = { cmp.ItemField.Kind, cmp.ItemField.Abbr, cmp.ItemField.Menu },
         format = require("lspkind").cmp_format({
           mode = "text_symbol",
           preset = "codicons",
@@ -160,6 +186,7 @@ return {
       -- of the configured keys to be able to use the completion menu.
       opts.completion = vim.tbl_deep_extend("force", {
         autocomplete = false,
+        scrolloff = true,
         --completeopt = "menuone,menu,noselect,noinsert",
       }, opts.completion or {})
     end,
@@ -178,25 +205,82 @@ return {
         return string.format("%s%s", key_cmp, key)
       end
       local cmp = require("cmp")
+      mapd(kf(";"), function()
+        cmp.complete({
+          config = {
+            sources = {
+              { name = "codeium" },
+              { name = "tabnine" },
+            },
+          },
+        })
+      end)
       mapd(kf("f"), function()
         cmp.complete({
           config = {
             sources = {
-              { name = "fonts", option = { space_filter = "-" } },
+              {
+                name = "fonts",
+                option = { space_filter = "-" },
+              },
             },
           },
         })
-      end, { desc = "cmp:>> fonts completion menu" })
-      if vim.fn.has("copilot") and os.getenv("NVIM_ENABLE_COPILOT") then
-        mapd(kf(";"), function()
+      end, { desc = "cmp=> fonts completion menu" })
+      mapd(kf("i"), function()
+        cmp.complete({
+          config = {
+            sources = {
+              { name = "nerdfonts" },
+              { name = "emoji" },
+            },
+          },
+        })
+      end, { desc = "cmp=> icons completion menu" })
+      mapd(kf("l"), function()
+        cmp.complete({
+          config = {
+            sources = {
+              { name = "nvim_lsp" },
+              { name = "nvim_lsp_signature_help" },
+              { name = "nvim_lsp_document_symbol" },
+              { name = "treesitter" },
+              { name = "luasnip" },
+              { name = "dap" },
+            },
+          },
+        })
+      end, { desc = "cmp=> lsp completion menu" })
+      mapd(kf("."), function()
+        cmp.complete({
+          config = {
+            sources = {
+              { name = "git" },
+              { name = "path" },
+              { name = "rg" },
+              { name = "env" },
+              { name = "buffer" },
+              { name = "cmdline" },
+            },
+          },
+        })
+      end, { desc = "cmp=> local completion menu" })
+      if vim.fn.has("copilot") and env.ai.enabled.copilot then
+        mapd(kf(":"), function()
           cmp.complete({
             config = {
               sources = {
-                { name = "copilot", option = {} },
+                { name = "copilot" },
+                { name = "codeium" },
+                { name = "tabnine" },
+                { name = "cmp_ai" },
+                { name = "nvim_lsp" },
+                { name = "nvim_lsp_signature_help" },
+                { name = "nvim_lsp_document_symbol" },
               },
             },
           })
-        end)
+        end, { desc = "cmp=> available ai completion menus" })
       end
     end,
   },

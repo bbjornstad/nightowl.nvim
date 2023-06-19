@@ -16,18 +16,28 @@ return {
           }
         end,
       },
+      {
+        "JoosepAlviste/nvim-ts-context-commentstring",
+      },
     },
     opts = {
       ensure_installed = "all",
       auto_install = true,
       indent = { enable = true },
       highlight = { enable = true },
-      incremental_selection = { enable = true },
+      incremental_selection = { enable = false },
       autotag = { enable = true },
       endwise = { enable = true },
       matchup = { enable = true },
+      context_commentstring = {
+        enable = true,
+      },
     },
     build = pcall(vim.cmd, "TSUpdate"),
+    -- get rid of the control space mapping overwrite here.
+    init = function()
+      vim.keymap.set({ "n" }, "<C-Space>", "<nop>")
+    end,
   },
   {
     "RRethy/nvim-treesitter-endwise",

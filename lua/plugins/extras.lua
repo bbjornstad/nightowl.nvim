@@ -1,7 +1,7 @@
 local env = require("environment.ui")
 local stems = require("environment.keys").stems
-local mapn = require('environment.keys').map("n")
-local mapnv = require('environment.keys').map({"n", "v"})
+local mapn = require("environment.keys").map("n")
+local mapnv = require("environment.keys").map({ "n", "v" })
 
 local key_pomodoro = stems.pomodoro
 local key_easyread = stems.easyread
@@ -26,17 +26,17 @@ return {
       mapn(
         key_pomodoro .. "s",
         "<CMD>PomodoroStart<CR>",
-        { desc = "pomorg:>> start pomodoro timer" }
+        { desc = "pomorg=> start pomodoro timer" }
       )
       mapn(
         key_pomodoro .. "q",
         "<CMD>PomodoroStop<CR>",
-        { desc = "pomorg:>> stop pomodoro timer" }
+        { desc = "pomorg=> stop pomodoro timer" }
       )
       mapn(
         key_pomodoro .. "u",
         "<CMD>PomodoroStatus<CR>",
-        { desc = "pomorg:>> pomodoro timer status" }
+        { desc = "pomorg=> pomodoro timer status" }
       )
     end,
     -- keys = require("environment.keys").pomodoro,
@@ -53,17 +53,36 @@ return {
   },
   { "wakatime/vim-wakatime", event = "VeryLazy", enabled = true },
   {
-    "nullchilly/fsread.nvim",
-    cmd = { "FSRead", "FSClear", "FSToggle" },
+    "HampusHauffman/bionic.nvim",
+    cmd = { "Bionic", "BionicOn", "BionicOff" },
     init = function()
       mapn(
         key_easyread,
-        "<CMD>FSToggle<CR>",
-        { desc = "bionic:>> toggle flow-state bionic reading" }
+        "<CMD>Bionic<CR>",
+        { desc = "bionic=> toggle flow-state bionic reading" }
       )
     end,
-    -- keys = require("environment.keys").easyread,
   },
+  {
+    "HampusHauffman/block.nvim",
+    config = function()
+      require("block").setup({
+        percent = 1.1,
+      })
+    end,
+  },
+  -- {
+  --   "nullchilly/fsread.nvim",
+  --   cmd = { "FSRead", "FSClear", "FSToggle" },
+  --   init = function()
+  --     mapn(
+  --       key_easyread,
+  --       "<CMD>FSToggle<CR>",
+  --       { desc = "bionic=> toggle flow-state bionic reading" }
+  --     )
+  --   end,
+  --   -- keys = require("environment.keys").easyread,
+  -- },
   {
     "uga-rosa/ccc.nvim",
     cmd = {
@@ -85,27 +104,27 @@ return {
       mapn(
         key_ccc .. "c",
         "<CMD>CccPick<CR>",
-        { desc = "ccc:>> pick color interface" }
+        { desc = "ccc=> pick color interface" }
       )
       mapn(
         key_ccc .. "h",
         "<CMD>CccHighlighterToggle<CR>",
-        { desc = "ccc:>> toggle inline color highlighting" }
+        { desc = "ccc=> toggle inline color highlighting" }
       )
       mapn(
         key_ccc .. "v",
         "<CMD>CccConvert<CR>",
-        { desc = "ccc:>> convert color to another format" }
+        { desc = "ccc=> convert color to another format" }
       )
       mapn(
         key_ccc .. "f",
         "<CMD>CccHighlighterDisable<CR>",
-        { desc = "ccc:>> turn off inline color highlighting" }
+        { desc = "ccc=> turn off inline color highlighting" }
       )
       mapn(
         key_ccc .. "o",
         "<CMD>CccHighlighterEnable<CR>",
-        { desc = "ccc:>> turn on inline color highlighting" }
+        { desc = "ccc=> turn on inline color highlighting" }
       )
     end,
     -- keys = require("environment.keys").ccc,
@@ -127,22 +146,22 @@ return {
       mapnv(
         stems.figlet .. "f",
         "<CMD>Figlet<CR>",
-        { desc = "figlet:>> ascii interface" }
+        { desc = "figlet=> ascii interface" }
       )
       mapnv(
         stems.figlet .. "c",
         "<CMD>FigComment<CR>",
-        { desc = "figlet:>> ascii comment interface" }
+        { desc = "figlet=> ascii comment interface" }
       )
       mapnv(
         stems.figlet .. "S",
         "<CMD>FigSelect<CR>",
-        { desc = "figlet:>> ascii select interface" }
+        { desc = "figlet=> ascii select interface" }
       )
       mapnv(
         stems.figlet .. "sc",
         "<CMD>FigSelectComment<CR>",
-        { desc = "figlet:>> ascii select comment interface" }
+        { desc = "figlet=> ascii select comment interface" }
       )
     end,
   },
@@ -163,7 +182,7 @@ return {
       require("telescope").load_extension("cheatsheet")
       mapnv("g/", function()
         require("telescope").extensions.cheatsheet.cheatsheet()
-      end, { desc = "cheatsheet:>> cheatsheet interface" })
+      end, { desc = "cheatsheet=> cheatsheet interface" })
     end,
   },
   {
@@ -193,7 +212,7 @@ return {
       mapn(
         key_glow,
         "<CMD>Glow!<CR>",
-        { desc = "glow:>> glow markdown preview" }
+        { desc = "glow=> glow markdown preview" }
       )
     end,
     -- keys = require("environment.keys").glow,
@@ -209,64 +228,64 @@ return {
       mapnv(
         "<localleader>B",
         require("comment-box").catalog,
-        { desc = "box:>> catalog" }
+        { desc = "box=> catalog" }
       )
       mapnv(key_cbox .. "ll", function()
         return require("comment-box").llbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰉢 󱄽:󰉢" })
+      end, { desc = "box=> 󰘷:󰉢 󱄽:󰉢" })
 
       mapnv(key_cbox .. "lc", function()
         return require("comment-box").lcbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰉢 󱄽:󰉠" })
+      end, { desc = "box=> 󰘷:󰉢 󱄽:󰉠" })
 
       mapnv(key_cbox .. "lr", function()
         return require("comment-box").lrbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰉢 󱄽:󰉣" })
+      end, { desc = "box=> 󰘷:󰉢 󱄽:󰉣" })
 
       mapnv(key_cbox .. "cl", function()
         return require("comment-box").clbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰉠 󱄽:󰉢" })
+      end, { desc = "box=> 󰘷:󰉠 󱄽:󰉢" })
 
       mapnv(key_cbox .. "cc", function()
         return require("comment-box").ccbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰉠 󱄽:󰉠" })
+      end, { desc = "box=> 󰘷:󰉠 󱄽:󰉠" })
 
       mapnv(key_cbox .. "cr", function()
         return require("comment-box").crbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰉠 󱄽:󰉣" })
+      end, { desc = "box=> 󰘷:󰉠 󱄽:󰉣" })
 
       mapnv(key_cbox .. "rl", function()
         return require("comment-box").rlbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰉣 󱄽:󰉢" })
+      end, { desc = "box=> 󰘷:󰉣 󱄽:󰉢" })
 
       mapnv(key_cbox .. "rc", function()
         return require("comment-box").rcbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰉣 󱄽:󰉠" })
+      end, { desc = "box=> 󰘷:󰉣 󱄽:󰉠" })
 
       mapnv(key_cbox .. "rr", function()
         return require("comment-box").rrbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰉣 󱄽:󰉣" })
+      end, { desc = "box=> 󰘷:󰉣 󱄽:󰉣" })
 
       mapnv(key_cbox .. "al", function()
         return require("comment-box").albox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰡎 󱄽:󰉢" })
+      end, { desc = "box=> 󰘷:󰡎 󱄽:󰉢" })
 
       mapnv(key_cbox .. "ac", function()
         return require("comment-box").acbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰡎 󱄽:󰉠" })
+      end, { desc = "box=> 󰘷:󰡎 󱄽:󰉠" })
 
       mapnv(key_cbox .. "ar", function()
         return require("comment-box").arbox(vim.v.count)
-      end, { desc = "box:>> 󰘷:󰡎 󱄽:󰉣" })
+      end, { desc = "box=> 󰘷:󰡎 󱄽:󰉣" })
       mapnv(key_cline .. "l", function()
         return require("comment-box").line(vim.v.count)
-      end, { desc = "line:>> 󰘷:󰡎 󱄽:󰉣" })
+      end, { desc = "line=> 󰘷:󰡎 󱄽:󰉣" })
       mapnv(key_cline .. "c", function()
         return require("comment-box").cline(vim.v.count)
-      end, { desc = "line:>> 󰘷:󰡎 󱄽:󰉣" })
+      end, { desc = "line=> 󰘷:󰡎 󱄽:󰉣" })
       mapnv(key_cline .. "r", function()
         return require("comment-box").rline(vim.v.count)
-      end, { desc = "line:>> 󰘷:󰡎 󱄽:󰉣" })
+      end, { desc = "line=> 󰘷:󰡎 󱄽:󰉣" })
     end,
   },
   {
@@ -293,8 +312,36 @@ return {
       mapn(
         "<localleader><bar>",
         "<CMD>Tetris<CR>",
-        { desc = "tetris:>> play tetris" }
+        { desc = "tetris=> play tetris" }
       )
     end,
+  },
+  {
+    "jim-fx/sudoku.nvim",
+    cmd = "Sudoku",
+    config = function()
+      require("sudoku").setup({
+        -- configuration ...
+      })
+    end,
+  },
+  {
+    "alanfortlink/blackjack.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = "BlackJackNewGame",
+    opts = {
+      card_style = "large",
+    },
+  },
+  {
+    "seandewar/killersheep.nvim",
+    cmd = "KillKillKill",
+    opts = {
+      gore = true,
+    },
+  },
+  {
+    "seandewar/nvimesweeper",
+    cmd = "Nvimesweeper",
   },
 }
