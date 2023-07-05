@@ -41,16 +41,16 @@ return {
     end,
     -- keys = require("environment.keys").pomodoro,
   },
-  {
-    "nvim-lualine/lualine.nvim",
-    opts = function(_, opts)
-      opts.tabline = opts.tabline or {}
-      opts.tabline.lualine_x = opts.tabline.lualine_x or {}
-      table.insert(opts.tabline.lualine_x, {
-        require("pomodoro").statusline(),
-      })
-    end,
-  },
+  -- {
+  --   "nvim-lualine/lualine.nvim",
+  --   opts = function(_, opts)
+  --     opts.tabline = opts.tabline or {}
+  --     opts.tabline.lualine_x = opts.tabline.lualine_x or {}
+  --     table.insert(opts.tabline.lualine_x, {
+  --       require("pomodoro").statusline(),
+  --     })
+  --   end,
+  -- },
   { "wakatime/vim-wakatime", event = "VeryLazy", enabled = true },
   {
     "HampusHauffman/bionic.nvim",
@@ -65,24 +65,21 @@ return {
   },
   {
     "HampusHauffman/block.nvim",
-    config = function()
-      require("block").setup({
-        percent = 1.1,
-      })
+    opts = {
+      percent = 1.1,
+      depth = 8,
+      automatic = true,
+    },
+    config = true,
+    cmd = { "Block", "BlockOn", "BlockOff" },
+    init = function()
+      mapn(
+        "<leader>uB",
+        "<CMD>Block<CR>",
+        { desc = "block=> toggle block highlighting" }
+      )
     end,
   },
-  -- {
-  --   "nullchilly/fsread.nvim",
-  --   cmd = { "FSRead", "FSClear", "FSToggle" },
-  --   init = function()
-  --     mapn(
-  --       key_easyread,
-  --       "<CMD>FSToggle<CR>",
-  --       { desc = "bionic=> toggle flow-state bionic reading" }
-  --     )
-  --   end,
-  --   -- keys = require("environment.keys").easyread,
-  -- },
   {
     "uga-rosa/ccc.nvim",
     cmd = {
@@ -215,7 +212,6 @@ return {
         { desc = "glow=> glow markdown preview" }
       )
     end,
-    -- keys = require("environment.keys").glow,
   },
   {
     "LudoPinelli/comment-box.nvim",
