@@ -1,12 +1,4 @@
 local env = require("environment.ui")
--- vim.diagnostic.config({
---   virtual_text = true,
---   signs = true,
---   underline = true,
---   update_in_insert = true,
---   -- float = { border = env.borders.main },
--- })
---
 local stems = require("environment.keys").stems
 local mapn = require("environment.keys").map("n")
 local mapx = vim.keymap.set
@@ -16,7 +8,7 @@ local key_lens = stems.lens
 local key_git = stems.git
 local key_oil = stems.oil
 
---────────────────────────────────────────────────────────────-----------------
+--------------------------------------------------------------------------------
 -- This is to change filename color in the window bar based on the git status.
 -- Modified is now a nice purple color (defined directly from the kanagawa theme)
 -- New will be green, as would be typical.
@@ -64,10 +56,6 @@ local function memory_use()
   return ("󱈭 Used: %.2f"):format(use) .. "%"
 end
 
-local function filesize()
-  local fsize = require("lualine")
-end
-
 local function pomodoro()
   local pom = require("pomdoro")
   local possible_status = pom.statusline()
@@ -75,13 +63,6 @@ local function pomodoro()
     return "󱦠..."
   end
   return string.format("󰔟 [%s]", possible_status)
-end
-
-local function keymap()
-  if vim.opt.iminsert:get() > 0 and vim.b.keymap_name then
-    return "⌨ " .. vim.b.keymap_name
-  end
-  return ""
 end
 
 local function diff_source()
@@ -98,9 +79,6 @@ end
 return {
   {
     "williamboman/mason.nvim",
-    -- build = function()
-    --  pcall(vim.cmd, "MasonUpdate")
-    -- end,
     opts = { ui = { border = env.borders.main_accent } },
   },
   {
@@ -111,7 +89,7 @@ return {
   {
     "folke/noice.nvim",
     opts = {
-      --debug = true,
+      -- debug = true,
       lsp = {
         -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
         override = {
@@ -125,7 +103,7 @@ return {
       },
       presets = {
         bottom_search = false, -- use a classic bottom cmdline for search
-        command_palette = true, -- position the cmdline and popupmenu together
+        command_palette = false, -- position the cmdline and popupmenu together
         long_message_to_split = true, -- long messages will be sent to a split
         inc_rename = true,
       },
@@ -185,26 +163,21 @@ return {
         },
       },
       routes = {
-        -- {
-        --   filter = { event = "msg_show", kind = "", find = "written" },
-        --   opts = { skip = true },
-        -- },
-        -- {
-        --   filter = {
-        --     event = "msg_show",
-        --     find = "Neogen: Language alpha not supported",
-        --     kind = "",
-        --   },
-        --   opts = { skip = true },
-        -- },
-        -- {
-        --   filter = {
-        --     event = "msg_show",
-        --     find = "nvim-biscuits",
-        --     kind = "",
-        --   },
-        --   opts = { skip = true },
-        -- },
+        {
+          filter = { event = "msg_show", kind = "", find = "written" },
+          opts = { skip = true },
+        },
+        {
+          view = "mini",
+          filter = {
+            event = "lsp",
+            kind = "progress",
+            find = "Processing file symbols...",
+          },
+          opts = {
+            skip = true,
+          },
+        },
       },
     },
   },
@@ -311,7 +284,6 @@ return {
   {
     "akinsho/toggleterm.nvim",
     version = "*",
-    enabled = false,
     opts = function(_, opts)
       table.insert(opts, {
         open_mapping = "<C-`>",
@@ -335,7 +307,7 @@ return {
         shading_factor = 5,
       })
     end,
-    event = { "VimEnter" },
+    event = { "VeryLazy" },
     init = function()
       vim.g.hidden = true
       function _G.set_terminal_keymaps()
@@ -367,7 +339,7 @@ return {
     end,
   },
   {
-    "beauwilliams/focus.nvim",
+    "nvim-focus/focus.nvim",
     opts = {
       enable = true,
       winhighlight = false,
@@ -395,25 +367,25 @@ return {
       focusmap("L")
       mapx(
         "n",
-        "<leader>uO",
+        "<leader>uWw",
         focus.focus_toggle,
         { desc = "focus=> toggle focus win-sizer" }
       )
       mapx(
         "n",
-        "<leader>uoo",
+        "<leader>uWo",
         focus.focus_enable,
         { desc = "focus=> enable focus win-sizer" }
       )
       mapx(
         "n",
-        "<leader>uoq",
+        "<leader>uWq",
         focus.focus_disable,
         { desc = "focus=> disable focus win-sizer" }
       )
       mapx(
         "n",
-        "<leader>M",
+        "<leader>uWM",
         focus.focus_max_or_equal,
         { desc = "focus=> toggle maximized focus" }
       )
@@ -423,37 +395,33 @@ return {
         group = vim.api.nvim_create_augroup("enable_focus_for_docsymbols", {}),
         callback = require("focus").focus_enable_window,
       })
-      -- finally, set up an important autocommand that will allow the document symbols to be correctly processed with focus.
     end,
   },
   {
     "b0o/incline.nvim",
-    enabled = true,
+    event = "VeryLazy",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
-      "nvim-lualine/lualine.nvim",
     },
     opts = {
-      hide = {
-        cursorline = "focused_win",
-      },
       render = function(props)
         return {
-          { pomodoro() },
-          { filesize() },
+          { require("noice").api.status.mode.get() },
+          -- { pomodoro() },
+          -- { filesize() },
           { memory_use() },
         }
       end,
       window = {
-        margin = { vertical = 0, horizontal = 1 },
-        padding = 2,
+        margin = { vertical = 1, horizontal = 1 },
+        padding = { left = 1, right = 1 },
         placement = { horizontal = "right", vertical = "top" },
         width = "fit",
         options = {
           winblend = 20,
           signcolumn = "no",
           wrap = false,
-          border = env.borders.main,
+          -- border = env.borders.main,
         },
         winhighlight = {
           InclineNormal = {
@@ -467,22 +435,14 @@ return {
     },
   },
   {
-    "ray-x/lsp_signature.nvim",
-    event = "LspAttach",
-    opts = {
-      debug = true,
-      bind = true,
-      verbose = true,
-      noice = true,
-      always_trigger = false,
-      transparency = 10,
-      shadow_blend = 36,
-      shadow_guibg = require("kanagawa.colors").setup({ theme = "wave" }).theme.ui.bg_dim,
-    },
-    enabled = env.enable_lsp_signature,
+    "f-person/git-blame.nvim",
+    cmd = { "GitBlameToggle", "GitBlameEnable" },
+    init = function()
+      vim.g.gitblame_delay = 1000
+    end,
   },
   {
-    "TimUntersberger/neogit",
+    "NeogitOrg/neogit",
     dependencies = { "nvim-lua/plenary.nvim" },
     event = { "VeryLazy" },
     cmd = { "Neogit" },
@@ -499,39 +459,34 @@ return {
     end,
   },
   {
-    "mawkler/modicator.nvim",
-    config = true,
-    enabled = false,
-    event = "VeryLazy",
-    init = function()
-      vim.o.number = true
-      vim.o.cursorline = true
-    end,
-    opts = {},
-  },
-  {
     "nvim-lualine/lualine.nvim",
     dependencies = {
+      "folke/noice.nvim",
       "nvim-tree/nvim-web-devicons",
-      "b0o/incline.nvim",
       "meuter/lualine-so-fancy.nvim",
+      "Bekaboo/dropbar.nvim",
+      "rebelot/kanagawa.nvim",
     },
+    event = "VimEnter",
     opts = {
       options = {
-        -- theme = "auto",
+        theme = "auto",
         icons_enabled = true,
         globalstatus = true,
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
+        refresh = {
+          statusline = 10,
+          tabline = 10,
+          winbar = 10,
+        },
         disabled_filetypes = {
+          "dashboard",
           winbar = {
             "oil",
-            "neotree",
-            "neo-tree",
             "Outline",
             "dashboard",
             "fzf",
-            "quickfix",
             "trouble",
           },
         },
@@ -547,7 +502,7 @@ return {
         },
         lualine_x = {
           {
-            keymap(),
+            require("noice").api.status.command.get,
           },
           {
             "filetype",
@@ -562,8 +517,9 @@ return {
           },
         },
         lualine_y = {
-
-          "fancy_lsp_servers",
+          {
+            "fancy_lsp_servers",
+          },
         },
         lualine_z = {
           {
@@ -583,10 +539,17 @@ return {
         },
         lualine_x = {
           {
+            require("noice").api.status.mode.get,
+            cond = require("noice").api.status.mode.has,
+            color = {
+              fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.dragonRed,
+            },
+          },
+          {
             custom_fname,
             path = 0,
             symbols = {
-              modified = "",
+              modified = "",
               readonly = "󱪛",
               unnamed = "",
               newfile = "",
@@ -650,30 +613,22 @@ return {
     build = ":TSUpdate",
   },
   {
-    "lvimuser/lsp-inlayhints.nvim",
-    enabled = false,
-    event = "LspAttach",
-    opts = {},
-    config = function(_, opts)
-      require("lsp-inlayhints").setup(opts)
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("LspAttach_inlayhints", {}),
-        callback = function(args)
-          if not (args.data and args.data.client_id) then
-            return
-          end
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          require("lsp-inlayhints").on_attach(client, args.buf, false)
-        end,
-      })
-    end,
-    init = function()
-      mapn(
-        "<leader>ua",
-        require("lsp-inlayhints").toggle,
-        { desc = "lsp=> toggle inlayhints" }
-      )
-    end,
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    ---@type Flash.Config
+    opts = {
+      label = {
+        rainbow = {
+          enabled = true,
+        },
+        style = "inline",
+      },
+      modes = {
+        char = {
+          keys = { "f", "F", "t", "T", "," },
+        },
+      },
+    },
   },
   {
     "junegunn/fzf",
@@ -705,25 +660,15 @@ return {
       opts.top_down = true
       opts.render = "compact"
       opts.on_open = function(win)
-        vim.api.nvim_win_set_config(win, { border = env.borders.main })
+        vim.api.nvim_win_set_config(win, {
+          border = env.borders.main,
+        })
       end
-    end,
-    init = function()
-      mapn(
-        key_notify .. "n",
-        "<CMD>Notifications<CR>",
-        { desc = "noit=> notification history" }
-      )
-      mapn(
-        key_notify .. "t",
-        require("telescope").extensions.notify.notify,
-        { desc = "noit=> telescope search notification history" }
-      )
     end,
   },
   {
     "VidocqH/lsp-lens.nvim",
-    enabled = false,
+    enabled = true,
     opts = {
       include_declaration = true,
       sections = {
@@ -734,16 +679,32 @@ return {
       ignore_filetype = { "prisma" },
     },
     cmd = { "LspLensOn", "LspLensOff", "LspLensToggle" },
-    init = function()
-      mapn(
+    keys = {
+      {
         key_lens .. "t",
         "<CMD>LspLensToggle<CR>",
-        { desc = "lens=> toggle" }
-      )
-      mapn(key_lens .. "o", "<CMD>LspLensOn<CR>", { desc = "lens=> on" })
-      mapn(key_lens .. "f", "<CMD>LspLensOff<CR>", { desc = "lens=> off" })
-      mapn("<leader>uE", "<CMD>LspLensToggle<CR>", { desc = "lens=> toggle" })
-    end,
+        mode = { "n" },
+        desc = "lens=> toggle",
+      },
+      {
+        key_lens .. "o",
+        "<CMD>LspLensOn<CR>",
+        mode = { "n" },
+        desc = "lens=> on",
+      },
+      {
+        key_lens .. "q",
+        "<CMD>LspLensOff<CR>",
+        mode = { "n" },
+        desc = "lens=> off",
+      },
+      {
+        "<leader>uE",
+        "<CMD>LspLensToggle<CR>",
+        mode = { "n" },
+        desc = "lens=> toggle",
+      },
+    },
   },
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -799,11 +760,17 @@ return {
     },
   },
   {
+    "bennypowers/nvim-regexplainer",
+    config = true,
+    event = "VeryLazy",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "MunifTanjim/nui.nvim",
+    },
+  },
+  {
     "SmiteshP/nvim-navic",
-    enabled = true,
-    dependencies = { "neovim/nvim-lspconfig" },
-    event = "LspAttach",
-    opts = function(_, opts) end,
+    enabled = false,
   },
   {
     "johann2357/nvim-smartbufs",
@@ -813,27 +780,50 @@ return {
     init = function()
       mapx(
         { "n", "v" },
+        "<leader>qq",
+        require("nvim-smartbufs").close_current_buffer,
+        { desc = "buf=> close current buffer" }
+      )
+      mapx(
+        { "n", "v" },
+        "<leader>Q",
+        require("nvim-smartbufs").close_current_buffer,
+        { desc = "buf=> close current buffer" }
+      )
+      mapx(
+        { "n", "v" },
+        "<leader>qQ",
+        "<CMD>qa<CR>",
+        { desc = "buf=> close all buffers" }
+      )
+      mapx(
+        { "n", "v" },
+        "<leader>QQ",
+        "<CMD>qa!<CR>",
+        { desc = "buf=> close all buffers immediately" }
+      )
+      mapx(
+        { "n", "v" },
         "<leader>b[",
-        "<CMD>lua require('nvim-smartbufs').goto_prev_buffer()<CR>",
+        require("nvim-smartbufs").goto_prev_buffer,
         { desc = "buf=> previous buffer" }
       )
-
       mapx(
         { "n", "v" },
         "<leader>b]",
-        "<CMD>lua require('nvim-smartbufs').goto_next_buffer()<CR>",
+        require("nvim-smartbufs").goto_next_buffer,
         { desc = "buf=> next buffer" }
       )
       mapx(
         { "n", "v", "i" },
         "<C-S-Left>",
-        "<CMD>lua require('nvim-smartbufs').goto_prev_buffer()<CR>",
+        require("nvim-smartbufs").goto_prev_buffer,
         { desc = "buf=> previous buffer" }
       )
       mapx(
         { "n", "v", "i" },
         "<C-S-Right>",
-        "<CMD>lua require('nvim-smartbufs').goto_next_buffer()<CR>",
+        require("nvim-smartbufs").goto_next_buffer,
         { desc = "buf=> next buffer" }
       )
       for i = 1, 9, 1 do
@@ -858,22 +848,16 @@ return {
       mapx(
         { "n", "v" },
         "<leader>bq",
-        "<CMD>lua require('nvim-smartbufs').close_current_buffer()<CR>",
-        { desc = "buf=> intelligently close current buffer" }
-      )
-      mapx(
-        { "n", "v" },
-        "<leader>bq",
-        "<CMD>lua require('nvim-smartbufs').close_current_buffer()<CR>",
-        { desc = "buf=> intelligently close current buffer" }
+        require("nvim-smartbufs").close_current_buffer,
+        { desc = "buf=> close current buffer" }
       )
     end,
   },
   {
     "Bekaboo/dropbar.nvim",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    event = "VimEnter",
-    enabled = true,
+    version = "*",
+    event = "VeryLazy",
     opts = {
       general = {
         enable = false,
@@ -882,7 +866,6 @@ return {
         win_configs = {
           border = env.borders.main,
           style = "minimal",
-          zindex = 999,
         },
       },
     },

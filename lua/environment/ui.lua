@@ -43,7 +43,6 @@ env.bufferline.tab_format = "slant"
 
 env.enable_vim_strict = false
 
-env.enable_lsp_signature = false
 --------------------------------------------------------------------------------
 -- UI: Colorscheme Options
 -- ===========
