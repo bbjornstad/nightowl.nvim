@@ -6,20 +6,32 @@ local toggle_fmtoption = require("uutils.edit").toggle_fmtopt
 return {
   {
     "simrat39/rust-tools.nvim",
+    dependencies = {
+      {
+        "rust-lang/rust.vim",
+        config = function() end,
+      },
+    },
     ft = { "rust" },
     opts = function(_, opts)
       opts.tools = vim.tbl_extend("force", {
         inlay_hints = {
-          auto = false,
+          auto = true,
         },
       }, opts.tools or {})
-    end,
-  },
-  {
-    "rust-lang/rust.vim",
-    ft = { "rust" },
-    config = function()
-      --any rust specific setup should go here.
+      opts.server = vim.tbl_extend("force", {
+        on_attach = function(_, bufnr)
+          vim.keymap.set(
+            { "n" },
+            "<leader>ca",
+            rust_tools.hover_actions.hover_actions,
+            {
+              buffer = bufnr,
+              desc = "lsp=> rust code actions for symbol",
+            }
+          )
+        end,
+      }, opts.server or {})
     end,
   },
   { "lervag/vimtex", ft = { "tex" } },
@@ -126,7 +138,7 @@ return {
   },
   {
     "LhKipp/nvim-nu",
-    build = ":TSInstall nu",
+    build = [[:TSInstall nu]],
     ft = { "nu" },
     opts = {
       use_lsp_features = true,

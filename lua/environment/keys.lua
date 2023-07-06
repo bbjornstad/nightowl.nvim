@@ -37,7 +37,7 @@ mod.stems = {}
 mod.stems.ccc = "<leader>uh"
 mod.stems.toggleterm = "<leader>t"
 mod.stems.pomodoro = "<leader>T"
-mod.stems.easyread = "<leader>ub"
+mod.stems.easyread = "<leader>uB"
 mod.stems.neural = aistem .. "r"
 mod.stems.copilot = aistem .. "g"
 mod.stems.neoai = aistem .. "n"
@@ -50,12 +50,13 @@ mod.stems.glow = "<leader>P"
 mod.stems.notify = "<leader>n"
 mod.stems.vista = "<leader>v"
 mod.stems.neogen = "<leader>D"
-mod.stems.lens = "<leader>ue"
+mod.stems.lens = "<leader>uo"
 mod.stems.iron = "<leader>r"
 -- cannot use o key for oil, since orgmode has the binding
 -- also not the l key because lazy has that one.
 mod.stems.oil = "<leader>f"
 mod.stems.git = "<leader>g"
+mod.stems.block = "<leader>ub"
 
 mod.stems.figlet = "<localleader>i"
 mod.stems.textgen = "<localleader>t"

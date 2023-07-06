@@ -481,7 +481,6 @@ return {
           winbar = 10,
         },
         disabled_filetypes = {
-          "dashboard",
           winbar = {
             "oil",
             "Outline",
@@ -603,7 +602,7 @@ return {
   {
     "code-biscuits/nvim-biscuits",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    enabled = false,
+    enabled = true,
     opts = {
       cursor_line_only = true,
       toggle_keybind = "<leader>uu",
