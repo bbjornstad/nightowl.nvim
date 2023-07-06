@@ -9,6 +9,7 @@ local key_ccc = stems.ccc
 local key_glow = stems.glow
 local key_cbox = stems.cbox
 local key_cline = stems.cline
+local key_block = stems.block
 
 return {
   {
@@ -22,35 +23,27 @@ return {
       border = { style = env.borders.main },
     },
     cmd = { "PomodoroStart", "PomodoroStop", "PomodoroStatus" },
-    init = function()
-      mapn(
+    keys = {
+      {
         key_pomodoro .. "s",
         "<CMD>PomodoroStart<CR>",
-        { desc = "pomorg=> start pomodoro timer" }
-      )
-      mapn(
+        desc = "pomorg=> start pomodoro timer",
+        mode = { "n", "v" },
+      },
+      {
         key_pomodoro .. "q",
         "<CMD>PomodoroStop<CR>",
-        { desc = "pomorg=> stop pomodoro timer" }
-      )
-      mapn(
+        desc = "pomorg=> stop pomodoro timer",
+        mode = { "n", "v" },
+      },
+      {
         key_pomodoro .. "u",
         "<CMD>PomodoroStatus<CR>",
-        { desc = "pomorg=> pomodoro timer status" }
-      )
-    end,
-    -- keys = require("environment.keys").pomodoro,
+        desc = "pomorg=> pomodoro timer status",
+        mode = { "n", "v" },
+      },
+    },
   },
-  -- {
-  --   "nvim-lualine/lualine.nvim",
-  --   opts = function(_, opts)
-  --     opts.tabline = opts.tabline or {}
-  --     opts.tabline.lualine_x = opts.tabline.lualine_x or {}
-  --     table.insert(opts.tabline.lualine_x, {
-  --       require("pomodoro").statusline(),
-  --     })
-  --   end,
-  -- },
   { "wakatime/vim-wakatime", event = "VeryLazy", enabled = true },
   {
     "HampusHauffman/bionic.nvim",
@@ -72,13 +65,13 @@ return {
     },
     config = true,
     cmd = { "Block", "BlockOn", "BlockOff" },
-    init = function()
-      mapn(
-        "<leader>uB",
+    keys = {
+      {
+        key_block,
         "<CMD>Block<CR>",
-        { desc = "block=> toggle block highlighting" }
-      )
-    end,
+        desc = "block=> toggle block highlighting",
+      },
+    },
   },
   {
     "uga-rosa/ccc.nvim",
@@ -91,40 +84,48 @@ return {
     opts = {
       win_opts = {
         style = "minimal",
+        relative = "cursor",
         border = env.borders.main,
       },
       auto_close = true,
       preserve = true,
       default_color = require("kanagawa.colors").setup({ theme = "wave" }).theme.ui.fg_dim,
+      recognize = {
+        input = true,
+        output = true,
+      },
+      highlighter = {
+        auto_enable = true,
+      },
+      bar_len = 50,
     },
-    init = function()
-      mapn(
+    keys = {
+      {
         key_ccc .. "c",
         "<CMD>CccPick<CR>",
-        { desc = "ccc=> pick color interface" }
-      )
-      mapn(
+        desc = "ccc=> pick color interface",
+      },
+      {
         key_ccc .. "h",
         "<CMD>CccHighlighterToggle<CR>",
-        { desc = "ccc=> toggle inline color highlighting" }
-      )
-      mapn(
+        desc = "ccc=> toggle inline color highlighting",
+      },
+      {
         key_ccc .. "v",
         "<CMD>CccConvert<CR>",
-        { desc = "ccc=> convert color to another format" }
-      )
-      mapn(
+        desc = "ccc=> convert color to another format",
+      },
+      {
         key_ccc .. "f",
         "<CMD>CccHighlighterDisable<CR>",
-        { desc = "ccc=> turn off inline color highlighting" }
-      )
-      mapn(
+        desc = "ccc=> turn off inline color highlighting",
+      },
+      {
         key_ccc .. "o",
         "<CMD>CccHighlighterEnable<CR>",
-        { desc = "ccc=> turn on inline color highlighting" }
-      )
-    end,
-    -- keys = require("environment.keys").ccc,
+        desc = "ccc=> turn on inline color highlighting",
+      },
+    },
   },
   {
     -- <leader>i mappings for ASCII
@@ -170,17 +171,23 @@ return {
       "nvim-lua/popup.nvim",
       "nvim-lua/plenary.nvim",
     },
-    opts = {
-      bundled_cheatsheets = true,
-      bundled_plugin_cheatsheets = true,
-      include_only_installed_plugins = true,
-    },
-    init = function()
+    opts = function(_, opts)
       require("telescope").load_extension("cheatsheet")
-      mapnv("g/", function()
-        require("telescope").extensions.cheatsheet.cheatsheet()
-      end, { desc = "cheatsheet=> cheatsheet interface" })
+      opts = vim.tbl_extend("force", {
+        bundled_cheatsheets = true,
+        bundled_plugin_cheatsheets = true,
+        include_only_installed_plugins = true,
+      }, opts or {})
     end,
+    keys = {
+      {
+        "g/",
+        function()
+          require("telescope").extensions.cheatsheet.cheatsheet()
+        end,
+        desc = "cheatsheet=> cheatsheet interface",
+      },
+    },
   },
   {
     "Djancyp/cheat-sheet",
@@ -199,6 +206,12 @@ return {
       },
     },
     cmd = { "CheatSH" },
+    keys = {
+      "<leader><Home>",
+      "<CMD>CheatSH<CR>",
+      desc = "cheat=> cheat.sh interface",
+      mode = { "n" },
+    },
   },
   {
     "ellisonleao/glow.nvim",
@@ -287,18 +300,18 @@ return {
   {
     "eandrju/cellular-automaton.nvim",
     cmd = { "CellularAutomaton" },
-    init = function()
-      mapn(
+    keys = {
+      {
         "<leader>fml",
         "<CMD>CellularAutomaton make_it_rain<CR>",
-        { desc = "here be automatous dragons [rainy]" }
-      )
-      mapn(
+        desc = "here be automatous dragons [rainy]",
+      },
+      {
         "<leader>fmd",
         "<CMD>CellularAutomaton game_of_life<CR>",
-        { desc = "here be automatous dragons [gamey]" }
-      )
-    end,
+        desc = "here be automatous dragons [gamey]",
+      },
+    },
   },
   {
     "alec-gibson/nvim-tetris",

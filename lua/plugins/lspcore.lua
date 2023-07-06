@@ -40,7 +40,6 @@ return {
       { "nvim-lua/lsp-status.nvim" },
       { "folke/neodev.nvim" },
     },
-    ---@diagnostic disable-next-line: unused-local
     config = function(_, opts)
       local lsp = require("lsp-zero").preset({
         name = "minimal",
@@ -61,42 +60,9 @@ return {
       lsp.on_attach(function(client, bufnr)
         require("lsp-status").on_attach(client)
         lsp.default_keymaps({ buffer = bufnr, preserve_mappings = true })
-        if client.server_capabilities.documentSymbolProvider then
-          local navic = require("nvim-navic") or {}
-          if navic ~= {} then
-            navic.attach(client, bufnr)
-          end
-        end
       end)
 
-      if vim.fn.has("rust-tools") then
-        lsp.skip_server_setup("rust_analyzer")
-        local rust_tools = require("rust-tools")
-        rust_tools.setup({
-          server = {
-            on_attach = function()
-              vim.keymap.set(
-                { "n" },
-                "<leader>ca",
-                rust_tools.hover_actions.hover_actions,
-                {
-                  buffer = vim.nvim_get_current_buf(),
-                  desc = "lsp=> rust code actions for symbol",
-                }
-              )
-            end,
-          },
-        })
-      end
-
       require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls({
-        on_attach = function(client, bufnr)
-          local hinter = require("inlay-hints") or {}
-          print(hinter)
-          if hinter ~= {} then
-            hinter.on_attach(client, bufnr)
-          end
-        end,
         settings = {
           Lua = {
             hint = {
@@ -110,6 +76,11 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    opts = {
+      inlay_hints = {
+        enabled = true,
+      },
+    },
     init = function()
       local keys = require("lazyvim.plugins.lsp.keymaps").get()
       keys[#keys + 1] = {
@@ -137,9 +108,23 @@ return {
       keys[#keys + 1] = {
         "g?",
         function()
-          vim.cmd([[help ]] .. vim.fn.expand("<cword>"))
+          vim.cmd(string.format([[help %s]], vim.fn.expand("<cword>")))
         end,
         desc = "lsp=> find symbol help",
+      }
+      keys[#keys + 1] = {
+        "<leader>hh",
+        function()
+          vim.lsp.inlay_hint(0, true)
+        end,
+        desc = "lsp=> enable current buffer inlay hints",
+      }
+      keys[#keys + 1] = {
+        "<leader>hH",
+        function()
+          vim.lsp.inlay_hint(0, false)
+        end,
+        desc = "lsp=> disable current buffer inlay hints",
       }
     end,
     dependencies = {

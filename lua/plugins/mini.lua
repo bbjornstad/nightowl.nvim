@@ -1,5 +1,5 @@
 return {
-  { "echasnovski/mini.colors", version = false },
+  { "echasnovski/mini.colors", event = "VeryLazy", version = false },
   { "echasnovski/mini.surround", event = "VeryLazy", version = false },
   { "echasnovski/mini.bracketed", event = "VeryLazy", version = false },
   { "echasnovski/mini.align", event = "VeryLazy", version = false },
@@ -27,37 +27,4 @@ return {
     end,
   },
   { "echasnovski/mini.sessions", event = "VeryLazy", version = false },
-  {
-    "ggandor/flit.nvim",
-    enabled = false,
-  },
-
-  -- {
-  --   "echasnovski/mini.jump",
-  --   version = false,
-  --   event = "VeryLazy",
-  --   opts = {
-  --     mappings = {
-  --       repeat_jump = "",
-  --     },
-  --   },
-  -- },
-  -- {
-  --   "echasnovski/mini.jump2d",
-  --   version = false,
-  --   event = "VeryLazy",
-  --   opts = {
-  --     view = {
-  --       dim = false,
-  --       n_steps_ahead = 3,
-  --     },
-  --     allowed_windows = {
-  --       current = true,
-  --       not_current = false,
-  --     },
-  --     mappings = {
-  --       start_jumping = "'",
-  --     },
-  --   },
-  -- },
 }
