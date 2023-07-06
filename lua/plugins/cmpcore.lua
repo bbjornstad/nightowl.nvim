@@ -1,10 +1,8 @@
--- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local ncmp = "hrsh7th/nvim-cmp"
 local env = require("environment.ui")
-local mapd = require("environment.keys").map({ "n", "v", "i", "o" })
+local mapd = require("environment.keys").map({ "n", "v", "o" })
 
 return {
-
   {
     "L3MON4D3/LuaSnip",
     keys = function()
@@ -40,13 +38,10 @@ return {
     },
     opts = function(_, opts)
       local cmp = require("cmp")
-      -- we don't want to include the next part because it is already included
-      -- in the call to friendly-snippets configuration via LazyVim
-      -- require("luasnip.loaders.from_vscode").lazy_load()
-      -- This one is ok because it is not loaded afaict by way of LazyVim
+      require("luasnip.loaders.from_vscode").lazy_load()
       require("luasnip.loaders.from_snipmate").lazy_load()
-      -- this is ok, we now put our sources and configuration for such sources
-      -- in this list item below
+      -- configure the display parameters for teh window, in particular
+      -- changing the border and border padding options.
       opts.window = vim.tbl_deep_extend("force", {
         completion = cmp.config.window.bordered({
           border = env.borders.main,
@@ -57,11 +52,14 @@ return {
           side_padding = 2,
         }),
       }, opts.window or {})
+      -- configure nvim-cmp sources.
+      -- TODO integrate a completion menu system that can filter these by first
+      -- items on the initialization of the menu.
       opts.sources = vim.list_extend(opts.sources, {
         {
           name = "nvim_lsp",
           max_item_count = 20,
-
+          -- keyword_pattern = ">lsp",
           entry_filter = function(entry, ctx)
             local kind =
               require("cmp.types").lsp.CompletionItemKind[entry:get_kind()]
@@ -73,36 +71,92 @@ return {
           end,
           priority = 2,
         },
-
         {
           name = "nvim_lsp_signature_help",
           max_item_count = 20,
           priority = 2,
+          -- keyword_pattern = ">sig",
         },
         {
           name = "nvim_lsp_document_symbol",
           max_item_count = 20,
           priority = 2,
+          -- keyword_pattern = ">lsd",
         },
-        { name = "treesitter", max_item_count = 20 },
-        { name = "luasnip", max_item_count = 20, priority = 2 },
-        { name = "dap", max_item_count = 20 },
-        { name = "rg", max_item_count = 20, keyword_length = 5 },
-        { name = "git", max_item_count = 20, keyword_length = 3 },
-        --{ name = "env", max_item_count = 5, keyword_length = 5 },
-        --{ name = "buffer", max_item_count = 5, keyword_length = 7 },
-        { name = "path", max_item_count = 15, keyword_length = 5 },
-        { name = "calc", max_item_count = 10 },
-        { name = "cmdline", max_item_count = 15, keyword_length = 5 },
-        { name = "ctags", max_item_count = 10 },
-        { name = "emoji", max_item_count = 20, keyword_length = 3 },
-        { name = "nerdfonts", max_item_count = 20, keyword_length = 3 },
-        { name = "color_names", max_item_count = 10, keyword_length = 3 },
+        {
+          name = "treesitter",
+          max_item_count = 20,
+          -- keyword_pattern = ">tree",
+        },
+        {
+          name = "luasnip",
+          max_item_count = 20,
+          priority = 2,
+          -- keyword_pattern = ">snip",
+        },
+        { name = "dap", max_item_count = 20 }, -- keyword_pattern = ">dap" },
+        {
+          name = "rg",
+          max_item_count = 20,
+          keyword_length = 5,
+          -- keyword_pattern = ">rg",
+        },
+        {
+          name = "git",
+          max_item_count = 20,
+          keyword_length = 3,
+          -- keyword_pattern = ">git",
+        },
+        {
+          name = "env",
+          max_item_count = 5,
+          keyword_length = 5,
+          -- keyword_pattern = ">env",
+        },
+        {
+          name = "buffer",
+          -- keyword_pattern = ">buf",
+          max_item_count = 5,
+          keyword_length = 7,
+        },
+        {
+          name = "path",
+          max_item_count = 15,
+          keyword_length = 5,
+          keyword_pattern = ">~",
+        },
+        { name = "calc", max_item_count = 10 }, -- keyword_pattern = ">math" },
+        {
+          name = "cmdline",
+          max_item_count = 15,
+          keyword_length = 5,
+          -- keyword_pattern = ">/",
+        },
+        { name = "ctags", max_item_count = 10 }, -- keyword_pattern = ">tag" },
+        {
+          name = "emoji",
+          max_item_count = 20,
+          keyword_length = 3,
+          -- keyword_pattern = ">emoji",
+        },
+        {
+          name = "nerdfonts",
+          max_item_count = 20,
+          keyword_length = 3,
+          -- keyword_pattern = ">nerd",
+        },
+        {
+          name = "color_names",
+          max_item_count = 10,
+          keyword_length = 3,
+          -- keyword_pattern = ">col",
+        },
         {
           name = "fonts",
           option = { space_filter = "-" },
           max_item_count = 20,
           keyword_length = 3,
+          -- keyword_pattern = ">font",
         },
       })
 
@@ -114,7 +168,6 @@ return {
       opts.formatting = vim.tbl_deep_extend("force", {
         fields = { cmp.ItemField.Kind, cmp.ItemField.Abbr, cmp.ItemField.Menu },
         format = require("lspkind").cmp_format({
-          mode = "text_symbol",
           preset = "codicons",
           maxwidth = 80,
           ellipsis_char = "...",
