@@ -27,8 +27,8 @@ return {
           week_header = {
             enable = true,
           },
-          project = { enable = true, limit = 5 },
-          mru = { enable = true, limit = 8 },
+          project = { enable = true, limit = 10 },
+          mru = { enable = true, limit = 6 },
         },
       })
     end,
