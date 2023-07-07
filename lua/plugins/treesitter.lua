@@ -35,9 +35,6 @@ return {
     },
     build = pcall(vim.cmd, "TSUpdate"),
     -- get rid of the control space mapping overwrite here.
-    init = function()
-      vim.keymap.set({ "n" }, "<C-Space>", "<nop>")
-    end,
   },
   {
     "RRethy/nvim-treesitter-endwise",
@@ -49,7 +46,7 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
-    opts = { mode = "cursor" },
+    opts = { mode = "topline", separator = "🮩" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   { "windwp/nvim-ts-autotag", opts = {} },
