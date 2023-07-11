@@ -235,38 +235,41 @@ return {
         ["-"] = "actions.parent",
       },
     },
-    init = function()
-      mapx(
-        { "n", "v" },
+    keys = {
+      {
         key_oil .. "o",
-        require("oil").open_float,
-        { desc = "oil=> open oil (float)" }
-      )
-      mapx(
-        { "n", "v" },
+        function()
+          return require("oil").open_float()
+        end,
+        mode = { "n", "v" },
+        desc = "oil=> open oil (float)",
+      },
+      {
         key_oil .. "O",
-        require("oil").open,
-        { desc = "oil=> open oil (not float)" }
-      )
-      mapx(
-        { "n", "v" },
+        function()
+          return require("oil").open()
+        end,
+        mode = { "n", "v" },
+        desc = "oil=> open oil (not float)",
+      },
+      {
         key_oil .. "q",
-        require("oil").close,
-        { desc = "oil=> close oil" }
-      )
-      mapx(
-        { "n", "v" },
+        function()
+          return require("oil").close()
+        end,
+        mode = { "n", "v" },
+        desc = "oil=> close oil",
+      },
+      {
         "<leader>e",
-        require("oil").open_float,
-        { desc = "oil => float oil" }
-      )
-      mapx(
-        "n",
-        "-",
-        require("oil").open,
-        { desc = "oil=> open parent directory" }
-      )
-
+        function()
+          return require("oil").open_float()
+        end,
+        mode = { "n", "v" },
+        desc = "oil => float oil",
+      },
+    },
+    init = function()
       vim.api.nvim_create_autocmd("FileType", {
         pattern = { "oil" },
         group = vim.api.nvim_create_augroup("oil_quit_on_q", {}),
@@ -731,10 +734,9 @@ return {
     },
   },
   {
-    "sindrets/diffview.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
+    "sindrets/diffview.nvim",
     cmd = { "DiffviewOpen", "DiffviewFileHistory" },
-    enabled = false,
   },
   {
     "simrat39/symbols-outline.nvim",
@@ -783,12 +785,12 @@ return {
         require("nvim-smartbufs").close_current_buffer,
         { desc = "buf=> close current buffer" }
       )
-      mapx(
-        { "n", "v" },
-        "<leader>Q",
-        require("nvim-smartbufs").close_current_buffer,
-        { desc = "buf=> close current buffer" }
-      )
+      -- mapx(
+      --   { "n", "v" },
+      --   "<leader>Q",
+      --   require("nvim-smartbufs").close_current_buffer,
+      --   { desc = "buf=> close current buffer" }
+      -- )
       mapx(
         { "n", "v" },
         "<leader>qQ",
