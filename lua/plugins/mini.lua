@@ -27,4 +27,10 @@ return {
     end,
   },
   { "echasnovski/mini.sessions", event = "VeryLazy", version = false },
+  {
+    "echasnovski/mini.bufremove",
+    enabled = false,
+    event = "VeryLazy",
+    version = false,
+  },
 }
