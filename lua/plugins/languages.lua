@@ -13,26 +13,26 @@ return {
       },
     },
     ft = { "rust" },
-    opts = function(_, opts)
-      opts.tools = vim.tbl_extend("force", {
+    opts = {
+      tools = {
         inlay_hints = {
           auto = true,
         },
-      }, opts.tools or {})
-      opts.server = vim.tbl_extend("force", {
+      },
+      server = {
         on_attach = function(_, bufnr)
           vim.keymap.set(
             { "n" },
             "<leader>ca",
-            rust_tools.hover_actions.hover_actions,
+            require("rust_tools").hover_actions.hover_actions,
             {
               buffer = bufnr,
               desc = "lsp=> rust code actions for symbol",
             }
           )
         end,
-      }, opts.server or {})
-    end,
+      },
+    },
   },
   { "lervag/vimtex", ft = { "tex" } },
   { "jmcantrell/vim-virtualenv", ft = { "python" } },
@@ -60,7 +60,15 @@ return {
       vim.g.vim_markdown_json_frontmatter = 1
     end,
   },
-  { "SidOfc/mkdx", ft = { "markdown", "md" } },
+  {
+    "SidOfc/mkdx",
+    ft = { "markdown", "md" },
+    config = function()
+      vim.cmd(
+        [[let g:mkdx#settings = { 'highlight': { 'frontmatter': { 'toml': 1}}}]]
+      )
+    end,
+  },
   {
     "danymat/neogen",
     event = { "VeryLazy" },
@@ -83,7 +91,7 @@ return {
   },
   { "Fymyte/rasi.vim", ft = { "rasi" } },
   {
-    "hkupty/iron.nvim",
+    "Vigemus/iron.nvim",
     tag = "v3.0",
     module = "iron.core",
     opts = {
@@ -187,7 +195,7 @@ return {
       toggle_fmtoption("l")
       vim.opt.formatoptions = vim.opt.formatoptions + "o"
       mapn(
-        "<leader>mm",
+        "<leader>M",
         require("yaml-companion").open_ui_select,
         { desc = "schema=> select YAML schemas" }
       )
@@ -195,6 +203,12 @@ return {
   },
   {
     "jbyuki/nabla.nvim",
+    config = false,
     ft = { "markdown", "md" },
+  },
+  {
+    "joelbeedle/pseudo-syntax",
+    ft = { "pseudo" },
+    config = false,
   },
 }

@@ -1,5 +1,9 @@
 return {
   {
+    "goolord/alpha-nvim",
+    enabled = false,
+  },
+  {
     "nvimdev/dashboard-nvim",
     event = "VimEnter",
     config = function()
@@ -39,13 +43,9 @@ return {
       {
         "<Home>",
         "<CMD>Dashboard<CR>",
-        desc = "א.α => return to alpha state",
         mode = { "n", "v" },
+        desc = "א.α => return to alpha state",
       },
     },
-  },
-  {
-    "goolord/alpha-nvim",
-    enabled = false,
   },
 }

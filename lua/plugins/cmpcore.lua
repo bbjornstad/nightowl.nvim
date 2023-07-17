@@ -28,7 +28,7 @@ return {
       "rcarriga/cmp-dap",
       "hrsh7th/cmp-calc",
       "ray-x/cmp-treesitter",
-      -- "Saecki/crates.nvim",
+      "Saecki/crates.nvim",
       "bydlw98/cmp-env",
       "nat-418/cmp-color-names.nvim",
       "jc-doyle/cmp-pandoc-references",
@@ -69,18 +69,15 @@ return {
             end
             return true
           end,
-          priority = 2,
         },
         {
           name = "nvim_lsp_signature_help",
           max_item_count = 20,
-          priority = 2,
           -- keyword_pattern = ">sig",
         },
         {
           name = "nvim_lsp_document_symbol",
           max_item_count = 20,
-          priority = 2,
           -- keyword_pattern = ">lsd",
         },
         {
@@ -91,7 +88,6 @@ return {
         {
           name = "luasnip",
           max_item_count = 20,
-          priority = 2,
           -- keyword_pattern = ">snip",
         },
         { name = "dap", max_item_count = 20 }, -- keyword_pattern = ">dap" },
@@ -170,7 +166,7 @@ return {
         format = require("lspkind").cmp_format({
           preset = "codicons",
           maxwidth = 80,
-          ellipsis_char = "...",
+          ellipsis_char = "",
         }),
       }, opts.formatting or {})
 
@@ -350,7 +346,7 @@ return {
   { "rcarriga/cmp-dap", dependencies = { ncmp } },
   { "hrsh7th/cmp-calc", dependencies = { ncmp } },
   { "ray-x/cmp-treesitter", dependencies = { ncmp } },
-  -- { "Saecki/crates.nvim", dependencies = { ncmp }, ft = "rust" },
+  { "Saecki/crates.nvim", dependencies = { ncmp }, ft = "rust" },
   { "bydlw98/cmp-env", dependencies = { ncmp } },
   { "nat-418/cmp-color-names.nvim", dependencies = { ncmp } },
   { "jc-doyle/cmp-pandoc-references", dependencies = { ncmp } },

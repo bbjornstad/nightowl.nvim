@@ -7,6 +7,7 @@ local key_vista = stems.vista
 local key_lens = stems.lens
 local key_git = stems.git
 local key_oil = stems.oil
+local key_tterm = stems.tterm
 
 --------------------------------------------------------------------------------
 -- This is to change filename color in the window bar based on the git status.
@@ -108,6 +109,11 @@ return {
         inc_rename = true,
       },
       views = {
+        popup = {
+          border = {
+            style = env.borders.main,
+          },
+        },
         cmdline_popup = {
           position = { row = 16, col = "50%" },
           size = {
@@ -154,8 +160,18 @@ return {
             padding = { 1, 2 },
           },
         },
-        popup = {
-          border = { style = env.borders.main },
+        confirm = {
+          border = {
+            style = env.borders.main,
+            padding = { 1, 2 },
+            text = {},
+          },
+          win_options = {
+            winhighlight = {
+              Normal = "NormalFloat",
+              FloatBorder = "FloatBorder",
+            },
+          },
         },
         notify = {
           border = { style = env.borders.main },
@@ -287,29 +303,28 @@ return {
   {
     "akinsho/toggleterm.nvim",
     version = "*",
-    opts = function(_, opts)
-      table.insert(opts, {
-        open_mapping = "<C-`>",
-        float_opts = {
-          border = env.borders.main,
-          winblend = 5,
-        },
-        insert_mappings = false,
-        terminal_mappings = true,
-        autochdir = true,
-        direction = "float",
-        size = function(term)
-          if term.direction == "horizontal" then
-            return 0.25 * vim.api.nvim_win_get_height(0)
-          elseif term.direction == "vertical" then
-            return 0.25 * vim.api.nvim_win_get_width(0)
-          elseif term.direction == "float" then
-            return 85
-          end
-        end,
-        shading_factor = 5,
-      })
-    end,
+    config = true,
+    opts = {
+      open_mapping = "<C-;>",
+      float_opts = {
+        border = env.borders.main,
+        winblend = 10,
+      },
+      insert_mappings = false,
+      terminal_mappings = true,
+      autochdir = true,
+      direction = "float",
+      size = function(term)
+        if term.direction == "horizontal" then
+          return 0.25 * vim.api.nvim_win_get_height(0)
+        elseif term.direction == "vertical" then
+          return 0.25 * vim.api.nvim_win_get_width(0)
+        elseif term.direction == "float" then
+          return 85
+        end
+      end,
+      shading_factor = 2,
+    },
     event = { "VeryLazy" },
     init = function()
       vim.g.hidden = true
@@ -327,27 +342,52 @@ return {
       -- if you only want these mappings for toggle term use term://*toggleterm#* instead
       vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
 
-      mapx({ "n", "t" }, "<leader>tv", function()
+      mapx({ "n", "t" }, key_tterm .. "v", function()
         require("toggleterm").setup({ direction = "vertical" })
       end, { desc = "toggle terminals vertically" })
-      mapx({ "n", "t" }, "<leader>th", function()
+      mapx({ "n", "t" }, key_tterm .. "h", function()
         require("toggleterm").setup({ direction = "horizontal" })
       end, { desc = "toggle terminals horizontally" })
-      mapx({ "n", "t" }, "<leader>tf", function()
+      mapx({ "n", "t" }, key_tterm .. "f", function()
         require("toggleterm").setup({ direction = "float" })
       end, { desc = "toggle floating terminals" })
-      mapx({ "n", "t" }, "<leader>tb", function()
+      mapx({ "n", "t" }, key_tterm .. "b", function()
         require("toggleterm").setup({ direction = "tabbed" })
       end, { desc = "toggle terminals vertically" })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "oil" },
+        group = vim.api.nvim_create_augroup("oil_quit_on_q", {}),
+        callback = function()
+          vim.keymap.set(
+            "n",
+            "q",
+            "<CMD>quit<CR>",
+            { buffer = true, desc = "quit", remap = false }
+          )
+        end,
+      })
     end,
   },
   {
     "nvim-focus/focus.nvim",
+    enabled = true,
     opts = {
       enable = true,
-      winhighlight = false,
-      hybridnumber = true,
-      absolutenumber_unfocussed = true,
+      commands = true,
+      autoresize = {
+        enable = true,
+      },
+      ui = {
+        absolutenumber_unfocussed = true,
+        hybridnumber = true,
+        winhighlight = false,
+        cursorline = true,
+        cursorcolumn = false,
+        colorcolumn = {
+          enable = true,
+          list = "+1",
+        },
+      },
     },
     event = "VeryLazy",
     init = function()
@@ -355,7 +395,7 @@ return {
       local focusmap = function(direction)
         vim.api.nvim_set_keymap(
           "n",
-          "<Leader>" .. direction,
+          "<Leader>w" .. direction,
           -- this comes directly from  the focus nvim readme but we want to use the capital letter mappings for consistency
           ":lua require'focus'.split_command('"
             .. string.lower(direction)
@@ -364,10 +404,10 @@ return {
         )
       end
       -- Use `<Leader>h` to split the screen to the left, same as command FocusSplitLeft etc
-      focusmap("H")
-      focusmap("J")
-      focusmap("K")
-      focusmap("L")
+      focusmap("h")
+      focusmap("j")
+      focusmap("k")
+      focusmap("l")
       mapx(
         "n",
         "<leader>uWw",
@@ -447,19 +487,20 @@ return {
   {
     "NeogitOrg/neogit",
     dependencies = { "nvim-lua/plenary.nvim" },
+    enabled = true,
     event = { "VeryLazy" },
     cmd = { "Neogit" },
     opts = {
       integrations = { diffview = true },
     },
-    init = function()
-      mapx(
-        { "n", "v" },
+    keys = {
+      {
         key_git .. "n",
         "<CMD>Neogit<CR>",
-        { desc = "git=> neogit" }
-      )
-    end,
+        mode = { "n", "v" },
+        desc = "git=> neogit",
+      },
+    },
   },
   {
     "nvim-lualine/lualine.nvim",
@@ -672,39 +713,34 @@ return {
     "VidocqH/lsp-lens.nvim",
     enabled = true,
     opts = {
-      include_declaration = true,
+      enable = true,
+      include_declaration = false,
       sections = {
         definition = true,
         references = true,
-        implementation = true,
+        implements = true,
       },
       ignore_filetype = { "prisma" },
     },
     cmd = { "LspLensOn", "LspLensOff", "LspLensToggle" },
     keys = {
       {
-        key_lens .. "t",
+        key_lens .. "o",
         "<CMD>LspLensToggle<CR>",
         mode = { "n" },
-        desc = "lens=> toggle",
+        desc = "lens.lsp=> toggle",
       },
       {
-        key_lens .. "o",
+        key_lens .. "O",
         "<CMD>LspLensOn<CR>",
         mode = { "n" },
-        desc = "lens=> on",
+        desc = "lens.lsp=> on",
       },
       {
         key_lens .. "q",
         "<CMD>LspLensOff<CR>",
         mode = { "n" },
-        desc = "lens=> off",
-      },
-      {
-        "<leader>uE",
-        "<CMD>LspLensToggle<CR>",
-        mode = { "n" },
-        desc = "lens=> toggle",
+        desc = "lens.lsp=> off",
       },
     },
   },
@@ -741,6 +777,26 @@ return {
   {
     "simrat39/symbols-outline.nvim",
     cmd = { "SymbolsOutline", "SymbolsOutlineOpen", "SymbolsOutlineClose" },
+    opts = {
+      highlight_hovered_item = true,
+      show_guides = true,
+      position = "left",
+      width = 28,
+      auto_close = false,
+      auto_preview = false,
+      winblend = 15,
+      keymaps = {
+        close = { "qq" },
+        toggle_preview = "<C-Space>",
+        hover_symbol = "K",
+        fold_all = "M",
+        unfold_all = "R",
+        fold_reset = "zW",
+      },
+      symbols = {
+        event = { icon = "", hl = "@type" },
+      },
+    },
     config = true,
     keys = {
       {
@@ -770,16 +826,13 @@ return {
     },
   },
   {
-    "SmiteshP/nvim-navic",
-    enabled = false,
-  },
-  {
     "johann2357/nvim-smartbufs",
     opts = {},
     event = "VeryLazy",
     config = function() end,
     init = function()
       mapx(
+
         { "n", "v" },
         "<leader>qq",
         require("nvim-smartbufs").close_current_buffer,
@@ -954,5 +1007,545 @@ return {
     },
     config = true,
     event = "VeryLazy",
+  },
+  {
+    "jghauser/mkdir.nvim",
+    config = function() end,
+    event = "VeryLazy",
+  },
+  {
+    "mawkler/modicator.nvim",
+    config = true,
+    enabled = false,
+    opts = {},
+    init = function()
+      -- These are required for Modicator to work
+      vim.o.cursorline = true
+      vim.o.number = true
+      vim.o.termguicolors = true
+    end,
+    event = "VeryLazy",
+  },
+  {
+    "stevearc/dressing.nvim",
+    event = "BufReadPre",
+    config = true,
+    opts = {
+      input = {
+        relative = "editor",
+      },
+      select = {
+        backend = { "telescope", "fzf", "builtin" },
+      },
+    },
+  },
+  -- this is just to load navbuddy before the lspconfig setup.
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = {
+      {
+        "SmiteshP/nvim-navbuddy",
+        dependencies = {
+          "SmiteshP/nvim-navic",
+          "MunifTanjim/nui.nvim",
+        },
+        keys = {
+          {
+            "<leader>`",
+            function()
+              require("nvim-navbuddy").open()
+            end,
+            mode = "n",
+            desc = "nav=> open navbuddy",
+          },
+        },
+        opts = {
+          lsp = { auto_attach = true },
+          window = {
+            border = env.borders.main,
+            size = "70%",
+            position = "50%",
+            scrolloff = true,
+            left = {
+              size = "20%",
+              border = nil,
+            },
+            mid = {
+              size = "40%",
+              border = nil,
+            },
+            right = {
+              border = nil,
+              preview = "leaf",
+            },
+          },
+        },
+      },
+    },
+    -- your lsp config or other stuff
+  },
+  {
+    "utilyre/sentiment.nvim",
+    version = "*",
+    event = "VeryLazy", -- keep for lazy loading
+    opts = {
+      -- config
+    },
+    init = function()
+      -- `matchparen.vim` needs to be disabled manually in case of lazy loading
+      vim.g.loaded_matchparen = 1
+    end,
+  },
+  {
+    "glepnir/template.nvim",
+    cmd = { "Template", "TemProject" },
+    config = true,
+    opts = {
+      temp_dir = "~/.config/nvim/templates",
+    },
+  },
+  { "mrjones2014/smart-splits.nvim", event = "VeryLazy" },
+  {
+    "rest-nvim/rest.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+      -- Open request results in a horizontal split
+      result_split_horizontal = false,
+      -- Keep the http file buffer above|left when split horizontal|vertical
+      result_split_in_place = false,
+      -- Skip SSL verification, useful for unknown certificates
+      skip_ssl_verification = false,
+      -- Encode URL before making request
+      encode_url = true,
+      -- Highlight request on run
+      highlight = {
+        enabled = true,
+        timeout = 150,
+      },
+      result = {
+        -- toggle showing URL, HTTP info, headers at top the of result window
+        show_url = true,
+        -- show the generated curl command in case you want to launch
+        -- the same request via the terminal (can be verbose)
+        show_curl_command = true,
+        show_http_info = true,
+        show_headers = true,
+        -- executables or functions for formatting response body [optional]
+        -- set them to false if you want to disable them
+        formatters = {
+          json = "jq",
+          html = function(body)
+            return vim.fn.system({ "tidy", "-i", "-q", "-" }, body)
+          end,
+        },
+      },
+      -- Jump to request line on run
+      jump_to_request = false,
+      env_file = ".env",
+      custom_dynamic_variables = {},
+      yank_dry_run = true,
+    },
+    config = true,
+    cmd = { "RestNvim", "RestNvimPreview", "RestNvimLast" },
+    keys = {
+      {
+        "<leader>R" .. "r",
+        "<Plug>RestNvim",
+        mode = "n",
+        desc = "rest=> open rest client",
+        remap = true,
+      },
+      {
+        "<leader>R" .. "p",
+        "<Plug>RestNvimPreview",
+        mode = "n",
+        desc = "rest=> open rest preview",
+        remap = true,
+      },
+      {
+        "<leader>R" .. "l",
+        "<Plug>RestNvimLast",
+        mode = "n",
+        desc = "rest=> open last used rest client",
+        remap = true,
+      },
+    },
+  },
+  {
+    "anuvyklack/pretty-fold.nvim",
+    config = true,
+    event = "VeryLazy",
+    opts = {
+      sections = {
+        left = {
+          "content",
+        },
+        right = {
+          " ",
+          "number_of_folded_lines",
+          ": ",
+          "percentage",
+          " ",
+          function(config)
+            return config.fill_char:rep(3)
+          end,
+        },
+      },
+      fill_char = "🮧",
+
+      remove_fold_markers = true,
+
+      -- Keep the indentation of the content of the fold string.
+      keep_indentation = true,
+
+      -- Possible values:
+      -- "delete" : Delete all comment signs from the fold string.
+      -- "spaces" : Replace all comment signs with equal number of spaces.
+      -- false    : Do nothing with comment signs.
+      process_comment_signs = "spaces",
+
+      -- Comment signs additional to the value of `&commentstring` option.
+      comment_signs = {},
+
+      -- List of patterns that will be removed from content foldtext section.
+      stop_words = {
+        "@brief%s*", -- (for C++) Remove '@brief' and all spaces after.
+      },
+
+      add_close_pattern = true, -- true, 'last_line' or false
+
+      matchup_patterns = {
+        { "{", "}" },
+        { "%(", ")" }, -- % to escape lua pattern char
+        { "%[", "]" }, -- % to escape lua pattern char
+      },
+
+      ft_ignore = { "neorg" },
+    },
+  },
+  {
+    "mvllow/modes.nvim",
+    tag = "v0.2.0",
+    config = true,
+    opts = {
+      colors = {
+        copy = kanacolor.boatYellow2,
+        delete = kanacolor.peachRed,
+        insert = kanacolor.springBlue,
+        visual = kanacolor.springViolet1,
+      },
+    },
+    event = "VeryLazy",
+  },
+  {
+    "haringsrob/nvim_context_vt",
+    enabled = false,
+    event = "VeryLazy",
+    cmd = { "NvimContextVtToggle" },
+    keys = {
+      {
+        "<leader>uX",
+        "<CMD>NvimContextVtToggle<CR>",
+        mode = "n",
+        desc = "ctx=> toggle code context labeling",
+      },
+    },
+    opts = {
+      -- Enable by default. You can disable and use :NvimContextVtToggle to maually enable.
+      -- Default: true
+      enabled = true,
+
+      -- Override default virtual text prefix
+      -- Default: '-->'
+      prefix = "󰟵",
+
+      -- Override the internal highlight group name
+      -- Default: 'ContextVt'
+      highlight = "CustomContextVt",
+
+      -- Disable virtual text for given filetypes
+      -- Default: { 'markdown' }
+      disable_ft = { "markdown" },
+
+      -- Disable display of virtual text below blocks for indentation based languages like Python
+      -- Default: false
+      disable_virtual_lines = false,
+
+      -- Same as above but only for spesific filetypes
+      -- Default: {}
+      disable_virtual_lines_ft = { "yaml" },
+
+      -- How many lines required after starting position to show virtual text
+      -- Default: 1 (equals two lines total)
+      min_rows = 1,
+
+      -- Same as above but only for spesific filetypes
+      -- Default: {}
+      min_rows_ft = {},
+
+      -- Custom virtual text node parser callback
+      -- Default: nil
+      custom_parser = function(node, ft, opts)
+        local utils = require("nvim_context_vt.utils")
+
+        -- If you return `nil`, no virtual text will be displayed.
+        if node:type() == "function" then
+          return nil
+        end
+
+        -- This is the standard text
+        return "--> " .. utils.get_node_text(node)[1]
+      end,
+
+      -- Custom node validator callback
+      -- Default: nil
+      custom_validator = function(node, ft, opts)
+        -- Internally a node is matched against min_rows and configured targets
+        local default_validator =
+          require("nvim_context_vt.utils").default_validator
+        if default_validator(node, ft) then
+          -- Custom behaviour after using the internal validator
+          if node:type() == "function" then
+            return false
+          end
+        end
+
+        return true
+      end,
+
+      -- Custom node virtual text resolver callback
+      -- Default: nil
+      custom_resolver = function(nodes, ft, opts)
+        -- By default the last node is used
+        return nodes[#nodes]
+      end,
+    },
+  },
+  {
+    "Pocco81/auto-save.nvim",
+    opts = {
+      enabled = false, -- start auto-save when the plugin is loaded (i.e. when your package manager loads it)
+      execution_message = {
+        message = function() -- message to print on save
+          return ("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"))
+        end,
+        dim = 0.18, -- dim the color of `message`
+        cleaning_interval = 1250, -- (milliseconds) automatically clean MsgArea after displaying `message`. See :h MsgArea
+      },
+      trigger_events = { "InsertLeave", "TextChanged" }, -- vim events that trigger auto-save. See :h events
+      -- function that determines whether to save the current buffer or not
+      -- return true: if buffer is ok to be saved
+      -- return false: if it's not ok to be saved
+      condition = function(buf)
+        local fn = vim.fn
+        local utils = require("auto-save.utils.data")
+
+        if
+          fn.getbufvar(buf, "&modifiable") == 1
+          and utils.not_in(fn.getbufvar(buf, "&filetype"), {})
+        then
+          return true -- met condition(s), can save
+        end
+        return false -- can't save
+      end,
+      write_all_buffers = false, -- write all buffers when the current one meets `condition`
+      debounce_delay = 135, -- saves the file at most every `debounce_delay` milliseconds
+      callbacks = { -- functions to be executed at different intervals
+        enabling = nil, -- ran when enabling auto-save
+        disabling = nil, -- ran when disabling auto-save
+        before_asserting_save = nil, -- ran before checking `condition`
+        before_saving = nil, -- ran before doing the actual save
+        after_saving = nil, -- ran after doing the actual save
+      },
+    },
+    keys = {
+      {
+        "<leader>uS",
+        "<CMD>ASToggle<CR>",
+        mode = "n",
+        desc = "ui=> toggle auto save",
+      },
+    },
+    cmd = "ASToggle",
+  },
+  {
+    "kevinhwang91/nvim-hlslens",
+    enabled = true,
+    config = true,
+    event = "VeryLazy",
+    opts = {
+      auto_enable = {
+        description = [[Enable nvim-hlslens automatically]],
+        default = true,
+      },
+      enable_incsearch = {
+        description = [[When `incsearch` option is on and enable_incsearch is true, add lens
+            for the current matched instance]],
+        default = false,
+      },
+      calm_down = {
+        description = [[If calm_down is true, clear all lens and highlighting When the cursor is
+            out of the position range of the matched instance or any texts are changed]],
+        default = true,
+      },
+      nearest_only = {
+        description = [[Only add lens for the nearest matched instance and ignore others]],
+        default = false,
+      },
+      nearest_float_when = {
+        description = [[When to open the floating window for the nearest lens.
+            'auto': floating window will be opened if room isn't enough for virtual text;
+            'always': always use floating window instead of virtual text;
+            'never': never use floating window for the nearest lens]],
+        default = "auto",
+      },
+      float_shadow_blend = {
+        description = [[Winblend of the nearest floating window. `:h winbl` for more details]],
+        default = 30,
+      },
+      virt_priority = {
+        description = [[Priority of virtual text, set it lower to overlay others.
+        `:h nvim_buf_set_extmark` for more details]],
+        default = 100,
+      },
+      override_lens = {
+        description = [[Hackable function for customizing the lens. If you like hacking, you
+            should search `override_lens` and inspect the corresponding source code.
+            There's no guarantee that this function will not be changed in the future. If it is
+            changed, it will be listed in the CHANGES file.
+            @param render table an inner module for hlslens, use `setVirt` to set virtual text
+            @param splist table (1,1)-indexed position
+            @param nearest boolean whether nearest lens
+            @param idx number nearest index in the plist
+            @param relIdx number relative index, negative means before current position,
+                                  positive means after
+        ]],
+        default = nil,
+      },
+    },
+    keys = {
+      {
+        "<leader>uL",
+        "<CMD>HlSearchLensToggle<CR>",
+        mode = "n",
+        desc = "lens=> toggle search results lens",
+      },
+    },
+    cmd = {
+      "HlSearchLensToggle",
+      "HlSearchLensEnable",
+      "HlSearchLensDisable",
+    },
+  },
+  {
+    "Wansmer/treesj",
+    keys = {
+      {
+        "<space>m",
+        function()
+          require("treesj").toggle()
+        end,
+        mode = "n",
+        desc = "treesj=> toggle fancy splitjoin",
+      },
+      {
+        "<space>j",
+        function()
+          require("treesj").join()
+        end,
+        mode = "n",
+        desc = "treesj=> join with splitjoin",
+      },
+      {
+        "<space>p",
+        function()
+          require("treesj").split()
+        end,
+        mode = "n",
+        desc = "treesj=> split with splitjoin",
+      },
+    },
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = true,
+    opts = {
+      -- Use default keymaps
+      -- (<space>m - toggle, <space>j - join, <space>s - split)
+      use_default_keymaps = false,
+
+      -- Node with syntax error will not be formatted
+      check_syntax_error = true,
+
+      -- If line after join will be longer than max value,
+      -- node will not be formatted
+      max_join_length = 120,
+
+      -- hold|start|end:
+      -- hold - cursor follows the node/place on which it was called
+      -- start - cursor jumps to the first symbol of the node being formatted
+      -- end - cursor jumps to the last symbol of the node being formatted
+      cursor_behavior = "hold",
+
+      -- Notify about possible problems or not
+      notify = true,
+
+      -- Use `dot` for repeat action
+      dot_repeat = true,
+    },
+  },
+  {
+    "arjunmahishi/flow.nvim",
+    cmd = {
+      "FlowRunSelected",
+      "FlowRunFile",
+      "FlowSetCustomCmd",
+      "FlowRunCustomCmd",
+      "FlowLauncher",
+      "FlowRunLastCmd",
+      "FlowLastOutput",
+    },
+    config = true,
+    opts = function(_, opts)
+      opts.output = vim.tbl_extend("force", {
+        buffer = true,
+        split_cmd = "20split",
+      }, opts.output or {})
+
+      -- add/override the default command used for a perticular filetype
+      -- the "%s" you see in the below example is interpolated by the contents of
+      -- the file you are trying to run
+      -- Format { <filetype> = <command> }
+      opts.filetype_cmd_map = vim.tbl_extend("force", {
+        python = "python3 <<-EOF\n%s\nEOF",
+      }, opts.filetype_cmd_map)
+
+      local function config_sql_wrapper(path)
+        return vim.require("flow.util").read_sql_config(path)
+      end
+
+      -- optional DB configuration for running .sql files/snippets (experimental)
+      opts.sql_configs = opts.sql_configs
+        or config_sql_wrapper(
+          vim.fn.stdpath("data") .. "flow/flowdb/.db_config.json"
+        )
+    end,
+  },
+  {
+    "winston0410/range-highlight.nvim",
+    config = function() end,
+    opts = {},
+    event = "VeryLazy",
+  },
+  {
+    "nvim-zh/better-escape.vim",
+    config = function()
+      vim.g.better_escape_shortcut = "jj"
+    end,
+    event = "InsertEnter",
+  },
+  {
+    "arsham/archer.nvim",
+    event = "VeryLazy",
+    dependencies = { "arsham/arshlib.nvim" },
+    config = true,
   },
 }
