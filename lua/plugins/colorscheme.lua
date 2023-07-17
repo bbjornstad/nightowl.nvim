@@ -7,6 +7,10 @@ local linemapper = {
   default = "auto",
 }
 
+if vim.fn.has("termguicolors") then
+  vim.cmd([[set termguicolors]])
+end
+
 return {
   {
     "rebelot/kanagawa.nvim",
@@ -46,35 +50,6 @@ return {
           InclineNormalNC = { bg = colors.palette.sumiInk1 },
           WinBar = { bg = colors.palette.sumiInk4 },
           WinBarNC = { bg = colors.palette.sumiInk1 },
-          -- Nvim-Navic
-          -- NavicIconsFile = { fg = theme.syn.punct },
-          -- NavicIconsModule = { fg = theme.syn.operator },
-          -- NavicIconsNamespace = { fg = theme.syn.punct },
-          -- NavicIconsPackage = { fg = theme.ui.special },
-          -- NavicIconsClass = { fg = theme.syn.constant },
-          -- NavicIconsMethod = { fg = theme.syn.fun },
-          -- NavicIconsProperty = { fg = theme.syn.type },
-          -- NavicIconsField = { fg = theme.diag.hint },
-          -- NavicIconsConstructor = { fg = theme.syn.constant },
-          -- NavicIconsEnum = { fg = theme.syn.regex },
-          -- NavicIconsInterface = { fg = theme.syn.identifier },
-          -- NavicIconsFunction = { fg = theme.syn.fun },
-          -- NavicIconsVariable = { fg = theme.syn.statement },
-          -- NavicIconsConstant = { fg = theme.syn.statement },
-          -- NavicIconsString = { fg = theme.syn.string },
-          -- NavicIconsNumber = { fg = theme.syn.number },
-          -- NavicIconsBoolean = { fg = theme.syn.constant },
-          -- NavicIconsArray = { fg = theme.syn.type },
-          -- NavicIconsObject = { fg = theme.syn.constant },
-          -- NavicIconsKey = { fg = theme.syn.statement },
-          -- NavicIconsNull = { fg = theme.syn.identifier },
-          -- NavicIconsEnumMember = { fg = theme.syn.identifier },
-          -- NavicIconsStruct = { fg = theme.syn.constant },
-          -- NavicIconsEvent = { fg = theme.syn.constant },
-          -- NavicIconsOperator = { fg = theme.syn.punct },
-          -- NavicIconsTypeParameter = { fg = theme.syn.special1 },
-          -- NavicText = { fg = theme.ui.fg },
-          -- NavicSeparator = { fg = theme.ui.fg },
         }
       end,
     },
@@ -159,6 +134,12 @@ return {
     config = function()
       -- require("nordic").load()
     end,
+  },
+  {
+    "sainnhe/everforest",
+    lazy = true,
+    priority = 992,
+    config = function() end,
   },
   { "LazyVim/LazyVim", opts = { colorscheme = env.default_colorscheme } },
 }

@@ -147,6 +147,36 @@ local organization_tools = {
     },
   },
   {
+    "danilshvalov/org-modern.nvim",
+    dependencies = { "nvim-orgmode/orgmode" },
+    ft = { "org" },
+    opts = {},
+    config = function()
+      local env = require("environment.ui").borders
+      local Menu = require("org-modern.menu")
+      require("orgmode").setup({
+        ui = {
+          menu = {
+            handler = function(data)
+              Menu:new({
+                window = {
+                  margin = { 1, 0, 1, 0 },
+                  padding = { 1, 2, 1, 2 },
+                  title_pos = "center",
+                  border = env.main,
+                  zindex = 1000,
+                },
+                icons = {
+                  separator = "➜",
+                },
+              }):open(data)
+            end,
+          },
+        },
+      })
+    end,
+  },
+  {
     "nvim-neorg/neorg",
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -186,6 +216,8 @@ if vim.fn.has("orgmode") or vim.fn.has("neorg") then
       "lukas-reineke/headlines.nvim",
       dependencies = {
         "nvim-treesitter/nvim-treesitter",
+        "nvim-orgmode/orgmode",
+        "nvim-neorg/neorg",
       },
       opts = {},
     },

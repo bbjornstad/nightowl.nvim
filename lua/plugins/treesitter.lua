@@ -26,7 +26,13 @@ return {
       indent = { enable = true },
       highlight = { enable = true },
       incremental_selection = { enable = false },
-      autotag = { enable = true },
+      autotag = {
+        enable = true,
+        enable_rename = true,
+        enable_close = true,
+        enable_close_on_slash = true,
+        filetypes = { "html", "xml" },
+      },
       endwise = { enable = true },
       matchup = { enable = true },
       context_commentstring = {

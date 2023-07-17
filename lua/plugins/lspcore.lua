@@ -1,14 +1,7 @@
 local env = require("environment.ui")
+local key_sniprun = require("environment.keys").stems.sniprun
 
 return {
-  -- neodev
-  {
-    "folke/neodev.nvim",
-    opts = {
-      debug = true,
-      experimental = { pathStrict = true },
-    },
-  },
   ---------------------------------------------------------------------------
   -- if we want to use this (lsp-zero) we need to be a bit more careful about
   -- how we are handling dependencies in the setup of lazyvim. It is unclear
@@ -28,17 +21,13 @@ return {
           "williamboman/mason.nvim",
           "VonHeikemen/lsp-zero.nvim",
         },
-      }, -- Optional
+      }, -- Optional but recommended
       { "jay-babu/mason-null-ls.nvim" },
       -- Autocompletion
       { "hrsh7th/nvim-cmp" }, -- Required
       { "hrsh7th/cmp-nvim-lsp" }, -- Required
       { "L3MON4D3/LuaSnip" }, -- Required
-      -- Required when using LazyVim, in order to prevent
-      -- startup warnings related to incorrect plugin load order.
-      { "folke/neoconf.nvim" },
-      { "nvim-lua/lsp-status.nvim" },
-      { "folke/neodev.nvim" },
+      { "nvim-lua/lsp-status.nvim" }, -- Optional but recommended
     },
     config = function(_, opts)
       local lsp = require("lsp-zero").preset({
@@ -145,6 +134,56 @@ return {
       "williamboman/mason.nvim",
       "jose-elias-alvarez/null-ls.nvim",
       "VonHeikemen/lsp-zero.nvim",
+    },
+  },
+  {
+    "michaelb/sniprun",
+    build = "sh ./install.sh",
+    config = true,
+    opts = {},
+    event = "VeryLazy",
+    keys = {
+      {
+        key_sniprun .. "O",
+        "<Plug>SnipRun",
+        mode = { "n" },
+        silent = true,
+        desc = "run=> line sniprun",
+      },
+      {
+        key_sniprun .. "o",
+        "<Plug>SnipRunOperator",
+        mode = { "n" },
+        silent = true,
+        desc = "run=> operator sniprun",
+      },
+      {
+        key_sniprun,
+        "<Plug>SnipRun",
+        mode = { "v" },
+        silent = true,
+        desc = "run=> sniprun",
+      },
+      {
+        key_sniprun .. "i",
+        "<Plug>SnipInfo",
+        mode = { "n" },
+        silent = true,
+        desc = "run=> sniprun info",
+      },
+      {
+        key_sniprun .. "q",
+        "<Plug>SnipClose",
+        mode = { "n" },
+        desc = "run=> close sniprun",
+      },
+      {
+        key_sniprun .. "l",
+        "<Plug>SnipLive",
+        mode = { "n" },
+        silent = true,
+        desc = "run=> sniprun live mode",
+      },
     },
   },
 }

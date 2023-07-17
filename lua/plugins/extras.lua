@@ -1,9 +1,6 @@
 local env = require("environment.ui")
 local stems = require("environment.keys").stems
-local mapn = require("environment.keys").map("n")
-local mapnv = require("environment.keys").map({ "n", "v" })
 
-local key_pomodoro = stems.pomodoro
 local key_easyread = stems.easyread
 local key_ccc = stems.ccc
 local key_glow = stems.glow
@@ -13,48 +10,16 @@ local key_block = stems.block
 
 return {
   {
-    "wthollingsworth/pomodoro.nvim",
-    dependencies = { "MunifTanjim/nui.nvim" },
-    opts = {
-      time_work = 50,
-      time_break_short = 10,
-      time_break_long = 30,
-      timers_to_long_break = 2,
-      border = { style = env.borders.main },
-    },
-    cmd = { "PomodoroStart", "PomodoroStop", "PomodoroStatus" },
-    keys = {
-      {
-        key_pomodoro .. "s",
-        "<CMD>PomodoroStart<CR>",
-        desc = "pomorg=> start pomodoro timer",
-        mode = { "n", "v" },
-      },
-      {
-        key_pomodoro .. "q",
-        "<CMD>PomodoroStop<CR>",
-        desc = "pomorg=> stop pomodoro timer",
-        mode = { "n", "v" },
-      },
-      {
-        key_pomodoro .. "u",
-        "<CMD>PomodoroStatus<CR>",
-        desc = "pomorg=> pomodoro timer status",
-        mode = { "n", "v" },
-      },
-    },
-  },
-  { "wakatime/vim-wakatime", event = "VeryLazy", enabled = true },
-  {
     "HampusHauffman/bionic.nvim",
     cmd = { "Bionic", "BionicOn", "BionicOff" },
-    init = function()
-      mapn(
+    keys = {
+      {
         key_easyread,
         "<CMD>Bionic<CR>",
-        { desc = "bionic=> toggle flow-state bionic reading" }
-      )
-    end,
+        mode = { "n", "v" },
+        desc = "bionic=> toggle flow-state bionic reading",
+      },
+    },
   },
   {
     "HampusHauffman/block.nvim",
@@ -102,28 +67,68 @@ return {
     keys = {
       {
         key_ccc .. "c",
-        "<CMD>CccPick<CR>",
+        function()
+          vim.cmd([[CccPick]])
+        end,
         desc = "ccc=> pick color interface",
       },
       {
         key_ccc .. "h",
-        "<CMD>CccHighlighterToggle<CR>",
+        function()
+          vim.cmd([[CccHighlighterToggle]])
+        end,
         desc = "ccc=> toggle inline color highlighting",
       },
       {
         key_ccc .. "v",
-        "<CMD>CccConvert<CR>",
+        function()
+          vim.cmd([[CccConvert]])
+        end,
         desc = "ccc=> convert color to another format",
       },
       {
         key_ccc .. "f",
-        "<CMD>CccHighlighterDisable<CR>",
+        function()
+          vim.cmd([[CccHighlighterDisable]])
+        end,
         desc = "ccc=> turn off inline color highlighting",
       },
       {
         key_ccc .. "o",
-        "<CMD>CccHighlighterEnable<CR>",
+        function()
+          vim.cmd([[CccHighlighterEnable]])
+        end,
         desc = "ccc=> turn on inline color highlighting",
+      },
+    },
+  },
+  {
+    "thazelart/figban.nvim",
+    config = false,
+    opts = {},
+    cmd = "Figban",
+    keys = {
+      {
+        stems.figban .. "F",
+        function()
+          vim.ui.input({
+            prompt = "select a figlet font 󰄾 ",
+          }, function(input)
+            vim.g.figban_fontstyle = input
+          end)
+        end,
+        mode = "n",
+        desc = "figlet=> select banner font",
+      },
+      {
+        stems.figban .. "b",
+        function()
+          vim.ui.input({
+            prompt = "enter banner text 󰄾 ",
+          }, function(input)
+            pcall(vim.cmd, ([[Figban %s]]):format(input))
+          end)
+        end,
       },
     },
   },
@@ -140,28 +145,32 @@ return {
       "FigSelect",
       "FigSelectComment",
     },
-    init = function()
-      mapnv(
+    keys = {
+      {
         stems.figlet .. "f",
         "<CMD>Figlet<CR>",
-        { desc = "figlet=> ascii interface" }
-      )
-      mapnv(
+        mode = { "n", "v" },
+        { desc = "figlet=> ascii interface" },
+      },
+      {
         stems.figlet .. "c",
         "<CMD>FigComment<CR>",
-        { desc = "figlet=> ascii comment interface" }
-      )
-      mapnv(
+        mode = { "n", "v" },
+        desc = "figlet=> ascii comment interface",
+      },
+      {
         stems.figlet .. "S",
         "<CMD>FigSelect<CR>",
-        { desc = "figlet=> ascii select interface" }
-      )
-      mapnv(
+        mode = { "n", "v" },
+        desc = "figlet=> ascii select interface",
+      },
+      {
         stems.figlet .. "sc",
         "<CMD>FigSelectComment<CR>",
-        { desc = "figlet=> ascii select comment interface" }
-      )
-    end,
+        mode = { "n", "v" },
+        desc = "figlet=> ascii select comment interface",
+      },
+    },
   },
   -- this is a test of figlet
   {
@@ -186,6 +195,18 @@ return {
           require("telescope").extensions.cheatsheet.cheatsheet()
         end,
         desc = "cheatsheet=> cheatsheet interface",
+      },
+    },
+  },
+  {
+    "RishabhRD/nvim-cheat.sh",
+    cmd = { "Cheat", "CheatWithoutComments" },
+    keys = {
+      {
+        "g`",
+        function()
+          local user_inp = vim.ui.input()
+        end,
       },
     },
   },
@@ -218,13 +239,16 @@ return {
     opts = { border = env.borders.main, style = vim.env.CANDY_NVIM_MOOD },
     cmd = "Glow",
     ft = { "markdown", "mkd", "md", "rmd", "qmd" },
-    init = function()
-      mapn(
+    keys = {
+      {
         key_glow,
-        "<CMD>Glow!<CR>",
-        { desc = "glow=> glow markdown preview" }
-      )
-    end,
+        function()
+          vim.cmd([[Glow!]])
+        end,
+        mode = "n",
+        desc = "glow=> glow markdown preview",
+      },
+    },
   },
   {
     "LudoPinelli/comment-box.nvim",
@@ -233,69 +257,174 @@ return {
       doc_width = tonumber(vim.opt.textwidth:get()),
       box_width = (3 / 4) * tonumber(vim.opt.textwidth:get()),
     },
-    init = function()
-      mapnv(
+    keys = {
+      {
         "<localleader>B",
-        require("comment-box").catalog,
-        { desc = "box=> catalog" }
-      )
-      mapnv(key_cbox .. "ll", function()
-        return require("comment-box").llbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰉢 󱄽:󰉢" })
+        function()
+          require("comment-box").catalog()
+        end,
+        mode = { "n", "v" },
+        desc = "box=> catalog",
+      },
+      {
+        key_cbox .. "ll",
+        function()
+          return require("comment-box").llbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰉢 󱄽:󰉢",
+      },
+      {
+        key_cbox .. "lc",
+        function()
+          return require("comment-box").lcbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰉢 󱄽:󰉠",
+      },
+      {
+        key_cbox .. "lr",
+        function()
+          return require("comment-box").lrbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰉢 󱄽:󰉣",
+      },
+      {
+        key_cbox .. "cl",
+        function()
+          return require("comment-box").clbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰉠 󱄽:󰉢",
+      },
+      {
+        key_cbox .. "cc",
+        function()
+          return require("comment-box").ccbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰉠 󱄽:󰉠",
+      },
+      {
+        key_cbox .. "cr",
+        function()
+          return require("comment-box").crbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰉠 󱄽:󰉣",
+      },
+      {
+        key_cbox .. "rl",
+        function()
+          return require("comment-box").rlbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰉣 󱄽:󰉢",
+      },
+      {
+        key_cbox .. "rc",
+        function()
+          return require("comment-box").rcbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰉣 󱄽:󰉠",
+      },
+      {
+        key_cbox .. "rr",
+        function()
+          return require("comment-box").rrbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰉣 󱄽:󰉣",
+      },
+      {
+        key_cbox .. "al",
+        function()
+          return require("comment-box").albox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰡎 󱄽:󰉢",
+      },
+      {
+        key_cbox .. "ac",
+        function()
+          return require("comment-box").acbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰡎 󱄽:󰉠",
+      },
+      {
+        key_cbox .. "ar",
+        function()
+          return require("comment-box").arbox(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "box=> 󰘷:󰡎 󱄽:󰉣",
+      },
+      {
+        key_cline .. "l",
+        function()
+          return require("comment-box").line(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "line=> 󰘷:󰡎 󱄽:󰉣",
+      },
+      {
+        key_cline .. "c",
+        function()
+          return require("comment-box").cline(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "line=> 󰘷:󰡎 󱄽:󰉣",
+      },
+      {
+        key_cline .. "r",
+        function()
+          return require("comment-box").rline(vim.v.count)
+        end,
+        mode = { "n", "v" },
+        desc = "line=> 󰘷:󰡎 󱄽:󰉣",
+      },
+    },
+  },
+  {
+    "s1n7ax/nvim-comment-frame",
+    config = true,
+    opts = {
+      disable_default_keymap = true,
+      keymap = "<localleader>cf",
+      multiline_keymap = "<localleader>cm",
+      -- start the comment with this string
+      start_str = "//",
 
-      mapnv(key_cbox .. "lc", function()
-        return require("comment-box").lcbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰉢 󱄽:󰉠" })
+      -- end the comment line with this string
 
-      mapnv(key_cbox .. "lr", function()
-        return require("comment-box").lrbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰉢 󱄽:󰉣" })
+      end_str = "//",
+      -- fill the comment frame border with this character
+      fill_char = "-",
 
-      mapnv(key_cbox .. "cl", function()
-        return require("comment-box").clbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰉠 󱄽:󰉢" })
+      -- width of the comment frame
+      frame_width = 70,
 
-      mapnv(key_cbox .. "cc", function()
-        return require("comment-box").ccbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰉠 󱄽:󰉠" })
+      -- wrap the line after 'n' characters
+      line_wrap_len = 50,
 
-      mapnv(key_cbox .. "cr", function()
-        return require("comment-box").crbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰉠 󱄽:󰉣" })
+      -- automatically indent the comment frame based on the line
+      auto_indent = true,
 
-      mapnv(key_cbox .. "rl", function()
-        return require("comment-box").rlbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰉣 󱄽:󰉢" })
+      -- add comment above the current line
+      add_comment_above = true,
 
-      mapnv(key_cbox .. "rc", function()
-        return require("comment-box").rcbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰉣 󱄽:󰉠" })
-
-      mapnv(key_cbox .. "rr", function()
-        return require("comment-box").rrbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰉣 󱄽:󰉣" })
-
-      mapnv(key_cbox .. "al", function()
-        return require("comment-box").albox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰡎 󱄽:󰉢" })
-
-      mapnv(key_cbox .. "ac", function()
-        return require("comment-box").acbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰡎 󱄽:󰉠" })
-
-      mapnv(key_cbox .. "ar", function()
-        return require("comment-box").arbox(vim.v.count)
-      end, { desc = "box=> 󰘷:󰡎 󱄽:󰉣" })
-      mapnv(key_cline .. "l", function()
-        return require("comment-box").line(vim.v.count)
-      end, { desc = "line=> 󰘷:󰡎 󱄽:󰉣" })
-      mapnv(key_cline .. "c", function()
-        return require("comment-box").cline(vim.v.count)
-      end, { desc = "line=> 󰘷:󰡎 󱄽:󰉣" })
-      mapnv(key_cline .. "r", function()
-        return require("comment-box").rline(vim.v.count)
-      end, { desc = "line=> 󰘷:󰡎 󱄽:󰉣" })
-    end,
+      -- configurations for individual language goes here
+      languages = {},
+    },
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+    },
+    event = {
+      "VeryLazy",
+    },
   },
   {
     "eandrju/cellular-automaton.nvim",
@@ -317,13 +446,14 @@ return {
     "alec-gibson/nvim-tetris",
     cmd = "Tetris",
     config = function() end,
-    init = function()
-      mapn(
+    keys = {
+      {
         "<localleader><bar>",
         "<CMD>Tetris<CR>",
-        { desc = "tetris=> play tetris" }
-      )
-    end,
+        mode = "n",
+        { desc = "tetris=> play tetris" },
+      },
+    },
   },
   {
     "jim-fx/sudoku.nvim",
@@ -352,5 +482,73 @@ return {
   {
     "seandewar/nvimesweeper",
     cmd = "Nvimesweeper",
+  },
+  {
+    "tamton-aquib/zone.nvim",
+    enabled = env.screensaver.enabled,
+    opts = {
+      style = env.screensaver.selections[math.random(
+        #env.screensaver.selections
+      )],
+      after = 3000,
+      exclude_filetypes = {
+        "TelescopePrompt",
+        "NvimTree",
+        "neo-tree",
+        "dashboard",
+        "lazy",
+      },
+      treadmill = {
+        direction = "left",
+        headache = true,
+        tick_time = 30, -- Lower, the faster
+        -- Opts for Treadmill style
+      },
+      epilepsy = {
+        stage = "aura", -- "aura" or "ictal"
+        tick_time = 100,
+      },
+      dvd = {
+        -- text = {"line1", "line2", "line3", "etc"}
+        tick_time = 100,
+      },
+      -- Opts for Dvd style
+    },
+    event = "VeryLazy",
+  },
+  {
+    "tamton-aquib/duck.nvim",
+    config = function() end,
+    event = "VeryLazy",
+    keys = {
+      {
+        "<F12>",
+        function()
+          require("duck").hatch("🦆", 5)
+        end,
+        mode = "n",
+        desc = "hatch=> a cat",
+      },
+      {
+        "<F11>",
+        function()
+          require("duck").hatch("🐈", 0.8)
+        end,
+        mode = "n",
+        desc = "hatch=> a duck",
+      },
+    },
+  },
+  {
+    "realprogrammersusevim/readability.nvim",
+    cmd = { "ReadabilitySmog", "ReadabilityFlesch" },
+  },
+  -- the following plugin only downloads some help files, so it doesn't need any
+  -- advanced configuration to speak of.
+  {
+    "danilamihailov/vim-tips-wiki",
+    enabled = false,
+    config = false,
+    opts = {},
   },
 }

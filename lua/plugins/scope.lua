@@ -84,6 +84,7 @@ local target_extensions = {
   "git_diffs",
   "find_pickers",
   "ports",
+  "toggleterm",
 }
 
 local scopeutils = require("uutils.scope")
@@ -121,6 +122,19 @@ return {
     "nvim-telescope/telescope.nvim",
     dependencies = {
       "BurntSushi/ripgrep",
+      {
+        "https://git.sr.ht/~havi/telescope-toggleterm.nvim",
+        dependencies = {
+          "akinsho/toggleterm.nvim",
+          "nvim-telescope/telescope.nvim",
+          "nvim-lua/popup.nvim",
+          "nvim-lua/plenary.nvim",
+        },
+        event = "TermOpen",
+        config = function()
+          require("telescope").load_extension("toggleterm")
+        end,
+      },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
@@ -353,6 +367,19 @@ return {
         config = function()
           require("telescope").load_extension("ports")
         end,
+      },
+      {
+        "prochri/telescope-all-recent.nvim",
+        dependencies = {
+          "nvim-telescope/telescope.nvim",
+          config = function()
+            require("telescope-all-recent").setup({
+              default = {
+                sorting = "frecency",
+              },
+            })
+          end,
+        },
       },
     },
     opts = {

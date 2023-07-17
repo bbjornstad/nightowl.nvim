@@ -29,6 +29,8 @@ env.ai.enabled = {
   hfcc = true,
   tabnine = false,
   codeium = true,
+  rgpt = false,
+  navi = false,
 }
 env.ai.configured_notify = false
 
@@ -42,6 +44,10 @@ env.bufferline = {}
 env.bufferline.tab_format = "slant"
 
 env.enable_vim_strict = false
+
+env.screensaver = {}
+env.screensaver.enabled = false
+env.screensaver.selections = { "treadmill", "epilepsy", "dvd" }
 
 --------------------------------------------------------------------------------
 -- UI: Colorscheme Options

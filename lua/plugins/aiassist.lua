@@ -10,6 +10,8 @@ local key_neural = stems.neural
 local key_gpt = stems.chatgpt
 local key_neoai = stems.neoai
 local key_codegpt = stems.codegpt
+local key_rgpt = stems.rgpt
+local key_navi = stems.navi
 
 local mapn = require("environment.keys").map("n")
 local mapnv = require("environment.keys").map({ "n", "v" })
@@ -32,10 +34,12 @@ AI Plugin Status:
   -> **chatgpt**: %s
   -> **codegpt**: %s
   -> **neural**: %s
+  -> **ReviewGPT**: %s
+  -> **naVi** %s
 
 * plugin is used during nvim-cmp autocompletion, and will therefore connect to an external service
-** plugin uses proprietary, non-free, non-open, or non-libre backend
-*** plugin has both of the attributes listed above.
+** plugin uses proprietary, non-free, non-open, or non-libre backend (namely ChatGPT)
+*** plugin has both of the above listed attributes
 ]],
       enb.hfcc,
       enb.codeium,
@@ -45,7 +49,9 @@ AI Plugin Status:
       enb.neoai,
       enb.chatgpt,
       enb.codegpt,
-      enb.neural
+      enb.neural,
+      enb.rgpt,
+      enb.navi
     ),
     vim.log.levels.INFO
   )
@@ -199,6 +205,27 @@ return {
     end,
   },
   {
+    "vibovenkat123/rgpt.nvim",
+    enabled = enb.rgpt,
+    opts = {
+      model = "text-davinci-003",
+      max_tokens = 200,
+      temperature = 0.2,
+      top_p = 1,
+      frequence_penalty = 1.2,
+      presence_penalty = 0.3,
+      best_of = 1,
+    },
+    keys = {
+      {
+        key_rgpt .. "r",
+        "<CMD>ReviewGPT review<CR>",
+        mode = "n",
+        desc = "ai.rgpt=> enable ai code review",
+      },
+    },
+  },
+  {
     "codota/tabnine-nvim",
     module = "tabnine",
     enabled = enb.tabnine,
@@ -263,13 +290,16 @@ return {
     opts = { source = { openai = { apiKey = "OPENAI_API_KEY" } } },
     cmd = "Neural",
     -- keys = require("environment.keys").neural,
-    init = function()
-      mapnv(
+    keys = {
+      {
         key_neural,
-        "<CMD>Neural<CR>",
-        { desc = "ai.nrl=> chatgpt neural interface" }
-      )
-    end,
+        function()
+          vim.cmd([[Neural]])
+        end,
+        mode = { "n", "v" },
+        desc = "ai.nrl=> chatgpt neural interface",
+      },
+    },
   },
   {
     "jackMort/ChatGPT.nvim",
@@ -304,7 +334,7 @@ return {
         "<CMD>ChatGPTCustomCodeAction<CR>",
         { desc = "ai.chatgpt=> code actions" }
       )
-      mapn("'G", "<CMD>ChatGPT<CR>", { desc = "ai.chatgpt=> interface" })
+      mapn(";G", "<CMD>ChatGPT<CR>", { desc = "ai.chatgpt=> interface" })
     end,
   },
   {
@@ -507,5 +537,36 @@ return {
         end,
       })
     end,
+  },
+  {
+    "deifyed/naVi",
+    config = true,
+    enabled = enb.navi,
+    opts = {
+      -- OpenAI token. Required
+      openai_token = os.getenv("OPENAI_API_KEY"), -- Alternatively, use environment variable OPENAI_TOKEN=<token>
+      -- OpenAI model. Optional. Default is gpt-3.5-turbo
+      openai_model = "gpt-3.5-turbo",
+      -- OpenAI max tokens. Optional. Default is 512
+      openai_max_tokens = 512,
+      -- OpenAI temperature. Optional. Default is 0.6
+      openai_temperature = 0.6,
+      -- Debug mode. Optional. Default is false
+      debug = false, -- Alternatively, use environment variable NAVI_DEBUG=true
+      -- Setup for input window
+      prompt_window = {
+        border = env.borders.main,
+        style = "minimal",
+        relative = "editor",
+      },
+      -- Setup for window showing various reports
+      report_window = {
+        -- Specifies if the report will be shown in a vertical window or in a floating window.
+        window = "floating",
+        border = env.borders.main,
+        style = "minimal",
+        relative = "editor",
+      },
+    },
   },
 }
