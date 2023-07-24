@@ -36,13 +36,16 @@ end
 mod.stems = {}
 mod.stems.ccc = "<leader>uh"
 mod.stems.toggleterm = "<leader>t"
-mod.stems.pomodoro = "<leader>T"
+mod.stems.pomodoro = "<bar>p"
 mod.stems.easyread = "<leader>uB"
+mod.stems.rest = "<leader>R"
 
 ---------------------------------
 -- Ai Related Stems
+mod.stems.BASEAI = aistem
 mod.stems.neural = aistem .. "n"
 mod.stems.copilot = aistem .. "g"
+mod.stems.codeium = aistem .. "d"
 mod.stems.neoai = aistem .. "e"
 mod.stems.cmp_ai = aistem .. "a"
 mod.stems.hfcc = aistem .. "h"
@@ -53,7 +56,7 @@ mod.stems.navi = aistem .. "v"
 
 mod.stems.sniprun = "'"
 
-mod.stems.telescope = "<leader>i"
+mod.stems.telescope = "<leader><leader>"
 mod.stems.glow = "<leader>P"
 mod.stems.notify = "<leader>n"
 mod.stems.vista = "<leader>v"
@@ -66,6 +69,8 @@ mod.stems.oil = "<leader>f"
 mod.stems.git = "<leader>g"
 mod.stems.block = "<leader>ub"
 mod.stems.tterm = "<leader>T"
+mod.stems.navbuddy = "<leader>~"
+mod.stems.undotree = "<leader>U"
 
 mod.stems.figlet = "<localleader>i"
 mod.stems.figban = "<localleader>f"

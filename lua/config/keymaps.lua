@@ -24,10 +24,29 @@ end
 -- mistakes that I seem to make while coding.
 -----
 mapx(
+  { "n", "v", "o" },
+  "qq",
+  "<CMD>quit<CR>",
+  { desc = "quit=> close this buffer", remap = false, nowait = true }
+)
+mapx(
+  { "n", "v", "o" },
+  "QQ",
+  "<CMD>quit!<CR>",
+  { desc = "quit=> close forcefully", remap = false, nowait = true }
+)
+mapx(
+  { "n", "v", "o", "i" },
+  "<Esc>",
+  "<Esc>",
+  { desc = "esc=> to normal mode", remap = false, nowait = true }
+)
+
+mapx(
   { "n", "v", "o", "i" },
   "<F1>",
   "<Esc>",
-  { desc = "esc=> to normal mode", remap = false }
+  { desc = "esc=> to normal mode", remap = false, nowait = true }
 )
 
 --------------------------------------------------------------------------------
@@ -36,7 +55,7 @@ mapx(
   { "n", "v", "o" },
   "g?",
   "<CMD>help<CR>",
-  { desc = "got=> get help", remap = false }
+  { desc = "got=> get help", remap = false, nowait = true }
 )
 
 ---------------------------------------------------------------------------------
