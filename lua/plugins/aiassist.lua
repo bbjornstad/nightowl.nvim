@@ -4,17 +4,19 @@ local enb = env.ai.enabled
 
 local stems = require("environment.keys").stems
 
+local key_ai = stems.BASEAI
 local key_copilot = stems.copilot
+local key_codeium = stems.codeium
 local key_hfcc = stems.hfcc
 local key_neural = stems.neural
-local key_gpt = stems.chatgpt
+local key_chatgpt = stems.chatgpt
 local key_neoai = stems.neoai
 local key_codegpt = stems.codegpt
 local key_rgpt = stems.rgpt
 local key_navi = stems.navi
+local key_cmpai = stems.cmp_ai
 
 local mapn = require("environment.keys").map("n")
-local mapnv = require("environment.keys").map({ "n", "v" })
 
 -- show a menu, but only if the user has selected the appropriate option.
 -- This menu is supposed to inform the user which plugins might send
@@ -62,13 +64,16 @@ return {
     "folke/which-key.nvim",
     opts = {
       defaults = {
-        [";"] = { name = "+ai" },
-        [";a"] = { name = "ai=> +neoai" },
-        [";g"] = { name = "ai=> +chatgpt (openai original)" },
-        [";c"] = { name = "ai=> +copilot" },
-        [";h"] = { name = "ai=> +huggingface" },
-        [";n"] = { name = "ai=> +neoai" },
-        [";o"] = { name = "ai=> +codegpt" },
+        [key_ai] = { name = "+ai" },
+        [key_neoai] = { name = "ai=> +neoai" },
+        [key_chatgpt] = { name = "ai=> +chatgpt (openai original)" },
+        [key_copilot] = { name = "ai=> +copilot" },
+        [key_hfcc] = { name = "ai=> +huggingface" },
+        [key_neural] = { name = "ai=> +neural" },
+        [key_codegpt] = { name = "ai=> +codegpt" },
+        [key_rgpt] = { name = "ai=> +rgpt" },
+        [key_navi] = { name = "ai=> +navi" },
+        [key_cmpai] = { name = "ai=> +cmp-ai" },
         -- TODO Add a few more of these baseline name mappings
         -- directly onto the which-key configuration here.
       },
@@ -77,18 +82,21 @@ return {
   {
     "jcdickinson/codeium.nvim",
     dependencies = {
-      "jcdickinson/http.nvim",
+      {
+        "jcdickinson/http.nvim",
+        build = "cargo build --workspace --release",
+      },
       "nvim-lua/plenary.nvim",
       "hrsh7th/nvim-cmp",
     },
-    opts = {},
     cmd = "Codeium",
+    event = "VeryLazy",
     enabled = enb.codeium,
   },
   {
     "hrsh7th/nvim-cmp",
     opts = function(_, opts)
-      if enb.codeium and vim.fn.has("codeium") then
+      if enb.codeium then
         opts.sources = vim.list_extend(opts.sources, {
           name = "codeium",
           max_item_count = 20,
@@ -106,8 +114,8 @@ return {
         top_p = 0.95,
         stop_token = "<|endoftext|>",
       },
-      accept_keymap = "'",
-      dismiss_keymap = '"',
+      accept_keymap = "<C-y>",
+      dismiss_keymap = "<C-e>",
     },
     enabled = enb.hfcc,
     cmd = { "HugMyFace", "HFccSuggestion", "HFccToggleAutoSuggest" },
@@ -142,34 +150,29 @@ return {
       mapn(
         key_copilot .. "a",
         "<CMD>Copilot auth<CR>",
-        { desc = "ai.copilot=> authenticate copilot" }
+        { desc = "ai.copilot=> authenticate" }
       )
       mapn(
         key_copilot .. "t",
         "<CMD>Copilot toggle<CR>",
-        { desc = "ai.copilot=> toggle copilot" }
+        { desc = "ai.copilot=> toggle" }
       )
       mapn(
         key_copilot .. "s",
         "<CMD>Copilot status<CR>",
-        { desc = "ai.copilot=> copilot status" }
+        { desc = "ai.copilot=> status" }
       )
       mapn(
         key_copilot .. "d",
         "<CMD>Copilot detach<CR>",
-        { desc = "ai.copilot=> detach copilot" }
-      )
-      mapn(
-        key_copilot .. "C",
-        "<CMD>Copilot status<CR>",
-        { desc = "ai.copilot=> copilot status" }
+        { desc = "ai.copilot=> detach" }
       )
     end,
   },
   {
     "hrsh7th/nvim-cmp",
     opts = function(_, opts)
-      if vim.fn.has("copilot") and enb.copilot then
+      if enb.copilot then
         opts.sources = vim.list_extend(opts.sources, {
           name = "copilot",
           max_item_count = 10,
@@ -179,7 +182,7 @@ return {
   },
   {
     "zbirenbaum/copilot-cmp",
-    enabled = vim.fn.has("copilot"),
+    enabled = enb.copilot,
     dependencies = { "zbirenbaum/copilot.lua" },
     opts = {},
   },
@@ -230,30 +233,32 @@ return {
     module = "tabnine",
     enabled = enb.tabnine,
     build = "./dl_binaries.sh",
-    config = function(opts)
-      require("tabnine").setup({
-        disable_auto_comment = true,
-        accept_keymap = "<C-9>",
-        dismiss_keymap = "<C-0>",
-        debounce_ms = 800,
-        suggestion_color = { gui = "#808080", cterm = 244 },
-        exclude_filetypes = {
-          "TelescopePrompt",
-          "neo-tree",
-          "neo-tree-popup",
-          "notify",
-          "oil",
-          "Oil",
-        },
-        log_file_path = nil, -- absolute path to Tabnine log file
-      })
-    end,
+    config = true,
+    opts = {
+      disable_auto_comment = true,
+      accept_keymap = "<C-y>",
+      dismiss_keymap = "<C-n>",
+      debounce_ms = 800,
+      suggestion_color = { gui = "#808080", cterm = 244 },
+      exclude_filetypes = {
+        "TelescopePrompt",
+        "neo-tree",
+        "neo-tree-popup",
+        "notify",
+        "oil",
+        "Oil",
+        "dashboard",
+        "lazy",
+        "quickfix",
+      },
+      log_file_path = nil, -- absolute path to Tabnine log file
+    },
     dependencies = { "tzachar/cmp-tabnine" },
   },
   {
     "hrsh7th/nvim-cmp",
     opts = function(_, opts)
-      if enb.tabnine and vim.fn.has("tabnine") then
+      if enb.tabnine then
         opts.sources = vim.list_extend(opts.sources, {
           { name = "cmp_tabnine", max_item_count = 20 },
         })
@@ -262,7 +267,7 @@ return {
     dependencies = {
       {
         "tzachar/cmp-tabnine",
-        enabled = vim.fn.has("tabnine") and enb.tabnine,
+        enabled = enb.tabnine,
         build = "./install.sh",
         dependencies = { "codota/tabnine-nvim", "hrsh7th/nvim-cmp" },
       },
@@ -275,14 +280,15 @@ return {
     config = function()
       require("codegpt.config")
     end,
-    cmd = { "Chat" },
-    init = function()
-      mapnv(
+    cmd = { "CodeGPT" },
+    keys = {
+      {
         key_codegpt,
         "<CMD>CodeGPT<CR>",
-        { desc = "ai.codegpt=> codegpt interface" }
-      )
-    end,
+        mode = { "n" },
+        desc = "ai.codegpt=> open interface",
+      },
+    },
   },
   {
     "dense-analysis/neural",
@@ -293,11 +299,9 @@ return {
     keys = {
       {
         key_neural,
-        function()
-          vim.cmd([[Neural]])
-        end,
+        "<CMD>Neural<CR>",
         mode = { "n", "v" },
-        desc = "ai.nrl=> chatgpt neural interface",
+        desc = "ai.neural=> chatgpt neural interface",
       },
     },
   },
@@ -317,25 +321,38 @@ return {
       popup_window = { border = { style = env.borders.alt } },
       popup_input = { border = { style = env.borders.alt } },
     },
-    init = function()
-      mapn(key_gpt .. "gg", "<CMD>ChatGPT<CR>", { desc = "chatgpt" })
-      mapn(
-        key_gpt .. "gr",
+    keys = {
+      {
+        key_chatgpt .. "g",
+        "<CMD>ChatGPT<CR>",
+        mode = "n",
+        desc = "ai.chatgpt=> open interface",
+      },
+      {
+        key_chatgpt .. "r",
         "<CMD>ChatGPTActAs<CR>",
-        { desc = "ai.chatgpt=> role prompts" }
-      )
-      mapn(
-        key_gpt .. "ge",
+        mode = "n",
+        desc = "ai.chatgpt=> role prompts",
+      },
+      {
+        key_chatgpt .. "e",
         "<CMD>ChatGPTEditWithInstructions<CR>",
-        { desc = "ai.chatgpt=> edit with instructions" }
-      )
-      mapn(
-        key_gpt .. "ga",
+        mode = "n",
+        desc = "ai.chatgpt=> edit with instructions",
+      },
+      {
+        key_chatgpt .. "a",
         "<CMD>ChatGPTCustomCodeAction<CR>",
-        { desc = "ai.chatgpt=> code actions" }
-      )
-      mapn(";G", "<CMD>ChatGPT<CR>", { desc = "ai.chatgpt=> interface" })
-    end,
+        mode = "n",
+        desc = "ai.chatgpt=> code actions",
+      },
+      {
+        key_ai .. "G",
+        "<CMD>ChatGPT<CR>",
+        mode = "n",
+        desc = "ai.chatgpt=> open interface",
+      },
+    },
   },
   {
     "Bryley/neoai.nvim",
@@ -532,7 +549,7 @@ return {
             "n",
             "q",
             "<CMD>quit<CR>",
-            { desc = "quit", remap = false, buffer = true }
+            { desc = "quit", remap = false, buffer = true, nowait = true }
           )
         end,
       })
@@ -546,9 +563,9 @@ return {
       -- OpenAI token. Required
       openai_token = os.getenv("OPENAI_API_KEY"), -- Alternatively, use environment variable OPENAI_TOKEN=<token>
       -- OpenAI model. Optional. Default is gpt-3.5-turbo
-      openai_model = "gpt-3.5-turbo",
+      openai_model = "gpt-4",
       -- OpenAI max tokens. Optional. Default is 512
-      openai_max_tokens = 512,
+      openai_max_tokens = 1024,
       -- OpenAI temperature. Optional. Default is 0.6
       openai_temperature = 0.6,
       -- Debug mode. Optional. Default is false
@@ -566,6 +583,44 @@ return {
         border = env.borders.main,
         style = "minimal",
         relative = "editor",
+      },
+    },
+    keys = {
+      {
+        key_navi .. "a",
+        "<cmd>lua require('navi').Append()<cr>",
+        mode = "n",
+        desc = "ai.navi=> append",
+      },
+      {
+        key_navi .. "e",
+        "<cmd>lua require('navi').Edit()<cr>",
+        mode = "v",
+        desc = "ai.navi=> edit",
+      },
+      {
+        key_navi .. "b",
+        "<cmd>lua require('navi').EditBuffer()<cr>",
+        mode = "n",
+        desc = "ai.navi=> edit buffer",
+      },
+      {
+        key_navi .. "r",
+        "<cmd>lua require('navi').Review()<cr>",
+        mode = "v",
+        desc = "ai.navi=> review",
+      },
+      {
+        key_navi .. "x",
+        "<cmd>lua require('navi').Explain()<cr>",
+        mode = "v",
+        desc = "ai.navi=> explain",
+      },
+      {
+        key_navi .. "c",
+        "<cmd>lua require('navi').Chat()<cr>",
+        mode = "n",
+        desc = "ai.navi=> chat",
       },
     },
   },
