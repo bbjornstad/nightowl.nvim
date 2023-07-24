@@ -1,12 +1,32 @@
-local function toboolean(str)
-  local bool = false
-  if str == "true" or str == "1" then
-    bool = true
+local env = {}
+
+--- formats the necessary field access and method calls to bring in well-defined
+--- colors from the colorscheme Kanagawa. This will need to be remimplemented
+--- in the future to accept other themes as well.This gets around an apparent function call
+--- timing issue where the kanagawa.colors item is not yet accessible when the
+--- definition is made. By using this function, you are effectively deferring the
+--- evaluation of the color definition until it is directly accessed.
+---
+---@param opts table: Maps the item that is to be colored to a string of the
+--- color that it should receive.
+---@param scheme_target string: Identifies an item that is to be required in the
+---sense of calling lua's require to bring the main definitions into focus.
+function env.colors(opts, scheme_target, scheme_cfg)
+  scheme_target = scheme_target or "kanagawa.colors"
+  scheme_cfg = scheme_cfg or {}
+  local function itemized_color(colorname)
+    local retval = require(scheme_target).setup(scheme_cfg).palette[colorname]
+    return retval
   end
-  return bool
+
+  local retval = vim.tbl_map(itemized_color, opts)
+  return retval
 end
 
-local env = {}
+function env.kanacolors(opts)
+  return env.colors(opts, "kanagawa.colors", { theme = "wave" })
+end
+
 --------------------------------------------------------------------------------
 -- UI: Borders
 -- ===========
@@ -48,6 +68,27 @@ env.enable_vim_strict = false
 env.screensaver = {}
 env.screensaver.enabled = false
 env.screensaver.selections = { "treadmill", "epilepsy", "dvd" }
+
+env.ft_ignore_list = {
+  "oil",
+  "Outline",
+  "dashboard",
+  "fzf",
+  "trouble",
+  "toggleterm",
+  "outline",
+  "qf",
+  "TelescopePrompt",
+  "Telescope",
+  "tsplayground",
+  "spectre_panel",
+  "undotree",
+  "undotreeDiff",
+  "neo-tree",
+  "Lazy",
+  "dropbar_menu",
+  "noice",
+}
 
 --------------------------------------------------------------------------------
 -- UI: Colorscheme Options

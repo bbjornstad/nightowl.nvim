@@ -51,7 +51,7 @@ return {
     },
     keys = {
       {
-        "|t",
+        "<bar>t",
         function()
           vim.ui.input({
             prompt = "Task Description: ",
@@ -63,15 +63,15 @@ return {
         desc = "do=> add a task",
       },
       {
-        "|T",
+        "<bar>T",
         function()
           vim.cmd([[DoToggle]])
         end,
         mode = "n",
-        desc = "do=> toggle tasklist",
+        desc = "do=> toggle tasklist view",
       },
       {
-        "|w",
+        "<bar>w",
         function()
           vim.cmd([[DoSave]])
         end,
@@ -79,22 +79,98 @@ return {
         desc = "do=> save tasklist",
       },
       {
-        "|e",
+        "<bar>e",
         function()
           vim.cmd([[DoEdit]])
         end,
         mode = "n",
-        desc = "do=> save tasklist",
+        desc = "do=> edit tasklist in buffer",
       },
       {
-        "|d",
+        "<bar>d",
         function()
           vim.cmd([[Done!]])
         end,
         mode = "n",
-        desc = "do=> save tasklist",
+        desc = "do=> remove task from tasklist",
       },
     },
   },
   { "wakatime/vim-wakatime", event = "VeryLazy", enabled = true },
+  {
+    "soywod/unfog.vim",
+    config = false,
+    cmd = "Unfog",
+    keys = {
+      {
+        "<bar>U",
+        "<CMD>Unfog<CR>",
+        mode = "n",
+        desc = "unfog=> list tasks in the mist",
+      },
+    },
+    init = function()
+      local mapn = require("environment.keys").map("n")
+      vim.api.nvim_create_autocmd({ "FileType" }, {
+        pattern = { "*unfog*" },
+        callback = function(ev)
+          mapn(
+            "gd",
+            "<Plug>(unfog-list-done)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "gD",
+            "<Plug>(unfog-list-deleted)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "<CR>",
+            "<Plug>(unfog-toggle)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "K",
+            "<Plug>(unfog-info)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "gc",
+            "<Plug>(unfog-context)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "gw",
+            "<Plug>(unfog-worktime)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "<C-n>",
+            "<Plug>(unfog-next-cell)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "<C-p>",
+            "<Plug>(unfog-prev-cell)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "dic",
+            "<Plug>(unfog-delete-in-cell)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "cic",
+            "<Plug>(unfog-change-in-cell)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+          mapn(
+            "vic",
+            "<Plug>(unfog-visual-in-cell)",
+            { desc = "fog=> list done", buffer = ev.buf }
+          )
+        end,
+      })
+    end,
+  },
 }

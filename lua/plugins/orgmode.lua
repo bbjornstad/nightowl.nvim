@@ -25,8 +25,9 @@ local organization_tools = {
     },
     ft = { "org" },
     init = function()
-      if vim.fn.has("ufo") then
-        require("ufo").detach()
+      local ok, res = pcall(require, "ufo")
+      if ok then
+        res.detach()
       end
     end,
     config = function(_, opts)
@@ -208,12 +209,10 @@ local organization_tools = {
       },
     },
   },
-}
-
-if vim.fn.has("orgmode") or vim.fn.has("neorg") then
-  table.insert(organization_tools, {
+  {
     {
       "lukas-reineke/headlines.nvim",
+      ft = { "org", "norg" },
       dependencies = {
         "nvim-treesitter/nvim-treesitter",
         "nvim-orgmode/orgmode",
@@ -221,7 +220,7 @@ if vim.fn.has("orgmode") or vim.fn.has("neorg") then
       },
       opts = {},
     },
-  })
-end
+  },
+}
 
 return organization_tools

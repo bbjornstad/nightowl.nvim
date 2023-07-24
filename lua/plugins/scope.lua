@@ -1,6 +1,4 @@
 local key_scope = require("environment.keys").stems.telescope
-local mapn = require("environment.keys").map("n")
-local mapnv = require("environment.keys").map({ "n", "v" })
 
 local target_pickers = {
   "find_files",
@@ -55,11 +53,12 @@ local target_pickers = {
 -- env.targets.pickers
 local target_extensions = {
   "fzf",
-  "dap", -- "luasnip",
+  "dap",
+  "luasnip",
   "notify",
   "env",
   "heading",
-  -- "repo",
+  "repo",
   "changes",
   "menu",
   "recent_files",
@@ -77,7 +76,8 @@ local target_extensions = {
   "media_files",
   "conventional_commits",
   "xray23", -- this is for sessions, not sure why it still has this name
-  "dir", -- "lsp-toggle",
+  "dir",
+  "lsp-toggle",
   "color_names",
   "neoclip",
   "undo",
@@ -85,6 +85,8 @@ local target_extensions = {
   "find_pickers",
   "ports",
   "toggleterm",
+  "notifications",
+  "manix",
 }
 
 local scopeutils = require("uutils.scope")
@@ -106,12 +108,26 @@ local extspec = scopeutils.setup_extensions(target_extensions, {
   },
 }, "ivy")
 
+local function funext(extension_name, module_override)
+  module_override = module_override or extension_name
+  local scope = require("telescope")
+  return function()
+    scope.extensions[module_override][extension_name]()
+  end
+end
+
+local function funblt(builtin_name, builtin_override)
+  builtin_override = builtin_override or "telescope.builtin"
+  return function()
+    require(builtin_override)[builtin_name]()
+  end
+end
+
 return {
   {
     "folke/which-key.nvim",
     opts = {
       defaults = {
-        ["<leader>"] = { name = "+nvim core fxns" },
         [key_scope] = { name = "+telescope" },
         -- TODO Add a few more of these baseline name mappings
         -- directly onto the which-key configuration here.
@@ -157,13 +173,13 @@ return {
           require("telescope").load_extension("file_browser")
         end,
       },
-      -- {
-      --   "cljoly/telescope-repo.nvim",
-      --   dependencies = { "nvim-telescope/telescope.nvim" },
-      --   config = function()
-      --     require("telescope").load_extension("repo")
-      --   end,
-      -- },
+      {
+        "cljoly/telescope-repo.nvim",
+        dependencies = { "nvim-telescope/telescope.nvim" },
+        config = function()
+          require("telescope").load_extension("repo")
+        end,
+      },
       {
         "LinArcX/telescope-env.nvim",
         dependencies = { "nvim-telescope/telescope.nvim" },
@@ -330,13 +346,14 @@ return {
         config = function()
           require("telescope").load_extension("find_pickers")
         end,
-        init = function()
-          mapn(
-            "<leader><leader>",
-            require("telescope").extensions.find_pickers.find_pickers,
-            { desc = "scope=> extensions and pickers" }
-          )
-        end,
+        keys = {
+          {
+            key_scope .. "<leader>",
+            funext("find_pickers"),
+            mode = "n",
+            desc = "scope=> extensions and pickers",
+          },
+        },
       },
       {
         "adoyle-h/lsp-toggle.nvim",
@@ -381,6 +398,16 @@ return {
           end,
         },
       },
+      -- {
+      --   "mrcjkb/telescope-manix",
+      --   dependencies = {
+      --     "nvim-lua/plenary.nvim",
+      --     "nvim-telescope/telescope.nvim",
+      --   },
+      --   config = function()
+      --     require("telescope").load_extension("manix")
+      --   end,
+      -- },
     },
     opts = {
       defaults = {
@@ -389,129 +416,153 @@ return {
       pickers = pickspec,
       extensions = extspec,
     },
-    init = function()
+    keys = {
       ---
       -- @module telescope.core: core keymappings.
       -- telescope.core: Find Files
-      mapn(
+      {
         key_scope .. "ff",
-        require("telescope.builtin").find_files,
-        { desc = "scope=> search local files" }
-      )
+        funblt("find_files"),
+        mode = "n",
+        desc = "scope=> search local files",
+      },
       -- telescope.core: Old Files
-      mapn(
+      {
         key_scope .. "fo",
-        require("telescope.builtin").oldfiles,
-        { desc = "scope=> search oldfiles" }
-      )
+        funblt("oldfiles"),
+        mode = "n",
+        desc = "scope=> search oldfiles",
+      },
       -- telescope.core: Global Tags
-      mapn(
+      {
         key_scope .. "g",
-        require("telescope.builtin").tags,
-        { desc = "scope=> search tags" }
-      )
+        funblt("tags"),
+        mode = "n",
+        desc = "scope=> search tags",
+      },
       -- telescope.core: Vim Commands
-      mapn(
+      {
         key_scope .. "c",
-        require("telescope.builtin").commands,
-        { desc = "scope=> scope through vim commands" }
-      )
+        funblt("commands"),
+        mode = "n",
+        desc = "scope=> scope through vim commands",
+      },
       -- telescope.cort:. Help Tags
-      mapn(
+      {
         key_scope .. "ht",
-        require("telescope.builtin").help_tags,
-        { desc = "scope=> search help tags" }
-      )
+        funblt("help_tags"),
+        mode = "n",
+        desc = "scope=> search help tags",
+      },
       -- telescope.core: Manual Pages
-      mapn(
+      {
         key_scope .. "hm",
-        require("telescope.builtin").man_pages,
-        { desc = "scope=> search man pages" }
-      )
+        funblt("man_pages"),
+        mode = "n",
+        desc = "scope=> search man pages",
+      },
       -- telescope.core: Search History
-      mapn(
+      {
         key_scope .. "hs",
-        require("telescope.builtin").search_history,
-        { desc = "scope=> scope history" }
-      )
+        funblt("search_history"),
+        mode = "n",
+        desc = "scope=> scope history",
+      },
       -- telescope.core: Command History
-      mapn(
+      {
         key_scope .. "hc",
-        require("telescope.builtin").command_history,
-        { desc = "scope=> command history" }
-      )
+        funblt("command_history"),
+        mode = "n",
+        desc = "scope=> command history",
+      },
       -- telescope.core: telescope builtins
-      mapn(
+      {
         key_scope .. "i",
-        require("telescope.builtin").builtin,
-        { desc = "scope=> search telescope" }
-      )
+        funblt("builtin"),
+        mode = "n",
+        desc = "scope=> search telescope",
+      },
       -- telescope.core: open buffers
-      mapn(
+      {
         key_scope .. "b",
-        require("telescope.builtin").buffers,
-        { desc = "scope=> search open buffers" }
-      )
+        funblt("buffers"),
+        mode = "n",
+        desc = "scope=> search open buffers",
+      },
       -- telescope.core: treesitter nodes
-      mapn(
+      {
         key_scope .. "e",
-        require("telescope.builtin").treesitter,
-        { desc = "scope=> search treesitter nodes" }
-      )
+        funblt("treesitter"),
+        mode = "n",
+        desc = "scope=> search treesitter nodes",
+      },
       -- telescope.core: current buffer tags
-      mapn(
+      {
         key_scope .. "t",
-        require("telescope.builtin").current_buffer_tags,
-        { desc = "scope=> search current buffer's tags" }
-      )
+        funblt("current_buffer_tags"),
+        mode = "n",
+        desc = "scope=> search current buffer's tags",
+      },
       -- telescope.core: vim marks
-      mapn(
+      {
         key_scope .. "m",
-        require("telescope.builtin").marks,
-        { desc = "scope=> search marks" }
-      )
+        funblt("marks"),
+        mode = "n",
+        desc = "scope=> search marks",
+      },
       -- telescope.core: loclist
-      mapn(
+      {
         key_scope .. "y",
-        require("telescope.builtin").loclist,
-        { desc = "scope=> search loclist" }
-      )
+        funblt("loclist"),
+        mode = "n",
+        desc = "scope=> search loclist",
+      },
       -- telescope.core: keymappings
-      mapn(
+      {
         key_scope .. "k",
-        require("telescope.builtin").keymaps,
-        { desc = "scope=> search defined keymappings" }
-      )
+        funblt("keymaps"),
+        mode = "n",
+        desc = "scope=> search defined keymappings",
+      },
       -- telescope.core: builtin pickers
-      mapn(
+      {
         key_scope .. "o",
-        require("telescope.builtin").pickers,
-        { desc = "scope=> search telescope" }
-      )
+        funblt("pickers"),
+        mode = "n",
+        desc = "scope=> search telescope",
+      },
       -- telescope.core: vim options
-      mapn(
+      {
         key_scope .. "v",
-        require("telescope.builtin").vim_options,
-        { desc = "scope=> search vim options" }
-      )
+        funblt("vim_options"),
+        mode = "n",
+        desc = "scope=> search vim options",
+      },
       -- telescope.core: luasnip snippets
-      mapn(
+      {
         key_scope .. "s",
-        require("telescope").extensions.luasnip.luasnip,
-        { desc = "scope=> search defined snippets" }
-      )
+        funext("luasnip"),
+        mode = "n",
+        desc = "scope=> search defined snippets",
+      },
       -- telescope.core: notifications
-      mapn(
+      {
         key_scope .. "n",
-        require("telescope").extensions.notify.notify,
-        { desc = "scope=> search notifications" }
-      )
+        funext("notify"),
+        mode = "n",
+        desc = "scope=> search notifications",
+      },
       ---
       -- @module telescope.aux
       -- remap the default command history menu with the telescope menu since it
       -- is more convenient to exit and otherwise functions similarly. Plus
       -- unifies the ui just a bit more.
-      mapnv("q:", "<nop>")
-    end,
+      {
+        "q:",
+        funblt("command_history"),
+        mode = { "n", "v" },
+        desc = "scope=> command history",
+      },
+    },
   },
 }
