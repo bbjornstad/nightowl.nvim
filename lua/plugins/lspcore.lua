@@ -41,7 +41,7 @@ return {
           set_extra_mappings = true,
           set_sources = "recommended",
           use_luasnip = true,
-          set_format = false,
+          set_format = true,
           documentation_window = true,
         },
       })
@@ -102,14 +102,14 @@ return {
         desc = "lsp=> find symbol help",
       }
       keys[#keys + 1] = {
-        "<leader>hh",
+        "<leader>uHh",
         function()
           vim.lsp.inlay_hint(0, true)
         end,
         desc = "lsp=> enable current buffer inlay hints",
       }
       keys[#keys + 1] = {
-        "<leader>hH",
+        "<leader>uHq",
         function()
           vim.lsp.inlay_hint(0, false)
         end,
@@ -183,6 +183,19 @@ return {
         mode = { "n" },
         silent = true,
         desc = "run=> sniprun live mode",
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      defaults = {
+        ["<leader>"] = { name = "+nvim core fxns" },
+        ["<localleader>"] = { name = "+metadata and special editor cmds" },
+        ["<Bar>"] = { name = "+task and time management" },
+        ["'"] = { name = "+sniprun code runner" },
+        -- TODO Add a few more of these baseline name mappings
+        -- directly onto the which-key configuration here.
       },
     },
   },
