@@ -133,7 +133,6 @@ return {
     },
   },
   {
-    -- <leader>i mappings for ASCII
     "pavanbhat1999/figlet.nvim",
     dependencies = { "numToStr/Comment.nvim" },
     cmd = {
@@ -172,7 +171,6 @@ return {
       },
     },
   },
-  -- this is a test of figlet
   {
     "sudormrfbin/cheatsheet.nvim",
     dependencies = {
@@ -190,11 +188,11 @@ return {
     end,
     keys = {
       {
-        "g/",
+        "g!",
         function()
           require("telescope").extensions.cheatsheet.cheatsheet()
         end,
-        desc = "cheatsheet=> cheatsheet interface",
+        desc = "cheat=> cheatsheet interface",
       },
     },
   },
@@ -203,10 +201,29 @@ return {
     cmd = { "Cheat", "CheatWithoutComments" },
     keys = {
       {
-        "g`",
+        "g;",
         function()
-          local user_inp = vim.ui.input()
+          vim.ui.input({
+            prompt = "cheat.sh=> search: ",
+          }, function(input)
+            local ok, res = pcall(vim.cmd, ("Cheat %s"):format(input))
+          end)
         end,
+        mode = { "n" },
+        desc = "cheat=> search cheat.sh",
+      },
+      {
+        "g:",
+        function()
+          vim.ui.input({
+            prompt = "cheat.sh=> search (no comments): ",
+          }, function(input)
+            local ok, res =
+              pcall(vim.cmd, ("CheatWithoutComments %s"):format(input))
+          end)
+        end,
+        mode = { "n" },
+        desc = "cheat=> search cheat.sh (no comments)",
       },
     },
   },
@@ -228,7 +245,7 @@ return {
     },
     cmd = { "CheatSH" },
     keys = {
-      "<leader><Home>",
+      "g=",
       "<CMD>CheatSH<CR>",
       desc = "cheat=> cheat.sh interface",
       mode = { "n" },
@@ -490,13 +507,14 @@ return {
       style = env.screensaver.selections[math.random(
         #env.screensaver.selections
       )],
-      after = 3000,
+      after = 6000,
       exclude_filetypes = {
         "TelescopePrompt",
         "NvimTree",
         "neo-tree",
         "dashboard",
         "lazy",
+        "oil",
       },
       treadmill = {
         direction = "left",
@@ -527,7 +545,7 @@ return {
           require("duck").hatch("🦆", 5)
         end,
         mode = "n",
-        desc = "hatch=> a cat",
+        desc = "duck=> hatch a duck",
       },
       {
         "<F11>",
@@ -535,7 +553,15 @@ return {
           require("duck").hatch("🐈", 0.8)
         end,
         mode = "n",
-        desc = "hatch=> a duck",
+        desc = "duck=> hatch a cat",
+      },
+      {
+        "<Shift-F12>",
+        function()
+          require("duck").cook()
+        end,
+        mode = "n",
+        desc = "duck=> cook a duck",
       },
     },
   },
@@ -550,5 +576,22 @@ return {
     enabled = false,
     config = false,
     opts = {},
+  },
+  {
+    "samodostal/image.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "m00qek/baleia.nvim" },
+    opts = {
+      render = {
+        min_padding = 5,
+        show_label = true,
+        show_image_dimensions = true,
+        use_dither = true,
+        foreground_color = true,
+        background_color = true,
+      },
+      events = {
+        update_on_nvim_resize = true,
+      },
+    },
   },
 }
