@@ -29,7 +29,7 @@ return {
             icon = "󱝰",
             desc = "א.α => sync & open Lazy",
             group = "@label",
-            key = "|",
+            key = "P",
             action = "Lazy sync",
           },
           -- {
@@ -63,12 +63,11 @@ return {
             "nightowl.nvim................................",
             "...Invisible Things are the Only Realities...",
           },
-          -- header = startdash2("nightowl"),
           week_header = {
             enable = true,
           },
           project = { enable = true, limit = 10 },
-          mru = { enable = true, limit = 6 },
+          mru = { enable = true, limit = 8 },
         },
       })
     end,
@@ -81,10 +80,6 @@ return {
         "<CMD>Dashboard<CR>",
         mode = { "n", "v" },
         desc = "א.α => return to alpha state",
-      },
-      {
-        ".",
-        "<CMD>edit .<CR>",
       },
     },
   },
