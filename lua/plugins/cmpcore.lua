@@ -1,6 +1,6 @@
 local ncmp = "hrsh7th/nvim-cmp"
 local env = require("environment.ui")
-local mapd = require("environment.keys").map({ "n", "v", "o" })
+local mapd = require("environment.keys").map({ "i", "v" })
 
 return {
   {
@@ -249,12 +249,12 @@ return {
     -- individual keymappings to access, say for instance, the fonts completion
     -- options specifically (C+S+f).
     init = function()
-      local key_cmp = ";"
+      local key_cmp = "<C-x>"
       local function kf(key)
         return string.format("%s%s", key_cmp, key)
       end
       local cmp = require("cmp")
-      mapd(kf(";"), function()
+      mapd(kf("a"), function()
         cmp.complete({
           config = {
             sources = {
@@ -263,7 +263,7 @@ return {
             },
           },
         })
-      end)
+      end, { desc = "ai=> FOSS/libre tools" })
       mapd(kf("f"), function()
         cmp.complete({
           config = {
@@ -314,7 +314,7 @@ return {
           },
         })
       end, { desc = "cmp=> local completion menu" })
-      if vim.fn.has("copilot") and env.ai.enabled.copilot then
+      if env.ai.enabled.copilot then
         mapd(kf(":"), function()
           cmp.complete({
             config = {
