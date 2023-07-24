@@ -10,7 +10,43 @@ return {
       require("dashboard").setup({
         theme = "hyper",
         shortcut_type = "letter",
-        hide = { statusline = true, tabline = true, winbar = true },
+        shortcut = {
+          {
+            icon = "󱛕",
+            desc = "א.α => open .candy.d",
+            group = "@label",
+            key = "~",
+            action = ("edit %s"):format(os.getenv("DOTCANDYD_USER_HOME")),
+          },
+          {
+            icon = "󱉮",
+            desc = "א.α => open cwd",
+            group = "@label",
+            key = ".",
+            action = "edit .",
+          },
+          {
+            icon = "󱝰",
+            desc = "א.α => sync & open Lazy",
+            group = "@label",
+            key = "|",
+            action = "Lazy sync",
+          },
+          -- {
+          --   icon = "󰱢",
+          --   desc = "א.α => remove dashboard project",
+          --   group = "@label",
+          --   key = "-",
+          --   action = function(path)
+          --     vim.ui.input({
+          --       prompt = "Remove item number: ",
+          --     }, function(input)
+          --       vim.cmd(([[DbProjectDelete %s]]):format(input))
+          --     end)
+          --   end,
+          -- },
+        },
+        hide = { statusline = false, tabline = false, winbar = true },
         preview = {
           file_path = true,
           file_height = true,
@@ -45,6 +81,10 @@ return {
         "<CMD>Dashboard<CR>",
         mode = { "n", "v" },
         desc = "א.α => return to alpha state",
+      },
+      {
+        ".",
+        "<CMD>edit .<CR>",
       },
     },
   },
