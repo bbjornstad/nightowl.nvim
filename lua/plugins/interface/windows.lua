@@ -85,7 +85,7 @@ return {
           border = {
             style = env.borders.main,
             padding = { 1, 2 },
-            text = {},
+            text = { "test" },
           },
           win_options = {
             winhighlight = {
