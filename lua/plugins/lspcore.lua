@@ -60,6 +60,7 @@ return {
           },
         },
       }))
+
       lsp.setup()
     end,
   },
@@ -77,18 +78,18 @@ return {
         vim.lsp.buf.format,
         desc = "lsp=> format current buffer",
       }
-      keys[#keys + 1] =
-        { "K", vim.lsp.buf.hover, "hover", desc = "lsp=> hover information" }
+      -- keys[#keys + 1] =
+      --   { "K", vim.lsp.buf.hover, "hover", desc = "lsp=> hover information" }
       keys[#keys + 1] = {
         "gk",
         vim.lsp.buf.signature_help,
         desc = "lsp=> symbol signature help",
       }
-      keys[#keys + 1] = {
-        "gl",
-        vim.diagnostic.open_float,
-        desc = "lsp=> show line diagnostics",
-      }
+      -- keys[#keys + 1] = {
+      --   "gl",
+      --   vim.diagnostic.open_float,
+      --   desc = "lsp=> show line diagnostics",
+      -- }
       keys[#keys + 1] = {
         "ga",
         vim.lsp.buf.code_action,
