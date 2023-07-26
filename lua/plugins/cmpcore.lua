@@ -1,6 +1,7 @@
 local ncmp = "hrsh7th/nvim-cmp"
 local env = require("environment.ui")
-local mapd = require("environment.keys").map({ "i", "v" })
+local key_cmp = require("environment.keys").stems.cmp
+local mapd = require("environment.keys").map({ "i" })
 
 return {
   {
@@ -38,6 +39,7 @@ return {
     },
     opts = function(_, opts)
       local cmp = require("cmp")
+      local t_cmp = require("cmp.types.cmp")
       require("luasnip.loaders.from_vscode").lazy_load()
       require("luasnip.loaders.from_snipmate").lazy_load()
       -- configure the display parameters for teh window, in particular
@@ -165,81 +167,26 @@ return {
         fields = { cmp.ItemField.Kind, cmp.ItemField.Abbr, cmp.ItemField.Menu },
         format = require("lspkind").cmp_format({
           preset = "codicons",
-          maxwidth = 80,
-          ellipsis_char = "",
+          maxwidth = 60,
+          ellipsis_char = "",
         }),
       }, opts.formatting or {})
-
-      local colorizer =
-        require("kanagawa.colors").setup({ theme = "wave" }).palette
-      -- gray
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemAbbrDeprecated",
-        { bg = "NONE", strikethrough = true, fg = colorizer.lotusGrey3 }
-      )
-      -- blue
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemAbbrMatch",
-        { bg = "NONE", fg = colorizer.lotusBlue4 }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemAbbrMatchFuzzy",
-        { link = "CmpIntemAbbrMatch" }
-      )
-      -- light blue
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemKindVariable",
-        { bg = "NONE", fg = colorizer.lotusTeal1 }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemKindInterface",
-        { link = "CmpItemKindVariable" }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemKindText",
-        { link = "CmpItemKindVariable" }
-      )
-      -- pink
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemKindFunction",
-        { bg = "NONE", fg = colorizer.lotusPink } -- colorizer.lotusPink }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemKindMethod",
-        { link = "CmpItemKindFunction" }
-      )
-      -- front
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemKindKeyword",
-        { bg = "NONE", fg = colorizer.lotusViolet2 }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        "CmpItemKindProperty",
-        { link = "CmpItemKindKeyword" }
-      )
-      vim.api.nvim_set_hl(0, "CmpItemKindUnit", { link = "CmpItemKindKeyword" })
 
       -- -────────────────────────────────────────────────────────────---------
       -- The following changes the behavior of the menu. Noteably, we are
       -- turning off autocompletion on insert, in other words we need to hit one
       -- of the configured keys to be able to use the completion menu.
       opts.completion = vim.tbl_deep_extend("force", {
-        autocomplete = false,
+        autocomplete = {
+          t_cmp.TriggerEvent.InsertEnter,
+          t_cmp.TriggerEvent.TextChanged,
+        },
         scrolloff = true,
         --completeopt = "menuone,menu,noselect,noinsert",
       }, opts.completion or {})
     end,
   },
+
   {
     "hrsh7th/nvim-cmp",
     -- we are going to make a mapping that will allow us to access focused
@@ -247,13 +194,15 @@ return {
     -- have that Ctrl+Space should be the way that we bring up a completion
     -- menu. If we remap this so that it includes a submenu, we can have
     -- individual keymappings to access, say for instance, the fonts completion
-    -- options specifically (C+S+f).
+    -- options specifically (C+o+f).
     init = function()
-      local key_cmp = "<C-x>"
       local function kf(key)
         return string.format("%s%s", key_cmp, key)
       end
       local cmp = require("cmp")
+      mapd("<C-Tab>", function()
+        cmp.complete_common_string()
+      end)
       mapd(kf("a"), function()
         cmp.complete({
           config = {
