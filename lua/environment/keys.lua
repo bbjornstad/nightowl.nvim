@@ -39,6 +39,9 @@ mod.stems.toggleterm = "<leader>t"
 mod.stems.pomodoro = "<bar>p"
 mod.stems.easyread = "<leader>uB"
 mod.stems.rest = "<leader>R"
+mod.stems.lsp = "<leader>l"
+mod.stems.lazy = "<leader>L"
+mod.stems.cmp = "<C-o>"
 
 ---------------------------------
 -- Ai Related Stems
@@ -69,7 +72,7 @@ mod.stems.oil = "<leader>f"
 mod.stems.git = "<leader>g"
 mod.stems.block = "<leader>ub"
 mod.stems.tterm = "<leader>T"
-mod.stems.navbuddy = "<leader>~"
+mod.stems.navbuddy = "<leader>v"
 mod.stems.undotree = "<leader>U"
 
 mod.stems.figlet = "<localleader>i"

@@ -36,7 +36,7 @@ return {
               desc = "lsp=> hover (rust edition)",
             },
             {
-              "<leader>a",
+              "<leader>ca",
               function()
                 require("rust-tools").code_action_group.code_action_group()
               end,
@@ -498,43 +498,56 @@ return {
       "plaintex",
       "norg",
       "org",
-      r,
+      "quarto",
+      "rmd",
     },
     config = function()
       require("autolist").setup()
+      local mapi = require("environment.keys").map("i")
+      local mapn = require("environment.keys").map("n")
 
-      vim.keymap.set("i", "<tab>", "<cmd>AutolistTab<cr>")
-      vim.keymap.set("i", "<s-tab>", "<cmd>AutolistShiftTab<cr>")
-      -- vim.keymap.set("i", "<c-t>", "<c-t><cmd>AutolistRecalculate<cr>") -- an example of using <c-t> to indent
-      vim.keymap.set("i", "<CR>", "<CR><cmd>AutolistNewBullet<cr>")
-      vim.keymap.set("n", "o", "o<cmd>AutolistNewBullet<cr>")
-      vim.keymap.set("n", "O", "O<cmd>AutolistNewBulletBefore<cr>")
-      vim.keymap.set("n", "<CR>", "<cmd>AutolistToggleCheckbox<cr><CR>")
-      vim.keymap.set("n", "<C-r>", "<cmd>AutolistRecalculate<cr>")
-
-      -- cycle list types with dot-repeat
-      vim.keymap.set(
-        "n",
-        "<leader>cn",
-        require("autolist").cycle_next_dr,
-        { expr = true }
-      )
-      vim.keymap.set(
-        "n",
-        "<leader>cp",
-        require("autolist").cycle_prev_dr,
-        { expr = true }
-      )
-
-      -- if you don't want dot-repeat
-      -- vim.keymap.set("n", "<leader>cn", "<cmd>AutolistCycleNext<cr>")
-      -- vim.keymap.set("n", "<leader>cp", "<cmd>AutolistCycleNext<cr>")
-
-      -- functions to recalculate list on edit
-      vim.keymap.set("n", ">>", ">><cmd>AutolistRecalculate<cr>")
-      vim.keymap.set("n", "<<", "<<<cmd>AutolistRecalculate<cr>")
-      vim.keymap.set("n", "dd", "dd<cmd>AutolistRecalculate<cr>")
-      vim.keymap.set("v", "d", "d<cmd>AutolistRecalculate<cr>")
+      vim.api.nvim_create_autocmd({ "FileType" }, {
+        pattern = {
+          "markdown",
+          "text",
+          "tex",
+          "plaintex",
+          "norg",
+          "org",
+          "quarto",
+          "rmd",
+        },
+        callback = function(ev)
+          -- base mappings for autolist
+          mapi("<tab>", "<cmd>AutolistTab<cr>", { buffer = ev.buf })
+          mapi("<s-tab>", "<cmd>AutolistShiftTab<cr>", { buffer = ev.buf })
+          mapi("<CR>", "<CR><cmd>AutolistNewBullet<cr>", { buffer = ev.buf })
+          mapn("o", "o<cmd>AutolistNewBullet<cr>", { buffer = ev.buf })
+          mapn("O", "O<cmd>AutolistNewBulletBefore<cr>", { buffer = ev.buf })
+          mapn(
+            "<CR>",
+            "<cmd>AutolistToggleCheckbox<cr><CR>",
+            { buffer = ev.buf }
+          )
+          mapn("<C-r>", "<cmd>AutolistRecalculate<cr>", { buffer = ev.buf })
+          -- cycle list types with dot-repeat
+          mapn(
+            "<leader>cn",
+            require("autolist").cycle_next_dr,
+            { buffer = ev.buf, expr = true }
+          )
+          mapn(
+            "<leader>cp",
+            require("autolist").cycle_prev_dr,
+            { buffer = ev.buf, expr = true }
+          )
+          -- functions to recalculate list on edit
+          mapn(">>", ">><cmd>AutolistRecalculate<cr>", { buffer = ev.buf })
+          mapn("<<", "<<<cmd>AutolistRecalculate<cr>", { buffer = ev.buf })
+          mapn("dd", "dd<cmd>AutolistRecalculate<cr>", { buffer = ev.buf })
+          mapn("d", "d<cmd>AutolistRecalculate<cr>", { buffer = ev.buf })
+        end,
+      })
     end,
   },
   {

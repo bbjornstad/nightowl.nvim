@@ -1,10 +1,10 @@
 local keystems = require("environment.keys").stems
 local env = require("environment.ui")
-
+-- local quithelp = require("uutils.window").quit_helper
 local key_navbuddy = keystems.navbuddy
 local key_vista = keystems.vista
-local key_lens = keystems.lens
 
+local key_lens = keystems.lens
 return {
   {
     "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
@@ -38,31 +38,33 @@ return {
         },
         keys = {
           {
-            key_navbuddy,
+            key_navbuddy .. "b",
             function()
               require("nvim-navbuddy").open()
             end,
             mode = "n",
             desc = "nav=> open navbuddy",
           },
+          -- {
+          --   key_navbuddy .. "q",
+          --   quithelp,
+          --   mode = "n",
+          --   desc = "",
+          -- },
         },
         opts = {
           lsp = { auto_attach = true },
           window = {
             border = env.borders.main,
-            size = "70%",
+            size = "90%",
             position = "50%",
-            scrolloff = true,
             left = {
               size = "20%",
-              border = nil,
             },
             mid = {
               size = "40%",
-              border = nil,
             },
             right = {
-              border = nil,
               preview = "leaf",
             },
           },
