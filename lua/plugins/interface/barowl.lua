@@ -37,7 +37,7 @@ end
 local function memory_use()
   local use = (1 - (vim.loop.get_free_memory() / vim.loop.get_total_memory()))
     * 100
-  return ("󱈭 Used: %.2f"):format(use) .. "%"
+  return ("󱈭 %.2f"):format(use) .. "%"
 end
 
 local function pom_status()
@@ -61,11 +61,6 @@ local function diff_source()
   end
 end
 
-local function macro_status()
-  local ok, res = pcall(require, "noice")
-  return ok and res.api.status.mode.get() .. " "
-end
-
 return {
   {
     "akinsho/bufferline.nvim",
@@ -77,10 +72,27 @@ return {
     event = "VeryLazy",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
+      {
+        "jcdickinson/wpm.nvim",
+        opts = {
+          sample_count = 10,
+          sample_interval = 2000,
+          percentile = 0.8,
+        },
+        config = true,
+      },
+      "tzachar/local-highlight.nvim",
     },
     opts = {
       render = function(props)
         return {
+          { require("wpm").historic_graph() },
+          { "  / 󰌓 " },
+          { require("wpm").wpm() },
+          { " | " },
+          { " " },
+          { require("local-highlight").match_count(props.buf) },
+          { "|" },
           { memory_use() },
         }
       end,
@@ -299,8 +311,35 @@ return {
           style = "minimal",
           border = env.borders.main,
         },
+        quick_navigation = true,
+        entry = {
+          padding = {
+            left = 2,
+            right = 2,
+          },
+        },
+        keymaps = {
+          ["q"] = function()
+            local api = require("dropbar.api")
+            local thismenu = api.get_current_dropbar_menu()
+            if not thismenu then
+              return
+            end
+            thismenu:close()
+          end,
+        },
       },
       bar = {},
+      icons = {
+        bar = {
+          separator = "  ",
+          extends = "  ",
+        },
+        menu = {
+          separator = " ",
+          indicator = "",
+        },
+      },
     },
     keys = {
       {

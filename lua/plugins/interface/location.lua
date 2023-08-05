@@ -6,6 +6,7 @@ return {
     config = function() end,
     event = "VeryLazy",
   },
+
   {
     "mvllow/modes.nvim",
     tag = "v0.2.0",
@@ -60,6 +61,18 @@ return {
         mode = "n",
         desc = "specs=> toggle location flare",
       },
+    },
+  },
+  {
+    "nacro90/numb.nvim",
+    config = true,
+    event = "VeryLazy",
+    opts = {
+      show_numbers = true,
+      show_cursorline = true,
+      hide_relativenumbers = true,
+      number_only = false,
+      centered_peeking = true,
     },
   },
 }

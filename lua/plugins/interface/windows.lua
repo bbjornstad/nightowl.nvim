@@ -1,6 +1,29 @@
 local env = require("environment.ui")
 local mapn = require("environment.keys").map({ "n" })
 local mapx = vim.keymap.set
+local df = require("uutils.functional").lazy_defer
+
+local bdelete_handler =
+  "<CMD>lua require('nvim-smartbufs').close_current_buffer()<CR>"
+local bdeletebang_handler = bdelete_handler
+local bnext_handler =
+  "<CMD>lua require('nvim-smartbufs').goto_next_buffer()<CR>"
+local bprev_handler =
+  "<CMD>lua require('nvim-smartbufs').goto_prev_buffer()<CR>"
+local quit_handler = "<CMD>quit<CR>"
+local quitbang_handler = "<CMD>quit!<CR>"
+local quitall_handler = "<CMD>quitall<CR>"
+local quitallbang_handler = "<CMD>quitall!<CR>"
+
+-- local bdelete_handler = df(wutils.bdelete_handler)
+-- local bdeletebang_handler = df(wutils.bdeletebang_handler)
+-- local bnext_handler = df(wutils.bnext_handler)
+-- local bprev_handler = df(wutils.bprev_handler)
+--
+-- local quit_handler = df(wutils.quit_handler)
+-- local quitbang_handler = df(wutils.quitbang_handler)
+-- local quitall_handler = df(wutils.quitall_handler)
+-- local quitallbang_handler = df(wutils.quitallbang_handler)
 
 return {
   {
@@ -39,12 +62,11 @@ return {
           position = { row = 16, col = "50%" },
           size = {
             width = math.max(80, vim.opt.textwidth:get()),
-            height = "auto",
           },
           -- put it on top of everything else that could exist below (we picked
           -- 1200 because it was larger than the largest present zindex
           -- definition for any other component)
-          zindex = 1200,
+          zindex = 100,
           border = { style = env.borders.main, padding = { 1, 2 } },
           win_options = {
             winhighlight = {
@@ -56,11 +78,11 @@ return {
         },
         popupmenu = {
           relative = "editor",
-          position = { row = 20, col = "50%" },
+          position = { row = 16, col = "50%" },
           size = { width = 80, height = "auto" },
           -- once again, put it on top of everything else that could exist below.
           -- 1200 rationale still holds here too.
-          zindex = 1200,
+          zindex = 100,
           border = { style = env.borders.main, padding = { 1, 2 } },
           win_options = {
             winhighlight = {
@@ -116,12 +138,57 @@ return {
           },
         },
         {
+          view = "mini",
           filter = {
             event = "msg_show",
             kind = "progress",
             find = "checking document",
           },
           opts = { skip = true },
+        },
+        {
+          view = "mini",
+          filter = {
+            event = "lsp",
+            kind = "progress",
+            find = "Diagnosing",
+          },
+          opts = {
+            skip = true,
+          },
+        },
+        {
+          view = "mini",
+          filter = {
+            event = "lsp",
+            kind = "progress",
+            find = "Processing full semantic tokens",
+          },
+          opts = {
+            skip = true,
+          },
+        },
+        {
+          view = "mini",
+          filter = {
+            event = "lsp",
+            kind = "progress",
+            find = "Searching in files...",
+          },
+          opts = {
+            skip = true,
+          },
+        },
+        {
+          view = "mini",
+          filter = {
+            event = "lsp",
+            kind = "progress",
+            find = "Processing reference...",
+          },
+          opts = {
+            skip = true,
+          },
         },
       },
     },
@@ -189,12 +256,6 @@ return {
         focus.focus_max_or_equal,
         { desc = "focus=> toggle maximized focus" }
       )
-
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "outline" },
-        group = vim.api.nvim_create_augroup("enable_focus_for_docsymbols", {}),
-        callback = require("focus").focus_enable_window,
-      })
     end,
   },
   {
@@ -214,49 +275,81 @@ return {
     opts = {},
     event = "VeryLazy",
     config = function() end,
-    init = function()
-      mapx(
-        { "n", "v" },
-        "<leader>qq",
-        require("nvim-smartbufs").close_current_buffer,
-        { desc = "buf=> close current buffer" }
-      )
-      mapx(
-        { "n", "v" },
-        "<leader>qQ",
-        "<CMD>qa<CR>",
-        { desc = "buf=> close all buffers" }
-      )
-      mapx(
-        { "n", "v" },
-        "<leader>QQ",
-        "<CMD>qa!<CR>",
-        { desc = "buf=> close all buffers immediately" }
-      )
-      mapx(
-        { "n", "v" },
+    keys = {
+      {
+        "qq",
+        quit_handler,
+        mode = { "n", "v" },
+        desc = "buf=> quit current buffer",
+      },
+      {
+        "qQ",
+        quitbang_handler,
+        mode = { "n", "v" },
+        desc = "buf[!]=> QUIT current buffer",
+      },
+      {
+        "qd",
+        bdelete_handler,
+        mode = { "n", "v" },
+        desc = "buf=> delete current buffer",
+      },
+      {
+        "qD",
+        bdeletebang_handler,
+        mode = { "n", "v" },
+        desc = "buf[!]=> DELETE current buffer",
+      },
+      {
+        "Qq",
+        quitall_handler,
+        mode = { "n", "v" },
+        desc = "buf=> quit all buffer",
+      },
+      {
+        "QQ",
+        quitall_handler,
+        mode = { "n", "v" },
+        desc = "buf=> QUIT all buffers",
+      },
+      {
+        "QQQ",
+        quitallbang_handler,
+        mode = { "n", "v" },
+        desc = "buf[!]=> QUIT all buffers",
+      },
+      {
         "<leader>b[",
-        require("nvim-smartbufs").goto_prev_buffer,
-        { desc = "buf=> previous buffer" }
-      )
-      mapx(
-        { "n", "v" },
+        bprev_handler,
+        mode = { "n", "v" },
+        desc = "buf=> previous buffer",
+      },
+      {
         "<leader>b]",
-        require("nvim-smartbufs").goto_next_buffer,
-        { desc = "buf=> next buffer" }
-      )
-      mapx(
-        { "n", "v", "i" },
+        bnext_handler,
+        mode = { "n", "v" },
+        desc = "buf=> next buffer",
+      },
+      {
         "<C-S-Left>",
-        require("nvim-smartbufs").goto_prev_buffer,
-        { desc = "buf=> previous buffer" }
-      )
-      mapx(
-        { "n", "v", "i" },
+        bprev_handler,
+        mode = { "n", "v", "i" },
+        desc = "buf=> previous buffer",
+      },
+      {
         "<C-S-Right>",
-        require("nvim-smartbufs").goto_next_buffer,
-        { desc = "buf=> next buffer" }
-      )
+        bnext_handler,
+        mode = { "n", "v", "i" },
+        desc = "buf=> next buffer",
+      },
+      {
+        "<leader>bd",
+        bdelete_handler,
+        mode = { "n", "v" },
+        desc = "buf=> delete current buffer",
+      },
+    },
+    init = function()
       for i = 1, 9, 1 do
         local keynum = i
         mapn(
@@ -276,12 +369,6 @@ return {
           { desc = string.format("buf=> leave buffer %d", keynum) }
         )
       end
-      mapx(
-        { "n", "v" },
-        "<leader>bq",
-        require("nvim-smartbufs").close_current_buffer,
-        { desc = "buf=> close current buffer" }
-      )
     end,
   },
   {
@@ -295,13 +382,13 @@ return {
       select = {
         backend = { "telescope", "fzf_lua", "fzf", "builtin", "nui" },
         telescope = require("telescope.themes").get_ivy({
-          winblend = 15,
+          winblend = 30,
           width = 0.70,
-          prompt = "telescope=>",
+          prompt = "scope=> ",
           show_line = true,
           previewer = true,
-          results_title = "results",
-          preview_title = "content",
+          results_title = "results ",
+          preview_title = "content ",
           layout_config = {
             preview_width = 0.5,
           },
@@ -316,4 +403,46 @@ return {
     },
   },
   { "mrjones2014/smart-splits.nvim", event = "VeryLazy" },
+  {
+    "matbme/JABS.nvim",
+    cmd = "JABSOpen",
+    keys = {
+      {
+        "qj",
+        "<CMD>JABSOpen<CR>",
+        mode = { "n", "v" },
+        desc = "buf=> open JABS",
+      },
+      {
+        "<leader>j",
+        "<CMD>JABSOpen<CR>",
+        mode = { "n", "v" },
+        desc = "buf=> open JABS",
+      },
+    },
+    opts = {
+      position = { "left", "top" },
+      width = 60,
+      height = 20,
+      border = env.borders.main,
+      preview_position = "right",
+      preview = {
+        width = 60,
+        height = 80,
+        border = "shadow",
+      },
+      clip_popup_size = true,
+      offset = {
+        top = 2,
+        left = 2,
+        right = 1,
+        bottom = 1,
+      },
+      relative = "editor",
+      keymap = {
+        close = "q",
+      },
+    },
+    config = true,
+  },
 }
