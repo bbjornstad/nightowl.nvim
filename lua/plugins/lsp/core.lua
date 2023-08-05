@@ -29,26 +29,27 @@ return {
       { "L3MON4D3/LuaSnip" }, -- Required
       { "nvim-lua/lsp-status.nvim" }, -- Optional but recommended
     },
+    opts = {
+      name = "minimal",
+      set_lsp_keymaps = { preserve_mappings = true },
+      setup_servers_on_start = true,
+      float_border = env.borders.main,
+      configure_diagnostics = true,
+      manage_nvim_cmp = {
+        set_basic_mappings = true,
+        set_extra_mappings = true,
+        set_sources = "recommended",
+        use_luasnip = true,
+        set_format = true,
+        documentation_window = true,
+      },
+    },
     config = function(_, opts)
-      local lsp = require("lsp-zero").preset({
-        name = "minimal",
-        set_lsp_keymaps = { preserve_mappings = true },
-        setup_servers_on_start = true,
-        float_border = env.borders.main,
-        configure_diagnostics = true,
-        manage_nvim_cmp = {
-          set_basic_mappings = true,
-          set_extra_mappings = true,
-          set_sources = "recommended",
-          use_luasnip = true,
-          set_format = true,
-          documentation_window = true,
-        },
-      })
+      local lsp = require("lsp-zero").preset(opts)
       require("lsp-status").register_progress()
       lsp.on_attach(function(client, bufnr)
         require("lsp-status").on_attach(client)
-        lsp.default_keymaps({ buffer = bufnr, preserve_mappings = true })
+        lsp.default_keymaps({ buffer = bufnr })
       end)
 
       require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls({
@@ -76,6 +77,7 @@ return {
       keys[#keys + 1] = {
         "gF",
         vim.lsp.buf.format,
+        mode = "n",
         desc = "lsp=> format current buffer",
       }
       -- keys[#keys + 1] =
@@ -83,6 +85,7 @@ return {
       keys[#keys + 1] = {
         "gk",
         vim.lsp.buf.signature_help,
+        mode = "n",
         desc = "lsp=> symbol signature help",
       }
       -- keys[#keys + 1] = {
@@ -93,20 +96,15 @@ return {
       keys[#keys + 1] = {
         "ga",
         vim.lsp.buf.code_action,
+        mode = "n",
         desc = "lsp=> show code actions",
-      }
-      keys[#keys + 1] = {
-        "g?",
-        function()
-          vim.cmd(string.format([[help %s]], vim.fn.expand("<cword>")))
-        end,
-        desc = "lsp=> find symbol help",
       }
       keys[#keys + 1] = {
         "<leader>uHh",
         function()
           vim.lsp.inlay_hint(0, true)
         end,
+        mode = "n",
         desc = "lsp=> enable current buffer inlay hints",
       }
       keys[#keys + 1] = {
@@ -114,11 +112,13 @@ return {
         function()
           vim.lsp.inlay_hint(0, false)
         end,
+        mode = "n",
         desc = "lsp=> disable current buffer inlay hints",
       }
     end,
     dependencies = {
       "VonHeikemen/lsp-zero.nvim",
+      "nvim-treesitter/nvim-treesitter",
       "jose-elias-alvarez/null-ls.nvim",
       "williamboman/mason-lspconfig.nvim",
       "jay-babu/mason-null-ls.nvim",
@@ -138,63 +138,13 @@ return {
     },
   },
   {
-    "michaelb/sniprun",
-    build = "sh ./install.sh",
-    config = true,
-    opts = {},
-    event = "VeryLazy",
-    keys = {
-      {
-        key_sniprun .. "O",
-        "<Plug>SnipRun",
-        mode = { "n" },
-        silent = true,
-        desc = "run=> line sniprun",
-      },
-      {
-        key_sniprun .. "o",
-        "<Plug>SnipRunOperator",
-        mode = { "n" },
-        silent = true,
-        desc = "run=> operator sniprun",
-      },
-      {
-        key_sniprun,
-        "<Plug>SnipRun",
-        mode = { "v" },
-        silent = true,
-        desc = "run=> sniprun",
-      },
-      {
-        key_sniprun .. "i",
-        "<Plug>SnipInfo",
-        mode = { "n" },
-        silent = true,
-        desc = "run=> sniprun info",
-      },
-      {
-        key_sniprun .. "q",
-        "<Plug>SnipClose",
-        mode = { "n" },
-        desc = "run=> close sniprun",
-      },
-      {
-        key_sniprun .. "l",
-        "<Plug>SnipLive",
-        mode = { "n" },
-        silent = true,
-        desc = "run=> sniprun live mode",
-      },
-    },
-  },
-  {
     "folke/which-key.nvim",
     opts = {
       defaults = {
         ["<leader>"] = { name = "+nvim core fxns" },
         ["<localleader>"] = { name = "+metadata and special editor cmds" },
         ["<Bar>"] = { name = "+task and time management" },
-        ["'"] = { name = "+sniprun code runner" },
+        ["`"] = { name = "+repl style" },
         -- TODO Add a few more of these baseline name mappings
         -- directly onto the which-key configuration here.
       },
