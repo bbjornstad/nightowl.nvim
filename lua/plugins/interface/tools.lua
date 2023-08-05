@@ -2,6 +2,9 @@ local env = require("environment.ui")
 local stems = require("environment.keys").stems
 local mapx = vim.keymap.set
 local key_tterm = stems.tterm
+local key_based = stems.based
+local key_block = stems.block
+local key_easyread = stems.easyread
 
 -- these are the core interface items. These are the base upon which the other
 -- interface items are built. At the bottom of this file we merge all of the
@@ -12,10 +15,10 @@ local iface_core = {
     version = "*",
     config = true,
     opts = {
-      open_mapping = "<C-;>",
+      open_mapping = "<F1>",
       float_opts = {
         border = env.borders.main,
-        winblend = 20,
+        winblend = 10,
       },
       insert_mappings = false,
       terminal_mappings = true,
@@ -33,45 +36,127 @@ local iface_core = {
       shading_factor = 2,
     },
     event = { "VeryLazy" },
+    keys = {
+      {
+        key_tterm .. "v",
+        function()
+          require("toggleterm").setup({ direction = "vertical" })
+        end,
+        mode = { "n", "t" },
+        desc = "term=> toggle vertical layout",
+      },
+      {
+        key_tterm .. "h",
+        function()
+          require("toggleterm").setup({ direction = "horizontal" })
+        end,
+        mode = { "n", "t" },
+        desc = "term=> toggle horizontal layout",
+      },
+      {
+        key_tterm .. "f",
+        function()
+          require("toggleterm").setup({ direction = "float" })
+        end,
+        mode = { "n", "t" },
+        desc = "term=> toggle float layout",
+      },
+      {
+        key_tterm .. "b",
+        function()
+          require("toggleterm").setup({ direction = "tabbed" })
+        end,
+        mode = { "n", "t" },
+        desc = "term=> toggle tabbed layout",
+      },
+    },
     init = function()
       vim.g.hidden = true
-      function _G.set_terminal_keymaps()
-        local opts = { buffer = 0 }
-        mapx("t", "<esc>", [[<C-\><C-n>]], opts)
-        mapx("t", "jk", [[<C-\><C-n>]], opts)
-        mapx("t", "<C-h>", [[<Cmd>wincmd h<CR>]], opts)
-        mapx("t", "<C-j>", [[<Cmd>wincmd j<CR>]], opts)
-        mapx("t", "<C-k>", [[<Cmd>wincmd k<CR>]], opts)
-        mapx("t", "<C-l>", [[<Cmd>wincmd l<CR>]], opts)
-        mapx("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
+      local function set_terminal_keymaps(bufnr)
+        local opts = { buffer = bufnr or 0 }
+        mapx(
+          "t",
+          "<esc>",
+          [[<C-\><C-n>]],
+          vim.tbl_deep_extend("force", {
+            nowait = true,
+            desc = "term=> escape",
+          }, opts)
+        )
+        mapx(
+          "t",
+          "jk",
+          [[<C-\><C-n>]],
+          vim.tbl_deep_extend("force", {
+            nowait = true,
+            desc = "term=> escape",
+          }, opts)
+        )
+        mapx(
+          "t",
+          "<C-h>",
+          [[<Cmd>wincmd h<CR>]],
+          vim.tbl_deep_extend("force", {
+            nowait = true,
+            desc = "term=> go to left window",
+          }, opts)
+        )
+        mapx(
+          "t",
+          "<C-j>",
+          [[<Cmd>wincmd j<CR>]],
+          vim.tbl_deep_extend("force", {
+            nowait = true,
+            desc = "term=> go to below window",
+          }, opts)
+        )
+        mapx(
+          "t",
+          "<C-k>",
+          [[<Cmd>wincmd k<CR>]],
+          vim.tbl_deep_extend("force", {
+            nowait = true,
+            desc = "term=> go to above window",
+          }, opts)
+        )
+        mapx(
+          "t",
+          "<C-l>",
+          [[<Cmd>wincmd l<CR>]],
+          vim.tbl_deep_extend("force", {
+            nowait = true,
+            desc = "term=> go to right window",
+          }, opts)
+        )
+        mapx(
+          "t",
+          "<C-w>",
+          [[<C-\><C-n><C-w>]],
+          vim.tbl_deep_extend("force", {
+            nowait = true,
+            desc = "term=> window management",
+          }, opts)
+        )
+        mapx(
+          "t",
+          "q",
+          "<CMD>quit<CR>",
+          vim.tbl_deep_extend("force", {
+            remap = false,
+            nowait = true,
+            desc = "term=> close terminal",
+          }, opts)
+        )
       end
 
       -- if you only want these mappings for toggle term use term://*toggleterm#* instead
       vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
-
-      mapx({ "n", "t" }, key_tterm .. "v", function()
-        require("toggleterm").setup({ direction = "vertical" })
-      end, { desc = "toggle terminals vertically" })
-      mapx({ "n", "t" }, key_tterm .. "h", function()
-        require("toggleterm").setup({ direction = "horizontal" })
-      end, { desc = "toggle terminals horizontally" })
-      mapx({ "n", "t" }, key_tterm .. "f", function()
-        require("toggleterm").setup({ direction = "float" })
-      end, { desc = "toggle floating terminals" })
-      mapx({ "n", "t" }, key_tterm .. "b", function()
-        require("toggleterm").setup({ direction = "tabbed" })
-      end, { desc = "toggle terminals vertically" })
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "toggleterm" },
-        group = vim.api.nvim_create_augroup("toggleterm_quit_on_q", {}),
-        callback = function()
-          vim.keymap.set(
-            "n",
-            "q",
-            "<CMD>quit<CR>",
-            { buffer = true, desc = "quit", remap = false, nowait = true }
-          )
+      vim.api.nvim_create_autocmd("TermOpen", {
+        pattern = { "term://*" },
+        callback = function(ev)
+          set_terminal_keymaps(ev.buf)
         end,
+        group = vim.api.nvim_create_augroup("terminal_open_keymappings", {}),
       })
     end,
   },
@@ -97,13 +182,14 @@ local iface_core = {
     "folke/which-key.nvim",
     opts = {
       plugins = {
-        marks = false,
+        marks = true,
         registers = true,
       },
       window = {
         border = env.borders.main,
-        winblend = 25,
-        zindex = 1000,
+        position = "top",
+        winblend = 35,
+        zindex = 80,
       },
       triggers_nowait = {
         "g`",
@@ -142,7 +228,7 @@ local iface_core = {
     "Wansmer/treesj",
     keys = {
       {
-        "<space>m",
+        "<space>Jm",
         function()
           require("treesj").toggle()
         end,
@@ -150,7 +236,7 @@ local iface_core = {
         desc = "treesj=> toggle fancy splitjoin",
       },
       {
-        "<space>j",
+        "<space>Jj",
         function()
           require("treesj").join()
         end,
@@ -158,7 +244,7 @@ local iface_core = {
         desc = "treesj=> join with splitjoin",
       },
       {
-        "<space>p",
+        "<space>Jp",
         function()
           require("treesj").split()
         end,
@@ -236,10 +322,168 @@ local iface_core = {
     event = "VeryLazy",
     config = true,
     opts = {
-      mapping = { "jj", "jk" },
+      mapping = { "jj" },
       timeout = vim.o.timeoutlen,
       clear_empty_lines = true,
       keys = "<Esc>",
+    },
+  },
+  {
+    "axieax/urlview.nvim",
+    cmd = "UrlView",
+    config = true,
+    opts = {
+      default_picker = "native",
+      default_title = "  󱅸",
+    },
+    keys = {
+      {
+        "gLg",
+        "<CMD>UrlView<CR>",
+        mode = "n",
+        desc = "url=> view global links",
+      },
+      {
+        "gLl",
+        "<CMD>UrlView buffer<CR>",
+        mode = "n",
+        desc = "url=> view links in buffer",
+      },
+      {
+        "gLp",
+        "<CMD>UrlView lazy<CR>",
+        mode = "n",
+        desc = "url=> view lazy links",
+      },
+    },
+  },
+  {
+    "tzachar/local-highlight.nvim",
+    opts = {
+      disable_file_types = { "markdown" },
+    },
+    config = true,
+    event = "VeryLazy",
+  },
+  {
+    "tzachar/highlight-undo.nvim",
+    config = true,
+    enabled = false,
+    opts = {
+      keymaps = {
+        { "n", "u", "undo", {} },
+        { "n", "<C-r>", "redo", {} },
+      },
+    },
+    event = "VeryLazy",
+  },
+  {
+    "trmckay/based.nvim",
+    opts = {
+      highlight = "BasedHighlight",
+    },
+    keys = {
+      {
+        "<leader>Bc",
+        function()
+          vim.ui.input({ prompt = "base: " }, function(input)
+            require("based").convert(input)
+          end)
+          require("based").convert()
+        end,
+        mode = { "n", "v" },
+        desc = "base=> convert base",
+      },
+      {
+        "<leader>Bh",
+        function()
+          require("based").convert("hex")
+        end,
+        mode = { "n", "v" },
+        desc = "base=> convert to hex",
+      },
+      {
+        "<leader>Bd",
+        function()
+          require("based").convert("dec")
+        end,
+        mode = { "n", "v" },
+        desc = "base=> convert to decimal",
+      },
+    },
+  },
+  {
+    "HampusHauffman/bionic.nvim",
+    cmd = { "Bionic", "BionicOn", "BionicOff" },
+    keys = {
+      {
+        key_easyread,
+        "<CMD>Bionic<CR>",
+        mode = { "n", "v" },
+        desc = "bionic=> toggle flow-state bionic reading",
+      },
+    },
+  },
+  {
+    "HampusHauffman/block.nvim",
+    opts = {
+      percent = 1.1,
+      depth = 8,
+      automatic = true,
+    },
+    config = true,
+    cmd = { "Block", "BlockOn", "BlockOff" },
+    keys = {
+      {
+        key_block,
+        "<CMD>Block<CR>",
+        desc = "block=> toggle block highlighting",
+      },
+    },
+  },
+  {
+    "realprogrammersusevim/readability.nvim",
+    cmd = { "ReadabilitySmog", "ReadabilityFlesch" },
+  },
+  {
+    "MisanthropicBit/decipher.nvim",
+    opts = {
+      float = {
+        padding = 2,
+        border = env.borders.main,
+        title = true,
+        title_pos = "right",
+        autoclose = true,
+        enter = false,
+        options = { winblend = 25 },
+      },
+    },
+    config = true,
+    keys = {
+      {
+        "<localleader>ne",
+        function()
+          vim.ui.input({
+            prompt = "value to encode:",
+          }, function(input)
+            require("decipher").encode("base64", input)
+          end)
+        end,
+        mode = "n",
+        desc = "ncode=> encode text (base64)",
+      },
+      {
+        "<localleader>de",
+        function()
+          vim.ui.input({
+            prompt = "value to decode:",
+          }, function(input)
+            require("decipher").decode("base64", input)
+          end)
+        end,
+        mode = "n",
+        desc = "dcode=> decode text (base64)",
+      },
     },
   },
 }
