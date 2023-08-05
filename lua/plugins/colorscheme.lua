@@ -1,4 +1,6 @@
 local env = require("environment.ui")
+local bg_style = os.getenv("NIGHTOWL_BACKGROUND_STYLE")
+local scheme_selection = os.getenv("NIGHTOWL_COLORSCHEME") or "kanagawa"
 
 if vim.fn.has("termguicolors") then
   vim.cmd([[set termguicolors]])
@@ -56,10 +58,11 @@ local hl_overrides = {
   InclineNormalNC = { bg = "ui.bg_m2" },
   WinBar = { bg = "ui.bg_p1" },
   WinBarNC = { bg = "ui.bg_p1" },
-  DropBarCurrentContext = { link = "TreesitterContext" },
-  DropBarMenuCurrentContext = { link = "TreesitterContext" },
-  DropBarIconCurrentContext = { link = "TreesitterContext" },
-  DropBarPreview = { link = "TreesitterContext" },
+  DropBarCurrentContext = { bg = "NONE" },
+  DropBarMenuCurrentContext = { bg = "NONE" },
+  DropBarIconCurrentContext = { bg = "NONE" },
+  DropBarPreview = { bg = "NONE" },
+  TreeSitterContext = {},
 }
 
 return {
@@ -99,73 +102,23 @@ return {
           InclineNormalNC = { bg = colors.palette.sumiInk1 },
           WinBar = { bg = colors.palette.sumiInk4 },
           WinBarNC = { bg = colors.palette.sumiInk4 },
-          DropBarCurrentContext = { link = "TreesitterContext" },
-          DropBarMenuCurrentContext = { link = "TreesitterContext" },
-          DropBarIconCurrentContext = { link = "TreesitterContext" },
-          DropBarPreview = { link = "TreesitterContext" },
-          CustomContextVT = { fg = colors.palette.lightBlue, italic = true },
-          BiscuitColor = { fg = colors.palette.lightBlue, italic = true },
+          DropBarCurrentContext = { bg = "NONE" },
+          DropBarMenuCurrentContext = { bg = "NONE" },
+          DropBarIconCurrentContext = { bg = "NONE" },
+          DropBarPreview = { bg = "NONE" },
+          BiscuitColor = { link = "@comment" },
+          TreesitterContextBottom = { underline = true },
         }
       end,
     },
   },
   {
-    "sam4llis/nvim-tundra",
-    lazy = true,
-    priority = 993,
-    config = function(_, opts)
-      opts.transparent_background = false
-      opts.dim_inactive_windows = vim.tbl_extend("force", {
-        enabled = false,
-        color = nil,
-      }, opts.dim_inactive_windows or {})
-      opts.sidebars = vim.tbl_extend("force", {
-        enabled = true,
-        color = nil,
-      }, opts.sidebars or {})
-      opts.diagnostics = vim.tbl_extend("force", {
-        errors = {},
-        warnings = {},
-        information = {},
-        hints = {},
-      }, opts.diagnostics or {})
-      opts.syntax = vim.tbl_extend("force", {
-        booleans = { bold = true, italic = false },
-        comments = { bold = false, italic = true },
-        operators = { bold = true },
-        types = { italic = true },
-      }, opts.syntax or {})
-      opts.plugins = vim.tbl_extend("force", {
-        lsp = true,
-        treesitter = true,
-        telescope = true,
-        cmp = true,
-        context = true,
-        gitsigns = true,
-        neogit = true,
-      }, opts.plugins or {})
-      opts.overwrite = vim.tbl_extend("force", {
-        colors = {},
-        highlights = {},
-      }, opts.overwrite or {})
-    end,
-  },
-  { "dasupradyumna/midnight.nvim", lazy = true, priority = 994 },
-  {
     "projekt0n/github-nvim-theme",
-    config = function()
-      require("github-theme").setup({})
+    config = function(_, opts)
+      require("github-theme").setup(opts)
     end,
     lazy = true,
-    priority = 999,
-  },
-  {
-    "olimorris/onedarkpro.nvim",
-    config = function()
-      -- require("onedark").load()
-    end,
-    lazy = true,
-    priority = 990,
+    priority = 901,
   },
   {
     "rose-pine/neovim",
@@ -193,27 +146,25 @@ return {
         InclineNormalNC = { bg = rppal.base },
         WinBar = { bg = rppal.surface },
         WinBarNC = { bg = rppal.base },
+        BiscuitColor = { link = "@comment" },
+        DropBarCurrentContext = { bg = "NONE" },
+        DropBarMenuCurrentContext = { bg = "NONE" },
+        DropBarIconCurrentContext = { bg = "NONE" },
+        DropBarPreview = { bg = "NONE" },
+        TreesitterContextBottom = { underline = true },
       }, opts.highlight_groups or {})
     end,
     config = true,
     lazy = true,
-    priority = 996,
-  },
-  {
-    "sainnhe/everforest",
-    lazy = true,
-    priority = 992,
-    config = function()
-      vim.g.everforest_background = "hard"
-      vim.g.everforest_better_performance = 1
-      vim.cmd([[colorscheme everforest]])
-    end,
+    priority = 999,
   },
   {
     "yorik1984/newpaper.nvim",
+    priority = 900,
     config = true,
+    lazy = true,
     opts = {
-      style = "light",
+      style = bg_style,
     },
   },
   { "LazyVim/LazyVim", opts = { colorscheme = env.default_colorscheme } },
