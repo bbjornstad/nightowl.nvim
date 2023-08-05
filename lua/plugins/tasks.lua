@@ -1,6 +1,8 @@
 local env = require("environment.ui")
 local keystems = require("environment.keys").stems
 local key_pomodoro = keystems.pomodoro
+local key_overseer = keystems.overseer
+local key_do = keystems._do
 
 return {
   {
@@ -51,7 +53,7 @@ return {
     },
     keys = {
       {
-        "<bar>t",
+        key_do .. "t",
         function()
           vim.ui.input({
             prompt = "Task Description: ",
@@ -63,7 +65,7 @@ return {
         desc = "do=> add a task",
       },
       {
-        "<bar>T",
+        key_do .. "T",
         function()
           vim.cmd([[DoToggle]])
         end,
@@ -71,7 +73,7 @@ return {
         desc = "do=> toggle tasklist view",
       },
       {
-        "<bar>w",
+        key_do .. "w",
         function()
           vim.cmd([[DoSave]])
         end,
@@ -79,7 +81,7 @@ return {
         desc = "do=> save tasklist",
       },
       {
-        "<bar>e",
+        key_do .. "e",
         function()
           vim.cmd([[DoEdit]])
         end,
@@ -87,7 +89,7 @@ return {
         desc = "do=> edit tasklist in buffer",
       },
       {
-        "<bar>d",
+        key_do .. "d",
         function()
           vim.cmd([[Done!]])
         end,
@@ -172,5 +174,180 @@ return {
         end,
       })
     end,
+  },
+  {
+    "stevearc/overseer.nvim",
+    config = true,
+    opts = {
+      templates = { "builtin" },
+      task_list = {
+        default_detail = 2,
+        separator = "🮦🮦🮦🮦🮦🮦🮦🮦🮦🮦🮦",
+        direction = "bottom",
+      },
+      task_launcher = {
+        bindings = {
+          i = {
+            ["<C-s>"] = "Submit",
+            ["<C-c>"] = "Cancel",
+          },
+          n = {
+            ["<CR>"] = "Submit",
+            ["<C-s>"] = "Submit",
+            ["q"] = "Cancel",
+            ["?"] = "ShowHelp",
+          },
+        },
+      },
+      task_editor = {
+        -- Set keymap to false to remove default behavior
+        -- You can add custom keymaps here as well (anything vim.keymap.set accepts)
+        bindings = {
+          i = {
+            ["<CR>"] = "NextOrSubmit",
+            ["<C-s>"] = "Submit",
+            ["<Tab>"] = "Next",
+            ["<S-Tab>"] = "Prev",
+            ["<C-c>"] = "Cancel",
+          },
+          n = {
+            ["<CR>"] = "NextOrSubmit",
+            ["<C-s>"] = "Submit",
+            ["<Tab>"] = "Next",
+            ["<S-Tab>"] = "Prev",
+            ["q"] = "Cancel",
+            ["?"] = "ShowHelp",
+          },
+        },
+      },
+      -- Configure the floating window used for confirmation prompts
+      confirm = {
+        border = env.borders.main,
+        zindex = 40,
+        -- Dimensions can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
+        -- min_X and max_X can be a single value or a list of mixed integer/float types.
+        min_width = 20,
+        max_width = 0.5,
+        width = nil,
+        min_height = 6,
+        max_height = 0.9,
+        height = nil,
+        -- Set any window options here (e.g. winhighlight)
+        win_opts = {
+          winblend = 20,
+        },
+      },
+      -- Configuration for task floating windows
+      task_win = {
+        -- How much space to leave around the floating window
+        padding = 2,
+        border = env.borders.main,
+        -- Set any window options here (e.g. winhighlight)
+        win_opts = {
+          winblend = 20,
+        },
+      },
+    },
+    keys = {
+      {
+        key_overseer .. "o",
+        function()
+          require("overseer").open()
+        end,
+        mode = "n",
+        desc = "task.seer=> open overseer",
+      },
+      {
+        key_overseer .. "q",
+        function()
+          require("overseer").close()
+        end,
+        mode = "n",
+        desc = "task.seer=> close overseer",
+      },
+      {
+        key_overseer .. "v",
+        function()
+          require("overseer").toggle()
+        end,
+        mode = "n",
+        desc = "task.seer=> toggle overseer",
+      },
+      {
+        key_overseer .. "n",
+        function()
+          require("overseer").new_task()
+        end,
+        mode = "n",
+        desc = "task.seer=> new overseer task",
+      },
+      {
+        key_overseer .. "b",
+        function()
+          require("overseer").list_task_bundles()
+        end,
+        mode = "n",
+        desc = "task.seer=> list overseer task bundles",
+      },
+      {
+        key_overseer .. "l",
+        function()
+          require("overseer").list_tasks()
+        end,
+        mode = "n",
+        desc = "task.seer=> load overseer task bundle",
+      },
+      {
+        key_overseer .. "L",
+        function()
+          require("overseer").load_task_bundle()
+        end,
+        mode = "n",
+        desc = "task.seer=> load overseer task bundle",
+      },
+      {
+        key_overseer .. "d",
+        function()
+          require("overseer").load_task_bundle()
+        end,
+        mode = "n",
+        desc = "task.seer=> load overseer task bundle",
+      },
+      {
+        key_overseer .. "rr",
+        function()
+          require("overseer").run_template()
+        end,
+        mode = "n",
+        desc = "task.seer=> run overseer template",
+      },
+      {
+        key_overseer .. "ra",
+        function()
+          require("overseer").run_action()
+        end,
+        mode = "n",
+        desc = "task.seer=> run overseer action",
+      },
+    },
+  },
+  {
+    "https://git.sr.ht/~soywod/himalaya-vim",
+    config = function(_, opts)
+      vim.cmd([[syntax on]])
+      vim.cmd([[filetype plugin on]])
+      vim.opt.hidden = true
+
+      vim.g.himalaya_folder_picker = "fzf"
+    end,
+    cmd = "Himalaya",
+    keys = {
+      {
+        "<F9>",
+        "<CMD>Himalaya<CR>",
+        mode = "n",
+        desc = "mail=> update servers and view mail",
+      },
+    },
   },
 }
