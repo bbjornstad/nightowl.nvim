@@ -1,3 +1,5 @@
+local env = require("environment.ui")
+
 local handler = function(virtText, lnum, endLnum, width, truncate)
   local newVirtText = {}
   local suffix = ("  %d "):format(endLnum - lnum)
@@ -40,7 +42,6 @@ return { -- add folding range to capabilities
       },
     },
   },
-
   {
     "kevinhwang91/nvim-ufo",
     dependencies = {
@@ -54,50 +55,71 @@ return { -- add folding range to capabilities
       },
     },
     event = "VeryLazy",
-    opts = { fold_virt_text_handler = handler },
+    opts = {
+      fold_virt_text_handler = handler,
+      preview = {
+        win_config = {
+          border = env.borders.main,
+        },
+      },
+    },
     init = function()
       vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
       vim.o.foldlevelstart = 99
       vim.o.foldenable = true
       vim.o.foldcolumn = "0"
       -- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
-      vim.keymap.set(
-        "n",
-        "zR",
-        require("ufo").openAllFolds,
-        { desc = "ufo=> open all ultrafolded" }
-      )
-      vim.keymap.set(
-        "n",
-        "zM",
-        require("ufo").closeAllFolds,
-        { desc = "ufo=> close all ultrafolded" }
-      )
-      vim.keymap.set(
-        "n",
-        "zr",
-        require("ufo").openFoldsExceptKinds,
-        { desc = "ufo=> open ultrafolded excepting" }
-      )
-      vim.keymap.set(
-        "n",
-        "zm",
-        require("ufo").closeFoldsWith,
-        { desc = "ufo=> close this ultrafolded" }
-      )
-      vim.keymap.set(
-        "n",
-        "zI",
-        require("ufo").inspect,
-        { desc = "ufo=> inspect current buffer" }
-      )
-      vim.keymap.set(
-        "n",
-        "zp",
-        require("ufo").peekFoldedLinesUnderCursor,
-        { desc = "ufo=> peek under fold" }
-      )
     end,
+    keys = {
+      {
+        "zR",
+        function()
+          require("ufo").openAllFolds()
+        end,
+        mode = "n",
+        desc = "ufo=> open all ultrafolded",
+      },
+      {
+        "zM",
+        function()
+          require("ufo").closeAllFolds()
+        end,
+        mode = "n",
+        desc = "ufo=> close all ultrafolded",
+      },
+      {
+        "zr",
+        function()
+          require("ufo").openFoldsExceptKinds()
+        end,
+        mode = "n",
+        desc = "ufo=> open ultrafolded excepting",
+      },
+      {
+        "zm",
+        function()
+          require("ufo").closeFoldsWith()
+        end,
+        mode = "n",
+        desc = "ufo=> close this ultrafolded",
+      },
+      {
+        "zI",
+        function()
+          require("ufo").inspect()
+        end,
+        mode = "n",
+        desc = "ufo=> inspect current buffer",
+      },
+      {
+        "zp",
+        function()
+          require("ufo").peekFoldedLinesUnderCursor()
+        end,
+        mode = "n",
+        desc = "ufo=> peek under fold",
+      },
+    },
   },
   {
     "anuvyklack/pretty-fold.nvim",
@@ -119,7 +141,7 @@ return { -- add folding range to capabilities
           end,
         },
       },
-      fill_char = "🮧",
+      fill_char = "🮦",
 
       remove_fold_markers = true,
 
@@ -130,7 +152,7 @@ return { -- add folding range to capabilities
       -- "delete" : Delete all comment signs from the fold string.
       -- "spaces" : Replace all comment signs with equal number of spaces.
       -- false    : Do nothing with comment signs.
-      process_comment_signs = "spaces",
+      process_comment_signs = "delete",
 
       -- Comment signs additional to the value of `&commentstring` option.
       comment_signs = {},
@@ -148,7 +170,7 @@ return { -- add folding range to capabilities
         { "%[", "]" }, -- % to escape lua pattern char
       },
 
-      ft_ignore = { "neorg" },
+      ft_ignore = {},
     },
   },
 }
