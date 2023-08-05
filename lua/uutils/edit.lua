@@ -39,9 +39,9 @@ function mod.InsertDashBreak(colstop, dashchar)
 
   return api.nvim_buf_set_text(
     0,
-    row - 1,
+    math.max(0, row - 1),
     col + 1,
-    row - 1,
+    math.max(0, row - 1),
     col + 1,
     { dashes }
   )
@@ -52,6 +52,7 @@ function mod.InsertCommentBreak(colstop, dashchar, include_space)
   dashchar = tostring(dashchar) or "-"
   include_space = include_space or false
   local comment_string = vim.opt.commentstring:get()
+  vim.notify(vim.inspect(comment_string))
   local comment_linestart = string.match(comment_string, "%S")[0]
   local row, _ = unpack(api.nvim_win_get_cursor(0))
   local printstr
@@ -66,8 +67,9 @@ end
 
 function mod.InsertFancyBreak(colstop, pattern, include_space)
   colstop = tonumber(colstop) or 0
-  dashchar = tostring(dashchar) or "-"
+  pattern = tostring(pattern) or "-"
   include_space = include_space or false
+  mod.InsertCommentBreak(colstop, pattern, include_space)
 end
 
 return mod

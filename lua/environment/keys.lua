@@ -10,41 +10,22 @@ function mod.map(modes)
   return returnable
 end
 
-mod.keymap_style = "bind_api_init" -- or "bind_lazy"
-
-function mod.primer(keymap)
-  -- do somethign but mostly ensure correct formatting for input to register
-  local wk = require("which-key").register
-  local function wrap() end
-  return wrap
-end
-
-function mod.prime_wk(plugspec)
-  if not plugspec.stems then
-    -- ideally we do something here
-    plugspec.stems = {}
-  end
-  local inferred_keys = mod.infer_keystems(plugspec)
-  return {
-    "folke/which-key.nvim",
-    opts = {
-      unpack(mod.infer_keystems(inferred_keys)),
-    },
-  }
-end
-
 mod.stems = {}
 mod.stems.ccc = "<leader>uh"
 mod.stems.toggleterm = "<leader>t"
-mod.stems.pomodoro = "<bar>p"
 mod.stems.easyread = "<leader>uB"
 mod.stems.rest = "<leader>R"
-mod.stems.lsp = "<leader>l"
+mod.stems.lsp = "<leader>c"
 mod.stems.lazy = "<leader>L"
 mod.stems.cmp = "<C-o>"
 
----------------------------------
--- Ai Related Stems
+mod.stems.taskorg = "<bar>"
+mod.stems.pomodoro = mod.stems.taskorg .. "p"
+mod.stems.overseer = mod.stems.taskorg .. "v"
+mod.stems.unfog = mod.stems.taskorg .. "u"
+mod.stems._do = mod.stems.taskorg .. "d"
+
+--------------------------------------------------------------------------------
 mod.stems.BASEAI = aistem
 mod.stems.neural = aistem .. "n"
 mod.stems.copilot = aistem .. "g"
@@ -56,8 +37,16 @@ mod.stems.chatgpt = aistem .. "c"
 mod.stems.codegpt = aistem .. "o"
 mod.stems.rgpt = aistem .. "r"
 mod.stems.navi = aistem .. "v"
+mod.stems.explain_it = aistem .. "x"
+mod.stems.tabnine = aistem .. "9"
 
-mod.stems.sniprun = "'"
+mod.stems.repl = "`"
+mod.stems.sniprun = mod.stems.repl .. "s"
+mod.stems.iron = mod.stems.repl .. "r"
+mod.stems.vlime = mod.stems.repl .. "v"
+mod.stems.acid = mod.stems.repl .. "a"
+mod.stems.conjure = mod.stems.repl .. "c"
+mod.stems.jupyter = mod.stems.repl .. "j"
 
 mod.stems.telescope = "<leader><leader>"
 mod.stems.glow = "<leader>P"
@@ -66,19 +55,20 @@ mod.stems.vista = "<leader>v"
 mod.stems.neogen = "<leader>D"
 mod.stems.lens = "<leader>uo"
 mod.stems.iron = "<leader>r"
--- cannot use o key for oil, since orgmode has the binding
--- also not the l key because lazy has that one.
 mod.stems.oil = "<leader>f"
 mod.stems.git = "<leader>g"
 mod.stems.block = "<leader>ub"
 mod.stems.tterm = "<leader>T"
 mod.stems.navbuddy = "<leader>v"
 mod.stems.undotree = "<leader>U"
+mod.stems.based = "<leader>B"
 
 mod.stems.figlet = "<localleader>i"
 mod.stems.figban = "<localleader>f"
 mod.stems.textgen = "<localleader>t"
 mod.stems.cbox = "<localleader>b"
 mod.stems.cline = "<localleader>l"
+
+mod.stems.modeline = "<localleader>m"
 
 return mod
