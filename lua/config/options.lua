@@ -2,7 +2,7 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 ----- The basic settings from init.vim
-local CANDY_MOOD = os.getenv("CANDY_MOOD")
+local NIGHTOWL_BACKGROUND = os.getenv("NIGHTOWL_BACKGROUND_STYLE")
 
 -- leader key specification
 -- <leader> = <Space> for easy access
@@ -72,7 +72,15 @@ vim.opt.fillchars:append({
   verthoriz = "╋",
 })
 
-vim.opt.background = (CANDY_MOOD or "dark")
+if not NIGHTOWL_BACKGROUND then
+  vim.notify(
+    [[This configuration is missing a background specification in the environment.
+    You can set the background using the NIGHTOWL_BACKGROUND_STYLE environment variable,
+    which accepts two possible values: "light" or "dark". Without setting this variable,
+    defaults to "dark"]]
+  )
+end
+vim.opt.background = (NIGHTOWL_BACKGROUND or "dark")
 
 vim.cmd.hi("clear SignColumns")
 

@@ -31,7 +31,10 @@ local lazyconf = {
     { import = "lazyvim.plugins.extras.ui.edgy" },
     -- import/override with your plugins
     { import = "plugins" },
+    { import = "plugins.languages" },
     { import = "plugins.interface" },
+    { import = "plugins.cmp" },
+    { import = "plugins.lsp" },
   },
   defaults = {
     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
@@ -61,10 +64,11 @@ local lazyconf = {
   debug = false,
 }
 
-local function genspec(lazyconf)
-  if uienv.ai.enabled.copilot then
+local function genspec(conf)
+  local aienv = require("environment.ai")
+  if aienv.enabled.copilot then
     table.insert(
-      lazyconf.spec,
+      conf.spec,
       { { import = "lazyvim.plugins.extras.coding.copilot" } }
     )
   end
