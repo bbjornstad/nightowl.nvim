@@ -110,4 +110,18 @@ return {
       },
     },
   },
+  {
+    "akinsho/git-conflict.nvim",
+    config = true,
+    version = "*",
+    cmd = {
+      "GitConflictChooseOurs",
+      "GitConflictChooseTheirs",
+      "GitConflictChooseBoth",
+      "GitConflictChooseNone",
+      "GitConflictNextConflict",
+      "GitConflictPrevConflict",
+      "GitConflictListQf",
+    },
+  },
 }
