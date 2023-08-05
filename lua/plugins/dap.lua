@@ -3,9 +3,19 @@ return {
     "mfussenegger/nvim-dap",
     dependencies = {
       --- fancy UI for the debugger
-      { "rcarriga/nvim-dap-ui", opts = {} },
+      {
+        "rcarriga/nvim-dap-ui",
+        dependencies = { "mfussenegger/nvim-dap" },
+        opts = {},
+      },
       -- virtual text for the debugger
-      { "theHamsta/nvim-dap-virtual-text", opts = {} },
+      {
+        "theHamsta/nvim-dap-virtual-text",
+        opts = {},
+
+        dependencies = { "mfussenegger/nvim-dap" },
+      },
+
       -- which key integration
       {
         "folke/which-key.nvim",
@@ -35,5 +45,38 @@ return {
         },
       },
     },
+  },
+  {
+    "niuiic/dap-utils.nvim",
+    config = true,
+    opts = {},
+    dependencies = {
+      "niuiic/core.nvim",
+      "mfussenegger/nvim-dap",
+      "rcarriga/nvim-dap-ui",
+      "nvim-telescope/telescope.nvim",
+    },
+  },
+  {
+    "LiadOz/nvim-dap-repl-highlights",
+    config = true,
+    opts = {},
+    dependencies = {
+      "mfussenegger/nvim-dap",
+      "nvim-treesitter/nvim-treesitter",
+    },
+  },
+  {
+    "andrewferrier/debugprint.nvim",
+    event = "LspAttach",
+    opts = {},
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+  },
+  {
+    "andythigpen/nvim-coverage",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = true,
+    opts = {},
+    event = "VeryLazy",
   },
 }
