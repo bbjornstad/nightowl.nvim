@@ -1,6 +1,18 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local colors = require("kanagawa.colors").setup({ theme = "wave" }).palette
 
+local function ucall(mod, ref, opts)
+  opts = opts or nil
+  local function uwrap()
+    local ok, modres = pcall(require, mod)
+    if ok then
+      local innerok, innerres = pcall(modres, ref, opts)
+      return innerres
+    end
+  end
+  return uwrap
+end
+
 local function colorize(bg, fg, opts)
   opts = opts or {}
 
@@ -15,6 +27,7 @@ local organization_tools = {
   {
     "nvim-orgmode/orgmode",
     dependencies = {
+      { "nvim-treesitter/nvim-treesitter" },
       { "akinsho/org-bullets.nvim", opts = {} },
       {
         "joaomsa/telescope-orgmode.nvim",
@@ -24,12 +37,7 @@ local organization_tools = {
       },
     },
     ft = { "org" },
-    init = function()
-      local ok, res = pcall(require, "ufo")
-      if ok then
-        res.detach()
-      end
-    end,
+    -- init = ucall("ufo", "detach", {}),
     config = function(_, opts)
       -- Load custom tree-sitter grammar for org filetype
       require("orgmode").setup_ts_grammar()
@@ -48,8 +56,8 @@ local organization_tools = {
       require("orgmode").setup(opts)
     end,
     opts = {
-      org_agenda_files = { "~/.todo/agenda/**/*" },
-      org_default_notes_file = "~/.todo/daily/daily.org",
+      org_agenda_files = { "~/.agenda/**/*" },
+      org_default_notes_file = "~/.notes/agenda/daily.org",
       org_priority_highest = "A",
       org_priority_lowest = "L",
       org_priority_default = "E",
@@ -165,7 +173,7 @@ local organization_tools = {
                   padding = { 1, 2, 1, 2 },
                   title_pos = "center",
                   border = env.main,
-                  zindex = 1000,
+                  zindex = 30,
                 },
                 icons = {
                   separator = "➜",
@@ -179,6 +187,7 @@ local organization_tools = {
   },
   {
     "nvim-neorg/neorg",
+    enabled = true,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
@@ -188,35 +197,49 @@ local organization_tools = {
       },
     },
     build = ":Neorg sync-parsers",
+    cmd = "Neorg",
     ft = { "norg" },
-    init = function()
-      if vim.fn.has("ufo") then
-        require("ufo").detach()
-      end
-    end,
     opts = {
       load = {
         ["core.defaults"] = {},
-        ["core.concealer"] = {},
+        ["core.concealer"] = {
+          config = {
+            folds = true,
+            icon_preset = "diamond",
+          },
+        },
         ["core.dirman"] = {
-          config = { workspaces = { my_workspace = "~/." } },
+          config = { workspaces = { journal = "~/.notes/journal" } },
         },
         ["core.completion"] = {
           config = {
             engine = "nvim-cmp",
           },
         },
+        ["core.integrations.nvim-cmp"] = {},
+        ["core.summary"] = {
+          config = {
+            strategy = "default",
+          },
+        },
+        ["core.journal"] = {
+          config = {
+            journal_folder = ".",
+            strategy = "flat",
+            use_template = true,
+            workspace = "journal",
+          },
+        },
+        -- ["core.ui.calendar"] = {},
       },
     },
   },
   {
     {
       "lukas-reineke/headlines.nvim",
-      ft = { "org", "norg" },
+      ft = { "org", "norg", "markdown", "md", "rmd", "quarto" },
       dependencies = {
         "nvim-treesitter/nvim-treesitter",
-        "nvim-orgmode/orgmode",
-        "nvim-neorg/neorg",
       },
       opts = {},
     },
