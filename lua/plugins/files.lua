@@ -9,6 +9,63 @@ return {
     enabled = false,
   },
   {
+    "is0n/fm-nvim",
+    enabled = true,
+    event = "VeryLazy",
+    cmd = {
+      "Neomutt",
+      "Lazygit",
+      "Joshuto",
+      "Ranger",
+      "Broot",
+      "Gitui",
+      "Xplr",
+      "Vifm",
+      "Skim",
+      "Nnn",
+      "Fff",
+      "Twf",
+      "Fzf",
+      "Fzy",
+      "Lf",
+      "Fm",
+      "TaskWarriorTUI",
+    },
+    opts = {
+      edit_cmd = "edit",
+      ui = {
+        default = "split",
+        float = {
+          border = env.borders.main,
+          float_hl = "Normal",
+          border_hl = "FloatBorder",
+          blend = 20,
+          height = 0.6,
+          width = 0.6,
+        },
+        split = {
+          direction = "topleft",
+          size = 32,
+        },
+      },
+    },
+    config = true,
+    keys = {
+      {
+        "<leader>fe",
+        "<CMD>Broot<CR>",
+        mode = "n",
+        desc = "br=> open broot explorer",
+      },
+      {
+        "<leader>fE",
+        "<CMD>Broot<CR>",
+        mode = "n",
+        desc = "br=> open broot explorer (float)",
+      },
+    },
+  },
+  {
     "stevearc/oil.nvim",
     event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -28,7 +85,7 @@ return {
         border = env.borders.main,
       },
       preview = {
-        max_width = 0.7,
+        max_width = 0.8,
         min_width = { 40, 0.4 },
         border = env.borders.main,
         win_options = {
@@ -45,12 +102,13 @@ return {
         },
       },
       keymaps = {
-        ["<C-.>"] = "actions.cd",
         ["`"] = false,
         ["<C-t>"] = false,
-        ["<BS>"] = "actions.parent",
+        ["<BS>"] = "actions.toggle_hidden",
         ["-"] = "actions.parent",
         ["q"] = "actions.close",
+        [".."] = "actions.parent",
+        ["."] = "actions.cd",
       },
     },
     keys = {
@@ -86,6 +144,14 @@ return {
         mode = { "n", "v" },
         desc = "oil=> float oil",
       },
+      {
+        "<leader>E",
+        function()
+          return require("oil").open()
+        end,
+        mode = { "n", "v" },
+        desc = "oil=> open oil",
+      },
     },
   },
   {
@@ -96,7 +162,7 @@ return {
     init = function()
       vim.api.nvim_create_autocmd("FileType", {
         pattern = { "fzf" },
-        group = vim.api.nvim_create_augroup("fzf quit on q", {}),
+        group = vim.api.nvim_create_augroup("fzf_quit_on_q", {}),
         callback = function()
           vim.keymap.set(
             "n",
