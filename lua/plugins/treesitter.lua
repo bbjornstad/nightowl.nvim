@@ -16,9 +16,7 @@ return {
           }
         end,
       },
-      {
-        "JoosepAlviste/nvim-ts-context-commentstring",
-      },
+      "JoosepAlviste/nvim-ts-context-commentstring",
     },
     opts = {
       ensure_installed = "all",
@@ -37,9 +35,10 @@ return {
       matchup = { enable = true },
       context_commentstring = {
         enable = true,
+        enable_autocmd = false,
       },
     },
-    build = pcall(vim.cmd, "TSUpdate"),
+    build = ":TSUpdate",
     -- get rid of the control space mapping overwrite here.
   },
   {
@@ -52,7 +51,7 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
-    opts = { mode = "topline", separator = "🮩" },
+    opts = { mode = "cursor" }, -- separator = "🮩" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   { "windwp/nvim-ts-autotag", opts = {} },
