@@ -28,65 +28,19 @@ return {
     },
   },
   {
-    "neovim/nvim-lspconfig",
-    dependencies = {
-      {
-        "SmiteshP/nvim-navbuddy",
-        dependencies = {
-          "SmiteshP/nvim-navic",
-          "MunifTanjim/nui.nvim",
-        },
-        keys = {
-          {
-            key_navbuddy .. "b",
-            function()
-              require("nvim-navbuddy").open()
-            end,
-            mode = "n",
-            desc = "nav=> open navbuddy",
-          },
-          -- {
-          --   key_navbuddy .. "q",
-          --   quithelp,
-          --   mode = "n",
-          --   desc = "",
-          -- },
-        },
-        opts = {
-          lsp = { auto_attach = true },
-          window = {
-            border = env.borders.main,
-            size = "90%",
-            position = "50%",
-            left = {
-              size = "20%",
-            },
-            mid = {
-              size = "40%",
-            },
-            right = {
-              preview = "leaf",
-            },
-          },
-        },
-      },
-    },
-    -- your lsp config or other stuff
-  },
-  {
     "simrat39/symbols-outline.nvim",
     cmd = { "SymbolsOutline", "SymbolsOutlineOpen", "SymbolsOutlineClose" },
     opts = {
       highlight_hovered_item = true,
       show_guides = true,
       position = "left",
-      width = 28,
+      width = 36,
       auto_close = false,
-      auto_preview = true,
+      auto_preview = false,
       winblend = 15,
       keymaps = {
         close = { "q" },
-        toggle_preview = "<C-Space>",
+        toggle_preview = "<C-p>",
         hover_symbol = "K",
         fold_all = "zM",
         unfold_all = "zR",
@@ -101,17 +55,20 @@ return {
       {
         key_vista .. "s",
         "<CMD>SymbolsOutline<CR>",
-        { desc = "toggle symbols outline" },
+        mode = "n",
+        desc = "toggle symbols outline",
       },
       {
         key_vista .. "q",
         "<CMD>SymbolsOutlineClose<CR>",
-        { desc = "close symbols outline (force)" },
+        mode = "n",
+        desc = "close symbols outline (force)",
       },
       {
         key_vista .. "o",
         "<CMD>SymbolsOutlineOpen<CR>",
-        { desc = "open symbols outline (force)" },
+        mode = "n",
+        desc = "open symbols outline (force)",
       },
     },
   },
@@ -157,10 +114,18 @@ return {
       cursor_line_only = false,
       toggle_keybind = "<leader>uu",
       show_on_start = true,
-      prefix_string = "    󰟵 --> ",
+      prefix_string = " 󰁭 󰟵 󰙔  ",
+      language_config = {
+        vimdoc = {
+          disabled = true,
+        },
+        help = {
+          disabled = true,
+        },
+      },
     },
     event = { "BufWinEnter" },
-    build = ":TSUpdate",
+    build = pcall(vim.cmd, "TSUpdate"),
   },
   {
     "utilyre/sentiment.nvim",
