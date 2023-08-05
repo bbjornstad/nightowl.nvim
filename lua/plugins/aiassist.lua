@@ -1,35 +1,34 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local env = require("environment.ui")
-local enb = env.ai.enabled
-
+local enb = require("environment.ai").enabled_agents_status
 local stems = require("environment.keys").stems
 
 local key_ai = stems.BASEAI
 local key_copilot = stems.copilot
-local key_codeium = stems.codeium
 local key_hfcc = stems.hfcc
 local key_neural = stems.neural
 local key_chatgpt = stems.chatgpt
 local key_neoai = stems.neoai
 local key_codegpt = stems.codegpt
-local key_rgpt = stems.rgpt
 local key_navi = stems.navi
+local key_rgpt = stems.rgpt
 local key_cmpai = stems.cmp_ai
-
-local mapn = require("environment.keys").map("n")
+local key_explain_it = stems.explain_it
+local key_tabnine = stems.tabnine
 
 -- show a menu, but only if the user has selected the appropriate option.
--- This menu is supposed to inform the user which plugins might send
--- their code off to an external service for analysis.
-if env.ai.configured_notify then
+-- This menu is supposed to inform the user which plugins might send -- their code off to an external service for analysis.
+
+local function notify_agents()
   vim.notify(
     string.format(
       [[
 AI Plugin Status:
 -----------------
+
   -> *huggingface*: %s
   -> *codeium*: %s
-  -> *tabnine*: %s
+  -> *tabnine*: %s (cmp-source: %s)
   -> *cmp_ai*: %s
   -> ***copilot***: %s
   -> **neoai**: %s
@@ -38,26 +37,34 @@ AI Plugin Status:
   -> **neural**: %s
   -> **ReviewGPT**: %s
   -> **naVi** %s
+  -> **explain-it** %s
 
-* plugin is used during nvim-cmp autocompletion, and will therefore connect to an external service
-** plugin uses proprietary, non-free, non-open, or non-libre backend (namely ChatGPT)
-*** plugin has both of the above listed attributes
+*plugin is used during nvim-cmp autocompletion, and will therefore connect to an external service without explicit instruction to do so*
+**plugin uses proprietary, non-free, non-open, or non-libre backend (namely ChatGPT)**
+***plugin has both of the above listed attributes***
 ]],
-      enb.hfcc,
-      enb.codeium,
-      enb.tabnine,
-      enb.cmp_ai,
-      enb.copilot,
-      enb.neoai,
-      enb.chatgpt,
-      enb.codegpt,
-      enb.neural,
-      enb.rgpt,
-      enb.navi
+      enb.hfcc.enable,
+      enb.codeium.enable,
+      enb.tabnine.enable,
+      enb.cmp_tabnine.enable,
+      enb.cmp_ai.enable,
+      enb.copilot.enable,
+      enb.neoai.enable,
+      enb.chatgpt.enable,
+      enb.codegpt.enable,
+      enb.neural.enable,
+      enb.rgpt.enable,
+      enb.navi.enable,
+      enb.explain_it.enable
     ),
     vim.log.levels.INFO
   )
 end
+
+vim.api.nvim_create_autocmd({ "VimEnter" }, {
+  group = vim.api.nvim_create_augroup("ai_agents_startup_notification", {}),
+  callback = notify_agents,
+})
 
 return {
   {
@@ -74,6 +81,7 @@ return {
         [key_rgpt] = { name = "ai=> +rgpt" },
         [key_navi] = { name = "ai=> +navi" },
         [key_cmpai] = { name = "ai=> +cmp-ai" },
+        [key_tabnine] = { name = "ai=> +tabnine" },
         -- TODO Add a few more of these baseline name mappings
         -- directly onto the which-key configuration here.
       },
@@ -87,22 +95,11 @@ return {
         build = "cargo build --workspace --release",
       },
       "nvim-lua/plenary.nvim",
-      "hrsh7th/nvim-cmp",
+      -- "hrsh7th/nvim-cmp",
     },
     cmd = "Codeium",
     event = "VeryLazy",
-    enabled = enb.codeium,
-  },
-  {
-    "hrsh7th/nvim-cmp",
-    opts = function(_, opts)
-      if enb.codeium then
-        opts.sources = vim.list_extend(opts.sources, {
-          name = "codeium",
-          max_item_count = 20,
-        })
-      end
-    end,
+    enabled = enb.codeium.enable,
   },
   {
     "huggingface/hfcc.nvim",
@@ -114,102 +111,103 @@ return {
         top_p = 0.95,
         stop_token = "<|endoftext|>",
       },
-      accept_keymap = "<C-y>",
-      dismiss_keymap = "<C-e>",
+      accept_keymap = "<C-=>",
+      dismiss_keymap = "<C-->",
+      fim = {
+        enabled = true,
+        prefix = "<fim_prefix>",
+        middle = "<fim_middle>",
+        suffix = "<fim_suffix>",
+      },
     },
-    enabled = enb.hfcc,
+    enabled = enb.hfcc.enable,
     cmd = { "HugMyFace", "HFccSuggestion", "HFccToggleAutoSuggest" },
     init = function()
       vim.api.nvim_create_user_command("HugMyFace", function()
         require("hfcc.completion").complete()
       end, {})
-      mapn(
+    end,
+    keys = {
+      {
         key_hfcc .. "f",
         "<CMD>HFccSuggestion<CR>",
-        { desc = "ai.hfcc=> suggest huggingface completion" }
-      )
-      mapn(
+        mode = "n",
+        desc = "ai.hfcc=> suggest huggingface completion",
+      },
+      {
         key_hfcc .. "F",
         "<CMD>HFccToggleAutoSuggest<CR>",
-        { desc = "ai.hfcc=> toggle insert mode autosuggest" }
-      )
-      mapn(
-        key_hfcc .. "a",
+        mode = "n",
+        desc = "ai.hfcc=> toggle insert mode autosuggest",
+      },
+      {
         "<CMD>HFccToggleAutoSuggest<CR>",
-        { desc = "ai.hfcc=> toggle insert mode autosuggest" }
-      )
-    end,
+        key_hfcc .. "a",
+        mode = "n",
+        desc = "ai.hfcc=> toggle insert mode autosuggest",
+      },
+    },
   },
   {
     "zbirenbaum/copilot.lua",
-    enabled = enb.copilot,
-    cmd = "Copilot",
-    -- event = { "InsertEnter" },
+    enabled = enb.copilot.enable,
+    -- cmd = "Copilot",
+    event = { "InsertEnter" },
     opts = { suggestion = { enabled = false }, panel = { enabled = false } },
-    init = function()
-      mapn(
+    keys = {
+      {
         key_copilot .. "a",
         "<CMD>Copilot auth<CR>",
-        { desc = "ai.copilot=> authenticate" }
-      )
-      mapn(
+        mode = "n",
+        desc = "ai.copilot=> authenticate",
+      },
+      {
         key_copilot .. "t",
         "<CMD>Copilot toggle<CR>",
-        { desc = "ai.copilot=> toggle" }
-      )
-      mapn(
+        mode = "n",
+        desc = "ai.copilot=> toggle",
+      },
+      {
         key_copilot .. "s",
         "<CMD>Copilot status<CR>",
-        { desc = "ai.copilot=> status" }
-      )
-      mapn(
+        mode = "n",
+        desc = "ai.copilot=> status",
+      },
+      {
         key_copilot .. "d",
         "<CMD>Copilot detach<CR>",
-        { desc = "ai.copilot=> detach" }
-      )
-    end,
-  },
-  {
-    "hrsh7th/nvim-cmp",
-    opts = function(_, opts)
-      if enb.copilot then
-        opts.sources = vim.list_extend(opts.sources, {
-          name = "copilot",
-          max_item_count = 10,
-        })
-      end
-    end,
+        mode = "n",
+        desc = "ai.copilot=> detach",
+      },
+    },
   },
   {
     "zbirenbaum/copilot-cmp",
-    enabled = enb.copilot,
-    dependencies = { "zbirenbaum/copilot.lua" },
-    opts = {},
+    enabled = enb.copilot.enable,
+    dependencies = {
+      "zbirenbaum/copilot.lua",
+    },
   },
   {
     "tzachar/cmp-ai",
-    enabled = enb.cmp_ai,
+    enabled = enb.cmp_ai.enable,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      -- "hrsh7th/nvim-cmp",
+    },
     config = function(_, opts)
       require("cmp_ai.config"):setup(vim.tbl_deep_extend("force", {
         max_lines = 1000,
-        provider = "OpenAI",
-        model = "gpt-4",
-        notify = true,
+        provider = "HF",
+        -- notify = true,
         run_on_every_keystroke = true,
+        ignored_file_types = {},
       }, opts or {}))
     end,
   },
   {
-    "hrsh7th/nvim-cmp",
-    opts = function(_, opts)
-      opts.sources = vim.list_extend(opts.sources, {
-        { name = "cmp_ai", max_item_count = 10 },
-      })
-    end,
-  },
-  {
     "vibovenkat123/rgpt.nvim",
-    enabled = enb.rgpt,
+    enabled = enb.rgpt.enable,
     opts = {
       model = "text-davinci-003",
       max_tokens = 200,
@@ -230,14 +228,44 @@ return {
   },
   {
     "codota/tabnine-nvim",
-    module = "tabnine",
-    enabled = enb.tabnine,
+    enabled = enb.tabnine.enable,
     build = "./dl_binaries.sh",
-    config = true,
+    keys = {
+      {
+        key_tabnine .. "s",
+        "<CMD>TabnineStatus<CR>",
+        mode = "n",
+        desc = "ai.nine=> tabnine status",
+      },
+      {
+        key_tabnine .. "e",
+        "<CMD>TabnineEnable<CR>",
+        mode = "n",
+        desc = "ai.nine=> enable tabnine",
+      },
+      {
+        key_tabnine .. "q",
+        "<CMD>TabnineDisable<CR>",
+        mode = "n",
+        desc = "ai.nine=> disable tabnine",
+      },
+      {
+        key_tabnine .. "9",
+        "<CMD>TabnineToggle<CR>",
+        mode = "n",
+        desc = "ai.nine=> tabnine status",
+      },
+      {
+        key_tabnine .. "c",
+        "<CMD>TabnineChat<CR>",
+        mode = "n",
+        desc = "ai.nine=> tabnine status",
+      },
+    },
     opts = {
       disable_auto_comment = true,
-      accept_keymap = "<C-y>",
-      dismiss_keymap = "<C-n>",
+      accept_keymap = "<C-=>",
+      dismiss_keymap = "<C-->",
       debounce_ms = 800,
       suggestion_color = { gui = "#808080", cterm = 244 },
       exclude_filetypes = {
@@ -253,29 +281,24 @@ return {
       },
       log_file_path = nil, -- absolute path to Tabnine log file
     },
-    dependencies = { "tzachar/cmp-tabnine" },
-  },
-  {
-    "hrsh7th/nvim-cmp",
-    opts = function(_, opts)
-      if enb.tabnine then
-        opts.sources = vim.list_extend(opts.sources, {
-          { name = "cmp_tabnine", max_item_count = 20 },
-        })
-      end
+    config = function(_, opts)
+      require("tabnine").setup(opts)
     end,
     dependencies = {
       {
         "tzachar/cmp-tabnine",
-        enabled = enb.tabnine,
+        enabled = enb.cmp_tabnine.enable,
         build = "./install.sh",
-        dependencies = { "codota/tabnine-nvim", "hrsh7th/nvim-cmp" },
+        dependencies = {
+          "codota/tabnine-nvim",
+          -- "hrsh7th/nvim-cmp",
+        },
       },
     },
   },
   {
     "dpayne/CodeGPT.nvim",
-    enabled = enb.codegpt,
+    enabled = enb.codegpt.enable,
     dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
     config = function()
       require("codegpt.config")
@@ -292,10 +315,9 @@ return {
   },
   {
     "dense-analysis/neural",
-    enabled = enb.neural,
+    enabled = enb.neural.enable,
     opts = { source = { openai = { apiKey = "OPENAI_API_KEY" } } },
     cmd = "Neural",
-    -- keys = require("environment.keys").neural,
     keys = {
       {
         key_neural,
@@ -307,7 +329,7 @@ return {
   },
   {
     "jackMort/ChatGPT.nvim",
-    enabled = enb.chatgpt,
+    enabled = enb.chatgpt.enable,
     cmd = {
       "ChatGPT",
       "ChatGPTAsCode",
@@ -370,7 +392,7 @@ return {
       "NeoAIInjectContext",
       "NeoAIInjectContextCode",
     },
-    enabled = enb.neoai,
+    enabled = enb.neoai.enable,
     opts = {
       ui = {
         output_popup_text = "neoai",
@@ -394,10 +416,10 @@ return {
       prompts = {
         context_prompt = function(context)
           return [[
-                            "Hey, I'd like to provide some context for future "
-                                "messages. Here is the code/text that I want to refer "
-                                "to in our upcoming conversations:\n\n"
-                                ]] .. context
+            Hey, I'd like to provide some context for future
+            messages. Here is the code/text that I want to refer
+            to in our upcoming conversations:\n\n
+          ]] .. context
         end,
       },
       mappings = { ["select_up"] = "<C-k>", ["select_down"] = "<C-j>" },
@@ -413,7 +435,7 @@ return {
              Please rewrite the text to make it more readable, clear,
              concise, and fix any grammatical, punctuation, or spelling
              errors
-         ]]
+            ]]
           end,
           modes = { "v" },
           strip_function = nil,
@@ -543,7 +565,7 @@ return {
     init = function()
       vim.api.nvim_create_autocmd("FileType", {
         pattern = { "neoai-input", "neoai-output" },
-        group = vim.api.nvim_create_augroup("neoai quit on q", {}),
+        group = vim.api.nvim_create_augroup("neoai_quit_on_q", {}),
         callback = function()
           vim.keymap.set(
             "n",
@@ -558,18 +580,20 @@ return {
   {
     "deifyed/naVi",
     config = true,
-    enabled = enb.navi,
+    enabled = enb.navi.enable,
+    dependencies = {
+      {
+        "jcdickinson/http.nvim",
+        build = "cargo build --workspace --release",
+      },
+    },
     opts = {
-      -- OpenAI token. Required
-      openai_token = os.getenv("OPENAI_API_KEY"), -- Alternatively, use environment variable OPENAI_TOKEN=<token>
       -- OpenAI model. Optional. Default is gpt-3.5-turbo
       openai_model = "gpt-4",
       -- OpenAI max tokens. Optional. Default is 512
       openai_max_tokens = 1024,
       -- OpenAI temperature. Optional. Default is 0.6
       openai_temperature = 0.6,
-      -- Debug mode. Optional. Default is false
-      debug = false, -- Alternatively, use environment variable NAVI_DEBUG=true
       -- Setup for input window
       prompt_window = {
         border = env.borders.main,
@@ -621,6 +645,58 @@ return {
         "<cmd>lua require('navi').Chat()<cr>",
         mode = "n",
         desc = "ai.navi=> chat",
+      },
+    },
+  },
+  {
+    "tdfacer/explain-it.nvim",
+    event = "VeryLazy",
+    dependencies = "rcarriga/nvim-notify",
+    opts = {
+      -- Prints useful log messages
+      debug = true,
+      -- Customize notification window width
+      max_notification_width = 20,
+      -- Retry API calls
+      max_retries = 3,
+      -- Customize response text file persistence location
+      output_directory = "/tmp/chat_output",
+      -- Toggle splitting responses in notification window
+      split_responses = true,
+      -- Set token limit to prioritize keeping costs low, or increasing quality/length of responses
+      token_limit = 2000,
+      -- Per-filetype default prompt questions
+      default_prompts = {
+        ["markdown"] = "Answer this question:",
+        ["txt"] = "Explain this block of text:",
+        ["lua"] = "What does this code do?",
+        ["zsh"] = "Answer this question:",
+      },
+    },
+    config = function(_, opts)
+      require("explain-it").setup(opts)
+    end,
+    keys = {
+      {
+        key_explain_it .. "x",
+        function()
+          require("explain-it").call_gpt({})
+        end,
+        mode = "n",
+        desc = "ai.xplain=> explain it",
+      },
+      {
+        key_explain_it .. "X",
+        function()
+          vim.ui.input({ prompt = "prompt: " }, function(input)
+            require("explain-it").call_gpt(
+              require("explain-it").get_buffer_lines(),
+              input
+            )
+          end)
+        end,
+        mode = { "n", "v" },
+        desc = "ai.xplain=> explain buffer (supply context)",
       },
     },
   },

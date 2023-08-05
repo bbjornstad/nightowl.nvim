@@ -1,3 +1,4 @@
+local toboolean = require("uutils.conversions").toboolean
 local env = {}
 
 --- formats the necessary field access and method calls to bring in well-defined
@@ -38,22 +39,6 @@ env.borders.main = "shadow"
 env.borders.alt = "solid"
 env.borders.main_accent = "double"
 
-env.ai = {}
-env.ai.enabled = {
-  copilot = false,
-  cmp_ai = true,
-  chatgpt = true,
-  codegpt = true,
-  neural = true,
-  neoai = true,
-  hfcc = true,
-  tabnine = false,
-  codeium = true,
-  rgpt = false,
-  navi = false,
-}
-env.ai.configured_notify = false
-
 env.telescope = {}
 env.telescope.theme = "ivy"
 
@@ -66,7 +51,8 @@ env.bufferline.tab_format = "slant"
 env.enable_vim_strict = false
 
 env.screensaver = {}
-env.screensaver.enabled = false
+env.screensaver.enabled = toboolean(os.getenv("NIGHTOWL_ENABLE_SCREENSAVER"))
+  or false
 env.screensaver.selections = { "treadmill", "epilepsy", "dvd" }
 
 env.ft_ignore_list = {
@@ -96,6 +82,6 @@ env.ft_ignore_list = {
 env.default_colorscheme = "kanagawa"
 env.colorscheme = {}
 
-env.lualine_theme = env.default_colorscheme
+env.lualine_theme = "auto" -- env.default_colorscheme
 
 return env
