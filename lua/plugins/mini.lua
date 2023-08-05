@@ -17,20 +17,5 @@ return {
     },
     version = false,
   },
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = function(_, opts)
-      opts.context_commentstring = vim.tbl_extend("force", {
-        enable = true,
-        enable_autocmd = false,
-      }, opts.context_commentstring or {})
-    end,
-  },
   { "echasnovski/mini.sessions", event = "VeryLazy", version = false },
-  {
-    "echasnovski/mini.bufremove",
-    enabled = false,
-    event = "VeryLazy",
-    version = false,
-  },
 }
