@@ -1,8 +1,11 @@
 local env = require("environment.ui")
+local wk_family = require("environment.keys").wk_family_inject
 local keystems = require("environment.keys").stems
 local key_pomodoro = keystems.pomodoro
 local key_overseer = keystems.overseer
 local key_do = keystems._do
+local key_conduct = keystems.conduct
+local key_taskorg = keystems.tasks
 
 return {
   {
@@ -21,19 +24,19 @@ return {
         key_pomodoro .. "s",
         "<CMD>PomodoroStart<CR>",
         desc = "pomorg=> start pomodoro timer",
-        mode = { "n", "v" },
+        mode = { "n" },
       },
       {
         key_pomodoro .. "q",
         "<CMD>PomodoroStop<CR>",
         desc = "pomorg=> stop pomodoro timer",
-        mode = { "n", "v" },
+        mode = { "n" },
       },
       {
         key_pomodoro .. "u",
         "<CMD>PomodoroStatus<CR>",
         desc = "pomorg=> pomodoro timer status",
-        mode = { "n", "v" },
+        mode = { "n" },
       },
     },
   },
@@ -350,4 +353,116 @@ return {
       },
     },
   },
+  {
+    "mvllow/stand.nvim",
+    opts = {
+      minute_interval = 52,
+    },
+    config = true,
+    event = "VeryLazy",
+    cmd = { "StandWhen", "StandNow" },
+  },
+  {
+    "aaditeynair/conduct.nvim",
+    opts = {
+      functions = {},
+      presets = {},
+      hooks = {
+        before_session_save = function() end,
+        before_session_load = function() end,
+        after_session_load = function() end,
+        before_project_load = function() end,
+        after_project_load = function() end,
+      },
+    },
+    config = function(_, opts)
+      require("conduct").setup(opts)
+      require("telescope").load_extension("conduct")
+    end,
+    cmd = {
+      -- project commands
+      "ConductNewProject",
+      "ConductLoadProject",
+      "ConductLoadLastProject",
+      "ConductLoadCwdProject",
+      "ConductRenameProject",
+      "ConductDeleteProject",
+      "ConductLoadProjectConfig",
+      "ConductReloadProjectConfig",
+      -- session commands
+      "ConductProjectNewSession",
+      "ConductProjectLoadSession",
+      "ConductProjectDeleteSession",
+      "ConductProjectRenameSession",
+    },
+    keys = {
+      {
+        key_conduct .. "l",
+        "<CMD>ConductLoadProject<CR>",
+        mode = "n",
+        desc = "conduct=> load project",
+      },
+      {
+        key_conduct .. "L",
+        "<CMD>ConductLoadLastProject<CR>",
+        mode = "n",
+        desc = "conduct=> load last project",
+      },
+      {
+        key_conduct .. "n",
+        "<CMD>ConductNewProject<CR>",
+        mode = "n",
+        desc = "conduct=> new project",
+      },
+      {
+        key_conduct .. "r",
+        "<CMD>ConductRenameProject<CR>",
+        mode = "n",
+        desc = "conduct=> new project",
+      },
+      {
+        key_conduct .. "d",
+        "<CMD>ConductDeleteProject<CR>",
+        mode = "n",
+        desc = "conduct=> delete project",
+      },
+      {
+        key_conduct .. "cp",
+        "<CMD>ConductLoadProjectConfig<CR>",
+        mode = "n",
+        desc = "conduct=> load project config",
+      },
+      {
+        key_conduct .. "cr",
+        "<CMD>ConductReloadProjectConfig<CR>",
+        mode = "n",
+        desc = "conduct=> reload project config",
+      },
+      {
+        key_conduct .. "sn",
+        "<CMD>ConductProjectNewSession<CR>",
+        mode = "n",
+        desc = "conduct=> new session in project",
+      },
+      {
+        key_conduct .. "sl",
+        "<CMD>ConductProjectLoadSession<CR>",
+        mode = "n",
+        desc = "conduct=> load session in project",
+      },
+      {
+        key_conduct .. "sd",
+        "<CMD>ConductProjectDeleteSession<CR>",
+        mode = "n",
+        desc = "conduct=> delete session in project",
+      },
+      {
+        key_conduct .. "sr",
+        "<CMD>ConductProjectRenameSession<CR>",
+        mode = "n",
+        desc = "conduct=> rename session in project",
+      },
+    },
+  },
+  wk_family("task/time management", { key_taskorg }),
 }
