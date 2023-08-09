@@ -1,5 +1,4 @@
 return {
-  { "echasnovski/mini.colors", event = "VeryLazy", version = false },
   { "echasnovski/mini.surround", event = "VeryLazy", version = false },
   { "echasnovski/mini.bracketed", event = "VeryLazy", version = false },
   { "echasnovski/mini.align", event = "VeryLazy", version = false },
@@ -17,5 +16,4 @@ return {
     },
     version = false,
   },
-  { "echasnovski/mini.sessions", event = "VeryLazy", version = false },
 }
