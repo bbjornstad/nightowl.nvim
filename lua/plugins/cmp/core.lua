@@ -1,7 +1,7 @@
 local ncmp = "hrsh7th/nvim-cmp"
 local env = require("environment.ui")
 local key_cmp = require("environment.keys").stems.cmp
-local mapd = require("environment.keys").map({ "i" })
+
 local function kf(key)
   return string.format("%s%s", key_cmp, key)
 end
@@ -188,10 +188,11 @@ return {
       -- turning off autocompletion on insert, in other words we need to hit one
       -- of the configured keys to be able to use the completion menu.
       opts.completion = vim.tbl_deep_extend("force", {
-        autocomplete = {
-          t_cmp.cmp.TriggerEvent.InsertEnter,
-          t_cmp.cmp.TriggerEvent.TextChanged,
-        },
+        autocomplete = false,
+        -- autocomplete = {
+        --   t_cmp.cmp.TriggerEvent.InsertEnter,
+        --   t_cmp.cmp.TriggerEvent.TextChanged,
+        -- },
         scrolloff = true,
       }, opts.completion or {})
 
