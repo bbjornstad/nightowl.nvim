@@ -19,7 +19,7 @@ return {
     end,
     keys = {
       {
-        "<F2>",
+        "<F3>",
         function()
           require("telescope").extensions.cheatsheet.cheatsheet()
         end,
@@ -33,7 +33,7 @@ return {
     cmd = { "Cheat", "CheatWithoutComments" },
     keys = {
       {
-        "<F3>",
+        "<F4>",
         function()
           vim.ui.input({
             prompt = "cheat.sh=> search: ",
@@ -45,7 +45,7 @@ return {
         desc = "cheat=> search cheat.sh",
       },
       {
-        "<F4>",
+        "<F5>",
         function()
           vim.ui.input({
             prompt = "cheat.sh=> search (no comments): ",
@@ -78,7 +78,7 @@ return {
     cmd = { "CheatSH" },
     keys = {
       {
-        "<F5>",
+        "<F6>",
         "<CMD>CheatSH<CR>",
         mode = { "n" },
         desc = "cheat=> cheat.sh interface",
