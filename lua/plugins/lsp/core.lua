@@ -28,6 +28,7 @@ return {
       { "hrsh7th/cmp-nvim-lsp" }, -- Required
       { "L3MON4D3/LuaSnip" }, -- Required
       { "nvim-lua/lsp-status.nvim" }, -- Optional but recommended
+      { "jubnzv/virtual-types.nvim" },
     },
     opts = {
       name = "minimal",
@@ -49,15 +50,14 @@ return {
       require("lsp-status").register_progress()
       lsp.on_attach(function(client, bufnr)
         require("lsp-status").on_attach(client)
+        require("virtualtypes").on_attach(client)
         lsp.default_keymaps({ buffer = bufnr })
       end)
 
       require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls({
-        settings = {
-          Lua = {
-            hint = {
-              enabled = true,
-            },
+        Lua = {
+          hint = {
+            enabled = true,
           },
         },
       }))
@@ -123,6 +123,7 @@ return {
       "williamboman/mason-lspconfig.nvim",
       "jay-babu/mason-null-ls.nvim",
       "nvim-lua/lsp-status.nvim",
+      "jubnzv/virtual-types.nvim",
     },
   },
   {
@@ -139,15 +140,6 @@ return {
   },
   {
     "folke/which-key.nvim",
-    opts = {
-      defaults = {
-        ["<leader>"] = { name = "+nvim core fxns" },
-        ["<localleader>"] = { name = "+metadata and special editor cmds" },
-        ["<Bar>"] = { name = "+task and time management" },
-        ["`"] = { name = "+repl style" },
-        -- TODO Add a few more of these baseline name mappings
-        -- directly onto the which-key configuration here.
-      },
-    },
+    opts = {},
   },
 }
