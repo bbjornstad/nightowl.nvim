@@ -2,8 +2,24 @@ local env = require("environment.ui")
 local stems = require("environment.keys").stems
 local key_git = stems.git
 local key_undotree = stems.undotree
+local key_versioning = "gs"
 
 return {
+  {
+    "kevinhwang91/nvim-fundo",
+    opts = {
+      archives_dir = vim.fn.stdpath("cache") .. "/fundo",
+      limit_archives_size = 256,
+    },
+    config = true,
+    init = function()
+      vim.o.undofile = true
+    end,
+    build = function(_)
+      require("fundo").install()
+    end,
+    event = "VeryLazy",
+  },
   {
     "jiaoshijie/undotree",
     event = "VeryLazy",
@@ -65,6 +81,14 @@ return {
     "sindrets/diffview.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+    keys = {
+      {
+        key_versioning .. "d",
+        "<CMD>DiffviewOpen<CR>",
+        mode = "n",
+        desc = "git=> compare in diffview",
+      },
+    },
   },
   {
     "f-person/git-blame.nvim",
@@ -74,15 +98,15 @@ return {
     end,
     keys = {
       {
-        "<leader>gb",
+        key_git .. "Bl",
         "<CMD>GitBlameToggle<CR>",
-        mode = { "n", "v" },
+        mode = { "n" },
         desc = "git=> toggle git blame on line",
       },
       {
-        "<leader>gB",
+        key_git .. "Be",
         "<CMD>GitBlameEnable<CR>",
-        mode = { "n", "v" },
+        mode = { "n" },
         desc = "git=> force enable git blame on line",
       },
     },
@@ -105,7 +129,7 @@ return {
       {
         key_git .. "n",
         "<CMD>Neogit<CR>",
-        mode = { "n", "v" },
+        mode = { "n" },
         desc = "git=> neogit",
       },
     },
@@ -122,6 +146,98 @@ return {
       "GitConflictNextConflict",
       "GitConflictPrevConflict",
       "GitConflictListQf",
+    },
+    keys = {
+      {
+        key_git .. "fq",
+        "<CMD>GitConflictListQf<CR>",
+        mode = "n",
+        desc = "git=> conflict quick fix",
+      },
+      {
+        key_git .. "fo",
+        "<CMD>GitConflictChooseOurs<CR>",
+        mode = "n",
+        desc = "git=> conflict choose ours",
+      },
+      {
+        key_git .. "ft",
+        "<CMD>GitConflictChooseTheirs<CR>",
+        mode = "n",
+        desc = "git=> conflict choose theirs",
+      },
+      {
+        key_git .. "fb",
+        "<CMD>GitConflictChooseBoth<CR>",
+        mode = "n",
+        desc = "git=> conflict choose both",
+      },
+      {
+        key_git .. "fe",
+        "<CMD>GitConflictChooseNone<CR>",
+        mode = "n",
+        desc = "git=> conflict choose none",
+      },
+      {
+        key_git .. "fn",
+        "<CMD>GitConflictNextConflict<CR>",
+        mode = "n",
+        desc = "git=> next conflict",
+      },
+      {
+        key_git .. "fp",
+        "<CMD>GitConflictPrevConflict<CR>",
+        mode = "n",
+        desc = "git=> previous conflict",
+      },
+    },
+  },
+  {
+    "APZelos/blamer.nvim",
+    config = function(_, opts)
+      vim.g.blamer_enabled = 1
+      vim.g.blamer_delay = 1000
+      vim.g.blamer_show_in_visual_modes = 0
+      vim.g.blamer_prefix = "  "
+      vim.g.blamer_template = "<committer>@<committer-time>  <summary>"
+      vim.g.blamer_relative_time = 1
+    end,
+    keys = {
+      {
+        key_git .. "bb",
+        "<CMD>BlamerToggle<CR>",
+        mode = "n",
+        desc = "git=> toggle global blamer",
+      },
+      {
+        key_git .. "bi",
+        "<leader>gbi",
+        function()
+          vim.g.blamer_show_in_insert_modes = 1
+        end,
+        mode = "n",
+        desc = "git=> show global blamer in insert mode",
+      },
+      {
+        key_git .. "bv",
+        function()
+          vim.g.blamer_show_in_visual_modes = 1
+        end,
+        mode = "n",
+        desc = "git=> show global blamer in visual mode",
+      },
+    },
+  },
+  {
+    "mcchrish/info-window.nvim",
+    cmd = "InfoWindowToggle",
+    keys = {
+      {
+        key_versioning .. "i",
+        "<CMD>InfoWindowToggle<CR>",
+        mode = "n",
+        desc = "info=> buffer metadata/file info",
+      },
     },
   },
 }
