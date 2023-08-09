@@ -2,7 +2,7 @@ local env = require("environment.ui")
 local key_ccc = require("environment.keys").stems.ccc
 
 local function default_colorizer(hlgroup)
-  local labeled_hl = vim.api.nvim_get_hl_by_name(hlgroup, true)
+  local labeled_hl = vim.api.nvim_get_hl(0, { name = hlgroup })
   return labeled_hl.fg
 end
 
@@ -70,5 +70,10 @@ return {
         desc = "ccc=> turn on inline color highlighting",
       },
     },
+  },
+  {
+    "echasnovski/mini.colors",
+    event = "VeryLazy",
+    version = false,
   },
 }
