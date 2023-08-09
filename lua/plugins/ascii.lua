@@ -122,7 +122,7 @@ return {
           return require("comment-box").line(vim.v.count)
         end,
         mode = { "n", "v" },
-        desc = "line=> 󰘷:󰡎 󱄽:󰉣",
+        desc = "line=> 󰘷:󰡎 󱄽:󰉢",
       },
       {
         key_cline .. "c",
@@ -130,7 +130,7 @@ return {
           return require("comment-box").cline(vim.v.count)
         end,
         mode = { "n", "v" },
-        desc = "line=> 󰘷:󰡎 󱄽:󰉣",
+        desc = "line=> 󰘷:󰡎 󱄽:󰉠",
       },
       {
         key_cline .. "r",
