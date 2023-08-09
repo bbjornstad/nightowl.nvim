@@ -8,11 +8,15 @@ return {
         dependencies = { "mfussenegger/nvim-dap" },
         opts = {},
       },
+      {
+        "niuiic/dap-utils.nvim",
+        dependencies = { "mfussenegger/nvim-dap" },
+        opts = {},
+      },
       -- virtual text for the debugger
       {
         "theHamsta/nvim-dap-virtual-text",
         opts = {},
-
         dependencies = { "mfussenegger/nvim-dap" },
       },
 
@@ -44,6 +48,9 @@ return {
           },
         },
       },
+      {
+        "LiadOz/nvim-dap-repl-highlights",
+      },
     },
   },
   {
@@ -69,7 +76,9 @@ return {
   {
     "andrewferrier/debugprint.nvim",
     event = "LspAttach",
-    opts = {},
+    opts = {
+      create_keymaps = false,
+    },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   {
