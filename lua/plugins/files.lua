@@ -1,12 +1,16 @@
 local env = require("environment.ui")
 local keystems = require("environment.keys").stems
+local wk_family = require("environment.keys").wk_family_inject
 
 local key_oil = keystems.oil
+local key_nnn = keystems.nnn
+local key_files = keystems.files
 
 return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     enabled = false,
+    module = false,
   },
   {
     "is0n/fm-nvim",
@@ -52,13 +56,13 @@ return {
     config = true,
     keys = {
       {
-        "<leader>fe",
+        key_files .. "e",
         "<CMD>Broot<CR>",
         mode = "n",
         desc = "br=> open broot explorer",
       },
       {
-        "<leader>fE",
+        key_files .. "E",
         "<CMD>Broot<CR>",
         mode = "n",
         desc = "br=> open broot explorer (float)",
@@ -102,13 +106,22 @@ return {
         },
       },
       keymaps = {
-        ["`"] = false,
-        ["<C-t>"] = false,
+        ["`"] = "actions.cd",
+        ["~"] = "actions.tcd",
         ["<BS>"] = "actions.toggle_hidden",
+        ["<C-BS>"] = "actions.parent",
         ["-"] = "actions.parent",
+        ["_"] = "actions.open_cwd",
         ["q"] = "actions.close",
         [".."] = "actions.parent",
-        ["."] = "actions.cd",
+        ["g."] = "actions.cd",
+        ["<C-l>"] = "actions.refresh",
+        ["<C-p>"] = "actions.preview",
+        ["<C-c>"] = false,
+        ["<C-s>"] = "actions.select_vsplit",
+        ["<C-h>"] = "actions.select_split",
+        ["g?"] = "actions.show_help",
+        ["?"] = "actions.show_help",
       },
     },
     keys = {
@@ -117,7 +130,7 @@ return {
         function()
           return require("oil").open_float()
         end,
-        mode = { "n", "v" },
+        mode = { "n" },
         desc = "oil=> open oil (float)",
       },
       {
@@ -125,7 +138,7 @@ return {
         function()
           return require("oil").open()
         end,
-        mode = { "n", "v" },
+        mode = { "n" },
         desc = "oil=> open oil (not float)",
       },
       {
@@ -133,7 +146,7 @@ return {
         function()
           return require("oil").close()
         end,
-        mode = { "n", "v" },
+        mode = { "n" },
         desc = "oil=> close oil",
       },
       {
@@ -141,7 +154,7 @@ return {
         function()
           return require("oil").open_float()
         end,
-        mode = { "n", "v" },
+        mode = { "n" },
         desc = "oil=> float oil",
       },
       {
@@ -149,34 +162,75 @@ return {
         function()
           return require("oil").open()
         end,
-        mode = { "n", "v" },
+        mode = { "n" },
         desc = "oil=> open oil",
       },
     },
   },
   {
-    "junegunn/fzf",
-    event = "VeryLazy",
-    dependencies = { "junegunn/fzf.vim" },
-    build = "make",
-    init = function()
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "fzf" },
-        group = vim.api.nvim_create_augroup("fzf_quit_on_q", {}),
-        callback = function()
-          vim.keymap.set(
-            "n",
-            "q",
-            "<CMD>quit<CR>",
-            { buffer = true, desc = "quit", remap = false, nowait = true }
-          )
-        end,
-      })
+    "luukvbaal/nnn.nvim",
+    config = true,
+    cmd = { "NnnExplorer", "NnnPicker" },
+    opts = function(_, opts)
+      opts.explorer = vim.tbl_deep_extend("force", {
+        width = 32,
+        side = "topleft",
+        session = "shared",
+        tabs = true,
+        fullscreen = false,
+      }, opts.explorer or {})
+      opts.picker = vim.tbl_deep_extend("force", {
+        style = {
+          width = 0.4,
+          height = 0.6,
+          border = env.borders.main,
+        },
+      }, opts.picker or {})
+      local builtin = require("nnn").builtin
+      opts.mappings = vim.tbl_deep_extend("force", {
+        { "g..", builtin.cd_to_path }, -- open file(s) in tab
+        { "<C-t>", builtin.open_in_tab }, -- open file(s) in tab
+        { "<C-s>", builtin.open_in_vsplit }, -- open file(s) in split
+        { "<C-v>", builtin.open_in_vsplit }, -- open file(s) in vertical split
+        { "<C-h>", builtin.open_in_split }, -- open file(s) in vertical split
+        { "<C-p>", builtin.open_in_preview }, -- open file in preview split keeping nnn focused
+        { "<C-y>", builtin.copy_to_clipboard }, -- copy file(s) to clipboard
+        { "g.", builtin.cd_to_path }, -- cd to file directory
+        { "<A-:>", builtin.populate_cmdline }, -- populate cmdline (:) with file(s)
+      }, opts.mappings or {})
     end,
+    keys = {
+      {
+        key_files .. "nE",
+        "<CMD>NnnExplorer<CR>",
+        mode = "n",
+        desc = "fm.nnn=> explorer mode",
+      },
+      {
+        key_files .. "ne",
+        "<CMD>NnnExplorer %:p<CR>",
+        mode = "n",
+        desc = "fm.nnn=> explorer mode",
+      },
+      {
+        key_files .. "np",
+        "<CMD>NnnPicker<CR>",
+        mode = { "n" },
+        desc = "fm.nnn=> picker mode",
+      },
+      {
+        key_nnn .. "N",
+        "<CMD>NnnPicker<CR>",
+        mode = { "n" },
+        desc = "fm.nnn=> picker mode",
+      },
+      {
+        key_nnn .. "n",
+        "<CMD>NnnExplorer<CR>",
+        mode = { "n" },
+        desc = "fm.nnn=> explorer mode",
+      },
+    },
   },
-  {
-    "junegunn/fzf.vim",
-    dependencies = { "junegunn/fzf" },
-    event = { "VeryLazy" },
-  },
+  wk_family("fm.nnn", "<leader>nn", { triggers_nowait = { key_nnn } }),
 }
