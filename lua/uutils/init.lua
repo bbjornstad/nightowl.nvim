@@ -7,7 +7,7 @@ local api = vim.api
 --  lua for neovim configuration.
 local uutils = {}
 
-uutils.edit = require("uutils.edit")
+uutils.text = require("uutils.text")
 uutils.scope = require("uutils.scope")
 uutils.window = require("uutils.window")
 
