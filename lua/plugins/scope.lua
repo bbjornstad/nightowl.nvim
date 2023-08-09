@@ -1,4 +1,5 @@
 local key_scope = require("environment.keys").stems.telescope
+local key_notice = require("environment.keys").stems.notice
 
 local target_pickers = {
   "find_files",
@@ -87,6 +88,7 @@ local target_extensions = {
   "toggleterm",
   "notifications",
   "manix",
+  "tasks",
 }
 
 local scopeutils = require("uutils.scope")
@@ -105,6 +107,15 @@ local extspec = scopeutils.setup_extensions(target_extensions, {
   },
   ["ui-select"] = {
     require("telescope.themes").get_dropdown({}),
+  },
+  tasks = {
+    theme = "ivy",
+    output = {
+      style = "float", -- "split" | "float" | "tab"
+      layout = "center", -- "left" | "right" | "center" | "below" | "above"
+      scale = 0.6, -- output window to editor size ratio
+      -- NOTE: scale and "center" layout are only relevant when style == "float"
+    },
   },
 }, "ivy")
 
@@ -398,6 +409,12 @@ return {
           end,
         },
       },
+      {
+        "lpoto/telescope-tasks.nvim",
+        config = function()
+          require("telescope").load_extension("tasks")
+        end,
+      },
       -- {
       --   "mrcjkb/telescope-manix",
       --   dependencies = {
@@ -547,7 +564,13 @@ return {
       },
       -- telescope.core: notifications
       {
-        key_scope .. "n",
+        key_scope .. "N",
+        funext("notify"),
+        mode = "n",
+        desc = "scope=> search notifications",
+      },
+      {
+        key_notice,
         funext("notify"),
         mode = "n",
         desc = "scope=> search notifications",
@@ -560,8 +583,15 @@ return {
       {
         "q:",
         funblt("command_history"),
-        mode = { "n", "v" },
+        mode = "n",
         desc = "scope=> command history",
+        nowait = true,
+      },
+      {
+        key_scope .. "T",
+        funext("tasks"),
+        mode = "n",
+        desc = "scope=> search tasks",
       },
     },
   },
