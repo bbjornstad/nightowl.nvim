@@ -8,11 +8,13 @@ return {
       {
         "<leader>fml",
         "<CMD>CellularAutomaton make_it_rain<CR>",
+        mode = "n",
         desc = "here be automatous dragons [rainy]",
       },
       {
         "<leader>fmd",
         "<CMD>CellularAutomaton game_of_life<CR>",
+        mode = "n",
         desc = "here be automatous dragons [gamey]",
       },
     },
@@ -98,7 +100,7 @@ return {
     event = "VeryLazy",
     keys = {
       {
-        "<F2>",
+        "<F7>",
         function()
           require("duck").hatch("🦆", 5)
         end,
@@ -106,7 +108,7 @@ return {
         desc = "duck=> hatch a duck",
       },
       {
-        "<F3>",
+        "<F8>",
         function()
           require("duck").hatch("🐈", 0.8)
         end,
@@ -114,7 +116,7 @@ return {
         desc = "duck=> hatch a cat",
       },
       {
-        "<F4>",
+        "<F9>",
         function()
           require("duck").cook()
         end,
