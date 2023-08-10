@@ -1,0 +1,62 @@
+@document.meta
+title: blockers
+description: things that are still causing hangups towards our better goal of progress.
+authors: Bailey Bjornstad | ursa-major
+categories: nightowl.nvim
+created: 2023-08-07
+updated: 2023-08-09
+version: 1.1.1
+@end
+
+* Nightowl.nvim
+  the following document outlines the major pieces of code, implementation, or
+  other work that is needed to get life back on the track that it was supposed
+  to be on. Neovim is a unique program in my arsenal, and unfortunately any
+  difficulties I presently have with the configuration itself is going to cause
+  issues with other things that I am also trying to do that involve neovim
+  somehow. This is the motivation to create this document.
+
+** Critical Blockers
+   The folliwng items are critical to the mission. They need to be fixed as soon
+   as possible, otherwise standard essential editing functions are missing.
+
+*** (-) Neorg and Treesitter do not seem to be cooperating.
+    I am not sure what the issue is here, it seems like whenever I backspace in
+    a certain pattern while in insert mode, then treesitter flips out and throws
+    some gnarly errors.
+
+    Update 2023-08-09: this is mostly fixed. debugging left to do, but no errors
+    on startup and everything looks like it is working correctly.
+
+*** (-) Completion Menu Icons
+    This has been a thorny issue for too long at this point, and the lspkind
+    wiki is not helpful to fixing this problem. Basically we have a timing
+    mismatch because lspkind is not found when needed, despite the fact that the
+    package is loaded within a separate opts function.
+
+    update 2023-08-09: this is also mostly fixed, and generally cmp is working
+    better after disabling the automenu and forcing explicit user activation
+    with the tab or c-space keys.
+
+*** (x) Neorg keybindings
+    Neorg is missing important keybindings to any of the convenience functions
+    that are provided.
+*** (-) edgy.nvim fixes
+    unfortunately, edgy was not working correctly before today. luckily, it is
+    working now more correctly although there's still a few problematic spots of
+    behavior that should be fixed in the long run.
+** Problematic Blockers
+   These items are not as critical as the above, but they still are important
+   to improving the overall experience to the point of usability.
+
+** Unimplemented Features
+   These items are not necessarily critical to being able to edit files in an
+   appropriate manner, but are important because they have features and details
+   that I would like to have in nightowl.nvim but are not yet implemented due to
+   hangups with other pieces that are holding this mission together.
+
+*** ( ) dropbar.nvim navigation in breadcrumbs menus
+    the basic idea behind this part is that when we are in a dropbar menu,
+    normally activated with `g_` as a normal mode mapping, we would like a few
+    additional ways to move between dropbar windows. In particular, tab and
+    shift-tab should move to next and previous windows.
