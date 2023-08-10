@@ -35,9 +35,9 @@ function custom_fname:update_status()
 end
 
 local function memory_use()
-  local use = (1 - (vim.loop.get_free_memory() / vim.loop.get_total_memory()))
+  local free = (1 - (vim.loop.get_free_memory() / vim.loop.get_total_memory()))
     * 100
-  return ("󱈭 %.2f"):format(use) .. "%"
+  return ("󱈯 %.2f"):format(free) .. "%"
 end
 
 local function pom_status()
@@ -92,7 +92,7 @@ return {
           { " | " },
           { " " },
           { require("local-highlight").match_count(props.buf) },
-          { "|" },
+          { " | " },
           { memory_use() },
         }
       end,
@@ -156,6 +156,7 @@ return {
       "nvim-tree/nvim-web-devicons",
       "meuter/lualine-so-fancy.nvim",
       "rebelot/kanagawa.nvim",
+      "Bekaboo/dropbar.nvim",
     },
     event = "VimEnter",
     opts = {
@@ -301,7 +302,6 @@ return {
     "Bekaboo/dropbar.nvim",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     version = "*",
-    event = "BufWinEnter",
     opts = {
       general = {
         enable = false,
@@ -319,6 +319,22 @@ return {
           },
         },
         keymaps = {
+          -- ["<tab>"] = function()
+          --   local api = require("dropbar.api")
+          --   local thismenu = api.get_current_dropbar_menu()
+          --   if not thismenu then
+          --     return
+          --   end
+          --   api.select_next_context()
+          -- end,
+          -- ["<shift-tab>"] = function()
+          --   local api = require("dropbar.api")
+          --   local thismenu = api.get_current_dropbar_menu()
+          --   if not thismenu then
+          --     return
+          --   end
+          --   thismenu:close()
+          -- end,
           ["q"] = function()
             local api = require("dropbar.api")
             local thismenu = api.get_current_dropbar_menu()
@@ -329,7 +345,9 @@ return {
           end,
         },
       },
-      bar = {},
+      bar = {
+        padding = { left = 2, right = 2 },
+      },
       icons = {
         bar = {
           separator = "  ",
@@ -343,11 +361,11 @@ return {
     },
     keys = {
       {
-        "g-",
+        "g_",
         function()
           require("dropbar.api").pick()
         end,
-        mode = { "n", "v", "o" },
+        mode = "n",
         desc = "lsp=> pick grains from breadcrumbs",
       },
     },
