@@ -1,9 +1,9 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local env = require("environment.ui")
 local enb = require("environment.ai").enabled_agents_status
-local stems = require("environment.keys").stems
 
-local key_ai = stems.BASEAI
+local stems = require("environment.keys").stems
+local key_ai = stems.base.ai
 local key_copilot = stems.copilot
 local key_hfcc = stems.hfcc
 local key_neural = stems.neural
@@ -15,6 +15,8 @@ local key_rgpt = stems.rgpt
 local key_cmpai = stems.cmp_ai
 local key_explain_it = stems.explain_it
 local key_tabnine = stems.tabnine
+local key_doctor = stems.doctor
+local key_llm = stems.llm
 
 -- show a menu, but only if the user has selected the appropriate option.
 -- This menu is supposed to inform the user which plugins might send -- their code off to an external service for analysis.
@@ -38,6 +40,7 @@ AI Plugin Status:
   -> **ReviewGPT**: %s
   -> **naVi** %s
   -> **explain-it** %s
+  -> **key_llm**: %s
 
 *plugin is used during nvim-cmp autocompletion, and will therefore connect to an external service without explicit instruction to do so*
 **plugin uses proprietary, non-free, non-open, or non-libre backend (namely ChatGPT)**
@@ -55,7 +58,9 @@ AI Plugin Status:
       enb.neural.enable,
       enb.rgpt.enable,
       enb.navi.enable,
-      enb.explain_it.enable
+      enb.explain_it.enable,
+      enb.llm.enable,
+      enb.doctor.enable
     ),
     vim.log.levels.INFO
   )
@@ -76,12 +81,15 @@ return {
         [key_chatgpt] = { name = "ai=> +chatgpt (openai original)" },
         [key_copilot] = { name = "ai=> +copilot" },
         [key_hfcc] = { name = "ai=> +huggingface" },
-        [key_neural] = { name = "ai=> +neural" },
         [key_codegpt] = { name = "ai=> +codegpt" },
+        [key_neural] = { name = "ai=> +neural" },
         [key_rgpt] = { name = "ai=> +rgpt" },
         [key_navi] = { name = "ai=> +navi" },
         [key_cmpai] = { name = "ai=> +cmp-ai" },
         [key_tabnine] = { name = "ai=> +tabnine" },
+        [key_llm] = { name = "ai=> +llms" },
+        [key_explain_it] = { name = "ai=> +explain it" },
+        [key_doctor] = { name = "ai=> the doc is in" },
         -- TODO Add a few more of these baseline name mappings
         -- directly onto the which-key configuration here.
       },
@@ -151,9 +159,9 @@ return {
   {
     "zbirenbaum/copilot.lua",
     enabled = enb.copilot.enable,
-    -- cmd = "Copilot",
+    cmd = "Copilot",
     event = { "InsertEnter" },
-    opts = { suggestion = { enabled = false }, panel = { enabled = false } },
+    opts = { suggestion = { enabled = true }, panel = { enabled = true } },
     keys = {
       {
         key_copilot .. "a",
@@ -450,7 +458,7 @@ return {
                  Using the following git diff generate a consise and
                  clear git commit message, with a short title summary
                  that is 75 characters or less:
-             ]] .. vim.fn.system("git diff --cached")
+            ]] .. vim.fn.system("git diff --cached")
           end,
           modes = { "n" },
           strip_function = nil,
@@ -469,7 +477,7 @@ return {
                  and without spelling or gramatical issues. The intended
                  audience will be somewhat familiar with tools and technologies
                  their preceding job postings are indicating are in use.:
-             ]]
+            ]]
           end,
           modes = { "n" },
           strip_function = nil,
@@ -490,7 +498,7 @@ return {
                  originality of the content (it should be original). The intended
                  audience will be somewhat familiar with tools and technologies
                  their preceding job postings are indicating are in use.:
-             ]]
+            ]]
           end,
           modes = { "n" },
           strip_function = nil,
@@ -526,7 +534,7 @@ return {
             return [[
                  Use the outline provided to generate a blog post for a blog
                  called 'The Spacebar', which will be dedicated to topics such
-                 as Linux, Data Engineering, or my personal dotfiles and configurations
+                 as Linux, Data Engineering, or my personal dotfiles, setup, and configurations
                  for my machine or the tools I use regularly. More generally, the
                  blog is about programming, mathematics, and the occasional general
                  musing on this weird wide world. The audience should be semi-
@@ -697,6 +705,53 @@ return {
         end,
         mode = { "n", "v" },
         desc = "ai.xplain=> explain buffer (supply context)",
+      },
+    },
+  },
+  {
+    "iagoleal/doctor.nvim",
+    enabled = enb.doctor.enable,
+    cmd = "TalkToTheDoctor",
+    keys = {
+      {
+        key_doctor,
+        "<CMD>TalkToTheDoctor<CR>",
+        mode = "n",
+        desc = "ai.doc=> talk to a fake doctor",
+      },
+    },
+  },
+  {
+    "gsuuon/llm.nvim",
+    cmd = {
+      "Llm",
+      "LlmSelect",
+      "LlmDelete",
+      "LlmStore",
+      "LlmMulti",
+      "LlmCancel",
+      "LlmShow",
+    },
+    opts = function(_, opts)
+      opts.prompts = require("llm.util").module.autoload("prompt_library")
+    end,
+    enabled = enb.llm.enable,
+    keys = {
+      {
+        key_llm .. "L",
+        "<CMD>Llm<CR>",
+        mode = "n",
+        desc = "ai.llm=> use default llm model",
+      },
+      {
+        key_llm .. "l",
+        function()
+          vim.ui.input({ prompt = "select llm prompt: " }, function(input)
+            vim.cmd(("llm %s"):format(input))
+          end)
+        end,
+        mode = { "n", "v" },
+        desc = "ai.llm=> select and use llm model",
       },
     },
   },
