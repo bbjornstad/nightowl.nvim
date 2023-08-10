@@ -91,8 +91,8 @@ return {
     "https://git.sr.ht/~reggie/licenses.nvim",
     opts = {
       copyright_holder = "Bailey Bjornstad | ursa-major",
-      email = "bailey@bjornstaddev",
-      license = "",
+      email = "bailey@bjornstad.dev",
+      license = "MIT",
     },
     config = true,
     cmd = { "LicenseInsert", "LicenseFetch", "LicenseUpdate", "LicenseWrite" },

@@ -1,6 +1,6 @@
 local stems = require("environment.keys").stems
 local mapn = require("environment.keys").map("n")
-local toggle_fmtoption = require("uutils.edit").toggle_fmtopt
+local toggle_fmtoption = require("uutils.text").toggle_fmtopt
 
 return {
   {

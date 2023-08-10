@@ -1,17 +1,6 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local colors = require("kanagawa.colors").setup({ theme = "wave" }).palette
-
-local function ucall(mod, ref, opts)
-  opts = opts or nil
-  local function uwrap()
-    local ok, modres = pcall(require, mod)
-    if ok then
-      local innerok, innerres = pcall(modres, ref, opts)
-      return innerres
-    end
-  end
-  return uwrap
-end
+local kenv = require("environment.keys")
 
 local function colorize(bg, fg, opts)
   opts = opts or {}
@@ -27,17 +16,18 @@ local organization_tools = {
   {
     "nvim-orgmode/orgmode",
     dependencies = {
-      { "nvim-treesitter/nvim-treesitter" },
-      { "akinsho/org-bullets.nvim", opts = {} },
+      "nvim-treesitter/nvim-treesitter",
+      "akinsho/org-bullets.nvim",
       {
         "joaomsa/telescope-orgmode.nvim",
         config = function()
           require("telescope").load_extension("orgmode")
         end,
       },
+      "danilshvalov/org-modern.nvim",
+      "lukas-reineke/headlines.nvim",
     },
     ft = { "org" },
-    -- init = ucall("ufo", "detach", {}),
     config = function(_, opts)
       -- Load custom tree-sitter grammar for org filetype
       require("orgmode").setup_ts_grammar()
@@ -187,14 +177,18 @@ local organization_tools = {
   },
   {
     "nvim-neorg/neorg",
-    enabled = true,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
       {
         "nvim-neorg/neorg-telescope",
         dependencies = "nvim-telescope/telescope.nvim",
+        config = function(_, opts)
+          require("telescope").load_extension("neorg")
+        end,
       },
+      "lukas-reineke/headlines.nvim",
+      -- "madskjeldgaard/neorg-figlet-module",
     },
     build = ":Neorg sync-parsers",
     cmd = "Neorg",
@@ -209,7 +203,17 @@ local organization_tools = {
           },
         },
         ["core.dirman"] = {
-          config = { workspaces = { journal = "~/.notes/journal" } },
+          config = {
+            workspaces = {
+              journal = "~/.notes/journal",
+              todo = "~/.notes/todo",
+              prj = "~/prj",
+              notes = "~/.notes/notes",
+            },
+            open_last_workspace = "default",
+            index = "note-index.norg",
+            default_workspace = "notes",
+          },
         },
         ["core.completion"] = {
           config = {
@@ -230,7 +234,60 @@ local organization_tools = {
             workspace = "journal",
           },
         },
-        -- ["core.ui.calendar"] = {},
+        ["core.export"] = {
+          config = {
+            export_dir = "<export-dir>/<language>",
+          },
+        },
+        ["core.export.markdown"] = {
+          config = {
+            extension = "md",
+            extensions = "all",
+          },
+        },
+        -- ["external.integrations.figlet"] = {
+        --   config = {
+        --     font = "impossible",
+        --     wrapInCodeTags = true,
+        --   },
+        -- },
+        ["core.keybinds"] = {
+          config = {
+            default_keybinds = true,
+            hook = function(binds)
+              local leader = binds.leader
+              binds.remap_key(
+                "norg",
+                "n",
+                "<C-Space>",
+                "cc",
+                { desc = "neorg=> cycle task status", buffer = true }
+              )
+              binds.remap_key(
+                "norg",
+                "n",
+                leader .. "nn",
+                "gnn",
+                { buffer = true, desc = "neorg=> new note" }
+              )
+              binds.map(
+                "norg",
+                "n",
+                leader .. "f",
+                "core.integrations.telescope.find_linkable",
+                { buffer = true, desc = "neorg=> find linkables" }
+              )
+              binds.map(
+                "norg",
+                "i",
+                ("<C-%s><C-l>"):format(leader),
+                "core.integrations.telescope.insert_link",
+                { buffer = true, desc = "neorg=> insert linkable" }
+              )
+            end,
+            neorg_leader = kenv.stems.base.tasks,
+          },
+        },
       },
     },
   },
@@ -241,7 +298,7 @@ local organization_tools = {
       dependencies = {
         "nvim-treesitter/nvim-treesitter",
       },
-      opts = {},
+      config = true,
     },
   },
 }

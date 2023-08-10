@@ -1,10 +1,11 @@
 local add_cmp_source = require("uutils.cmp").add_source
+local key_repl = require("environment.keys").stems.base.repl
 
 return {
   {
     "clojure-vim/acid.nvim",
     config = function() end,
-    build = pcall(vim.cmd, "UpdateRemotePlugins"),
+    build = ":UpdateRemotePlugins",
     ft = { "clojure" },
   },
   {
@@ -18,7 +19,7 @@ return {
   {
     "Shopify/shadowenv.vim",
     config = function() end,
-    ft = { "*shadowenv.d/*", "lisp" },
+    ft = { "*shadowenv.d/*" },
   },
   {
     "vlime/vlime",
@@ -28,7 +29,7 @@ return {
     end,
     keys = {
       {
-        "<leader>rv",
+        key_repl .. "v",
         "<CMD>!sbcl --load <CR>",
         mode = "n",
         desc = "lisp=> start vlime",

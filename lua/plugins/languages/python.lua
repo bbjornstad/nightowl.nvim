@@ -1,13 +1,11 @@
-local key_repl = require("environment.keys").stems.repl
+local key_repl = require("environment.keys").stems.base.repl
 local key_jupyter = key_repl .. "j"
 
 return {
   { "jmcantrell/vim-virtualenv", ft = { "python" } },
   {
     "mfussenegger/nvim-dap-python",
-    config = function(_, opts)
-      require("dap-python").setup("~/.virtualenv/debugpy/python")
-    end,
+    ft = { "python" },
   },
   {
     "lkhphuc/jupyter-kernel.nvim",
@@ -20,7 +18,7 @@ return {
       timeout = 0.5,
     },
     cmd = { "JupyterAttach", "JupyterInspect", "JupyterExecute" },
-    build = pcall(vim.cmd, [[UpdateRemotePlugins]]),
+    build = [[:UpdateRemotePlugins]],
     keys = {
       {
         key_jupyter .. "a",
