@@ -37,7 +37,7 @@ end
 env.borders = {}
 env.borders.main = "shadow"
 env.borders.alt = "solid"
-env.borders.main_accent = "double"
+env.borders.main_accent = "shadow"
 
 env.telescope = {}
 env.telescope.theme = "ivy"
@@ -74,6 +74,10 @@ env.ft_ignore_list = {
   "Lazy",
   "dropbar_menu",
   "noice",
+  "nnn",
+  "quickfix",
+  "nofile",
+  "prompt",
 }
 
 --------------------------------------------------------------------------------
