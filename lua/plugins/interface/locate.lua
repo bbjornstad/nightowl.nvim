@@ -1,4 +1,5 @@
 local kcolors = require("environment.ui").kanacolors
+local function decelerator() end
 
 return {
   {
@@ -6,7 +7,6 @@ return {
     config = function() end,
     event = "VeryLazy",
   },
-
   {
     "mvllow/modes.nvim",
     tag = "v0.2.0",
@@ -38,7 +38,7 @@ return {
     "yamatsum/nvim-cursorline",
     event = "VeryLazy",
     opts = {
-      cursorline = { enable = true, timeout = 1000, number = false },
+      cursorline = { enable = true, timeout = 500, number = false },
       cursorword = {
         enable = true,
         min_length = 3,
@@ -49,8 +49,9 @@ return {
   {
     "edluffy/specs.nvim",
     config = true,
+    event = "VeryLazy",
     opts = {
-      blend = 60,
+      blend = 20,
       width = 8,
       winhl = "PMenu",
     },
@@ -74,5 +75,23 @@ return {
       number_only = false,
       centered_peeking = true,
     },
+  },
+  {
+    "sitiom/nvim-numbertoggle",
+    event = "VeryLazy",
+  },
+  {
+    "rainbowhxch/accelerated-jk.nvim",
+    event = "VeryLazy",
+    opts = {
+      mode = "time_driven",
+      enable_deceleration = false,
+      acceleration_motions = { "j", "k", "e", "w", "b" },
+      acceleration_limit = 120,
+      acceleration_table = { 7, 12, 17, 21, 24, 26, 28, 30 },
+      -- when 'enable_deceleration = true', 'deceleration_table = { {200, 3}, {300, 7}, {450, 11}, {600, 15}, {750, 21}, {900, 9999} }'
+      deceleration_table = { { 150, 9999 } },
+    },
+    config = true,
   },
 }

@@ -5,6 +5,7 @@ local key_tterm = stems.tterm
 local key_based = stems.based
 local key_block = stems.block
 local key_easyread = stems.easyread
+local key_treesj = stems.treesj
 
 -- these are the core interface items. These are the base upon which the other
 -- interface items are built. At the bottom of this file we merge all of the
@@ -150,7 +151,6 @@ local iface_core = {
       end
 
       -- if you only want these mappings for toggle term use term://*toggleterm#* instead
-      vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
       vim.api.nvim_create_autocmd("TermOpen", {
         pattern = { "term://*" },
         callback = function(ev)
@@ -179,56 +179,14 @@ local iface_core = {
     },
   },
   {
-    "folke/which-key.nvim",
-    opts = {
-      plugins = {
-        marks = true,
-        registers = true,
-      },
-      window = {
-        border = env.borders.main,
-        position = "top",
-        winblend = 35,
-        zindex = 80,
-      },
-      triggers_nowait = {
-        "g`",
-        "g'",
-        -- registers
-        '"',
-        "<c-r>",
-        -- spelling
-        "z=",
-      },
-      documentation = {
-        view = "hover",
-        opts = {
-          lang = "markdown",
-          replace = true,
-          render = "plain",
-          format = { "{message}" },
-          win_options = { concealcursor = "n", conceallevel = 3 },
-        },
-      },
-    },
-  },
-  {
     "jghauser/mkdir.nvim",
     event = "VeryLazy",
-  },
-  {
-    "nvimdev/template.nvim",
-    cmd = { "Template", "TemProject" },
-    config = true,
-    opts = {
-      temp_dir = "~/.config/nvim/templates",
-    },
   },
   {
     "Wansmer/treesj",
     keys = {
       {
-        "<space>Jm",
+        key_treesj .. "m",
         function()
           require("treesj").toggle()
         end,
@@ -236,7 +194,7 @@ local iface_core = {
         desc = "treesj=> toggle fancy splitjoin",
       },
       {
-        "<space>Jj",
+        key_treesj .. "j",
         function()
           require("treesj").join()
         end,
@@ -244,7 +202,7 @@ local iface_core = {
         desc = "treesj=> join with splitjoin",
       },
       {
-        "<space>Jp",
+        key_treesj .. "p",
         function()
           require("treesj").split()
         end,
@@ -318,16 +276,26 @@ local iface_core = {
     end,
   },
   {
-    "max397574/better-escape.nvim",
-    event = "VeryLazy",
+    "TheBlob42/houdini.nvim",
     config = true,
     opts = {
-      mapping = { "jj" },
+      mappings = { "jj", "jk" },
       timeout = vim.o.timeoutlen,
-      clear_empty_lines = true,
-      keys = "<Esc>",
+      check_modified = true,
     },
+    event = "VeryLazy",
   },
+  -- {
+  --   "max397574/better-escape.nvim",
+  --   event = "VeryLazy",
+  --   config = true,
+  --   opts = {
+  --     mapping = { "jj" },
+  --     timeout = vim.o.timeoutlen,
+  --     clear_empty_lines = true,
+  --     keys = "<Esc>",
+  --   },
+  -- },
   {
     "axieax/urlview.nvim",
     cmd = "UrlView",
@@ -419,7 +387,7 @@ local iface_core = {
       {
         key_easyread,
         "<CMD>Bionic<CR>",
-        mode = { "n", "v" },
+        mode = { "n" },
         desc = "bionic=> toggle flow-state bionic reading",
       },
     },
@@ -437,6 +405,7 @@ local iface_core = {
       {
         key_block,
         "<CMD>Block<CR>",
+        mode = "n",
         desc = "block=> toggle block highlighting",
       },
     },
@@ -483,6 +452,20 @@ local iface_core = {
         end,
         mode = "n",
         desc = "dcode=> decode text (base64)",
+      },
+    },
+  },
+  {
+    "jbyuki/quickmath.nvim",
+    cmd = "Quickmath",
+    opts = {},
+    config = true,
+    keys = {
+      {
+        "<leader>C",
+        "<CMD>Quickmath<CR>",
+        mode = "n",
+        desc = "calc=> open quickmath",
       },
     },
   },
