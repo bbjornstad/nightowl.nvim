@@ -346,7 +346,13 @@ return {
     cmd = "Himalaya",
     keys = {
       {
-        "<F9>",
+        "<F10>",
+        "<CMD>Himalaya<CR>",
+        mode = "n",
+        desc = "mail=> update servers and view mail",
+      },
+      {
+        "<F11>",
         "<CMD>Himalaya<CR>",
         mode = "n",
         desc = "mail=> update servers and view mail",
