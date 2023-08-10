@@ -3,7 +3,7 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 -- -----------------------------------------------------------------------------
-local edit_tools = require("uutils.edit")
+local edit_tools = require("uutils.text")
 local key_cline = require("environment.keys").stems.cline
 local mapx = vim.keymap.set
 
@@ -20,63 +20,13 @@ local function toggle_fmtopt(char)
   end
 end
 
--------------------------------------------------------------------------------
--- rebinding for the q-mode close mappings. using the q key so liberally for
--- macros makes no sense in my mind, so what we are doing instead is subsetting
--- off any keys we want specifically for buffer/window manipulation instead.
--- Any non-bound q-keys should still work as macros.
------
--- mapx(
---   { "n", "v", "o" },
---   "qq",
---   "<CMD>quit<CR>",
---   { desc = "quit=> close this buffer", remap = false, nowait = true }
--- )
--- mapx(
---   { "n", "v", "o" },
---   "QQ",
---   "<CMD>quit!<CR>",
---   { desc = "quit=> close forcefully", remap = false, nowait = true }
--- )
-
---------------------------------------------------------------------------------
--- Rebindings for q-mode delete buffer mappings.
--- mapx(
---   { "n", "v", "o" },
---   "qd",
---   "<CMD>bdelete<CR>",
---   { desc = "quit=> close forcefully", remap = false, nowait = true }
--- )
--- mapx(
---   { "n", "v", "o" },
---   "qD",
---   "<CMD>bdelete!<CR>",
---   { desc = "quit=> close forcefully", remap = false, nowait = true }
--- )
-
 --------------------------------------------------------------------------------
 -- Rebind the help menu to be attached to "gh"
 mapx(
-  { "n", "v", "o" },
+  "n",
   "gh",
   ("<CMD>help %s<CR>"):format(vim.fn.expand("<cword>")),
   { desc = "got=> get help", remap = false, nowait = true }
-)
-
----------------------------------------------------------------------------------
--- Basic Buffer Manipulation. Most of this is handled in interface via the
--- plugin nvim-smartbuffs.
-mapx(
-  { "n", "v" },
-  "<leader>bw",
-  "<CMD>write<CR>",
-  { desc = "buf=> save buffer" }
-)
-mapx(
-  { "n", "v" },
-  "<leader>bW",
-  "<CMD>writeall<CR>",
-  { desc = "buf=> save buffer" }
 )
 
 ---------------------------------------------------------------------------------
@@ -103,7 +53,54 @@ end, { desc = "brk=> insert dash break" })
 -- that might be applied to the buffer due to things like search or flash.nvim
 mapx(
   "n",
-  "<C-n>",
+  "<C-c>",
   "<CMD>nohlsearch<CR>",
   { desc = "hilite=> remove temporary highlighting" }
 )
+
+-- -----------------------------------------------------------------------------
+-- this section contains relevant keybindings that can close or open windows.
+-- these are bound by default to keys beginning with the prefix `q`, which can
+-- cause some behavioral quirks related to recording macros. Hence, we rebind
+-- the macro record input to be <leader>q
+mapx(
+  "n",
+  "<leader>Q",
+  "q",
+  { desc = "macro=> record macro into register", remap = false }
+)
+vim.keymap.del("n", "q")
+-- mapx("n", "q", "<nop>", { remap = false })
+mapx("n", "qq", "<CMD>quit<CR>", { desc = "quit=> terminate window" })
+mapx("n", "q!", "<CMD>quit!<CR>", { desc = "quit=> [!] terminate window" })
+mapx("n", "QQ", "<CMD>quitall<CR>", { desc = "quit=> terminate all windows" })
+mapx(
+  "n",
+  "Q!",
+  "<CMD>quitall!<CR>",
+  { desc = "quit=> [!] terminate all windows" }
+)
+mapx("n", "qbn", function()
+  vim.ui.input({ prompt = "enter filename:" }, function(input)
+    vim.cmd(("edit ./%s"):format(input))
+  end)
+end, { desc = "buf=> new buffer" })
+mapx("n", "qbw", "<CMD>write<CR>", { desc = "buf=> save current buffer" })
+mapx("n", "qbW", "<CMD>writeall<CR>", { desc = "buf=> save all buffers" })
+mapx("n", "qbo", "<CMD>bwipeout<CR>", { desc = "buf=> wipeout this buffer" })
+mapx(
+  "n",
+  "qbO",
+  "<CMD>bwipeout!<CR>",
+  { desc = "buf=> [!] wipeout this buffer" }
+)
+
+vim.keymap.del("n", "<leader>bb")
+vim.keymap.del({ "n", "v", "i" }, "<A-j>")
+vim.keymap.del({ "n", "v", "i" }, "<A-k>")
+vim.keymap.del("n", require("environment.keys").stems.base.repl)
+
+vim.keymap.del({ "n", "x" }, "j")
+vim.keymap.del({ "n", "x" }, "k")
+mapx({ "n", "x" }, "j", "<Plug>(accelerated_jk_j)", { desc = "move=> down" })
+mapx({ "n", "x" }, "k", "<Plug>(accelerated_jk_k)", { desc = "move=> up" })
