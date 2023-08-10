@@ -14,6 +14,9 @@ local uienv = require("environment.ui")
 local lazyconf = {
   spec = {
     -- add LazyVim and import its plugins
+    -- edit: 2023-08-09 added personal fork to remove neo-tree
+    -- incompatibilities.
+    -- { "bbjornstad/nvimparliament", dev = false, import = "lazyvim.plugins" },
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     -- import any extras modules here
     { import = "lazyvim.plugins.extras.lang.typescript" },
@@ -22,6 +25,7 @@ local lazyconf = {
     { import = "lazyvim.plugins.extras.lang.rust" },
     { import = "lazyvim.plugins.extras.lang.clangd" },
     { import = "lazyvim.plugins.extras.lang.tailwind" },
+    { import = "lazyvim.plugins.extras.lang.python" },
     { import = "lazyvim.plugins.extras.ui.mini-animate" },
     { import = "lazyvim.plugins.extras.test.core" },
     { import = "lazyvim.plugins.extras.dap.core" },
@@ -42,7 +46,9 @@ local lazyconf = {
     lazy = true,
     version = false,
   },
-  install = { colorscheme = { "kanagawa", "iceberg", "tokyonight", "habamax" } },
+  install = {
+    colorscheme = { "kanagawa", "rose-pine", "github-theme", "newpaper" },
+  },
   checker = { enabled = true }, -- automatically check for plugin updates
   performance = {
     rtp = {
