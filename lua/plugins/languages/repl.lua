@@ -1,5 +1,6 @@
 local stems = require("environment.keys").stems
-local key_repl = stems.repl
+local mapn = require("environment.keys").map("n")
+local key_repl = stems.base.repl
 local key_iron = key_repl .. "r"
 local key_sniprun = key_repl .. "s"
 
@@ -111,11 +112,43 @@ return {
   {
     "quarto-dev/quarto-nvim",
     dependencies = {
-      "jmbuhr/otter.nvim",
+      {
+        "jmbuhr/otter.nvim",
+        dependencies = {
+          "hrsh7th/nvim-cmp",
+          "neovim/nvim-lspconfig",
+          "nvim-treesitter/nvim-treesitter",
+        },
+      },
       "hrsh7th/nvim-cmp",
       "neovim/nvim-lspconfig",
       "nvim-treesitter/nvim-treesitter",
     },
     ft = { "quarto", "qmd" },
+    init = function()
+      local otter = require("otter")
+      mapn(
+        "gd",
+        otter.ask_definition,
+        { desc = "otter=> ask for item definition", silent = true }
+      )
+      mapn(
+        "gK",
+        otter.ask_hover,
+        { desc = "otter=> ask for item hover", silent = true }
+      )
+      otter.activate({
+        "r",
+        "python",
+        "lua",
+        "julia",
+        "rust",
+      }, true)
+    end,
+  },
+  {
+    "google/executor.nvim",
+    config = true,
+    opts = {},
   },
 }

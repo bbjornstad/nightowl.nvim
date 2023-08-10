@@ -18,7 +18,7 @@ return {
     ft = { "markdown", "md" },
     config = function()
       vim.cmd(
-        [[let g:mkdx#settings = { 'highlight': { 'frontmatter': { 'toml': 1 } } }]]
+        [[let g:mkdx#settings = { 'highlight': { 'frontmatter': { 'toml': 1, "json": 1 } }, 'map': { 'enable': 1, 'prefix': "M" } }]]
       )
     end,
   },
@@ -31,7 +31,7 @@ return {
         buffers = true,
         conceal = true,
         cursor = true,
-        folds = true,
+        folds = false,
         links = true,
         lists = true,
         maps = true,
@@ -39,7 +39,7 @@ return {
         tables = true,
         yaml = true,
       },
-      filetypes = { "md", "markdown", "rmd", "qmd" },
+      filetypes = { md = true, rmd = true, markdown = true, qmd = true },
       create_dirs = true,
       perspective = {
         priority = "first",
@@ -95,7 +95,12 @@ return {
       yaml = {
         bib = { override = false },
       },
+      mappings = {
+        MkdnUnfoldSection = false,
+        MkdnFoldSection = false,
+      },
     },
+    ft = { "markdown", "md", "rmd", "qmd" },
   },
   {
     "jbyuki/nabla.nvim",
