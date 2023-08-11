@@ -1,5 +1,24 @@
 local mod = {}
 
+function mod.mopts(defaults, overrides, error)
+  error = error or "suppress"
+  if error == "suppress" then
+    overrides = overrides or {}
+  end
+
+  local ret = vim.tbl_deep_extend("force", defaults, overrides)
+
+  return ret
+end
+
+function mod.moptify(func, defaults)
+  local function funcwrap(...)
+    -- TODO implementation do something here
+  end
+
+  return funcwrap
+end
+
 --- defers the given callable from evaluation in its immediate context by
 --- wrapping it in a secondary function, much like decorators in python.
 ---@param callable function callable whose evaluation is to be deferred for the

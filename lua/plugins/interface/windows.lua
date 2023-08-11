@@ -3,6 +3,7 @@ local mapx = vim.keymap.set
 local key_bufmenu = require("environment.keys").stems.base.buffers
 local wk_family = require("environment.keys").wk_family_inject
 local ignore_buftypes = require("environment.ui").ft_ignore_list
+local mopts = require("uutils.functional").mopts
 
 local function pdel(mode, keys, opts)
   local ok, res = pcall(vim.keymap.del, mode, keys, opts)
@@ -375,8 +376,8 @@ return {
     },
     opts = {
       position = { "right", "top" },
-      width = 80,
-      height = 36,
+      width = 40,
+      height = 20,
       border = env.borders.main,
       preview_position = "left",
       preview = {
@@ -391,7 +392,7 @@ return {
         right = 1,
         bottom = 1,
       },
-      relative = "editor",
+      relative = "cursor",
       keymap = {
         close = "d",
         h_split = "h",
@@ -423,7 +424,9 @@ return {
       },
       {
         "qss",
-        [[<CMD>lua require('persistence').load()<CR>]],
+        function()
+          require("persistence").load()
+        end,
         mode = "n",
         desc = "sesh=> load session",
       },
@@ -434,7 +437,9 @@ return {
       },
       {
         "qsl",
-        [[<CMD>lua require('persistence').load({ last = true })<CR>]],
+        function()
+          require("persistence").load({ last = true })
+        end,
         mode = "n",
         desc = "sesh=> load last session",
       },
@@ -445,7 +450,9 @@ return {
       },
       {
         "qst",
-        [[<CMD>lua require('persistence').stop()<CR>]],
+        function()
+          require("persistence").stop()
+        end,
         mode = "n",
         desc = "sesh=> stop session",
       },
@@ -539,4 +546,120 @@ return {
       key_bufmenu,
     },
   }),
+  {
+    "dnlhc/glance.nvim",
+    cmd = { "Glance" },
+    opts = function(_, opts)
+      local actions = require("glance").actions
+      opts.height = opts.height or 16 -- Height of the window
+      opts.zindex = opts.zindex or 45
+      -- Or use a function to enable `detached` only when the active window is too small
+      -- (default behavior)
+      opts.detached = opts.detached
+        or function(winid)
+          return vim.api.nvim_win_get_width(winid) < 100
+        end
+
+      opts.preview_win_opts = mopts({
+        -- Configure preview window options
+        cursorline = true,
+        number = true,
+        wrap = true,
+      }, opts.preview_win_opts)
+      opts.border = mopts({
+        enable = false, -- Show window borders. Only horizontal borders allowed
+        top_char = "═",
+        bottom_char = "═",
+      }, opts.border)
+      opts.list = mopts({
+        position = "right", -- Position of the list window 'left'|'right'
+        width = 0.33, -- 33% width relative to the active window, min 0.1, max 0.5
+      }, opts.list)
+      opts.theme = mopts({ -- This feature might not work properly in nvim-0.7.2
+        enable = true, -- Will generate colors for the plugin based on your current colorscheme
+        mode = "auto", -- 'brighten'|'darken'|'auto', 'auto' will set mode based on the brightness of your colorscheme
+      }, opts.theme)
+      opts.mappings = mopts({
+        list = {
+          ["j"] = actions.next, -- Bring the cursor to the next item in the list
+          ["k"] = actions.previous, -- Bring the cursor to the previous item in the list
+          ["<Down>"] = actions.next,
+          ["<Up>"] = actions.previous,
+          ["<Tab>"] = actions.next_location, -- Bring the cursor to the next location skipping groups in the list
+          ["<S-Tab>"] = actions.previous_location, -- Bring the cursor to the previous location skipping groups in the list
+          ["<C-u>"] = actions.preview_scroll_win(5),
+          ["<C-d>"] = actions.preview_scroll_win(-5),
+          ["v"] = actions.jump_vsplit,
+          ["s"] = actions.jump_split,
+          ["t"] = actions.jump_tab,
+          ["<CR>"] = actions.jump,
+          ["o"] = actions.jump,
+          ["l"] = actions.open_fold,
+          ["h"] = actions.close_fold,
+          ["<leader>l"] = actions.enter_win("preview"), -- Focus preview window
+          ["q"] = actions.close,
+          ["Q"] = actions.close,
+          ["<Esc>"] = actions.close,
+          ["<C-q>"] = actions.quickfix,
+          -- ['<Esc>'] = false -- disable a mapping
+        },
+        preview = {
+          ["Q"] = actions.close,
+          ["<Tab>"] = actions.next_location,
+          ["<S-Tab>"] = actions.previous_location,
+          ["<leader>l"] = actions.enter_win("list"), -- Focus list window
+        },
+      }, opts.mapping)
+      opts.hooks = mopts({}, opts.hooks)
+      opts.folds = mopts({
+        fold_closed = "",
+        fold_open = "",
+        folded = true, -- Automatically fold list on startup
+      }, opts.folds)
+      opts.indent_lines = mopts({
+        enable = true,
+        icon = "│",
+      }, opts.indent_lines)
+      opts.winbar = mopts({
+        enable = true, -- Available strating from nvim-0.8+
+      }, opts.winbar)
+    end,
+    keys = {
+      {
+        "glr",
+        "<CMD>Glance references<CR>",
+        mode = "n",
+        desc = "glance=> references",
+      },
+      {
+        "gld",
+        "<CMD>Glance definitions<CR>",
+        mode = "n",
+        desc = "glance=> definitions",
+      },
+      {
+        "glt",
+        "<CMD>Glance type_definitions<CR>",
+        mode = "n",
+        desc = "glance=> type definitions",
+      },
+      {
+        "gli",
+        "<CMD>Glance implementations<CR>",
+        mode = "n",
+        desc = "glance=> implementations",
+      },
+    },
+  },
+  -- {
+  --   "ldelossa/litee.nvim",
+  --   config = true,
+  --   opts = {},
+  -- },
+  -- {
+  --   "ldelossa/litee-calltree.nvim",
+  --   dependencies = { "ldelossa/litee.nvim" },
+  --   config = true,
+  --   opts = {},
+  -- },
 }

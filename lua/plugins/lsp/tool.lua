@@ -248,6 +248,7 @@ return {
       enabled = true,
       prefix = " 󰁭 󰟵 󰙔 ",
       disable_ft = { "markdown" },
+      min_rows = 0,
     },
     keys = {
       {
@@ -299,5 +300,34 @@ return {
   {
     "jubnzv/virtual-types.nvim",
     event = "LspAttach",
+  },
+  {
+    "m-demare/hlargs.nvim",
+    opts = {
+      highlight = {},
+      excluded_filetypes = {},
+    },
+    config = true,
+    event = "LspAttach",
+  },
+  {
+    "mizlan/iswap.nvim",
+    opts = {},
+    config = true,
+    keys = {},
+    cmd = {
+      "ISwap",
+      "ISwapWith",
+      "ISwapNode",
+      "ISwapNodeWith",
+      "ISwapNodeWithLeft",
+      "ISwapNodeWithRight",
+      "IMove",
+      "IMoveWith",
+      "IMoveNode",
+      "IMoveNodeWith",
+      "IMoveNodeWithLeft",
+      "IMoveNodeWithRight",
+    },
   },
 }

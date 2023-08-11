@@ -157,6 +157,7 @@ return {
       "meuter/lualine-so-fancy.nvim",
       "rebelot/kanagawa.nvim",
       "Bekaboo/dropbar.nvim",
+      "cbochs/grapple.nvim",
     },
     event = "VimEnter",
     opts = {
@@ -190,15 +191,19 @@ return {
         },
         lualine_x = {
           {
+            function()
+              local key = require("grapple").key()
+              return "󰓼 ⋊ " .. key .. " ⋉"
+            end,
+            cond = function()
+              require("grapple").exists()
+            end,
+          },
+          {
             escape_wait,
           },
           {
             require("noice").api.status.command.get,
-          },
-          {
-            "filetype",
-            icon_only = false,
-            padding = { left = 1, right = 1 },
           },
           {
             "fancy_location",
@@ -208,6 +213,11 @@ return {
           },
         },
         lualine_y = {
+          {
+            "filetype",
+            icon_only = false,
+            padding = { left = 1, right = 1 },
+          },
           {
             "fancy_lsp_servers",
           },
@@ -239,9 +249,9 @@ return {
             path = 0,
             symbols = {
               modified = "",
-              readonly = "󱪛",
-              unnamed = "",
-              newfile = "",
+              readonly = "󱪜",
+              unnamed = "",
+              newfile = "󰜄",
             },
           },
         },

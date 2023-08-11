@@ -173,4 +173,17 @@ return { -- add folding range to capabilities
       ft_ignore = {},
     },
   },
+  {
+    "yaocccc/nvim-foldsign",
+    config = true,
+    event = { "CursorHold" },
+    opts = {
+      offset = -2,
+      foldsigns = {
+        open = "⌐",
+        closed = "⌈",
+        seps = { "│", "┃" },
+      },
+    },
+  },
 }
