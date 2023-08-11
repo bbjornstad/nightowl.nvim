@@ -186,7 +186,7 @@ local iface_core = {
     "Wansmer/treesj",
     keys = {
       {
-        key_treesj .. "m",
+        key_treesj .. "j",
         function()
           require("treesj").toggle()
         end,
@@ -194,7 +194,7 @@ local iface_core = {
         desc = "treesj=> toggle fancy splitjoin",
       },
       {
-        key_treesj .. "j",
+        key_treesj .. "J",
         function()
           require("treesj").join()
         end,
@@ -469,6 +469,84 @@ local iface_core = {
       },
     },
   },
+  {
+    "t-troebst/perfanno.nvim",
+    dependencies = "nvim-telescope/telescope.nvim",
+    opts = function(_, opts)
+      opts.formats = vim.tbl_deep_extend("force", {
+        { percent = true, format = "%.2f%%", minimum = 0.5 },
+        { percent = false, format = "%d", minimum = 1 },
+      }, opts.formats or {})
+      opts.annotate_after_load = opts.annotate_after_load or true
+      opts.annotate_on_open = opts.annotate_on_open or true
+      opts.telescope = vim.tbl_deep_extend("force", {
+        -- Enable if possible, otherwise the plugin will fall back to vim.ui.select
+        enabled = pcall(require, "telescope"),
+        -- Annotate inside of the preview window
+        annotate = true,
+      }, opts.telescope or {})
+
+      -- Node type patterns used to find the function that surrounds the cursor
+      opts.ts_function_patterns = vim.tbl_deep_extend("force", {
+        -- These should work for most languages (at least those used with perf)
+        default = {
+          "function",
+          "method",
+        },
+        -- Otherwise you can add patterns for specific languages like:
+        -- weirdlang = {
+        --     "weirdfunc",
+        -- }
+      }, opts.ts_function_patterns or {})
+    end,
+    config = true,
+    event = {},
+  },
+  {
+    "kevinhwang91/nvim-bqf",
+    ft = "qf",
+    opts = {
+      auto_enable = true,
+      auto_resize_height = true, -- highly recommended enable
+      preview = {
+        win_height = 16,
+        win_vheight = 16,
+        delay_syntax = 80,
+        border = { "┏", "━", "┓", "┃", "┛", "━", "┗", "┃" },
+        show_title = true,
+        should_preview_cb = function(bufnr, qwinid)
+          local ret = true
+          local bufname = vim.api.nvim_buf_get_name(bufnr)
+          local fsize = vim.fn.getfsize(bufname)
+          if fsize > 100 * 1024 then
+            -- skip file size greater than 100k
+            ret = false
+          elseif bufname:match("^fugitive://") then
+            -- skip fugitive buffer
+            ret = false
+          end
+          return ret
+        end,
+      },
+      -- make `drop` and `tab drop` to become preferred
+      func_map = {
+        drop = "o",
+        openc = "O",
+        split = "<C-s>",
+        tabdrop = "<C-t>",
+        -- set to empty string to disable
+        tabc = "",
+        ptogglemode = "z,",
+      },
+      filter = {
+        fzf = {
+          action_for = { ["ctrl-s"] = "split", ["ctrl-t"] = "tab drop" },
+          extra_opts = { "--bind", "ctrl-o:toggle-all", "--prompt", "> " },
+        },
+      },
+    },
+    config = true,
+  },
 }
 
 -- explicitly put all of the component parts to the interface submodule into the
@@ -483,9 +561,3 @@ local iface_core = {
 -- specifications, it doesn't actually affect the order of the loading of
 -- plugins, just how the configurations get stacked beforehand.
 return iface_core
--- {
---   iface_core,
---   -- require("plugins.interface.windows"),
---   -- require("plugins.interface.location"),
---   -- require("plugins.interface.barowl"),
--- }

@@ -240,4 +240,23 @@ return {
       },
     },
   },
+  {
+    "topaxi/gh-actions.nvim",
+    cmd = "GhActions",
+    keys = {
+      {
+        "<leader>ga",
+        "<cmd>GhActions<cr>",
+        mode = "n",
+        desc = "git=> Github Actions",
+      },
+    },
+    -- optional, you can also install and use `yq` instead.
+    build = "make",
+    dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
+    opts = {},
+    config = function(_, opts)
+      require("gh-actions").setup(opts)
+    end,
+  },
 }

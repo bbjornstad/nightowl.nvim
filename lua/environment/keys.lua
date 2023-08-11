@@ -47,6 +47,9 @@ mod.stems.base.tasks = "<bar>"
 mod.stems.base.repl = "<F2>"
 mod.stems.base.fuzzy = "Z"
 mod.stems.base.buffers = "q"
+mod.stems.base.grapple = {}
+mod.stems.base.grapple.popup = "gp"
+mod.stems.base.grapple.tag = "gt"
 
 mod.stems.ccc = mod.stems.base.core .. "uh"
 mod.stems.toggleterm = mod.stems.base.core .. "t"
