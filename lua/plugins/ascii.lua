@@ -2,11 +2,19 @@ local stems = require("environment.keys").stems
 local key_cbox = stems.cbox
 local key_cline = stems.cline
 local key_figlet = stems.figlet
+local mopts = require("uutils.functional").mopts
+local inp = require("uutils.input")
+local compute_effective_width = require("uutils.text").compute_effective_width
+
+local function change_figlet_font(fontopts)
+  vim.g.figban_fontstyle = fontopts.name or "Impossible"
+  require("figlet").Config(mopts({ font = "Impossible" }, fontopts))
+end
 
 return {
   {
     "LudoPinelli/comment-box.nvim",
-    event = "VeryLazy",
+    -- event = "VeryLazy",
     opts = {
       doc_width = tonumber(vim.opt.textwidth:get()),
       box_width = (3 / 4) * tonumber(vim.opt.textwidth:get()),
@@ -159,7 +167,7 @@ return {
       fill_char = "-",
 
       -- width of the comment frame
-      frame_width = 70,
+      frame_width = compute_effective_width(),
 
       -- wrap the line after 'n' characters
       line_wrap_len = 50,
@@ -176,9 +184,9 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
-    event = {
-      "VeryLazy",
-    },
+    -- event = {
+    --   "VeryLazy",
+    -- },
   },
   {
     "thazelart/figban.nvim",
@@ -190,48 +198,33 @@ return {
         -- somehow we would ideally like this keymapping to have completion items
         -- which are the selection of figlet fonts that are available on theme
         -- system
-        stems.figlet .. "F",
-        function()
-          vim.ui.input({
-            prompt = "select a figlet font 󰄾 ",
-          }, function(input)
-            vim.g.figban_fontstyle = input
-          end)
-        end,
-        mode = { "n", "v" },
+        key_figlet .. "F",
+        inp.callback_input("figlet font:", function(input)
+          vim.g.figban_fontstyle = input
+          vim.notify(("Assigned Figlet Font: %s"):format(input))
+        end),
+        mode = { "n" },
         desc = "figlet.ban=> select banner font",
       },
       {
-        stems.figban .. "b",
-        function()
-          vim.ui.input({
-            prompt = "enter banner text 󰄾 ",
-          }, function(input)
-            pcall(vim.cmd, ([[Figban %s]]):format(input))
-          end)
-        end,
+        key_figlet .. "b",
+        inp.cmdtext_input("banner text:", [[Figban %s]]),
         mode = "n",
         desc = "figlet.ban=> generate banner",
       },
       {
-        stems.figlet .. "b",
-        function()
-          local status, res = pcall(vim.cmd, [[Figban <range>]])
-          if not status then
-            return false
-          end
-          return true
-        end,
+        key_figlet .. "b",
+        ":Figban<CR>",
         mode = "v",
         desc = "figlet.ban=> selection generate banner",
       },
     },
   },
+
   {
     "pavanbhat1999/figlet.nvim",
     dependencies = { "numToStr/Comment.nvim" },
     cmd = {
-      "Figlet",
       "Fig",
       "FigComment",
       "FigCommentHighlight",
@@ -239,29 +232,48 @@ return {
       "FigSelect",
       "FigSelectComment",
     },
+    config = function(_, opts)
+      require("figlet").Config(mopts({ font = "Impossible" }, opts))
+    end,
+    opts = { font = "Impossible" },
     keys = {
       {
+        key_figlet .. "F",
+        change_figlet_font,
+        mode = "n",
+        desc = "figlet=> change font",
+      },
+      {
         key_figlet .. "f",
-        "<CMD>Figlet<CR>",
-        mode = { "n", "v" },
+        function()
+          vim.ui.input({ prompt = "text to figlet: " }, function(input)
+            vim.cmd(([[Fig %s]]):format(input))
+          end)
+        end,
+        "<CMD>Fig<CR>",
+        mode = { "n" },
         { desc = "figlet=> ascii interface" },
       },
       {
         key_figlet .. "c",
-        "<CMD>FigComment<CR>",
-        mode = { "n", "v" },
+        function()
+          vim.ui.input({ prompt = "text to figlet: " }, function(input)
+            vim.cmd(([[FigComment %s]]):format(input))
+          end)
+        end,
+        mode = { "n" },
         desc = "figlet=> ascii comment interface",
       },
       {
-        key_figlet .. "S",
+        key_figlet .. "ss",
         "<CMD>FigSelect<CR>",
-        mode = { "n", "v" },
+        mode = { "v" },
         desc = "figlet=> ascii select interface",
       },
       {
         key_figlet .. "sc",
         "<CMD>FigSelectComment<CR>",
-        mode = { "n", "v" },
+        mode = { "v" },
         desc = "figlet=> ascii select comment interface",
       },
     },
@@ -269,7 +281,7 @@ return {
   {
     "samodostal/image.nvim",
     dependencies = { "nvim-lua/plenary.nvim", "m00qek/baleia.nvim" },
-    event = "VeryLazy",
+    -- event = "VeryLazy",
     opts = {
       render = {
         min_padding = 5,

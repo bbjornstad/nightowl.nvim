@@ -1,6 +1,7 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local colors = require("kanagawa.colors").setup({ theme = "wave" }).palette
 local kenv = require("environment.keys")
+local inp = require("uutils.input")
 
 local function colorize(bg, fg, opts)
   opts = opts or {}
@@ -149,7 +150,6 @@ local organization_tools = {
     "danilshvalov/org-modern.nvim",
     dependencies = { "nvim-orgmode/orgmode" },
     ft = { "org" },
-    opts = {},
     config = function()
       local env = require("environment.ui").borders
       local Menu = require("org-modern.menu")
@@ -221,6 +221,7 @@ local organization_tools = {
           },
         },
         ["core.integrations.nvim-cmp"] = {},
+        ["core.integrations.telescope"] = {},
         ["core.summary"] = {
           config = {
             strategy = "default",
@@ -273,9 +274,30 @@ local organization_tools = {
               binds.map(
                 "norg",
                 "n",
-                leader .. "f",
+                leader .. "fl",
                 "core.integrations.telescope.find_linkable",
                 { buffer = true, desc = "neorg=> find linkables" }
+              )
+              binds.map(
+                "norg",
+                "n",
+                leader .. "il",
+                "core.integrations.telescope.insert_link",
+                { buffer = true, desc = "neorg=> insert linkable" }
+              )
+              binds.map(
+                "norg",
+                "n",
+                leader .. "if",
+                "core.integrations.telescope.insert_file_link",
+                { buffer = true, desc = "neorg=> insert file linkable" }
+              )
+              binds.map(
+                "norg",
+                "i",
+                ("<C-%s><C-f>"):format(leader),
+                "core.integrations.telescope.insert_file_link",
+                { buffer = true, desc = "neorg=> insert file linkable" }
               )
               binds.map(
                 "norg",
@@ -284,8 +306,77 @@ local organization_tools = {
                 "core.integrations.telescope.insert_link",
                 { buffer = true, desc = "neorg=> insert linkable" }
               )
+              binds.map(
+                "norg",
+                "n",
+                leader .. "im",
+                "core.esupports.metagen.inject_metadata",
+                { buffer = true, desc = "neorg=> insert metadata" }
+              )
+              binds.map(
+                "norg",
+                "n",
+                leader .. "um",
+                "core.esupports.metagen.update_metadata",
+                { buffer = true, desc = "neorg=> update metadata" }
+              )
+              binds.map("norg", "n", leader .. "wd", function()
+                vim.cmd([[Neorg workspace default]])
+              end, {
+                buffer = true,
+                desc = "neorg=> default workspace",
+              })
+              binds.map("norg", "n", leader .. "ws", function()
+                inp.workspace([[Neorg workspace %s]])
+              end, {
+                buffer = true,
+                desc = "neorg=> switch to workspace",
+              })
+              binds.map("norg", "n", leader .. "jd", function()
+                vim.cmd([[Neorg journal today]])
+              end, {
+                buffer = true,
+                desc = "neorg=> daily journal (today)",
+              })
+              binds.map(
+                "norg",
+                "n",
+                leader .. "jy",
+                function()
+                  vim.cmd([[Neorg journal yesterday]])
+                end,
+                { buffer = true, desc = "neorg=> daily journal (yesterday)" }
+              )
+              binds.map("norg", "n", leader .. "jo", function()
+                vim.cmd([[Neorg journal tomorrow]])
+              end, {
+                buffer = true,
+                desc = "neorg=> daily journal (tomorrow)",
+              })
+              binds.map("norg", "n", leader .. "jt", function()
+                vim.cmd([[Neorg journal template]])
+              end, {
+                buffer = true,
+                desc = "neorg=> journal template",
+              })
+              binds.map("norg", "n", leader .. "jc", function()
+                vim.cmd([[Neorg journal toc]])
+              end, {
+                buffer = true,
+                desc = "neorg=> journal contents",
+              })
+              binds.map(
+                "norg",
+                "n",
+                leader .. "sh",
+                "core.integrations.telescope.search_headings",
+                {
+                  buffer = true,
+                  desc = "neorg=> search headings",
+                }
+              )
             end,
-            neorg_leader = kenv.stems.base.tasks,
+            neorg_leader = "'", -- kenv.stems.base.tasks,
           },
         },
       },
