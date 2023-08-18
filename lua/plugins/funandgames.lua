@@ -63,19 +63,18 @@ return {
   {
     "tamton-aquib/zone.nvim",
     enabled = env.screensaver.enabled,
+    cmd = {
+      "Treadmill",
+      "DVD",
+      "Epilepsy",
+      "Vanish",
+    },
     opts = {
       style = env.screensaver.selections[math.random(
         #env.screensaver.selections
       )],
       after = 6000,
-      exclude_filetypes = {
-        "TelescopePrompt",
-        "NvimTree",
-        "neo-tree",
-        "dashboard",
-        "lazy",
-        "oil",
-      },
+      exclude_filetypes = env.ft_ignore_list,
       treadmill = {
         direction = "left",
         headache = true,
@@ -92,12 +91,12 @@ return {
       },
       -- Opts for Dvd style
     },
-    event = "VeryLazy",
+    -- event = "VeryLazy",
   },
   {
     "tamton-aquib/duck.nvim",
     config = function() end,
-    event = "VeryLazy",
+    -- event = "VeryLazy",
     keys = {
       {
         "<F7>",
