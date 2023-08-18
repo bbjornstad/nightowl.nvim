@@ -1,4 +1,5 @@
 local env = require("environment.ui")
+local mopts = require("uutils.functional").mopts
 
 local handler = function(virtText, lnum, endLnum, width, truncate)
   local newVirtText = {}
@@ -43,18 +44,19 @@ return { -- add folding range to capabilities
     },
   },
   {
+    "milisims/foldhue.nvim",
+    config = function(_, opts)
+      require("foldhue").enable()
+    end,
+  },
+  {
     "kevinhwang91/nvim-ufo",
     dependencies = {
       "kevinhwang91/promise-async",
-      "VonHeikemen/lsp-zero.nvim",
-      {
-        "milisims/foldhue.nvim",
-        config = function(_, opts)
-          require("foldhue").enable()
-        end,
-      },
+      -- "milisims/foldhue.nvim",
+      -- "yaocccc/nvim-foldsign",
+      "anuvyklack/pretty-fold.nvim",
     },
-    event = "VeryLazy",
     opts = {
       fold_virt_text_handler = handler,
       preview = {
@@ -124,7 +126,6 @@ return { -- add folding range to capabilities
   {
     "anuvyklack/pretty-fold.nvim",
     config = true,
-    event = "VeryLazy",
     opts = {
       sections = {
         left = {
@@ -152,7 +153,7 @@ return { -- add folding range to capabilities
       -- "delete" : Delete all comment signs from the fold string.
       -- "spaces" : Replace all comment signs with equal number of spaces.
       -- false    : Do nothing with comment signs.
-      process_comment_signs = "delete",
+      process_comment_signs = "spaces",
 
       -- Comment signs additional to the value of `&commentstring` option.
       comment_signs = {},
@@ -168,20 +169,37 @@ return { -- add folding range to capabilities
         { "{", "}" },
         { "%(", ")" }, -- % to escape lua pattern char
         { "%[", "]" }, -- % to escape lua pattern char
+        { "<", ">" },
+        { [[<CMD>]], [[<CR>]] }, -- % to escape lua pattern char
       },
 
-      ft_ignore = {},
+      ft_ignore = mopts({ "neorg" }, env.ft_ignore_list, "suppress"),
+    },
+  },
+  {
+    "chrisgrieser/nvim-origami",
+    config = true,
+    opts = {
+      keepFoldsAcrossSessions = true,
+      pauseFoldsOnSearch = true,
+      setupFoldKeymaps = true,
+    },
+    event = "VeryLazy",
+    dependencies = {
+      "anuvyklack/pretty-fold.nvim",
+      -- "yaocccc/nvim-foldsign",
+      -- "milisims/foldhue.nvim",
     },
   },
   {
     "yaocccc/nvim-foldsign",
+    event = "CursorHold",
     config = true,
-    event = { "CursorHold" },
     opts = {
-      offset = -2,
+      offset = -4,
       foldsigns = {
-        open = "⌐",
-        closed = "⌈",
+        open = "-",
+        closed = "+",
         seps = { "│", "┃" },
       },
     },
