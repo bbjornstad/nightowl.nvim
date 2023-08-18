@@ -1,6 +1,8 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local env = require("environment.ui")
-local enb = require("environment.ai").enabled_agents_status
+local enb =
+  require("environment.ai").enablements(require("environment.ai").enabled)
+local notify_on_startup = require("environment.ai").status_notify_on_startup
 
 local stems = require("environment.keys").stems
 local key_ai = stems.base.ai
@@ -66,9 +68,23 @@ AI Plugin Status:
   )
 end
 
+if notify_on_startup then
+  vim.api.nvim_create_autocmd({ "VimEnter" }, {
+    group = vim.api.nvim_create_augroup("ai_agents_startup_notification", {}),
+    callback = notify_agents,
+  })
+end
+
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
-  group = vim.api.nvim_create_augroup("ai_agents_startup_notification", {}),
-  callback = notify_agents,
+  group = vim.api.nvim_create_augroup("ai_agents_notification_keybind", {}),
+  callback = function()
+    vim.keymap.set(
+      { "n" },
+      key_ai .. "N",
+      notify_agents,
+      { desc = "ai.status=> notify agent statuses", remap = false }
+    )
+  end,
 })
 
 return {
@@ -106,7 +122,6 @@ return {
       -- "hrsh7th/nvim-cmp",
     },
     cmd = "Codeium",
-    event = "VeryLazy",
     enabled = enb.codeium.enable,
   },
   {
@@ -159,8 +174,9 @@ return {
   {
     "zbirenbaum/copilot.lua",
     enabled = enb.copilot.enable,
+    module = enb.copilot.enable,
     cmd = "Copilot",
-    event = { "InsertEnter" },
+    -- event = { "InsertEnter" },
     opts = { suggestion = { enabled = true }, panel = { enabled = true } },
     keys = {
       {
@@ -658,7 +674,6 @@ return {
   },
   {
     "tdfacer/explain-it.nvim",
-    event = "VeryLazy",
     dependencies = "rcarriga/nvim-notify",
     opts = {
       -- Prints useful log messages
