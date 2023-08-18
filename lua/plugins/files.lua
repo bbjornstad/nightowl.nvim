@@ -1,10 +1,25 @@
 local env = require("environment.ui")
 local keystems = require("environment.keys").stems
-local wk_family = require("environment.keys").wk_family_inject
 
 local key_oil = keystems.oil
 local key_nnn = keystems.nnn
+local key_broot = keystems.broot
 local key_files = keystems.files
+
+local function term_broot()
+  local Term = require("toggleterm.terminal").Terminal
+  local broot = Term:new({ cmd = "br", hidden = true })
+  local function _broot_toggle()
+    broot:toggle()
+  end
+  -- now just map this.
+  vim.keymap.set(
+    { "n" },
+    key_broot .. "e",
+    _broot_toggle,
+    { desc = "br=> tree view" }
+  )
+end
 
 return {
   {
@@ -15,30 +30,27 @@ return {
   {
     "is0n/fm-nvim",
     enabled = true,
-    event = "VeryLazy",
     cmd = {
-      "Neomutt",
-      "Lazygit",
+      -- "Lazygit",
       "Joshuto",
       "Ranger",
-      "Broot",
+      -- "Broot",
       "Gitui",
       "Xplr",
       "Vifm",
-      "Skim",
-      "Nnn",
+      -- "Skim",
+      -- "Nnn",
       "Fff",
       "Twf",
       "Fzf",
       "Fzy",
       "Lf",
       "Fm",
-      "TaskWarriorTUI",
     },
     opts = {
       edit_cmd = "edit",
       ui = {
-        default = "split",
+        default = "float",
         float = {
           border = env.borders.main,
           float_hl = "Normal",
@@ -52,26 +64,65 @@ return {
           size = 32,
         },
       },
+      broot_conf = vim.fs.normalize("~/.config/broot/conf.hjson"),
+      mappings = {
+        vert_split = "<C-v>",
+        horz_split = "<C-h>",
+        tabedit = "<C-t>",
+        edit = "<C-e>",
+        ESC = "<ESC>",
+      },
     },
     config = true,
+  },
+  {
+    "lstwn/broot.vim",
+    cmd = { "Broot", "BrootCurrentDir", "BrootWorkingDir", "BrootHomeDir" },
+    config = function(_, opts)
+      -- TODO: Determine if we need to do anything in config here.
+    end,
+    opts = {},
+    init = function()
+      vim.g.broot_default_conf_path =
+        vim.fs.normalize("~/.config/broot/conf.hjson")
+      -- vim.g.broot_replace_netrw = 1
+      -- vim.g.loaded_netrwPlugin = 1
+      -- vim.g.broot_command = "br"
+    end,
     keys = {
       {
-        key_files .. "e",
+        key_broot .. "e",
         "<CMD>Broot<CR>",
         mode = "n",
-        desc = "br=> open broot explorer",
+        desc = "br=> right here tree",
+        -- silent = true,
       },
       {
-        key_files .. "E",
-        "<CMD>Broot<CR>",
+        key_broot .. "c",
+        "<CMD>BrootCurrentDir<CR>",
         mode = "n",
-        desc = "br=> open broot explorer (float)",
+        desc = "br=> current directory tree",
+        -- silent = true,
+      },
+      {
+        key_broot .. "w",
+        "<CMD>BrootWorkingDir<CR>",
+        mode = "n",
+        desc = "br=> working directory tree",
+        silent = true,
+      },
+      {
+        key_broot .. "~",
+        "<CMD>BrootHomeDir<CR>",
+        mode = "n",
+        desc = "br=> home directory tree",
+        silent = true,
       },
     },
   },
   {
     "stevearc/oil.nvim",
-    event = "VeryLazy",
+    cmd = "Oil",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       columns = {
@@ -232,5 +283,4 @@ return {
       },
     },
   },
-  wk_family("fm.nnn", "<leader>nn", { triggers_nowait = { key_nnn } }),
 }
