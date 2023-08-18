@@ -4,7 +4,7 @@ description: things that are still causing hangups towards our better goal of pr
 authors: Bailey Bjornstad | ursa-major
 categories: nightowl.nvim
 created: 2023-08-07
-updated: 2023-08-09
+updated: 2023-08-18
 version: 1.1.1
 @end
 
@@ -27,6 +27,11 @@ version: 1.1.1
 
     Update 2023-08-09: this is mostly fixed. debugging left to do, but no errors
     on startup and everything looks like it is working correctly.
+    Update 2023-08-16: I'm not sure if this is entirely fixed, on startup
+    occasionally neorg treesitter seems to have a minor problem wherein the
+    syntax highlight definitions do not seem to be applied completely to the
+    document. The biggest thing is that headers and metadata are missing body
+    highlighting.
 
 *** (-) Completion Menu Icons
     This has been a thorny issue for too long at this point, and the lspkind
@@ -41,13 +46,43 @@ version: 1.1.1
 *** (x) Neorg keybindings
     Neorg is missing important keybindings to any of the convenience functions
     that are provided.
-*** (-) edgy.nvim fixes
+*** (x) edgy.nvim fixes
     unfortunately, edgy was not working correctly before today. luckily, it is
     working now more correctly although there's still a few problematic spots of
     behavior that should be fixed in the long run.
+
+*** ai components
+    This has become more problematic as time has gone on. Unfortunately, I don't
+    much like the way that I have started to set up the configuration of each
+    component, and whether or not it can be enabled. Perhaps we should do some
+    additional brainstorming about what might make the most sense in terms of
+    implementation. Perhaps we should take a few looks around to see what people
+    have done for their uses.
+    - ( ) check out folke's repos
+    - (x) we are working successfully now
+
 ** Problematic Blockers
    These items are not as critical as the above, but they still are important
    to improving the overall experience to the point of usability.
+
+*** escaping is sometimes weird
+    basically sometimes depending on the mode, pressing escape will just...not
+    do anything. I normally will have to spam other keys to get the keys to
+    "unlock" themselves even though they aren't locked by the system at all,
+    just vim input. Houdini is ok, but...
+
+**** Houdini: Alright so Far
+     the canonical way to deal with the fact that the escape key is in a weird
+     place is to use 'jj' or 'jk' in a keymapping from insert mode. Houdini
+     seems like the best version of these kinds of tools so far, but I am
+     struggling with one issue: in visual block mode, I don't seem to be able to
+     use the j key to move down...which is a problem as that is something I do
+     relatively commonly.
+
+**** Houdini: <2023-08-15> Houdini got the axe. Probably for good?
+     while I did really want to like the plugin, unfortunately it seemed like it
+     was almost too good at its job. Visual block mode had some trouble, and it
+     also was I think messing up other plugins.
 
 ** Unimplemented Features
    These items are not necessarily critical to being able to edit files in an
@@ -60,3 +95,97 @@ version: 1.1.1
     normally activated with `g_` as a normal mode mapping, we would like a few
     additional ways to move between dropbar windows. In particular, tab and
     shift-tab should move to next and previous windows.
+
+*** ( ) keymapping module
+    keymapping is sort of difficult to work with between having two opposed sets
+    of places where keymappings are reasonably defined under lazy.nvim
+    constraints. the init method uses the init key of the lazy spec item and
+    creates a function that creates the keymaps whenever the plugin is loaded.
+    The alternative and seemingly preferred way is to use the keys item of the
+    lazy spec instead, with individual table elements describing the keys, as
+    opposed to function calls.
+**** Enter lubrikey.nvim
+     the idea behind lubrikey is that it can dynamically adapt between both of
+     these forms of keybinding, or others. Hopefully makes heavy use of
+     functional ideas...and can mesh the use of either method because they are
+     needed in slightly different contexts.
+
+*** ( ) Input Prompter
+    this is supposed to be a simple module which can unify the text-formatting
+    and intake of user input via the vim.ui subset of functionality that is
+    exposed and configurable.
+
+** Debugging Features
+   This is the list of things that are implemented but that need some extra
+   debugging in order to make work exactly right.
+
+*** (-) CCC Maybe
+    it may be having some trouble but it also could just not work in the wrong
+    document types, e.g. ones without any color codes in them.
+
+*** (-) fuzz
+    the fuzz module that I have put together could probably use a bit of work
+    and debugging. Plus some keymapping assignments to different, more effective
+    and less conflicting places. I do like using the Z key though...if only I
+    could swap Z and z
+
+    this is in fact, technically possible. Maybe we will give it a shot to see?
+
+**** UPDATE: 2023-08-15 this did not go well, and we've reverted to the standard
+     z-mapping plus the capital Z-mapping for all FZF stuff. We do need to do one
+     additional bit here though, which is to clean out telescope materials and
+     plugins that are superceded by the fzf-lua mappings instead.
+
+*** folke/edgy.nvim fixes
+    I really want to like edgy because it nicely organizes the windows into
+    something slightly more manageable than they would otherwise be. But we are
+    still having a small amount of trouble with system stability while using
+    these tools.
+    - ( ) edgy sometimes doesn't open the symbol outline
+    - ( ) occasionally using symbol outline causes full crash of neovim
+
+*** The Balancing Act: Autocommands
+    Autocommands are proving to be a little bit of a finnicky beast here to
+    manage especially with the knowledge that we are trying to lazy load
+    everything if possible. In an ideal scenario, we would have the following:
+    all plugins would be left to their own devices. As long as each plugin makes
+    sure to accurately specify which other plugins it needs in the dependencies
+    field of each lazy.nvim specification item, there should be no issue with
+    conflicting, as long as there is actually a way to resolve the dependency
+    graph come time to put the program together.
+
+    Alas, things are proving more difficult than that it would seem on this
+    front. It does seem like there is a substantial effect of moving things
+    around in the lazy load runtime-specification by adjusting the event, keys,
+    filetype, or other relevant property items that are defined under lazy.nvim.
+    (e.g. those which affect the load order of plugins).
+
+**** A Definitive Specification, Perhaps?
+     Let the following items determine the precise "ideal" definition of how
+     plugins should be specified with regard to their import/setup-order
+     adjusting properties that are available in lazy.nvim.
+
+     ~ A plugin P1 is a dependency of another plugin P2 when the operations of
+     P1 are required in the execution of the specification of the operations
+     of P2. In this case P1 should be marked in the dependencies field of P2.
+     ~~
+     @code lua
+     {
+       "user2/plugin2",
+       dependencies = {
+         "user1/plugin1"
+       }
+     }
+     @end
+     ~ A plugin that is loaded lazily cannot be used directly in the
+     specification of another plugin without an additional function guard across
+     the property, even if the dependent plugin is specified as a dependency.
+     This is most commonly encountered with the `keys` field and using a bare
+     `require('plugin').function` as the action item.
+     ~ A plugin's internal operations do not have to rely on another plugin for
+     the latter to be a dependency of the first. This is to say that there are
+     two main scenarios when a plugin should be marked as a dependency: when
+     that plugin is specified by the author of the dependent plugin as being a
+     dependency, and when the user uses the functionality of the dependency
+     plugin in the lazy specification of the dependent plugin.
+     ~ asdf
