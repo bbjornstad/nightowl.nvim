@@ -1,5 +1,7 @@
 local fenv = require("environment.fuzz")
 local fstem = require("environment.keys").stems.base.fuzzy
+local sstem = require("environment.keys").stems.base.telescope
+local stem = require("environment.keys").stems.base.core
 
 return {
   {
@@ -7,21 +9,30 @@ return {
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
+    init = function()
+      require("fzf-lua").register_ui_select()
+    end,
     opts = {
       fenv.fzf_profile,
       winopts = {
         height = 0.85,
-        width = 0.95,
+        width = 0.90,
         row = 0.35,
         col = 0.5,
         border = fenv.fzf_border,
         preview = {
-          number = true,
-          cursorcolumn = false,
-          signcolumn = "yes",
-          list = true,
-          foldenable = false,
-          foldmethod = "manual",
+          border = "noborder",
+          wrap = "wrap",
+          layout = "flex",
+          scrollbar = "border",
+          winopts = {
+            signcolumn = "no",
+            list = true,
+            foldenable = false,
+            foldmethod = "manual",
+            cursorcolumn = false,
+            number = true,
+          },
         },
       },
       hls = {
@@ -32,12 +43,36 @@ return {
     config = true,
     keys = {
       {
+        stem .. "/",
+        function()
+          require("fzf-lua").live_grep()
+        end,
+        mode = "n",
+        desc = "fuzz.rg=> live grep",
+      },
+      {
+        fstem .. "/",
+        function()
+          require("fzf-lua").live_grep()
+        end,
+        mode = "n",
+        desc = "fuzz.rg=> live grep",
+      },
+      {
+        sstem .. "/",
+        function()
+          require("fzf-lua").live_grep()
+        end,
+        mode = "n",
+        desc = "fuzz.rg=> live grep",
+      },
+      {
         fstem .. "ff",
         function()
           require("fzf-lua").files()
         end,
         mode = "n",
-        desc = "fuzz=> files",
+        desc = "fuzz.fs=> files",
       },
       {
         fstem .. "fr",
@@ -45,31 +80,39 @@ return {
           require("fzf-lua").oldfiles()
         end,
         mode = "n",
-        desc = "fuzz=> recent files",
+        desc = "fuzz.fs=> recent files",
       },
       {
-        fstem .. "fb",
+        fstem .. "bf",
         function()
           require("fzf-lua").buffers()
         end,
         mode = "n",
-        desc = "fuzz=> buffers",
+        desc = "fuzz.buf=> buffers",
       },
       {
-        fstem .. "fbl",
+        fstem .. "bff",
+        function()
+          require("fzf-lua").buffers()
+        end,
+        mode = "n",
+        desc = "fuzz.buf=> buffers",
+      },
+      {
+        fstem .. "bfl",
         function()
           require("fzf-lua").blines()
         end,
         mode = "n",
-        desc = "fuzz=> lines in current buffer",
+        desc = "fuzz.buf=> lines in current buffer",
       },
       {
-        fstem .. "fbL",
+        fstem .. "bfL",
         function()
           require("fzf-lua").lines()
         end,
         mode = "n",
-        desc = "fuzz=> lines in all buffers",
+        desc = "fuzz.buf=> lines in all buffers",
       },
       {
         fstem .. "qf",
@@ -77,15 +120,15 @@ return {
           require("fzf-lua").quickfix()
         end,
         mode = "n",
-        desc = "fuzz=> quickfix",
+        desc = "fuzz.qf=> quickfix",
       },
       {
-        fstem .. "qs",
+        fstem .. "qF",
         function()
           require("fzf-lua").quickfix_stack()
         end,
         mode = "n",
-        desc = "fuzz=> quickfix stack",
+        desc = "fuzz.qf=> quickfix stack",
       },
       {
         fstem .. "ll",
@@ -93,15 +136,15 @@ return {
           require("fzf-lua").loclist()
         end,
         mode = "n",
-        desc = "fuzz=> location list",
+        desc = "fuzz.loc=> location list",
       },
       {
-        fstem .. "ls",
+        fstem .. "lL",
         function()
           require("fzf-lua").loclist_stack()
         end,
         mode = "n",
-        desc = "fuzz=> location list stack",
+        desc = "fuzz.loc=> location list stack",
       },
       {
         fstem .. "ar",
@@ -109,7 +152,7 @@ return {
           require("fzf-lua").args()
         end,
         mode = "n",
-        desc = "fuzz=> argument list",
+        desc = "fuzz.fn=> argument list",
       },
       {
         fstem .. "gg",
@@ -117,7 +160,7 @@ return {
           require("fzf-lua").grep()
         end,
         mode = "n",
-        desc = "fuzz=> grep everything",
+        desc = "fuzz.rg=> grep everything",
       },
       {
         fstem .. "gl",
@@ -125,7 +168,7 @@ return {
           require("fzf-lua").grep_last()
         end,
         mode = "n",
-        desc = "fuzz=> grep everything, last pattern",
+        desc = "fuzz.rg=> grep everything, last pattern",
       },
       {
         fstem .. "gw",
@@ -133,7 +176,7 @@ return {
           require("fzf-lua").grep_cword()
         end,
         mode = "n",
-        desc = "fuzz=> grep word under cursor",
+        desc = "fuzz.rg=> grep word under cursor",
       },
       {
         fstem .. "gW",
@@ -141,7 +184,7 @@ return {
           require("fzf-lua").grep_cWORD()
         end,
         mode = "n",
-        desc = "fuzz=> grep WORD under cursor",
+        desc = "fuzz.rg=> grep WORD under cursor",
       },
       {
         fstem .. "gv",
@@ -149,7 +192,7 @@ return {
           require("fzf-lua").grep_visual()
         end,
         mode = "v",
-        desc = "fuzz=> grep visual selection",
+        desc = "fuzz.rg=> grep visual selection",
       },
       {
         fstem .. "gp",
@@ -157,7 +200,7 @@ return {
           require("fzf-lua").grep_project()
         end,
         mode = "n",
-        desc = "fuzz=> grep lines in project",
+        desc = "fuzz.rg=> grep lines in project",
       },
       {
         fstem .. "gb",
@@ -165,7 +208,7 @@ return {
           require("fzf-lua").grep_curbuf()
         end,
         mode = "n",
-        desc = "fuzz=> grep lines in current buffer",
+        desc = "fuzz.rg=> grep lines in current buffer",
       },
       {
         fstem .. "lg",
@@ -173,7 +216,15 @@ return {
           require("fzf-lua").live_grep()
         end,
         mode = "n",
-        desc = "fuzz=> live grep everything",
+        desc = "fuzz.lrg=> live grep everything",
+      },
+      {
+        fstem .. "lgp",
+        function()
+          require("fzf-lua").live_grep()
+        end,
+        mode = "n",
+        desc = "fuzz.lrg=> live grep everything",
       },
       {
         fstem .. "lgb",
@@ -181,7 +232,7 @@ return {
           require("fzf-lua").lgrep_curbuf()
         end,
         mode = "n",
-        desc = "fuzz=> live grep current buffer",
+        desc = "fuzz.lrg=> live grep current buffer",
       },
       {
         fstem .. "lgr",
@@ -189,7 +240,7 @@ return {
           require("fzf-lua").live_grep_resume()
         end,
         mode = "n",
-        desc = "fuzz=> resume last live grep",
+        desc = "fuzz.lrg=> resume last live grep",
       },
       {
         fstem .. "lgg",
@@ -197,7 +248,7 @@ return {
           require("fzf-lua").live_grep_glob()
         end,
         mode = "n",
-        desc = "fuzz=> live grep everything (rg --glob support)",
+        desc = "fuzz.lrg=> live grep everything (rg --glob support)",
       },
       {
         fstem .. "gf",
@@ -205,7 +256,7 @@ return {
           require("fzf-lua").git_files()
         end,
         mode = "n",
-        desc = "fuzz=> git files",
+        desc = "fuzz.git=> files",
       },
       {
         fstem .. "gs",
@@ -213,7 +264,7 @@ return {
           require("fzf-lua").git_status()
         end,
         mode = "n",
-        desc = "fuzz=> git status",
+        desc = "fuzz.git=> status",
       },
       {
         fstem .. "gc",
@@ -221,7 +272,7 @@ return {
           require("fzf-lua").git_commits()
         end,
         mode = "n",
-        desc = "fuzz=> git commits",
+        desc = "fuzz.git=> commits",
       },
       {
         fstem .. "gC",
@@ -229,7 +280,7 @@ return {
           require("fzf-lua").git_bcommits()
         end,
         mode = "n",
-        desc = "fuzz=> git commits for current buffer",
+        desc = "fuzz.git=> commits [current buffer]",
       },
       {
         fstem .. "gb",
@@ -237,7 +288,7 @@ return {
           require("fzf-lua").git_branches()
         end,
         mode = "n",
-        desc = "fuzz=> git branches",
+        desc = "fuzz.git=> branches",
       },
       {
         fstem .. "gh",
@@ -245,7 +296,7 @@ return {
           require("fzf-lua").git_stash()
         end,
         mode = "n",
-        desc = "fuzz=> git stash",
+        desc = "fuzz.git=> stash",
       },
       {
         fstem .. "lr",
@@ -253,7 +304,7 @@ return {
           require("fzf-lua").lsp_references()
         end,
         mode = "n",
-        desc = "fuzz=> lsp references",
+        desc = "fuzz.lsp=> references",
       },
       {
         fstem .. "ld",
@@ -261,7 +312,7 @@ return {
           require("fzf-lua").lsp_definitions()
         end,
         mode = "n",
-        desc = "fuzz=> lsp definitions",
+        desc = "fuzz.lsp=> definitions",
       },
       {
         fstem .. "lD",
@@ -269,23 +320,23 @@ return {
           require("fzf-lua").lsp_declarations()
         end,
         mode = "n",
-        desc = "fuzz=> lsp declarations",
+        desc = "fuzz.lsp=> declarations",
       },
       {
         fstem .. "lt",
         function()
-          require("fzf-lua").git_stash()
+          require("fzf-lua").lsp_type_definitions()
         end,
         mode = "n",
-        desc = "fuzz=> lsp type definitions",
+        desc = "fuzz.lsp=> type definitions",
       },
       {
         fstem .. "li",
         function()
-          require("fzf-lua").git_stash()
+          require("fzf-lua").lsp_implementations()
         end,
         mode = "n",
-        desc = "fuzz=> lsp implementations",
+        desc = "fuzz.lsp=> implementations",
       },
       {
         fstem .. "lsd",
@@ -293,7 +344,7 @@ return {
           require("fzf-lua").document_symbols()
         end,
         mode = "n",
-        desc = "fuzz=> lsp symbols [document]",
+        desc = "fuzz.lsp=> symbols [document]",
       },
       {
         fstem .. "lsw",
@@ -301,7 +352,7 @@ return {
           require("fzf-lua").lsp_workspace_symbols()
         end,
         mode = "n",
-        desc = "fuzz=> lsp symbols [workspace]",
+        desc = "fuzz.lsp=> symbols [workspace]",
       },
       {
         fstem .. "lsl",
@@ -309,7 +360,7 @@ return {
           require("fzf-lua").lsp_live_workspace_symbols()
         end,
         mode = "n",
-        desc = "fuzz=> lsp symbols [live mode]",
+        desc = "fuzz.lspl=> symbols [live mode]",
       },
       {
         fstem .. "lca",
@@ -317,7 +368,7 @@ return {
           require("fzf-lua").lsp_code_actions()
         end,
         mode = "n",
-        desc = "fuzz=> lsp code actions",
+        desc = "fuzz.lsp=> code actions",
       },
       {
         fstem .. "lci",
@@ -325,7 +376,7 @@ return {
           require("fzf-lua").lsp_incoming_calls()
         end,
         mode = "n",
-        desc = "fuzz=> lsp incoming calls",
+        desc = "fuzz.lsp=> incoming calls",
       },
       {
         fstem .. "lco",
@@ -333,15 +384,15 @@ return {
           require("fzf-lua").lsp_outgoing_calls()
         end,
         mode = "n",
-        desc = "fuzz=> lsp outgoing calls",
+        desc = "fuzz.lsp=> outgoing calls",
       },
       {
-        fstem .. "lf",
+        fstem .. "lF",
         function()
           require("fzf-lua").lsp_finder()
         end,
         mode = "n",
-        desc = "fuzz=> lsp finder",
+        desc = "fuzz.lsp=> finder",
       },
       {
         fstem .. "dd",
@@ -349,7 +400,7 @@ return {
           require("fzf-lua").diagnostics_document()
         end,
         mode = "n",
-        desc = "fuzz=> diagnostics [document]",
+        desc = "fuzz.diag=> diagnostics [document]",
       },
       {
         fstem .. "dw",
@@ -357,7 +408,7 @@ return {
           require("fzf-lua").diagnostics_workspace()
         end,
         mode = "n",
-        desc = "fuzz=> diagnostics [workspace]",
+        desc = "fuzz.diag=> diagnostics [workspace]",
       },
       {
         fstem .. "dc",
@@ -365,7 +416,7 @@ return {
           require("fzf-lua").dap_commands()
         end,
         mode = "n",
-        desc = "fuzz=> dap commands",
+        desc = "fuzz.dap=> commands",
       },
       {
         fstem .. "dC",
@@ -373,7 +424,7 @@ return {
           require("fzf-lua").dap_configurations()
         end,
         mode = "n",
-        desc = "fuzz=> dap configurations",
+        desc = "fuzz.dap=> configurations",
       },
       {
         fstem .. "db",
@@ -381,7 +432,7 @@ return {
           require("fzf-lua").dap_breakpoints()
         end,
         mode = "n",
-        desc = "fuzz=> dap breakpoints",
+        desc = "fuzz.dap=> breakpoints",
       },
       {
         fstem .. "dv",
@@ -389,7 +440,7 @@ return {
           require("fzf-lua").dap_variables()
         end,
         mode = "n",
-        desc = "fuzz=> dap variables",
+        desc = "fuzz.dap=> variables",
       },
       {
         fstem .. "df",
@@ -397,7 +448,7 @@ return {
           require("fzf-lua").dap_frames()
         end,
         mode = "n",
-        desc = "fuzz=> dap frames",
+        desc = "fuzz.dap=> frames",
       },
       {
         fstem .. "R",
@@ -405,15 +456,15 @@ return {
           require("fzf-lua").resume()
         end,
         mode = "n",
-        desc = "fuzz=> resume last query",
+        desc = "fuzz.fzf=> resume last query",
       },
       {
-        fstem .. "b",
+        fstem .. "<leader>",
         function()
           require("fzf-lua").builtin()
         end,
         mode = "n",
-        desc = "fuzz=> fzf builtins",
+        desc = "fuzz.fzf=> builtins",
       },
       {
         fstem .. "p",
@@ -421,7 +472,7 @@ return {
           require("fzf-lua").profiles()
         end,
         mode = "n",
-        desc = "fuzz=> fzf profiles",
+        desc = "fuzz.fzf=> profiles",
       },
       {
         fstem .. "ht",
@@ -429,7 +480,7 @@ return {
           require("fzf-lua").help_tags()
         end,
         mode = "n",
-        desc = "fuzz=> help tags",
+        desc = "fuzz.man=> vim help tags",
       },
       {
         fstem .. "hm",
@@ -437,7 +488,7 @@ return {
           require("fzf-lua").man_pages()
         end,
         mode = "n",
-        desc = "fuzz=> man pages",
+        desc = "fuzz.man=> unix manual pages",
       },
       {
         fstem .. "cs",
@@ -445,7 +496,7 @@ return {
           require("fzf-lua").colorschemes()
         end,
         mode = "n",
-        desc = "fuzz=> colorschemes",
+        desc = "fuzz.col=> colorschemes",
       },
       {
         fstem .. "ch",
@@ -453,7 +504,7 @@ return {
           require("fzf-lua").highlights()
         end,
         mode = "n",
-        desc = "fuzz=> highlights",
+        desc = "fuzz.col=> highlights",
       },
       {
         fstem .. ":",
@@ -461,7 +512,7 @@ return {
           require("fzf-lua").commands()
         end,
         mode = "n",
-        desc = "fuzz=> neovim commands",
+        desc = "fuzz.vim=> neovim commands",
       },
       {
         fstem .. "h:",
@@ -469,7 +520,7 @@ return {
           require("fzf-lua").command_history()
         end,
         mode = "n",
-        desc = "fuzz=> history [neovim command]",
+        desc = "fuzz.vim=> history [command]",
       },
       {
         fstem .. "h/",
@@ -477,7 +528,7 @@ return {
           require("fzf-lua").search_history()
         end,
         mode = "n",
-        desc = "fuzz=> history [search]",
+        desc = "fuzz.vim=> history [search]",
       },
       {
         fstem .. "'",
@@ -485,7 +536,7 @@ return {
           require("fzf-lua").marks()
         end,
         mode = "n",
-        desc = "fuzz=> marks",
+        desc = "fuzz.vim=> marks",
       },
       {
         fstem .. "j",
@@ -493,7 +544,7 @@ return {
           require("fzf-lua").jumps()
         end,
         mode = "n",
-        desc = "fuzz=> jumps",
+        desc = "fuzz.vim=> jumps",
       },
       {
         fstem .. "u",
@@ -501,7 +552,7 @@ return {
           require("fzf-lua").changes()
         end,
         mode = "n",
-        desc = "fuzz=> changes",
+        desc = "fuzz.vc=> changes",
       },
       {
         fstem .. '"',
@@ -509,7 +560,7 @@ return {
           require("fzf-lua").registers()
         end,
         mode = "n",
-        desc = "fuzz=> registers",
+        desc = "fuzz.vim=> registers",
       },
       {
         fstem .. "T",
@@ -517,23 +568,24 @@ return {
           require("fzf-lua").tagstack()
         end,
         mode = "n",
-        desc = "fuzz=> tag stack",
+        --- not sure what to make this one.
+        desc = "fuzz.fs=> tag stack",
       },
       {
-        fstem .. "a",
+        fstem .. "au",
         function()
           require("fzf-lua").autocmds()
         end,
         mode = "n",
-        desc = "fuzz=> autocmds",
+        desc = "fuzz.vim=> autocmds",
       },
       {
         fstem .. "k",
         function()
-          require("fzf-lua").registers()
+          require("fzf-lua").keymaps()
         end,
         mode = "n",
-        desc = "fuzz=> keymaps",
+        desc = "fuzz.vim=> keymaps",
       },
       {
         fstem .. "ft",
@@ -541,7 +593,7 @@ return {
           require("fzf-lua").filetypes()
         end,
         mode = "n",
-        desc = "fuzz=> file types",
+        desc = "fuzz.vim=> file types",
       },
       {
         fstem .. "m",
@@ -549,7 +601,7 @@ return {
           require("fzf-lua").menus()
         end,
         mode = "n",
-        desc = "fuzz=> menus",
+        desc = "fuzz.vim=> menus",
       },
       {
         fstem .. "ss",
@@ -557,18 +609,26 @@ return {
           require("fzf-lua").spell_suggest()
         end,
         mode = "n",
-        desc = "fuzz=> spelling suggestions",
+        desc = "fuzz.vibm=> spelling suggestions",
         {
           "junegunn/fzf.vim",
           dependencies = { "junegunn/fzf" },
-          event = { "VeryLazy" },
+          -- event = { "VeryLazy" },
         },
+      },
+      {
+        "q:",
+        function()
+          require("fzf-lua").command_history()
+        end,
+        mode = "n",
+        desc = "scope=> command history",
+        nowait = true,
       },
     },
   },
   {
     "junegunn/fzf",
-    event = "VeryLazy",
     dependencies = { "junegunn/fzf.vim" },
     build = "make",
     init = function()
