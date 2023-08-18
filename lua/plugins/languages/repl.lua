@@ -9,49 +9,49 @@ return {
     "michaelb/sniprun",
     build = "sh ./install.sh",
     config = true,
-    opts = {},
-    event = "VeryLazy",
+    -- opts = {},
+    -- event = "VeryLazy",
     keys = {
       {
         key_sniprun .. "O",
         "<Plug>SnipRun",
         mode = { "n" },
         silent = true,
-        desc = "run=> line sniprun",
+        desc = "repl.snip=> line sniprun",
       },
       {
         key_sniprun .. "o",
         "<Plug>SnipRunOperator",
         mode = { "n" },
         silent = true,
-        desc = "run=> operator sniprun",
+        desc = "repl.snip=> operator sniprun",
       },
       {
         key_sniprun .. "s",
         "<Plug>SnipRun",
         mode = { "v" },
         silent = true,
-        desc = "run=> sniprun",
+        desc = "repl.snip=> sniprun",
       },
       {
         key_sniprun .. "i",
         "<Plug>SnipInfo",
         mode = { "n" },
         silent = true,
-        desc = "run=> sniprun info",
+        desc = "repl.snip=> sniprun info",
       },
       {
         key_sniprun .. "q",
         "<Plug>SnipClose",
         mode = { "n" },
-        desc = "run=> close sniprun",
+        desc = "repl.snip=> close sniprun",
       },
       {
         key_sniprun .. "l",
         "<Plug>SnipLive",
         mode = { "n" },
         silent = true,
-        desc = "run=> sniprun live mode",
+        desc = "repl.snip=> sniprun live mode",
       },
     },
   },
@@ -149,6 +149,19 @@ return {
   {
     "google/executor.nvim",
     config = true,
-    opts = {},
+    opts = {
+      use_split = true,
+      split = {
+        position = "right",
+      },
+    },
+    keys = {
+      {
+        key_repl .. "e",
+        "<CMD>ExecutorRun<CMD>",
+        mode = "n",
+        desc = "repl.gexec=> run",
+      },
+    },
   },
 }

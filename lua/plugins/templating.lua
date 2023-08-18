@@ -12,7 +12,6 @@ return {
       require("template").setup(opts)
       require("telescope").load_extension("find_template")
     end,
-    event = "VeryLazy",
     cmd = { "Template", "TemProject" },
     keys = {
       {

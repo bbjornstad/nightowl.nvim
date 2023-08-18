@@ -96,6 +96,5 @@ return {
     },
     config = true,
     cmd = { "LicenseInsert", "LicenseFetch", "LicenseUpdate", "LicenseWrite" },
-    event = { "BufWinEnter" },
   },
 }
