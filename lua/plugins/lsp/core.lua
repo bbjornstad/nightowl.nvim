@@ -10,16 +10,22 @@ return {
   -- plugin stack.
   {
     "VonHeikemen/lsp-zero.nvim",
+    event = "VimEnter",
     branch = "v2.x",
     dependencies = {
       -- LSP Support
-      { "neovim/nvim-lspconfig" }, -- Required
+      {
+        "neovim/nvim-lspconfig",
+        -- dependencies = {
+        --   "folke/neoconf.nvim",
+        -- },
+      }, -- Required
       { "williamboman/mason.nvim" }, -- Optional
       {
         "williamboman/mason-lspconfig.nvim",
         dependencies = {
           "williamboman/mason.nvim",
-          "VonHeikemen/lsp-zero.nvim",
+--           "VonHeikemen/lsp-zero.nvim",
         },
       }, -- Optional but recommended
       { "jay-babu/mason-null-ls.nvim" },
@@ -28,7 +34,7 @@ return {
       { "hrsh7th/cmp-nvim-lsp" }, -- Required
       { "L3MON4D3/LuaSnip" }, -- Required
       { "nvim-lua/lsp-status.nvim" }, -- Optional but recommended
-      { "jubnzv/virtual-types.nvim" },
+      { "jubnzv/virtual-types.nvim" }, -- required now
     },
     opts = {
       name = "minimal",
@@ -53,6 +59,12 @@ return {
         require("virtualtypes").on_attach(client)
         lsp.default_keymaps({ buffer = bufnr })
       end)
+      lsp.set_sign_icons({
+        error = "",
+        warn = "󱒾",
+        info = "󱇏",
+        hint = "󰻸",
+      })
 
       require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls({
         Lua = {
@@ -99,47 +111,51 @@ return {
         mode = "n",
         desc = "lsp=> show code actions",
       }
-      keys[#keys + 1] = {
-        "<leader>uHh",
-        function()
-          vim.lsp.inlay_hint(0, true)
-        end,
-        mode = "n",
-        desc = "lsp=> enable current buffer inlay hints",
-      }
-      keys[#keys + 1] = {
-        "<leader>uHq",
-        function()
-          vim.lsp.inlay_hint(0, false)
-        end,
-        mode = "n",
-        desc = "lsp=> disable current buffer inlay hints",
-      }
     end,
     dependencies = {
-      "VonHeikemen/lsp-zero.nvim",
+      -- "folke/neoconf.nvim",
+--       "VonHeikemen/lsp-zero.nvim",
       "nvim-treesitter/nvim-treesitter",
       "jose-elias-alvarez/null-ls.nvim",
       "williamboman/mason-lspconfig.nvim",
       "jay-babu/mason-null-ls.nvim",
-      "nvim-lua/lsp-status.nvim",
-      "jubnzv/virtual-types.nvim",
+--       "nvim-lua/lsp-status.nvim",
+--       "jubnzv/virtual-types.nvim",
     },
   },
-  {
-    "jose-elias-alvarez/null-ls.nvim",
-    dependencies = { "VonHeikemen/lsp-zero.nvim" },
-  },
+--   {
+--     "jose-elias-alvarez/null-ls.nvim",
+--     dependencies = { "VonHeikemen/lsp-zero.nvim" },
+--   },
   {
     "jay-babu/mason-null-ls.nvim",
     dependencies = {
       "williamboman/mason.nvim",
       "jose-elias-alvarez/null-ls.nvim",
-      "VonHeikemen/lsp-zero.nvim",
+--       "VonHeikemen/lsp-zero.nvim",
     },
   },
   {
-    "folke/which-key.nvim",
-    opts = {},
-  },
+
+  }
+--   {
+--     "folke/neoconf.nvim",
+--     event = "VimEnter",
+--     config = true,
+--     opts = {
+--       import = {
+--         vscode = false,
+--         coc = false,
+--         nlsp = false,
+--       },
+--     },
+--   },
+--   {
+--     "folke/neodev.nvim",
+--     event = "VimEnter",
+--     dependencies = {
+--       "folke/neoconf.nvim",
+--     },
+--     config = true,
+--   },
 }
