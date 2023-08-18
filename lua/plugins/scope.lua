@@ -1,5 +1,17 @@
+-- TODO update the keymappings in the keys item of the below lazyspec and make
+-- it such that the keymappings are made in each individual extension's setup as
+-- opposed to the global telescope setup.
+-- TODO update the keymappings so that FZF-lua is preferred in most cases for
+-- performance reasons.
 local key_scope = require("environment.keys").stems.telescope
 local key_notice = require("environment.keys").stems.notice
+local util = require("lazyvim.util")
+
+local function condition(spec)
+  if not util.has("fzf-lua") then
+    return spec
+  end
+end
 
 local target_pickers = {
   "find_files",
@@ -429,6 +441,17 @@ return {
     opts = {
       defaults = {
         layout_stragegy = "bottom_pane",
+        mappings = {
+          i = {
+            ["<C-h>"] = "which_key",
+            ["<C-q>"] = "close",
+          },
+          n = {
+            ["q"] = "close",
+            ["qq"] = "close",
+            ["gh"] = "which_key",
+          },
+        },
       },
       pickers = pickspec,
       extensions = extspec,
@@ -437,61 +460,61 @@ return {
       ---
       -- @module telescope.core: core keymappings.
       -- telescope.core: Find Files
-      {
-        key_scope .. "ff",
-        funblt("find_files"),
-        mode = "n",
-        desc = "scope=> search local files",
-      },
+      -- {
+      --   key_scope .. "ff",
+      --   funblt("find_files"),
+      --   mode = "n",
+      --   desc = "scope=> search local files",
+      -- },
       -- telescope.core: Old Files
-      {
-        key_scope .. "fo",
-        funblt("oldfiles"),
-        mode = "n",
-        desc = "scope=> search oldfiles",
-      },
+      -- {
+      --   key_scope .. "fo",
+      --   funblt("oldfiles"),
+      --   mode = "n",
+      --   desc = "scope=> search oldfiles",
+      -- },
       -- telescope.core: Global Tags
-      {
-        key_scope .. "g",
-        funblt("tags"),
-        mode = "n",
-        desc = "scope=> search tags",
-      },
+      -- {
+      --   key_scope .. "g",
+      --   funblt("tags"),
+      --   mode = "n",
+      --   desc = "scope=> search tags",
+      -- },
       -- telescope.core: Vim Commands
-      {
-        key_scope .. "c",
-        funblt("commands"),
-        mode = "n",
-        desc = "scope=> scope through vim commands",
-      },
+      -- {
+      --   key_scope .. "c",
+      --   funblt("commands"),
+      --   mode = "n",
+      --   desc = "scope=> scope through vim commands",
+      -- },
       -- telescope.cort:. Help Tags
-      {
-        key_scope .. "ht",
-        funblt("help_tags"),
-        mode = "n",
-        desc = "scope=> search help tags",
-      },
+      -- {
+      --   key_scope .. "ht",
+      --   funblt("help_tags"),
+      --   mode = "n",
+      --   desc = "scope=> search help tags",
+      -- },
       -- telescope.core: Manual Pages
-      {
-        key_scope .. "hm",
-        funblt("man_pages"),
-        mode = "n",
-        desc = "scope=> search man pages",
-      },
+      -- {
+      --   key_scope .. "hm",
+      --   funblt("man_pages"),
+      --   mode = "n",
+      --   desc = "scope=> search man pages",
+      -- },
       -- telescope.core: Search History
-      {
-        key_scope .. "hs",
-        funblt("search_history"),
-        mode = "n",
-        desc = "scope=> scope history",
-      },
+      -- {
+      --   key_scope .. "hs",
+      --   funblt("search_history"),
+      --   mode = "n",
+      --   desc = "scope=> scope history",
+      -- },
       -- telescope.core: Command History
-      {
-        key_scope .. "hc",
-        funblt("command_history"),
-        mode = "n",
-        desc = "scope=> command history",
-      },
+      -- {
+      --   key_scope .. "hc",
+      --   funblt("command_history"),
+      --   mode = "n",
+      --   desc = "scope=> command history",
+      -- },
       -- telescope.core: telescope builtins
       {
         key_scope .. "i",
@@ -500,12 +523,12 @@ return {
         desc = "scope=> search telescope",
       },
       -- telescope.core: open buffers
-      {
-        key_scope .. "b",
-        funblt("buffers"),
-        mode = "n",
-        desc = "scope=> search open buffers",
-      },
+      -- {
+      --   key_scope .. "b",
+      --   funblt("buffers"),
+      --   mode = "n",
+      --   desc = "scope=> search open buffers",
+      -- },
       -- telescope.core: treesitter nodes
       {
         key_scope .. "e",
@@ -514,33 +537,33 @@ return {
         desc = "scope=> search treesitter nodes",
       },
       -- telescope.core: current buffer tags
-      {
-        key_scope .. "t",
-        funblt("current_buffer_tags"),
-        mode = "n",
-        desc = "scope=> search current buffer's tags",
-      },
+      -- {
+      --   key_scope .. "t",
+      --   funblt("current_buffer_tags"),
+      --   mode = "n",
+      --   desc = "scope=> search current buffer's tags",
+      -- },
       -- telescope.core: vim marks
-      {
-        key_scope .. "m",
-        funblt("marks"),
-        mode = "n",
-        desc = "scope=> search marks",
-      },
+      -- {
+      --   key_scope .. "m",
+      --   funblt("marks"),
+      --   mode = "n",
+      --   desc = "scope=> search marks",
+      -- },
       -- telescope.core: loclist
-      {
-        key_scope .. "y",
-        funblt("loclist"),
-        mode = "n",
-        desc = "scope=> search loclist",
-      },
+      -- {
+      --   key_scope .. "y",
+      --   funblt("loclist"),
+      --   mode = "n",
+      --   desc = "scope=> search loclist",
+      -- },
       -- telescope.core: keymappings
-      {
-        key_scope .. "k",
-        funblt("keymaps"),
-        mode = "n",
-        desc = "scope=> search defined keymappings",
-      },
+      -- {
+      --   key_scope .. "k",
+      --   funblt("keymaps"),
+      --   mode = "n",
+      --   desc = "scope=> search defined keymappings",
+      -- },
       -- telescope.core: builtin pickers
       {
         key_scope .. "o",
@@ -549,12 +572,12 @@ return {
         desc = "scope=> search telescope",
       },
       -- telescope.core: vim options
-      {
-        key_scope .. "v",
-        funblt("vim_options"),
-        mode = "n",
-        desc = "scope=> search vim options",
-      },
+      -- {
+      --   key_scope .. "v",
+      --   funblt("vim_options"),
+      --   mode = "n",
+      --   desc = "scope=> search vim options",
+      -- },
       -- telescope.core: luasnip snippets
       {
         key_scope .. "s",
@@ -580,13 +603,13 @@ return {
       -- remap the default command history menu with the telescope menu since it
       -- is more convenient to exit and otherwise functions similarly. Plus
       -- unifies the ui just a bit more.
-      {
-        "q:",
-        funblt("command_history"),
-        mode = "n",
-        desc = "scope=> command history",
-        nowait = true,
-      },
+      -- {
+      --   "q:",
+      --   funblt("command_history"),
+      --   mode = "n",
+      --   desc = "scope=> command history",
+      --   nowait = true,
+      -- },
       {
         key_scope .. "T",
         funext("tasks"),

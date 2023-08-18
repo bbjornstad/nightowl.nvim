@@ -9,7 +9,7 @@ local env = {}
 --- * "telescope" -- tries to match telescope
 --- * "skim" -- ideally this is preferred but I'm currently having a failed skim
 ---   install for some reason.
-env.fzf_profile = "default"
+env.fzf_profile = "borderless_full"
 env.fzf_border = "thicc"
 env.fullscreen = false
 
