@@ -1,4 +1,4 @@
-local toboolean = require("uutils.conversions").toboolean
+local toboolean = require("uutils.conversion").toboolean
 local env = {}
 
 --- formats the necessary field access and method calls to bring in well-defined
@@ -27,6 +27,15 @@ end
 function env.kanacolors(opts)
   return env.colors(opts, "kanagawa.colors", { theme = "wave" })
 end
+
+env.accelerated_jk = {}
+env.accelerated_jk.enable = false
+env.tabout = {}
+env.tabout.enable = false
+env.numbertoggle = {}
+env.numbertoggle.enable = false
+env.houdini = {}
+env.houdini.enable = false
 
 --------------------------------------------------------------------------------
 -- UI: Borders
