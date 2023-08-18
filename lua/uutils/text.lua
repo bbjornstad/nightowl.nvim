@@ -23,6 +23,14 @@ function mod.toggle_fmtopt(char)
   end
 end
 
+function mod.compute_effective_width(offset)
+  offset = offset or 0
+  local res = (tonumber(vim.opt.colorcolumn:get())
+    or tonumber(vim.opt.textwidth:get())
+    or 80)
+  return res - offset
+end
+
 --- inserts a line after the current cursor that is simply dashes until the
 --- configured desired line-length; length is calculated as the first valid
 --- value out of: opt[colorcolumn], opt[textwidth], 80
@@ -38,9 +46,7 @@ function mod.InsertDashBreak(colstop, dashchar)
   local row, col = unpack(api.nvim_win_get_cursor(0))
   local dashtil
   if colstop == 0 then
-    dashtil = tonumber(vim.opt.colorcolumn:get())
-      or tonumber(vim.opt.textwidth:get())
-      or 80
+    dashtil = mod.compute_effective_width()
   else
     dashtil = tonumber(colstop) or 0
   end
@@ -79,7 +85,6 @@ function mod.InsertCommentBreak(colstop, dashchar, include_space)
   dashchar = tostring(dashchar) or "-"
   include_space = include_space or false
   local comment_string = vim.opt.commentstring:get()
-  vim.notify(vim.inspect(comment_string))
   local comment_linestart = string.match(comment_string, "%S")[0]
   local row, _ = unpack(api.nvim_win_get_cursor(0))
   local printstr
