@@ -39,6 +39,7 @@ return {
         function()
           vim.cmd([[CccPick]])
         end,
+        mode = "n",
         desc = "ccc=> pick color interface",
       },
       {
@@ -46,6 +47,7 @@ return {
         function()
           vim.cmd([[CccHighlighterToggle]])
         end,
+        mode = "n",
         desc = "ccc=> toggle inline color highlighting",
       },
       {
@@ -53,6 +55,7 @@ return {
         function()
           vim.cmd([[CccConvert]])
         end,
+        mode = "n",
         desc = "ccc=> convert color to another format",
       },
       {
@@ -60,6 +63,7 @@ return {
         function()
           vim.cmd([[CccHighlighterDisable]])
         end,
+        mode = "n",
         desc = "ccc=> turn off inline color highlighting",
       },
       {
@@ -67,6 +71,7 @@ return {
         function()
           vim.cmd([[CccHighlighterEnable]])
         end,
+        mode = "n",
         desc = "ccc=> turn on inline color highlighting",
       },
     },

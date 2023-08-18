@@ -10,7 +10,7 @@ return {
         registers = true,
       },
       window = {
-        border = env.borders.alt,
+        border = env.borders.main,
         position = "top",
         winblend = 25,
         zindex = 80,
@@ -22,7 +22,9 @@ return {
         '"',
         "<c-r>",
         -- spelling
-        "z=",
+        -- "z=",
+        "z",
+        "Z",
       },
       documentation = {
         view = "hover",
@@ -45,6 +47,7 @@ return {
         [keystems.telescope] = { name = "+fuzzy find with telescope" },
         [keystems.ui] = { name = "+user interface" },
         [keystems.code] = { name = "+act on code" },
+        [keystems.fuzzy] = { name = "+fuzzy find with fzf" },
       },
     },
   },
