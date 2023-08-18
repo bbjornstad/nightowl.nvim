@@ -3,12 +3,12 @@ local kenv = require("environment.keys")
 local kcolors = env.kanacolors
 local key_grapple_pop = kenv.stems.base.grapple.popup
 local key_grapple_tag = kenv.stems.base.grapple.tag
+local key_portal = kenv.stems.base.portal
 
 return {
   {
     "winston0410/range-highlight.nvim",
     config = function() end,
-    event = "VeryLazy",
   },
   {
     "mvllow/modes.nvim",
@@ -39,7 +39,6 @@ return {
   },
   {
     "yamatsum/nvim-cursorline",
-    event = "VeryLazy",
     opts = {
       cursorline = { enable = true, timeout = 500, number = false },
       cursorword = {
@@ -52,16 +51,48 @@ return {
   {
     "edluffy/specs.nvim",
     config = true,
-    event = "VeryLazy",
-    opts = {
-      blend = 20,
-      width = 8,
-      winhl = "PMenu",
-    },
+    opts = function()
+      local opts = {
+        show_jumps = true,
+        min_jump = 30,
+        popup = {
+          delay_ms = 0,
+          inc_ms = 30,
+          blend = 10,
+          width = 30,
+          winhl = "CmpCompletionSel",
+          fader = require("specs").linear_fader,
+          resizer = require("specs").shrink_resizer,
+        },
+        ignore_filetypes = env.ft_ignore_list,
+        ignore_buftypes = {
+          nofile = true,
+        },
+      }
+      return opts
+    end,
     keys = {
       {
-        "<leader>uS",
-        "<CMD>lua require('specs').toggle()<CR>",
+        "gC",
+        function()
+          require("specs").show_specs()
+        end,
+        mode = "n",
+        desc = "specs=> show location flare",
+      },
+      {
+        "gCs",
+        function()
+          require("specs").show_specs()
+        end,
+        mode = "n",
+        desc = "specs=> show location flare",
+      },
+      {
+        "gCt",
+        function()
+          require("specs").toggle()
+        end,
         mode = "n",
         desc = "specs=> toggle location flare",
       },
@@ -70,7 +101,6 @@ return {
   {
     "nacro90/numb.nvim",
     config = true,
-    event = "VeryLazy",
     opts = {
       show_numbers = true,
       show_cursorline = true,
@@ -80,12 +110,8 @@ return {
     },
   },
   {
-    "sitiom/nvim-numbertoggle",
-    event = "VeryLazy",
-  },
-  {
     "rainbowhxch/accelerated-jk.nvim",
-    event = "VeryLazy",
+    enabled = env.accelerated_jk.enable,
     opts = {
       mode = "time_driven",
       enable_deceleration = false,
@@ -99,6 +125,7 @@ return {
   },
   {
     "abecodes/tabout.nvim",
+    enabled = env.tabout.enable,
     event = "VeryLazy",
     opts = {
       tabkey = "<Tab>",
@@ -246,13 +273,13 @@ return {
     "cbochs/portal.nvim",
     keys = {
       {
-        "<leader>o",
-        "<CMD>Portal jumplist backward<CR>",
+        key_portal .. "f",
+        "<CMD>Portal jumplist forward<CR>",
         mode = "n",
-        desc = "portal=> backwards jumplist",
+        desc = "portal=> forwards jumplist",
       },
       {
-        "<leader>O",
+        key_portal .. "b",
         "<CMD>Portal jumplist backward<CR>",
         mode = "n",
         desc = "portal=> backwards jumplist",
@@ -260,7 +287,7 @@ return {
     },
     opts = {
       ---@type "debug" | "info" | "warn" | "error"
-      log_level = "warn",
+      log_level = "debug",
 
       ---The base filter applied to every search.
       ---@type Portal.SearchPredicate | nil
@@ -277,7 +304,7 @@ return {
       ---An ordered list of keys for labelling portals.
       ---Labels will be applied in order, or to match slotted results.
       ---@type string[]
-      labels = { "j", "k", "h", "l" },
+      labels = { "a", "b", "c", "d", "e" },
 
       ---Select the first portal when there is only one result.
       select_first = false,
@@ -287,6 +314,8 @@ return {
       ---@type table<string, boolean>
       escape = {
         ["<esc>"] = true,
+        ["q"] = true,
+        ["qq"] = true,
       },
 
       ---The raw window options used for the portal window
@@ -296,7 +325,7 @@ return {
         height = 3,
         col = 2,
         focusable = false,
-        border = env.borders.main,
+        border = env.borders.alt,
         noautocmd = true,
       },
     },

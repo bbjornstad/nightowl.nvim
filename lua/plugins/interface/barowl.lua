@@ -1,6 +1,7 @@
 local env = require("environment.ui")
 local custom_fname = require("lualine.components.filename"):extend()
 local highlight = require("lualine.highlight")
+local util = require("lazyvim.util")
 local kcolors = env.kanacolors
 
 function custom_fname:init(options)
@@ -158,6 +159,8 @@ return {
       "rebelot/kanagawa.nvim",
       "Bekaboo/dropbar.nvim",
       "cbochs/grapple.nvim",
+      "gennaro-tedesco/nvim-possession",
+      "wthollingsworth/pomodoro.nvim",
     },
     event = "VimEnter",
     opts = {
@@ -255,9 +258,23 @@ return {
             },
           },
         },
+        lualine_y = {
+          {
+            require("pomodoro").statusline,
+            cond = function()
+              if not util.has("pomodoro") then
+                return false
+              end
+              return require("pomodoro").status
+            end,
+          },
+        },
         lualine_z = {
           {
-            pom_status(),
+            require("nvim-possession").status,
+            cond = function()
+              return require("nvim-possession").status() ~= nil
+            end,
           },
         },
       },
@@ -305,6 +322,18 @@ return {
         lualine_x = {},
         lualine_y = {},
         lualine_z = {},
+      },
+      extensions = {
+        "quickfix",
+        "aerial",
+        "fzf",
+        "lazy",
+        "man",
+        "nvim-dap-ui",
+        "overseer",
+        "symbols-outline",
+        "toggleterm",
+        "trouble",
       },
     },
   },

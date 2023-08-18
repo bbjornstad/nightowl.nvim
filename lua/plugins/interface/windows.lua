@@ -1,8 +1,6 @@
 local env = require("environment.ui")
-local mapx = vim.keymap.set
 local key_bufmenu = require("environment.keys").stems.base.buffers
-local wk_family = require("environment.keys").wk_family_inject
-local ignore_buftypes = require("environment.ui").ft_ignore_list
+local key_focus = require("environment.keys").stems.focus
 local mopts = require("uutils.functional").mopts
 
 local function pdel(mode, keys, opts)
@@ -32,7 +30,6 @@ return {
       {
         "<leader>l",
         vim.NIL,
-        mode = "n",
       },
       {
         "<leader>L",
@@ -45,7 +42,7 @@ return {
   {
     "folke/noice.nvim",
     opts = {
-      -- debug = true,
+      debug = false,
       lsp = {
         -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
         override = {
@@ -207,9 +204,10 @@ return {
   },
   {
     "nvim-focus/focus.nvim",
+    enabled = false,
     opts = {
-      enable = true,
-      commands = true,
+      enable = false,
+      commands = false,
       autoresize = {
         enable = true,
         minwidth = 32,
@@ -228,6 +226,40 @@ return {
       },
     },
     event = "VeryLazy",
+    keys = {
+      {
+        key_focus .. "w",
+        function()
+          require("focus").focus_toggle()
+        end,
+        mode = "n",
+        desc = "focus=> toggle winresizer",
+      },
+      {
+        key_focus .. "o",
+        function()
+          require("focus").focus_enable()
+        end,
+        mode = "n",
+        desc = "focus=> enable winresizer",
+      },
+      {
+        key_focus .. "q",
+        function()
+          require("focus").focus_disable()
+        end,
+        mode = "n",
+        desc = "focus=> disable winresizer",
+      },
+      {
+        key_focus .. "M",
+        function()
+          require("focus").focus_max_or_equal()
+        end,
+        mode = "n",
+        desc = "focus=> toggle winresizer maximized",
+      },
+    },
     init = function()
       local focus = require("focus")
       local focusmap = function(direction)
@@ -246,47 +278,21 @@ return {
       focusmap("j")
       focusmap("k")
       focusmap("l")
-      mapx(
-        "n",
-        "<leader>uWw",
-        focus.focus_toggle,
-        { desc = "focus=> toggle focus win-sizer" }
-      )
-      mapx(
-        "n",
-        "<leader>uWo",
-        focus.focus_enable,
-        { desc = "focus=> enable focus win-sizer" }
-      )
-      mapx(
-        "n",
-        "<leader>uWq",
-        focus.focus_disable,
-        { desc = "focus=> disable focus win-sizer" }
-      )
-      mapx(
-        "n",
-        "<leader>uWM",
-        focus.focus_max_or_equal,
-        { desc = "focus=> toggle maximized focus" }
-      )
-      vim.api.nvim_create_autocmd("WinEnter", {
-        group = vim.api.nvim_create_augroup("FocusDisable", { clear = true }),
-        callback = function(_)
-          if vim.tbl_contains(ignore_buftypes, vim.bo.buftype) then
-            vim.b.focus_disable = true
-          end
-        end,
-        desc = "Disable focus autoresize for BufTypes",
-      })
+      -- vim.api.nvim_create_autocmd("WinEnter", {
+      --   group = vim.api.nvim_create_augroup("FocusDisable", { clear = true }),
+      --   callback = function(ev)
+      --     if vim.tbl_contains(ignore_buftypes, vim.bo.buftype) then
+      --       vim.b.focus_disable = true
+      --     end
+      --   end,
+      --   desc = "Disable focus autoresize for BufTypes",
+      -- })
     end,
   },
   {
     "echasnovski/mini.bufremove",
-    opts = function(_, opts)
-      pdel({ "n" }, "<leader>bd")
-      pdel({ "n" }, "<leader>bD")
-    end,
+    opts = function(_, opts) end,
+    config = true,
     keys = {
       {
         "<leader>bd",
@@ -297,7 +303,7 @@ return {
         false,
       },
       {
-        "qbd",
+        "qd",
         function()
           require("mini.bufremove").delete(0, false)
         end,
@@ -305,7 +311,7 @@ return {
         desc = "buf=> delete buffer",
       },
       {
-        "qbD",
+        "qD",
         function()
           require("mini.bufremove").delete(0, true)
         end,
@@ -317,13 +323,14 @@ return {
   {
     "rcarriga/nvim-notify",
     opts = function(_, opts)
-      opts.top_down = true
-      opts.render = "compact"
-      opts.on_open = function(win)
-        vim.api.nvim_win_set_config(win, {
-          border = env.borders.main,
-        })
-      end
+      opts.top_down = opts.top_down or true
+      opts.render = opts.render or "compact"
+      opts.on_open = opts.on_open
+        or function(win)
+          vim.api.nvim_win_set_config(win, {
+            border = env.borders.main,
+          })
+        end
     end,
   },
   {
@@ -332,10 +339,16 @@ return {
     config = true,
     opts = {
       input = {
-        relative = "editor",
+        relative = "win",
+        border = env.borders.main,
+        start_in_insert = true,
+        insert_only = true,
+        win_options = {
+          winblend = 20,
+        },
       },
       select = {
-        backend = { "telescope", "fzf_lua", "fzf", "builtin", "nui" },
+        backend = { "fzf_lua", "fzf", "telescope", "builtin", "nui" },
         telescope = require("telescope.themes").get_ivy({
           winblend = 30,
           width = 0.70,
@@ -348,6 +361,72 @@ return {
             preview_width = 0.5,
           },
         }),
+        fzf = {
+          window = {
+            width = 0.5,
+            height = 0.4,
+          },
+        },
+
+        -- Options for nui Menu
+        nui = {
+          position = "50%",
+          size = nil,
+          relative = "editor",
+          border = {
+            style = env.borders.main,
+          },
+          buf_options = {
+            swapfile = false,
+            filetype = "DressingSelect",
+          },
+          win_options = {
+            winblend = 10,
+          },
+          max_width = 80,
+          max_height = 40,
+          min_width = 40,
+          min_height = 10,
+        },
+
+        -- Options for built-in selector
+        builtin = {
+          -- These are passed to nvim_open_win
+          border = env.borders.main,
+          -- 'editor' and 'win' will default to being centered
+          relative = "editor",
+
+          buf_options = {},
+          win_options = {
+            -- Window transparency (0-100)
+            winblend = 10,
+            cursorline = true,
+            cursorlineopt = "both",
+          },
+
+          -- These can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
+          -- the min_ and max_ options can be a list of mixed types.
+          -- max_width = {140, 0.8} means "the lesser of 140 columns or 80% of total"
+          width = nil,
+          max_width = { 140, 0.8 },
+          min_width = { 40, 0.2 },
+          height = nil,
+          max_height = 0.9,
+          min_height = { 10, 0.2 },
+
+          -- Set to `false` to disable
+          mappings = {
+            ["<Esc>"] = "Close",
+            ["<C-c>"] = "Close",
+            ["<CR>"] = "Confirm",
+          },
+
+          override = function(conf)
+            -- This is the config that will be passed to nvim_open_win.
+            -- Change values here to customize the layout
+            return conf
+          end,
+        },
       },
       border = env.borders.main,
       win_options = {
@@ -463,18 +542,28 @@ return {
     config = function(_, opts)
       require("help-vsplit").setup(opts)
     end,
+    event = { "VeryLazy" },
     opts = {
       always = false,
       side = "right",
       buftype = { "help" },
       filetype = { "man" },
     },
-    event = "VeryLazy",
+    -- ft = { "man", "vimdoc", "help" },
   },
   {
     "folke/edgy.nvim",
+    init = function()
+      vim.opt.splitkeep = "screen"
+    end,
     opts = function()
       local opts = {
+        options = {
+          left = { size = 28 },
+          right = { size = 30 },
+          bottom = { size = 16 },
+          top = { size = 16 },
+        },
         bottom = {
           {
             ft = "toggleterm",
@@ -492,60 +581,85 @@ return {
           },
           {
             ft = "lazyterm",
-            title = "LazyTerm",
+            title = "term::",
             size = { height = 0.4 },
             filter = function(buf)
               return not vim.b[buf].lazyterm_cmd
             end,
           },
-          "Trouble",
-          { ft = "qf", title = "QuickFix" },
-          { ft = "spectre_panel", size = { height = 0.4 } },
+          { ft = "Trouble", title = "diag::trouble" },
+          { ft = "qf", title = "edit::quickfix" },
           {
-            title = "Neotest Output",
+            ft = "spectre_panel",
+            title = "edit::search/replace",
+            size = { height = 0.4 },
+          },
+          {
+            title = "neotest::output",
             ft = "neotest-output-panel",
             size = { height = 15 },
           },
         },
         left = {
-          {
-            title = "nnn",
-            ft = "nnn",
-            size = {
-              height = 0.33,
-            },
-            pinned = true,
-            open = "NnnExplorer",
-          },
-          { title = "Neotest Summary", ft = "neotest-summary" },
+          { title = "neotest::summary", ft = "neotest-summary" },
         },
+        right = {},
+        exit_when_last = true,
       }
 
       local Util = require("lazyvim.util")
-      if Util.has("aerial.nvim") then
-        table.insert(opts.left, #opts.left, {
-          title = "aerial",
-          ft = "aerial",
-          pinned = true,
-          open = "AerialOpen left",
-        })
+      local function condition(condition_to, edgy_loc, copts)
+        local function opts_mapper(cond, cprime)
+          if Util.has(cond) then
+            return mopts({}, cprime)
+          end
+        end
+        table.insert(
+          opts[edgy_loc],
+          #opts[edgy_loc],
+          opts_mapper(condition_to, copts)
+        )
       end
-      if Util.has("symbols-outline.nvim") then
-        table.insert(opts.left, #opts.left, {
-          title = "Outline",
-          ft = "Outline",
-          pinned = true,
-          open = "SymbolsOutline",
-        })
-      end
+
+      condition("nnn.nvim", "left", {
+        title = "files::nnn",
+        ft = "nnn",
+        size = {
+          height = 0.5,
+        },
+        pinned = true,
+        open = "NnnExplorer",
+      })
+      condition("symbols-outline.nvim", "right", {
+        title = "symb::outline",
+        ft = "Outline",
+        pinned = true,
+        size = {
+          height = 0.5,
+        },
+        open = "SymbolsOutline",
+      })
+      condition("aerial.nvim", "right", {
+        title = "symb::aerial",
+        ft = "aerial",
+        pinned = true,
+        size = {
+          height = 0.5,
+        },
+        open = "AerialOpen",
+      })
+
       return opts
     end,
   },
-  wk_family("buffer menu", key_bufmenu, {
-    triggers_nowait = {
-      key_bufmenu,
+  {
+    "folke/which-key.nvim",
+    opts = {
+      defaults = {
+        [key_bufmenu] = { name = "+buffers/quito" },
+      },
     },
-  }),
+  },
   {
     "dnlhc/glance.nvim",
     cmd = { "Glance" },
@@ -561,15 +675,15 @@ return {
         end
 
       opts.preview_win_opts = mopts({
-        -- Configure preview window options
+        -- Configure preview window
         cursorline = true,
         number = true,
         wrap = true,
       }, opts.preview_win_opts)
       opts.border = mopts({
-        enable = false, -- Show window borders. Only horizontal borders allowed
-        top_char = "═",
-        bottom_char = "═",
+        enable = true, -- Show window borders. Only horizontal borders allowed
+        top_char = "🮩",
+        bottom_char = "🮨",
       }, opts.border)
       opts.list = mopts({
         position = "right", -- Position of the list window 'left'|'right'
@@ -604,7 +718,9 @@ return {
           -- ['<Esc>'] = false -- disable a mapping
         },
         preview = {
+          ["q"] = actions.close,
           ["Q"] = actions.close,
+          ["<Esc>"] = actions.close,
           ["<Tab>"] = actions.next_location,
           ["<S-Tab>"] = actions.previous_location,
           ["<leader>l"] = actions.enter_win("list"), -- Focus list window
@@ -651,15 +767,4 @@ return {
       },
     },
   },
-  -- {
-  --   "ldelossa/litee.nvim",
-  --   config = true,
-  --   opts = {},
-  -- },
-  -- {
-  --   "ldelossa/litee-calltree.nvim",
-  --   dependencies = { "ldelossa/litee.nvim" },
-  --   config = true,
-  --   opts = {},
-  -- },
 }
