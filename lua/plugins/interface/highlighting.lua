@@ -1,0 +1,56 @@
+local kenv = require("environment.keys").stems
+local key_easyread = kenv.easyread
+local key_block = kenv.block
+
+return {
+  {
+    "tzachar/highlight-undo.nvim",
+    config = true,
+    enabled = false,
+    opts = {
+      keymaps = {
+        { "n", "u", "undo", {} },
+        { "n", "<C-r>", "redo", {} },
+      },
+    },
+    event = "VeryLazy",
+  },
+  {
+    "tzachar/local-highlight.nvim",
+    opts = {
+      disable_file_types = { "markdown" },
+    },
+    config = true,
+    event = "VeryLazy",
+  },
+  {
+    "HampusHauffman/bionic.nvim",
+    cmd = { "Bionic", "BionicOn", "BionicOff" },
+    keys = {
+      {
+        key_easyread,
+        "<CMD>Bionic<CR>",
+        mode = { "n" },
+        desc = "bionic=> toggle flow-state bionic reading",
+      },
+    },
+  },
+  {
+    "HampusHauffman/block.nvim",
+    opts = {
+      percent = 1.1,
+      depth = 8,
+      automatic = true,
+    },
+    config = true,
+    cmd = { "Block", "BlockOn", "BlockOff" },
+    keys = {
+      {
+        key_block,
+        "<CMD>Block<CR>",
+        mode = "n",
+        desc = "block=> toggle block highlighting",
+      },
+    },
+  },
+}
