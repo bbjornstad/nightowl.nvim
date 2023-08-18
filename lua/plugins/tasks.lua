@@ -1,11 +1,12 @@
 local env = require("environment.ui")
-local wk_family = require("environment.keys").wk_family_inject
+local inp = require("uutils.input")
 local keystems = require("environment.keys").stems
 local key_pomodoro = keystems.pomodoro
 local key_overseer = keystems.overseer
 local key_do = keystems._do
 local key_conduct = keystems.conduct
-local key_taskorg = keystems.tasks
+local key_taskorg = keystems.base.tasks
+local key_memento = keystems.memento
 
 return {
   {
@@ -101,90 +102,90 @@ return {
       },
     },
   },
-  { "wakatime/vim-wakatime", event = "VeryLazy", enabled = true },
-  {
-    "soywod/unfog.vim",
-    config = false,
-    cmd = "Unfog",
-    keys = {
-      {
-        "<bar>U",
-        "<CMD>Unfog<CR>",
-        mode = "n",
-        desc = "unfog=> list tasks in the mist",
-      },
-    },
-    init = function()
-      local mapn = require("environment.keys").map("n")
-      vim.api.nvim_create_autocmd({ "FileType" }, {
-        pattern = { "*unfog*" },
-        callback = function(ev)
-          mapn(
-            "gd",
-            "<Plug>(unfog-list-done)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "gD",
-            "<Plug>(unfog-list-deleted)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "<CR>",
-            "<Plug>(unfog-toggle)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "K",
-            "<Plug>(unfog-info)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "gc",
-            "<Plug>(unfog-context)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "gw",
-            "<Plug>(unfog-worktime)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "<C-n>",
-            "<Plug>(unfog-next-cell)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "<C-p>",
-            "<Plug>(unfog-prev-cell)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "dic",
-            "<Plug>(unfog-delete-in-cell)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "cic",
-            "<Plug>(unfog-change-in-cell)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-          mapn(
-            "vic",
-            "<Plug>(unfog-visual-in-cell)",
-            { desc = "fog=> list done", buffer = ev.buf }
-          )
-        end,
-      })
-    end,
-  },
+  { "wakatime/vim-wakatime", event = { "VeryLazy" }, enabled = true },
+  --   {
+  --     "soywod/unfog.vim",
+  --     config = false,
+  --     cmd = "Unfog",
+  --     keys = {
+  --       {
+  --         "<bar>U",
+  --         "<CMD>Unfog<CR>",
+  --         mode = "n",
+  --         desc = "unfog=> list tasks in the mist",
+  --       },
+  --     },
+  --     init = function()
+  --       local mapn = require("environment.keys").map("n")
+  --       vim.api.nvim_create_autocmd({ "FileType" }, {
+  --         pattern = { "*unfog*" },
+  --         callback = function(ev)
+  --           mapn(
+  --             "gd",
+  --             "<Plug>(unfog-list-done)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "gD",
+  --             "<Plug>(unfog-list-deleted)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "<CR>",
+  --             "<Plug>(unfog-toggle)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "K",
+  --             "<Plug>(unfog-info)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "gc",
+  --             "<Plug>(unfog-context)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "gw",
+  --             "<Plug>(unfog-worktime)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "<C-n>",
+  --             "<Plug>(unfog-next-cell)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "<C-p>",
+  --             "<Plug>(unfog-prev-cell)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "dic",
+  --             "<Plug>(unfog-delete-in-cell)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "cic",
+  --             "<Plug>(unfog-change-in-cell)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --           mapn(
+  --             "vic",
+  --             "<Plug>(unfog-visual-in-cell)",
+  --             { desc = "fog=> list done", buffer = ev.buf }
+  --           )
+  --         end,
+  --       })
+  --     end,
+  --   },
   {
     "stevearc/overseer.nvim",
     config = true,
     opts = {
       templates = { "builtin" },
       task_list = {
-        default_detail = 2,
+        default_detail = 3,
         separator = "🮦🮦🮦🮦🮦🮦🮦🮦🮦🮦🮦",
         direction = "bottom",
       },
@@ -339,18 +340,12 @@ return {
     config = function(_, opts)
       vim.cmd([[syntax on]])
       vim.cmd([[filetype plugin on]])
-      vim.opt.hidden = true
+      vim.opt.hidden = opts.hidden or true
 
       vim.g.himalaya_folder_picker = "fzf"
     end,
     cmd = "Himalaya",
     keys = {
-      {
-        "<F10>",
-        "<CMD>Himalaya<CR>",
-        mode = "n",
-        desc = "mail=> update servers and view mail",
-      },
       {
         "<F11>",
         "<CMD>Himalaya<CR>",
@@ -359,17 +354,24 @@ return {
       },
     },
   },
-  {
-    "mvllow/stand.nvim",
-    opts = {
-      minute_interval = 52,
-    },
-    config = true,
-    event = "VeryLazy",
-    cmd = { "StandWhen", "StandNow" },
-  },
+  -- {
+  --   "mvllow/stand.nvim",
+  --   opts = {
+  --     minute_interval = 52,
+  --   },
+  --   config = true,
+  --   event = { "VeryLazy" },
+  --   cmd = {
+  --     "StandWhen",
+  --     "StandNow",
+  --     "StandEvery",
+  --     "StandEnable",
+  --     "StandDisable",
+  --   },
+  -- },
   {
     "aaditeynair/conduct.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
     opts = {
       functions = {},
       presets = {},
@@ -404,7 +406,7 @@ return {
     keys = {
       {
         key_conduct .. "l",
-        "<CMD>ConductLoadProject<CR>",
+        inp.filename([[ConductLoadProject %s]]),
         mode = "n",
         desc = "conduct=> load project",
       },
@@ -416,7 +418,7 @@ return {
       },
       {
         key_conduct .. "n",
-        "<CMD>ConductNewProject<CR>",
+        inp.filename([[ConductNewProject %s]]),
         mode = "n",
         desc = "conduct=> new project",
       },
@@ -424,11 +426,11 @@ return {
         key_conduct .. "r",
         "<CMD>ConductRenameProject<CR>",
         mode = "n",
-        desc = "conduct=> new project",
+        desc = "conduct=> rename project",
       },
       {
         key_conduct .. "d",
-        "<CMD>ConductDeleteProject<CR>",
+        inp.filename([[ConductDeleteProject %s]]),
         mode = "n",
         desc = "conduct=> delete project",
       },
@@ -468,7 +470,52 @@ return {
         mode = "n",
         desc = "conduct=> rename session in project",
       },
+      {
+        "<leader>fp",
+        function()
+          require("telescope").extensions.conduct.conduct()
+        end,
+        mode = "n",
+        desc = "conduct=> projects",
+      },
     },
   },
-  wk_family("task/time management", { key_taskorg }),
+  {
+    "gaborvecsei/memento.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {},
+    config = false,
+    init = function()
+      vim.g.memento_history = 50
+      vim.g.memento_shorten_path = true
+      vim.g.memento_window_width = 80
+      vim.g.memento_window_height = 16
+    end,
+    keys = {
+      {
+        key_memento .. "m",
+        function()
+          require("memento").toggle()
+        end,
+        mode = "n",
+        desc = "mem=> recently closed files",
+      },
+      {
+        key_memento .. "c",
+        function()
+          require("memento").clear_history()
+        end,
+        mode = "n",
+        desc = "mem=> clear closed file history",
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      defaults = {
+        [key_taskorg] = { name = "task/time management" },
+      },
+    },
+  },
 }
