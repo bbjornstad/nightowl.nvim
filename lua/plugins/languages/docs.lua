@@ -8,24 +8,34 @@ return {
       "nvim-lua/plenary.nvim",
     },
     config = true,
-    opts = {},
     keys = {
       {
         "<leader>Do",
-        "<CMD>silent w<bar> lua require('auto-pandoc').run_pandoc()<CR>",
+        function()
+          require('auto-pandoc').run_pandoc()
+        end,
         mode = "n",
         desc = "docs=> convert with pandoc",
         buffer = 0,
-        noremap = true,
+        remap = false,
         silent = true,
       },
     },
   },
   {
     "danymat/neogen",
-    event = { "VeryLazy" },
+    cmd = { "Neogen" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    opts = { snippet_engine = "luasnip" },
+    opts = {
+      languages = {
+        lua = {
+          template = {
+            annotation_convention = "emmylua",
+          },
+        },
+      },
+      snippet_engine = "luasnip",
+    },
     keys = {
       {
         key_neogen .. "d",

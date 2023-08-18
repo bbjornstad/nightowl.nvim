@@ -6,17 +6,14 @@ return {
       {
         "rcarriga/nvim-dap-ui",
         dependencies = { "mfussenegger/nvim-dap" },
-        opts = {},
       },
       {
         "niuiic/dap-utils.nvim",
         dependencies = { "mfussenegger/nvim-dap" },
-        opts = {},
       },
       -- virtual text for the debugger
       {
         "theHamsta/nvim-dap-virtual-text",
-        opts = {},
         dependencies = { "mfussenegger/nvim-dap" },
       },
 
@@ -56,7 +53,6 @@ return {
   {
     "niuiic/dap-utils.nvim",
     config = true,
-    opts = {},
     dependencies = {
       "niuiic/core.nvim",
       "mfussenegger/nvim-dap",
@@ -67,7 +63,6 @@ return {
   {
     "LiadOz/nvim-dap-repl-highlights",
     config = true,
-    opts = {},
     dependencies = {
       "mfussenegger/nvim-dap",
       "nvim-treesitter/nvim-treesitter",
@@ -85,7 +80,5 @@ return {
     "andythigpen/nvim-coverage",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = true,
-    opts = {},
-    event = "VeryLazy",
   },
 }

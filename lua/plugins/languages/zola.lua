@@ -1,8 +1,7 @@
 return {
   {
     "yorik1984/zola.nvim",
-    opts = {},
-    config = function() end,
+    config = false,
     dependencies = {
       "Glench/Vim-Jinja2-Syntax",
       "cespare/vim-toml",

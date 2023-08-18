@@ -8,7 +8,6 @@ return {
       "windwp/nvim-ts-autotag",
       {
         "andymass/vim-matchup",
-        event = "BufReadPost",
         config = function()
           vim.g.matchup_matchparen_deferred = 1
           vim.g.matchup_matchparen_offscreen = {
@@ -17,6 +16,8 @@ return {
         end,
       },
       "JoosepAlviste/nvim-ts-context-commentstring",
+      "nvim-treesitter/nvim-treesitter-refactor",
+      "RRethy/nvim-treesitter-textsubjects",
     },
     opts = {
       ensure_installed = "all",
@@ -29,13 +30,28 @@ return {
         enable_rename = true,
         enable_close = true,
         enable_close_on_slash = true,
-        filetypes = { "html", "xml" },
       },
       endwise = { enable = true },
       matchup = { enable = true },
       context_commentstring = {
         enable = true,
         enable_autocmd = false,
+      },
+      textsubjects = {
+        enable = true,
+        prev_selection = "<C-<>", -- (Optional) keymap to select the previous selection
+        keymaps = {
+          ["."] = "textsubjects-smart",
+          [";"] = "textsubjects-container-outer",
+          ["i;"] = "textsubjects-container-inner",
+        },
+      },
+      refactor = {
+        highlight_definitions = {
+          enable = true,
+          -- Set to false if you have an `updatetime` of ~100.
+          clear_on_cursor_move = true,
+        },
       },
     },
     build = ":TSUpdate",
@@ -54,5 +70,16 @@ return {
     opts = { mode = "cursor" }, -- separator = "🮩" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
-  { "windwp/nvim-ts-autotag", opts = {} },
+  {
+    "windwp/nvim-ts-autotag",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+  },
+  {
+    "RRethy/nvim-treesitter-textsubjects",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+  },
+  {
+    "nvim-treesitter/nvim-treesitter-refactor",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+  },
 }

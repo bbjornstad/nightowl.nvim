@@ -62,7 +62,6 @@ return {
   },
   {
     "julienvincent/nvim-paredit",
-    opts = {},
     config = true,
     ft = { "clojure", "lisp" },
   },

@@ -18,11 +18,11 @@ return {
     build = function(_)
       require("fundo").install()
     end,
-    event = "VeryLazy",
+    event = { "VeryLazy" },
   },
   {
     "jiaoshijie/undotree",
-    event = "VeryLazy",
+    -- event = "VeryLazy",
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
@@ -83,7 +83,7 @@ return {
     cmd = { "DiffviewOpen", "DiffviewFileHistory" },
     keys = {
       {
-        key_versioning .. "d",
+        key_git .. "d",
         "<CMD>DiffviewOpen<CR>",
         mode = "n",
         desc = "git=> compare in diffview",
@@ -254,9 +254,77 @@ return {
     -- optional, you can also install and use `yq` instead.
     build = "make",
     dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
-    opts = {},
     config = function(_, opts)
       require("gh-actions").setup(opts)
     end,
+  },
+  {
+    "ahmedkhalf/project.nvim",
+    opts = {
+      scope_chdir = "tab",
+      exclude_dirs = {
+        "~/.local/share/nvim",
+        "~/.local/share/nvim/*",
+        "~/.local/state/nvim",
+      },
+    },
+    keys = {
+      {
+        "<leader>fp",
+        false,
+      },
+    },
+  },
+  {
+    "gennaro-tedesco/nvim-possession",
+    dependencies = {
+      "ibhagwan/fzf-lua",
+    },
+    opts = {
+      sessions = {
+        sessions_path = vim.fn.stdpath("data") .. "/sessions/",
+      },
+      autoload = true,
+      autosave = true,
+      autoswitch = {
+        enable = true,
+      },
+      fzf_winopts = {},
+    },
+    config = true,
+    keys = {
+      {
+        "<leader>Sl",
+        function()
+          require("nvim-possession").list()
+        end,
+        mode = "n",
+        desc = "session=> fuzzylist",
+      },
+      {
+        "<leader>Sn",
+        function()
+          require("nvim-possession").new()
+        end,
+        mode = "n",
+        desc = "session=> new",
+      },
+      {
+        "<leader>Su",
+        function()
+          require("nvim-possession").update()
+        end,
+        mode = "n",
+        desc = "session=> update",
+      },
+      {
+        "<leader>Sl",
+        function()
+          require("nvim-possession").delete()
+        end,
+        mode = "n",
+        desc = "session=> delete",
+      },
+    },
   },
 }
