@@ -20,14 +20,25 @@ local function toggle_fmtopt(char)
   end
 end
 
+local function helpmapper()
+  local thishelp = ("help %s"):format(vim.fn.expand("<cword>"))
+  vim.cmd(thishelp)
+end
 --------------------------------------------------------------------------------
 -- Rebind the help menu to be attached to "gh"
 mapx(
   "n",
   "gh",
-  ("<CMD>help %s<CR>"):format(vim.fn.expand("<cword>")),
+  helpmapper,
   { desc = "got=> get help", remap = false, nowait = true }
 )
+-- stop it from showing up on any touch of the <f1> key by default.
+-- mapx(
+--   { "n", "i", "v", "c" },
+--   "<F1>",
+--   "<NOP>",
+--   { desc = "got=> don't get help", remap = false, nowait = false }
+-- )
 
 ---------------------------------------------------------------------------------
 -- Toggles autoformatting on insert by appending the appropriate character to
@@ -80,27 +91,48 @@ mapx(
   "<CMD>quitall!<CR>",
   { desc = "quit=> [!] terminate all windows" }
 )
-mapx("n", "qbn", function()
+mapx("n", "qn", function()
   vim.ui.input({ prompt = "enter filename:" }, function(input)
     vim.cmd(("edit ./%s"):format(input))
   end)
 end, { desc = "buf=> new buffer" })
-mapx("n", "qbw", "<CMD>write<CR>", { desc = "buf=> save current buffer" })
-mapx("n", "qbW", "<CMD>writeall<CR>", { desc = "buf=> save all buffers" })
-mapx("n", "qbo", "<CMD>bwipeout<CR>", { desc = "buf=> wipeout this buffer" })
+mapx("n", "qw", "<CMD>write<CR>", { desc = "buf=> save current buffer" })
+mapx("n", "qW", "<CMD>writeall<CR>", { desc = "buf=> save all buffers" })
+mapx("n", "qo", "<CMD>bwipeout<CR>", { desc = "buf=> wipeout this buffer" })
 mapx(
   "n",
-  "qbO",
+  "qO",
   "<CMD>bwipeout!<CR>",
   { desc = "buf=> [!] wipeout this buffer" }
 )
-
 vim.keymap.del("n", "<leader>bb")
+
+-- vim.keymap.del("n", require("environment.keys").stems.base.repl)
+local jk_status = require("lazyvim.util").has("accelerated-jk.nvim")
+
+if jk_status then
+  vim.notify(vim.inspect(jk_status))
+  vim.keymap.del({ "n", "v" }, "j")
+  vim.keymap.del({ "n", "v" }, "k")
+  mapx({ "n", "v" }, "j", "<Plug>(accelerated_jk_j)", { desc = "move=> down" })
+  mapx({ "n", "v" }, "k", "<Plug>(accelerated_jk_k)", { desc = "move=> up" })
+end
 vim.keymap.del({ "n", "v", "i" }, "<A-j>")
 vim.keymap.del({ "n", "v", "i" }, "<A-k>")
-vim.keymap.del("n", require("environment.keys").stems.base.repl)
+mapx({ "n", "v", "i" }, "<A-l>", "<Right>", { desc = "move => right" })
+mapx({ "n", "v", "i" }, "<A-h>", "<Left>", { desc = "move => left" })
+mapx({ "n", "v", "i" }, "<A-k>", "<Up>", { desc = "move => up" })
+mapx({ "n", "v" }, "<A-j>", "<Down>", { desc = "move => down" })
 
-vim.keymap.del({ "n", "x" }, "j")
-vim.keymap.del({ "n", "x" }, "k")
-mapx({ "n", "x" }, "j", "<Plug>(accelerated_jk_j)", { desc = "move=> down" })
-mapx({ "n", "x" }, "k", "<Plug>(accelerated_jk_k)", { desc = "move=> up" })
+mapx(
+  { "n", "v", "i" },
+  "<A-H>",
+  "<CMD>bprevious<CR>",
+  { desc = "buf=> previous" }
+)
+mapx({ "n", "v", "i" }, "<A-L>", "<CMD>bnext<CR>", { desc = "buf=> next" })
+
+mapx({ "n" }, "<leader>uR", function()
+  local scrollval = tonumber(vim.opt.scrolloff:get())
+  vim.opt.scrolloff = 999 - scrollval
+end, { desc = "win=> sticky center cursor" })
