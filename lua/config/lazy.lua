@@ -72,7 +72,7 @@ local lazyconf = {
 
 local function genspec(conf)
   local aienv = require("environment.ai")
-  if aienv.enabled.copilot then
+  if aienv.enabled.copilot.enable then
     table.insert(
       conf.spec,
       { { import = "lazyvim.plugins.extras.coding.copilot" } }
