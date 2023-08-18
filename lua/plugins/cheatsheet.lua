@@ -38,7 +38,7 @@ return {
           vim.ui.input({
             prompt = "cheat.sh=> search: ",
           }, function(input)
-            local ok, res = pcall(vim.cmd, ("Cheat %s"):format(input))
+            vim.cmd(("Cheat %s"):format(input))
           end)
         end,
         mode = { "n" },
@@ -50,8 +50,7 @@ return {
           vim.ui.input({
             prompt = "cheat.sh=> search (no comments): ",
           }, function(input)
-            local ok, res =
-              pcall(vim.cmd, ("CheatWithoutComments %s"):format(input))
+            vim.cmd(("CheatWithoutComments %s"):format(input))
           end)
         end,
         mode = { "n" },
