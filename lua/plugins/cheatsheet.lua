@@ -1,5 +1,4 @@
 local env = require("environment.ui")
-local stems = require("environment.keys").stems
 
 return {
   {
