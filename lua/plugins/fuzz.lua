@@ -531,7 +531,7 @@ return {
         desc = "fuzz.vim=> history [search]",
       },
       {
-        fstem .. "'",
+        fstem .. "`",
         function()
           require("fzf-lua").marks()
         end,
@@ -622,8 +622,16 @@ return {
           require("fzf-lua").command_history()
         end,
         mode = "n",
-        desc = "scope=> command history",
+        desc = "fuzz=> command history",
         nowait = true,
+      },
+      {
+        "<leader><leader><leader>",
+        function()
+          require("fzf-lua").builtin()
+        end,
+        mode = "n",
+        desc = "fuzz=> builtin finders",
       },
     },
   },

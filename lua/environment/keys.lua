@@ -35,7 +35,7 @@ mod.stems = {}
 mod.stems.base = {}
 
 mod.stems.base.core = "<leader>"
-mod.stems.base.editor = "<localleader>"
+mod.stems.base.editor = "\\"
 
 --- assignment of keystems for each group into the base.
 mod.stems.base.ai = ";"
@@ -43,7 +43,7 @@ mod.stems.base.ui = mod.stems.base.core .. "u"
 mod.stems.base.remote = mod.stems.base.core .. "r"
 mod.stems.base.telescope = mod.stems.base.core .. "<leader>"
 mod.stems.base.code = mod.stems.base.core .. "c"
-mod.stems.base.tasks = "<bar>"
+mod.stems.base.tasks = "<localleader>"
 mod.stems.base.repl = "<F2>"
 mod.stems.base.fuzzy = "Z"
 mod.stems.base.buffers = "q"
@@ -58,7 +58,7 @@ mod.stems.easyread = mod.stems.base.core .. "uB"
 mod.stems.rest = mod.stems.base.core .. "R"
 mod.stems.lsp = mod.stems.base.core .. "c"
 mod.stems.lazy = mod.stems.base.core .. "L"
-mod.stems.cmp = "<C-g>"
+mod.stems.cmp = "<C-x>"
 
 mod.stems.pomodoro = mod.stems.base.tasks .. "p"
 mod.stems.overseer = mod.stems.base.tasks .. "v"
