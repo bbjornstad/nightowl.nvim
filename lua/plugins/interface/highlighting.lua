@@ -1,8 +1,26 @@
+local env = require("environment.ui")
 local kenv = require("environment.keys").stems
 local key_easyread = kenv.easyread
 local key_block = kenv.block
 
 return {
+  {
+    "winston0410/range-highlight.nvim",
+    event = "BufWinEnter",
+    config = function() end,
+  },
+  {
+    "m-demare/hlargs.nvim",
+    opts = {
+      highlight = {
+        link = "@float",
+      },
+      excluded_filetypes = env.ft_ignore_list,
+      extras = { named_parameters = true },
+    },
+    config = true,
+    event = "LspAttach",
+  },
   {
     "tzachar/highlight-undo.nvim",
     config = true,
