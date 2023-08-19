@@ -7,6 +7,7 @@ local key_do = keystems._do
 local key_conduct = keystems.conduct
 local key_taskorg = keystems.base.tasks
 local key_memento = keystems.memento
+local xtscope = require("uutils.scope").extendoscope
 
 return {
   {
@@ -473,10 +474,16 @@ return {
       {
         "<leader>fp",
         function()
-          require("telescope").extensions.conduct.conduct()
+          xtscope("projects", "conduct", {})
         end,
         mode = "n",
         desc = "conduct=> projects",
+      },
+      {
+        "<leader>fs",
+        function()
+          xtscope("sessions", "conduct", {})
+        end,
       },
     },
   },

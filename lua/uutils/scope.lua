@@ -57,4 +57,20 @@ function mod.setup_extensions(extensions, opts, themes)
   return mod.setup_targets(extensions, opts, themes, mod.setup_extension)
 end
 
+function mod.extendoscope(extension_name, module_override, opts)
+  opts = opts or {}
+  module_override = module_override or extension_name
+  local scope = require("telescope")
+  return function()
+    scope.extensions[module_override][extension_name]()
+  end
+end
+
+function mod.builtinoscope(builtin_name, builtin_override, opts)
+  opts = opts or {}
+  builtin_override = builtin_override or "telescope.builtin"
+  return function()
+    require(builtin_override)[builtin_name](opts)
+  end
+end
 return mod

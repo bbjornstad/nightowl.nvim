@@ -5,13 +5,6 @@
 -- performance reasons.
 local key_scope = require("environment.keys").stems.telescope
 local key_notice = require("environment.keys").stems.notice
-local util = require("lazyvim.util")
-
-local function condition(spec)
-  if not util.has("fzf-lua") then
-    return spec
-  end
-end
 
 local target_pickers = {
   "find_files",
@@ -131,20 +124,8 @@ local extspec = scopeutils.setup_extensions(target_extensions, {
   },
 }, "ivy")
 
-local function funext(extension_name, module_override)
-  module_override = module_override or extension_name
-  local scope = require("telescope")
-  return function()
-    scope.extensions[module_override][extension_name]()
-  end
-end
-
-local function funblt(builtin_name, builtin_override)
-  builtin_override = builtin_override or "telescope.builtin"
-  return function()
-    require(builtin_override)[builtin_name]()
-  end
-end
+local funext = scopeutils.extendoscope
+local funblt = scopeutils.builtinoscope
 
 return {
   {
@@ -370,12 +351,12 @@ return {
           require("telescope").load_extension("find_pickers")
         end,
         keys = {
-          {
-            key_scope .. "<leader>",
-            funext("find_pickers"),
-            mode = "n",
-            desc = "scope=> extensions and pickers",
-          },
+          -- {
+          --   key_scope .. "<leader>",
+          --   funext("find_pickers"),
+          --   mode = "n",
+          --   desc = "scope=> extensions and pickers",
+          -- },
         },
       },
       {
@@ -452,6 +433,12 @@ return {
             ["gh"] = "which_key",
           },
         },
+        winblend = 10,
+        prompt_prefix = " ",
+        selection_caret = " ",
+        initial_mode = "normal",
+        dynamic_preview_window = true,
+        prompt_title = "scope::searching...",
       },
       pickers = pickspec,
       extensions = extspec,
