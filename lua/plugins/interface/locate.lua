@@ -7,10 +7,6 @@ local key_portal = kenv.stems.base.portal
 
 return {
   {
-    "winston0410/range-highlight.nvim",
-    config = function() end,
-  },
-  {
     "mvllow/modes.nvim",
     tag = "v0.2.0",
     config = true,
@@ -101,6 +97,7 @@ return {
   {
     "nacro90/numb.nvim",
     config = true,
+    event = "VeryLazy",
     opts = {
       show_numbers = true,
       show_cursorline = true,
@@ -112,6 +109,7 @@ return {
   {
     "rainbowhxch/accelerated-jk.nvim",
     enabled = env.accelerated_jk.enable,
+    event = "VeryLazy",
     opts = {
       mode = "time_driven",
       enable_deceleration = false,
