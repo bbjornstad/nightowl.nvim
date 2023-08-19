@@ -52,7 +52,16 @@ return {
       "uga-rosa/cmp-latex-symbol",
       "octaltree/cmp-look",
     },
+    init = function()
+      vim.g.enable_cmp_completion = true
+      vim.g.enable_cmp_autocompletion = false
+    end,
     opts = function(_, opts)
+      opts = opts or {}
+      opts.enabled = opts.enabled
+        or function()
+          return vim.b.enable_cmp_completion
+        end
       local cmp = require("cmp")
       local t_cmp = require("cmp.types")
       require("luasnip.loaders.from_vscode").lazy_load()
@@ -181,18 +190,18 @@ return {
           group_index = 2,
         },
       }
-      opts.sources = vim.list_extend(opts.sources, default_sources)
+      vim.list_extend(opts.sources, default_sources)
 
       -- -────────────────────────────────────────────────────────────---------
       -- The following changes the behavior of the menu. Noteably, we are
       -- turning off autocompletion on insert, in other words we need to hit one
       -- of the configured keys to be able to use the completion menu.
       opts.completion = vim.tbl_deep_extend("force", {
-        autocomplete = false,
-        -- autocomplete = {
-        --   t_cmp.cmp.TriggerEvent.InsertEnter,
-        --   t_cmp.cmp.TriggerEvent.TextChanged,
-        -- },
+        -- autocomplete = false,
+        autocomplete = {
+          t_cmp.cmp.TriggerEvent.InsertEnter,
+          t_cmp.cmp.TriggerEvent.TextChanged,
+        },
         scrolloff = true,
       }, opts.completion or {})
 
@@ -299,7 +308,7 @@ return {
             s = require("cmp").mapping.confirm({ select = true }),
             c = require("cmp").mapping.confirm({
               behavior = require("cmp").ConfirmBehavior.Replace,
-              select = true,
+              select = false,
             }),
           }),
           ["<Tab>"] = require("lsp-zero").cmp_action().luasnip_supertab(),
@@ -478,6 +487,43 @@ return {
           }),
         }, opts.mapping or {}))
     end,
+    keys = {
+      {
+        "<leader>uxe",
+        function()
+          vim.b.enable_cmp_completion = not vim.b.enable_cmp_completion
+          vim.notify(("nvim-cmp: %s"):format(vim.b.enable_cmp_completion))
+        end,
+        mode = "n",
+        desc = "cmp=> toggle nvim-cmp enabled",
+      },
+      {
+        "<leader>uxc",
+        function()
+          local oldstatus = not vim.b.enable_cmp_autocompletion
+          vim.b.enable_cmp_autocompletion = oldstatus
+          if oldstatus then
+            require("cmp").setup.buffer({
+              completion = {
+                autocomplete = {
+                  require("cmp.types").cmp.TriggerEvent.InsertEnter,
+                  require("cmp.types").cmp.TriggerEvent.TextChanged,
+                },
+              },
+            })
+          else
+            require("cmp").setup.buffer({
+              autocomplete = false,
+            })
+          end
+          vim.notify(
+            ("Autocompletion: %s"):format(vim.b.enable_cmp_autocompletion)
+          )
+        end,
+        mode = "n",
+        desc = "cmp=> toggle autocompletion on insert",
+      },
+    },
   },
   -- explicitly list out the sources that we are installing for nvim-cmp. These
   -- match the list that is represented above, but with the added caveat that
@@ -565,6 +611,7 @@ return {
     "nat-418/cmp-color-names.nvim",
     dependencies = { ncmp },
     config = true,
+    ft = { "html", "css", "js", "md", "org", "norg" },
     opts = {},
   },
   { "hrsh7th/cmp-emoji", dependencies = { ncmp } },
