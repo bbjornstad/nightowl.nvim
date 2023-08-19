@@ -286,19 +286,8 @@ return {
     event = "LspAttach",
   },
   {
-    "m-demare/hlargs.nvim",
-    opts = {
-      highlight = {
-        -- Hlargs = { link = "@include" },
-      },
-      excluded_filetypes = env.ft_ignore_list,
-      extras = { named_parameters = true },
-    },
-    config = true,
-    event = "LspAttach",
-  },
-  {
     "echasnovski/mini.operators",
+    event = "VeryLazy",
     version = false,
     opts = {
       evaluate = {
@@ -318,19 +307,19 @@ return {
       },
     },
   },
-  --   {
-  --     "ivanjermakov/troublesum.nvim",
-  --     event = "LspAttach",
-  --     opts = {
-  --       enabled = true,
-  --       autocmd = true,
-  --       severity_format = { "", "", "", "󱍅" },
-  --       format = function(counts) end,
-  --       display_summary = function(bufnr, ns, text) end,
-  --     },
-  --     config = function(_, opts)
-  --       -- require("troublesum").override_config(opts)
-  --       require("troublesum").setup(opts)
-  --     end,
-  --   },
+  {
+    "ivanjermakov/troublesum.nvim",
+    event = "LspAttach",
+    opts = {
+      enabled = true,
+      autocmd = true,
+      severity_format = { "", "", "", "󱍅" },
+      format = function(counts) end,
+      display_summary = function(bufnr, ns, text) end,
+    },
+    config = function(_, opts)
+      -- require("troublesum").override_config(opts)
+      require("troublesum").setup(opts)
+    end,
+  },
 }
