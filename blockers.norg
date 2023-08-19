@@ -60,6 +60,7 @@ version: 1.1.1
     have done for their uses.
     - ( ) check out folke's repos
     - (x) we are working successfully now
+    ------
 
 ** Problematic Blockers
    These items are not as critical as the above, but they still are important
@@ -83,6 +84,8 @@ version: 1.1.1
      while I did really want to like the plugin, unfortunately it seemed like it
      was almost too good at its job. Visual block mode had some trouble, and it
      also was I think messing up other plugins.
+     ------
+    -----
 
 ** Unimplemented Features
    These items are not necessarily critical to being able to edit files in an
@@ -114,6 +117,7 @@ version: 1.1.1
     this is supposed to be a simple module which can unify the text-formatting
     and intake of user input via the vim.ui subset of functionality that is
     exposed and configurable.
+    -----
 
 ** Debugging Features
    This is the list of things that are implemented but that need some extra
@@ -135,6 +139,7 @@ version: 1.1.1
      z-mapping plus the capital Z-mapping for all FZF stuff. We do need to do one
      additional bit here though, which is to clean out telescope materials and
      plugins that are superceded by the fzf-lua mappings instead.
+     -----
 
 *** folke/edgy.nvim fixes
     I really want to like edgy because it nicely organizes the windows into
@@ -189,3 +194,28 @@ version: 1.1.1
      dependency, and when the user uses the functionality of the dependency
      plugin in the lazy specification of the dependent plugin.
      ~ asdf
+     ===
+
+* Random Notes: Nightowl.nvim
+  This is a section of the document that can hold some random notes related to
+  the implementation of all of the stuff that is listed in the preceding
+  section.
+
+** Project Management
+   the selection of task management plugins is maybe a bit too expansive at the
+   moment. We have, at least, the following plugins:
+   - `telescope-project.nvim`
+   - `project.nvim`
+   - `conduct.nvim`
+   - `nvim-possession`
+   - `mini.sessions`
+   - `persistence.nvim`
+   this does not include any plugins that are related to todo-management, which
+   is almost a separate thing since the former deal mostly with handling
+     directories while the latter are about time. Still, included below
+   - `pomodoro`,
+   - `wakatime`
+   - all todo management plugins, like `unfog.nvim`
+   - `do.nvim`
+     we probably should trim this down substantially.
+
