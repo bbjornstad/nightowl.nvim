@@ -6,7 +6,7 @@ return {
     "folke/which-key.nvim",
     opts = {
       plugins = {
-        marks = true,
+        marks = false,
         registers = true,
       },
       window = {
@@ -35,6 +35,11 @@ return {
           format = { "{message}" },
           win_options = { concealcursor = "n", conceallevel = 3 },
         },
+      },
+      icons = {
+        breadcrumb = "󰶻",
+        separator = "",
+        group = " ",
       },
       defaults = {
         [keystems.core] = { name = "+nvim core fxns" },

@@ -15,7 +15,7 @@ local NIGHTOWL_BACKGROUND = os.getenv("NIGHTOWL_BACKGROUND_STYLE")
 -- to most of what could be needed at a moment's notice when editing, and then
 -- some.
 vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
+vim.g.maplocalleader = "'"
 
 -- Basic interface options that are not handled with specific plugin
 -- configurations set in interface.lua

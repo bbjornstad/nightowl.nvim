@@ -2,6 +2,7 @@ local stems = require("environment.keys").stems
 local key_cbox = stems.cbox
 local key_cline = stems.cline
 local key_figlet = stems.figlet
+local key_editor = stems.base.editor
 local mopts = require("uutils.functional").mopts
 local inp = require("uutils.input")
 local compute_effective_width = require("uutils.text").compute_effective_width
@@ -21,7 +22,7 @@ return {
     },
     keys = {
       {
-        "<localleader>B",
+        key_cbox .. "B",
         function()
           require("comment-box").catalog()
         end,
@@ -153,10 +154,26 @@ return {
   {
     "s1n7ax/nvim-comment-frame",
     config = true,
+    keys = {
+      {
+        key_editor .. "cf",
+        function()
+          require("nvim-comment-frame").add_comment()
+        end,
+        mode = "n",
+        desc = "frame=> add comment frame",
+      },
+      {
+        key_editor .. "cm",
+        function()
+          require("nvim-comment-frame").add_multiline_comment()
+        end,
+        mode = "n",
+        desc = "frame=> multiline frame",
+      },
+    },
     opts = {
       disable_default_keymap = true,
-      keymap = "<localleader>cf",
-      multiline_keymap = "<localleader>cm",
       -- start the comment with this string
       start_str = "//",
 
@@ -191,7 +208,6 @@ return {
   {
     "thazelart/figban.nvim",
     config = false,
-    opts = {},
     cmd = "Figban",
     keys = {
       {
