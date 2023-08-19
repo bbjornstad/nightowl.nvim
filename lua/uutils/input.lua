@@ -65,7 +65,10 @@ function mod.cmdtext_input(prompt, ...)
   local argtable = { ... }
   local function extrawrap()
     vim.ui.input({ prompt = prompt }, function(input)
-      local res = vim.cmd(unpack(argtable))
+      local fargs = vim.tbl_map(function(val)
+        return val:format(input)
+      end, argtable)
+      local res = vim.cmd(unpack(fargs))
       return res
     end)
   end
