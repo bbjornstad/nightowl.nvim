@@ -45,6 +45,7 @@ return { -- add folding range to capabilities
   },
   {
     "milisims/foldhue.nvim",
+    event = "BufWinEnter",
     config = function(_, opts)
       require("foldhue").enable()
     end,
@@ -198,8 +199,8 @@ return { -- add folding range to capabilities
     opts = {
       offset = -4,
       foldsigns = {
-        open = "-",
-        closed = "+",
+        close = "⌐",
+        open = "⌙",
         seps = { "│", "┃" },
       },
     },
