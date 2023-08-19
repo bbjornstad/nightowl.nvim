@@ -1,6 +1,5 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local colors = require("kanagawa.colors").setup({ theme = "wave" }).palette
-local kenv = require("environment.keys")
 local inp = require("uutils.input")
 
 local function colorize(bg, fg, opts)
@@ -189,6 +188,7 @@ local organization_tools = {
       },
       "lukas-reineke/headlines.nvim",
       -- "madskjeldgaard/neorg-figlet-module",
+      "pysan3/neorg-templates",
     },
     build = ":Neorg sync-parsers",
     cmd = "Neorg",
@@ -206,13 +206,14 @@ local organization_tools = {
           config = {
             workspaces = {
               journal = "~/.notes/journal",
-              todo = "~/.notes/todo",
+              tasks = "~/.notes/tasks",
               prj = "~/prj",
               notes = "~/.notes/notes",
+              life = "~/.notes",
             },
             open_last_workspace = "default",
             index = "note-index.norg",
-            default_workspace = "notes",
+            default_workspace = "life",
           },
         },
         ["core.completion"] = {
@@ -244,6 +245,18 @@ local organization_tools = {
           config = {
             extension = "md",
             extensions = "all",
+          },
+        },
+        ["external.templates"] = {
+          config = {
+            templates_dir = vim.fn.stdpath("config")
+              .. "/templates/neorg-templates",
+          },
+        },
+        ["core.esupports.metagen"] = {
+          config = {
+            type = "auto",
+            update_date = true,
           },
         },
         -- ["external.integrations.figlet"] = {

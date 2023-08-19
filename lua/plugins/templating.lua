@@ -1,4 +1,5 @@
-local tempath = vim.fn.stdpath("config") .. "/templates"
+local key_editor = require("environment.keys").stems.base.editor
+local tempath = vim.fn.stdpath("config") .. "/templates/template.nvim"
 
 return {
   {
@@ -15,13 +16,13 @@ return {
     cmd = { "Template", "TemProject" },
     keys = {
       {
-        "<localleader>tt",
+        key_editor .. "tt",
         "<CMD>Template<CR>",
         mode = "n",
         desc = "plate=> serve up template",
       },
       {
-        "<localleader>tp",
+        key_editor .. "tp",
         function()
           vim.ui.input({ prompt = "enter template name: " }, function(input)
             vim.cmd(("Template %s"):format(input))
@@ -31,7 +32,7 @@ return {
         desc = "plate=> select up template",
       },
       {
-        "<localleader>te",
+        key_editor .. "te",
         ("<CMD>edit %s<CR>"):format(tempath),
         mode = "n",
         desc = "plate=> edit template directory",
