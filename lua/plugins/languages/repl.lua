@@ -6,6 +6,21 @@ local key_sniprun = key_repl .. "s"
 
 return {
   {
+    "vlime/vlime",
+    ft = { "lisp", "julia", "python", "clojure", "fennel", "conjure" },
+    config = function(plugin)
+      vim.opt.rtp:append((plugin.dir .. "vim/"))
+    end,
+    keys = {
+      {
+        key_repl .. "v",
+        "<CMD>!sbcl --load <CR>",
+        mode = "n",
+        desc = "lisp=> start vlime",
+      },
+    },
+  },
+  {
     "michaelb/sniprun",
     build = "sh ./install.sh",
     config = true,

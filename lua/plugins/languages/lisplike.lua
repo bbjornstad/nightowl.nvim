@@ -22,21 +22,6 @@ return {
     ft = { "*shadowenv.d/*" },
   },
   {
-    "vlime/vlime",
-    ft = { "lisp" },
-    config = function(plugin)
-      vim.opt.rtp:append((plugin.dir .. "vim/"))
-    end,
-    keys = {
-      {
-        key_repl .. "v",
-        "<CMD>!sbcl --load <CR>",
-        mode = "n",
-        desc = "lisp=> start vlime",
-      },
-    },
-  },
-  {
     "Olical/conjure",
     ft = { "clojure", "fennel", "python" },
     dependencies = {
@@ -62,7 +47,10 @@ return {
   },
   {
     "julienvincent/nvim-paredit",
-    config = true,
+    opts = {},
+    config = function(_, opts)
+      require("nvim-paredit").setup(opts)
+    end,
     ft = { "clojure", "lisp" },
   },
 }
