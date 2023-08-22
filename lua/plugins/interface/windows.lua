@@ -840,4 +840,36 @@ return {
   --     },
   --   },
   -- },
+  {
+    "anuvyklack/windows.nvim",
+    dependencies = {
+      "anuvyklack/middleclass",
+      "anuvyklack/animation.nvim",
+    },
+    config = function(_, opts)
+      vim.o.winwidth = 10
+      vim.o.winminwidth = 10
+      vim.o.equalalways = false
+      require("windows").setup(opts)
+    end,
+    opts = {
+      autowidth = {
+        enable = true,
+        winwidth = 5,
+        filetype = {
+          help = 2,
+        },
+      },
+      ignore = {
+        buftype = { "quickfix" },
+        filetype = env.ft_ignore_list,
+      },
+      animation = {
+        enable = true,
+        duration = 300,
+        fps = 60,
+        easing = "in_out_sine",
+      },
+    },
+  },
 }
