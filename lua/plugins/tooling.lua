@@ -65,6 +65,7 @@ return {
       },
     },
     init = function()
+      vim.g.hidden = true
       local function set_terminal_keymaps(bufnr)
         local opts = { buffer = bufnr or 0 }
         mapx(

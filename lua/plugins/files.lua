@@ -125,6 +125,8 @@ return {
     cmd = "Oil",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
+      default_file_explorer = true,
+      prompt_save_on_select_new_entry = true,
       columns = {
         "icon",
         "type",
@@ -224,7 +226,7 @@ return {
     cmd = { "NnnExplorer", "NnnPicker" },
     opts = function(_, opts)
       opts.explorer = vim.tbl_deep_extend("force", {
-        width = 32,
+        width = 28,
         side = "topleft",
         session = "shared",
         tabs = true,
