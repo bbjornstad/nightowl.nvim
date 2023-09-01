@@ -31,7 +31,7 @@ env.enabled = {
   codegpt = { env = true, fallback = false },
   neural = { env = true, fallback = false },
   neoai = { env = true, fallback = false },
-  hfcc = { env = true, fallback = true },
+  hfllm = { env = true, fallback = true },
   tabnine = { env = true, fallback = true },
   cmp_tabnine = { env = true, fallback = true },
   codeium = { env = true, fallback = true },
@@ -40,7 +40,37 @@ env.enabled = {
   explain_it = { env = true, fallback = false },
   doctor = { env = true, fallback = false },
   llm = { env = true, fallback = false },
+  backseat = { env = true, fallback = false },
+  wtf = { env = true, fallback = false },
 }
 env.status_notify_on_startup = false
+
+-- -----------------------------------------------------------------------------
+-- HuggingFace: Large Language Models
+-- -----
+-- llm.nvim: from huggingface
+-- this plugin's name conflicts with another large language model plugin, this
+-- one is also included in the same file as the huggingface option, but we can't
+-- have the name conflict, so we have to rename one of them appropriately.
+env.hf = {}
+env.hf.llm = {}
+env.hf.llm.name = "hfllm"
+env.hf.llm.model = "bigcode/starcoder"
+env.hf.llm.params = {
+  max_new_tokens = 60,
+  temperature = 0.2,
+  top_p = 0.95,
+  stop_token = "<|endoftext|>",
+}
+env.hf.llm.fim = {
+  enabled = true,
+  prefix = "<fim_prefix>",
+  middle = "<fim_middle>",
+  suffix = "<fim_suffix>",
+}
+env.hf.llm.lsp = {
+  enabled = true,
+  bin_path = vim.fs.normalize(vim.fn.stdpath("data") .. "/llm_nvim/bin"),
+}
 
 return env

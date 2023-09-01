@@ -1,13 +1,13 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local env = require("environment.ui")
-local enb =
-  require("environment.ai").enablements(require("environment.ai").enabled)
+local aienv = require("environment.ai")
+local enb = aienv.enablements(aienv.enabled)
 local notify_on_startup = require("environment.ai").status_notify_on_startup
 
 local stems = require("environment.keys").stems
 local key_ai = stems.base.ai
 local key_copilot = stems.copilot
-local key_hfcc = stems.hfcc
+local key_hfllm = stems.hfllm
 local key_neural = stems.neural
 local key_chatgpt = stems.chatgpt
 local key_neoai = stems.neoai
@@ -19,6 +19,8 @@ local key_explain_it = stems.explain_it
 local key_tabnine = stems.tabnine
 local key_doctor = stems.doctor
 local key_llm = stems.llm
+local key_backseat = stems.backseat
+local key_wtf = stems.wtf
 
 -- show a menu, but only if the user has selected the appropriate option.
 -- This menu is supposed to inform the user which plugins might send -- their code off to an external service for analysis.
@@ -42,13 +44,15 @@ AI Plugin Status:
   -> **ReviewGPT**: %s
   -> **naVi** %s
   -> **explain-it** %s
-  -> **key_llm**: %s
+  -> **llm**: %s
+  -> **backseat**: %s
+  -> **wtf**: %s
 
 *plugin is used during nvim-cmp autocompletion, and will therefore connect to an external service without explicit instruction to do so*
 **plugin uses proprietary, non-free, non-open, or non-libre backend (namely ChatGPT)**
 ***plugin has both of the above listed attributes***
 ]],
-      enb.hfcc.enable,
+      enb.hfllm.enable,
       enb.codeium.enable,
       enb.tabnine.enable,
       enb.cmp_tabnine.enable,
@@ -62,7 +66,9 @@ AI Plugin Status:
       enb.navi.enable,
       enb.explain_it.enable,
       enb.llm.enable,
-      enb.doctor.enable
+      enb.doctor.enable,
+      enb.backseat.enable,
+      enb.wtf.enable
     ),
     vim.log.levels.INFO
   )
@@ -96,7 +102,7 @@ return {
         [key_neoai] = { name = "ai=> +neoai" },
         [key_chatgpt] = { name = "ai=> +chatgpt (openai original)" },
         [key_copilot] = { name = "ai=> +copilot" },
-        [key_hfcc] = { name = "ai=> +huggingface" },
+        [key_hfllm] = { name = "ai=> +huggingface" },
         [key_codegpt] = { name = "ai=> +codegpt" },
         [key_neural] = { name = "ai=> +neural" },
         [key_rgpt] = { name = "ai=> +rgpt" },
@@ -125,10 +131,11 @@ return {
     enabled = enb.codeium.enable,
   },
   {
-    "huggingface/hfcc.nvim",
+    "huggingface/llm.nvim",
+    name = aienv.hf.llm.name or "llms",
     opts = {
-      model = "bigcode/starcoder",
-      query_params = {
+      model = aienv.hf.llm.model or "bigcode/starcoder",
+      query_params = aienv.hf.llm.params or {
         max_new_tokens = 60,
         temperature = 0.2,
         top_p = 0.95,
@@ -136,38 +143,39 @@ return {
       },
       accept_keymap = "<C-=>",
       dismiss_keymap = "<C-->",
-      fim = {
+      fim = aienv.hf.llm.fim or {
         enabled = true,
         prefix = "<fim_prefix>",
         middle = "<fim_middle>",
         suffix = "<fim_suffix>",
       },
+      lsp = aienv.hf.llm.lsp
+        or {
+          enabled = true,
+          bin_path = vim.fs.normalize(
+            vim.fs.joinpath(vim.fn.stdpath("data") .. "/llm_nvim/bin")
+          ),
+        },
     },
-    enabled = enb.hfcc.enable,
-    cmd = { "HugMyFace", "HFccSuggestion", "HFccToggleAutoSuggest" },
+    enabled = enb.hfllm.enable,
+    cmd = { "HugMyFace", "LLMToggleAutoSuggest" },
     init = function()
       vim.api.nvim_create_user_command("HugMyFace", function()
-        require("hfcc.completion").complete()
+        require("lmm.completion").complete()
       end, {})
     end,
     keys = {
       {
-        key_hfcc .. "f",
-        "<CMD>HFccSuggestion<CR>",
+        key_hfllm .. "F",
+        "<CMD>LLMToggleAutoSuggest<CR>",
         mode = "n",
-        desc = "ai.hfcc=> suggest huggingface completion",
+        desc = "ai.llm=> toggle insert mode autosuggest",
       },
       {
-        key_hfcc .. "F",
-        "<CMD>HFccToggleAutoSuggest<CR>",
+        key_hfllm .. "a",
+        "<CMD>LLMToggleAutoSuggest<CR>",
         mode = "n",
-        desc = "ai.hfcc=> toggle insert mode autosuggest",
-      },
-      {
-        "<CMD>HFccToggleAutoSuggest<CR>",
-        key_hfcc .. "a",
-        mode = "n",
-        desc = "ai.hfcc=> toggle insert mode autosuggest",
+        desc = "ai.llm=> toggle insert mode autosuggest",
       },
     },
   },
@@ -219,6 +227,7 @@ return {
       "nvim-lua/plenary.nvim",
       -- "hrsh7th/nvim-cmp",
     },
+    event = "VeryLazy",
     config = function(_, opts)
       require("cmp_ai.config"):setup(vim.tbl_deep_extend("force", {
         max_lines = 1000,
@@ -288,10 +297,10 @@ return {
     },
     opts = {
       disable_auto_comment = true,
-      accept_keymap = "<C-=>",
-      dismiss_keymap = "<C-->",
+      accept_keymap = "<A-=>",
+      dismiss_keymap = "<A-->",
       debounce_ms = 800,
-      suggestion_color = { gui = "#808080", cterm = 244 },
+      suggestion_color = { link = "@punctuation" },
       exclude_filetypes = {
         "TelescopePrompt",
         "neo-tree",
@@ -767,6 +776,75 @@ return {
         end,
         mode = { "n", "v" },
         desc = "ai.llm=> select and use llm model",
+      },
+    },
+  },
+  {
+    "james1236/backseat.nvim",
+    event = "VeryLazy",
+    cmd = { "Backseat", "BackseatAsk", "BackseatClear", "BackseatClearLine" },
+    opts = {
+      openai_model_id = "gpt-4",
+      additional_instruction = "Respond as if you were George Carlin, but also the best programmer",
+      highlight = {
+        icon = "",
+        group = "@punctuation",
+      },
+    },
+    keys = {
+      {
+        key_backseat .. "b",
+        "<CMD>Backseat<CR>",
+        mode = "n",
+        desc = "ai.backseat=> review",
+      },
+      {
+        key_backseat .. "a",
+        "<CMD>BackseatAsk<CR>",
+        mode = "n",
+        desc = "ai.backseat=> ask",
+      },
+      {
+        key_backseat .. "c",
+        "<CMD>BackseatClear<CR>",
+        mode = "n",
+        desc = "ai.backseat=> clear ai notes",
+      },
+      {
+        key_backseat .. "l",
+        "<CMD>BackseatClearLine<CR>",
+        mode = "n",
+        desc = "ai.backseat=> clear line's ai notes",
+      },
+    },
+  },
+  {
+    "piersolenski/wtf.nvim",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    event = "VeryLazy",
+    cmd = { "Wtf", "WtfSearch" },
+    opts = {
+      openai_model_id = "gpt-4",
+      additional_instructions = "Respond as if you were George Carlin, but also the best programmer",
+    },
+    keys = {
+      {
+        key_wtf .. "a",
+        mode = { "n" },
+        function()
+          require("wtf").ai()
+        end,
+        desc = "Debug diagnostic with AI",
+      },
+      {
+        mode = { "n" },
+        key_wtf .. "s",
+        function()
+          require("wtf").search()
+        end,
+        desc = "Search diagnostic with Google",
       },
     },
   },
