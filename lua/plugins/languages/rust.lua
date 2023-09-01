@@ -12,40 +12,20 @@ return {
         },
         hover_actions = {
           border = env.borders.main,
+          auto_focus = true,
+        },
+        executor = {
+          require("rust-tools.executors").toggleterm,
         },
       },
     },
   },
-  {
-    "neovim/nvim-lspconfig",
-    opts = function(_, opts)
-      opts.servers = vim.tbl_deep_extend("force", {
-        rust_analyzer = {
-          keys = {
-            {
-              "K",
-              function()
-                require("rust-tools").hover_actions.hover_actions()
-              end,
-              desc = "lsp=> hover (rust edition)",
-            },
-            {
-              "ga",
-              function()
-                require("rust-tools").code_action_group.code_action_group()
-              end,
-              desc = "lsp=> code actions (rust edition)",
-            },
-            {
-              "<leader>ca",
-              function()
-                require("rust-tools").code_action_group.code_action_group()
-              end,
-              desc = "lsp=> code actions (rust edition)",
-            },
-          },
-        },
-      }, opts.servers or {})
-    end,
-  },
+  -- {
+  --   "neovim/nvim-lspconfig",
+  --   opts = function(_, opts)
+  --     opts.servers = vim.tbl_deep_extend("force", {
+  --       rust_analyzer = {},
+  --     }, opts.servers or {})
+  --   end,
+  -- },
 }
