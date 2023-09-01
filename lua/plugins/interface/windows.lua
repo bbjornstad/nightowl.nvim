@@ -18,13 +18,8 @@ return {
   },
   {
     "folke/lazy.nvim",
-    opts = function(_, opts)
-      pdel({ "n" }, "<leader>l")
-      opts.dev = vim.tbl_deep_extend("force", {
-        path = "~/prj/nvim-dev",
-        patterns = {},
-        fallback = true,
-      })
+    init = function()
+      pdel({ "n", "<leader>l" })
     end,
     keys = {
       {
@@ -202,93 +197,6 @@ return {
       },
     },
   },
-  -- {
-  --   "nvim-focus/focus.nvim",
-  --   enabled = false,
-  --   opts = {
-  --     enable = false,
-  --     commands = false,
-  --     autoresize = {
-  --       enable = true,
-  --       minwidth = 32,
-  --       width = 36,
-  --     },
-  --     ui = {
-  --       absolutenumber_unfocussed = true,
-  --       hybridnumber = true,
-  --       winhighlight = false,
-  --       cursorline = true,
-  --       cursorcolumn = false,
-  --       colorcolumn = {
-  --         enable = true,
-  --         list = "+1",
-  --       },
-  --     },
-  --   },
-  --   event = "VeryLazy",
-  --   keys = {
-  --     {
-  --       key_focus .. "w",
-  --       function()
-  --         require("focus").focus_toggle()
-  --       end,
-  --       mode = "n",
-  --       desc = "focus=> toggle winresizer",
-  --     },
-  --     {
-  --       key_focus .. "o",
-  --       function()
-  --         require("focus").focus_enable()
-  --       end,
-  --       mode = "n",
-  --       desc = "focus=> enable winresizer",
-  --     },
-  --     {
-  --       key_focus .. "q",
-  --       function()
-  --         require("focus").focus_disable()
-  --       end,
-  --       mode = "n",
-  --       desc = "focus=> disable winresizer",
-  --     },
-  --     {
-  --       key_focus .. "M",
-  --       function()
-  --         require("focus").focus_max_or_equal()
-  --       end,
-  --       mode = "n",
-  --       desc = "focus=> toggle winresizer maximized",
-  --     },
-  --   },
-  --   init = function()
-  --     local focus = require("focus")
-  --     local focusmap = function(direction)
-  --       vim.api.nvim_set_keymap(
-  --         "n",
-  --         "<Leader>w" .. direction,
-  --         -- this comes directly from  the focus nvim readme but we want to use the capital letter mappings for consistency
-  --         ":lua require('focus').split_command('"
-  --           .. string.lower(direction)
-  --           .. "')<CR>",
-  --         { silent = true }
-  --       )
-  --     end
-  --     -- Use `<Leader>h` to split the screen to the left, same as command FocusSplitLeft etc
-  --     focusmap("h")
-  --     focusmap("j")
-  --     focusmap("k")
-  --     focusmap("l")
-  --     -- vim.api.nvim_create_autocmd("WinEnter", {
-  --     --   group = vim.api.nvim_create_augroup("FocusDisable", { clear = true }),
-  --     --   callback = function(ev)
-  --     --     if vim.tbl_contains(ignore_buftypes, vim.bo.buftype) then
-  --     --       vim.b.focus_disable = true
-  --     --     end
-  --     --   end,
-  --     --   desc = "Disable focus autoresize for BufTypes",
-  --     -- })
-  --   end,
-  -- },
   {
     "echasnovski/mini.bufremove",
     opts = function(_, opts) end,
@@ -340,7 +248,7 @@ return {
     opts = {
       input = {
         relative = "win",
-        border = env.borders.main,
+        border = env.borders.alt,
         start_in_insert = true,
         insert_only = true,
         win_options = {
@@ -622,10 +530,10 @@ return {
       end
 
       condition("nnn.nvim", "left", {
-        title = "files::nnn",
+        title = "fm::nnn",
         ft = "nnn",
         size = {
-          height = 0.5,
+          height = 0.6,
         },
         pinned = true,
         open = "NnnExplorer",
@@ -773,75 +681,9 @@ return {
     event = "BufWinEnter",
     cmd = { "PinBuffer", "PinBuftype", "PinFiletype", "Unpin" },
   },
-  -- {
-  --   "nvim-focus/focus.nvim",
-  --   event = "BufWinEnter",
-  --   init = function()
-  --     local ignore_filetypes = env.ft_ignore_list
-  --     local ignore_buftypes = { "nofile", "prompt", "popup" }
-  --     local augroup =
-  --       vim.api.nvim_create_augroup("FocusDisable", { clear = true })
-  --     vim.api.nvim_create_autocmd("WinEnter", {
-  --       group = augroup,
-  --       callback = function(_)
-  --         if vim.tbl_contains(ignore_buftypes, vim.bo.buftype) then
-  --           vim.w.focus_disable = true
-  --         else
-  --           vim.w.focus_disable = false
-  --         end
-  --       end,
-  --       desc = "Disable focus autoresize for BufType",
-  --     })
-  --
-  --     vim.api.nvim_create_autocmd("BufWinEnter", {
-  --       group = augroup,
-  --       callback = function(_)
-  --         if vim.tbl_contains(ignore_filetypes, vim.bo.filetype) then
-  --           vim.w.focus_disable = true
-  --         else
-  --           vim.w.focus_disable = false
-  --         end
-  --       end,
-  --       desc = "Disable focus autoresize for FileType",
-  --     })
-  --   end,
-  --   config = function(_, opts)
-  --     require("focus").setup(opts)
-  --   end,
-  --   opts = {
-  --     enable = true,
-  --     commands = true,
-  --     autoresize = {
-  --       enable = true,
-  --       ui = {
-  --         hybridnumber = true,
-  --         absolutenumber_unfocussed = true,
-  --       },
-  --     },
-  --   },
-  --   keys = {
-  --     {
-  --       key_focus .. "m",
-  --       "<CMD>FocusMaximise<CR>",
-  --       mode = "n",
-  --       desc = "focus=> maximize window",
-  --     },
-  --     {
-  --       key_focus .. "e",
-  --       "<CMD>FocusEqualise<CR>",
-  --       mode = "n",
-  --       desc = "focus=> equalize window",
-  --     },
-  --     {
-  --       key_focus .. "t",
-  --       "<CMD>FocusMaxOrEqual<CR>",
-  --       mode = "n",
-  --       desc = "focus=> toggle maximize",
-  --     },
-  --   },
-  -- },
   {
     "anuvyklack/windows.nvim",
+    event = "BufWinEnter",
     dependencies = {
       "anuvyklack/middleclass",
       "anuvyklack/animation.nvim",
@@ -871,5 +713,22 @@ return {
         easing = "in_out_sine",
       },
     },
+  },
+  {
+    "willothy/flatten.nvim",
+    lazy = false,
+    priority = 1001,
+    opts = {
+      window = {
+        open = "smart",
+        diff = "tab_vsplit",
+      },
+      one_per = {
+        wezterm = false,
+      },
+    },
+    config = function(_, opts)
+      require("flatten").setup(opts)
+    end,
   },
 }
