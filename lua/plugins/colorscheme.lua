@@ -1,43 +1,11 @@
 local env = require("environment.ui")
+local default_colorizer = env.identify_highlight
 local bg_style = os.getenv("NIGHTOWL_BACKGROUND_STYLE")
-local scheme_selection = os.getenv("NIGHTOWL_COLORSCHEME") or "kanagawa"
 
 if vim.fn.has("termguicolors") then
   vim.cmd([[set termguicolors]])
 end
 
-local function hlursa(overrides)
-  -- each item of overrides is a key-value pair where the keyname is the
-  -- highlight group and the value is a table with assignments in string name
-  -- form, along with an optional colordef_section key which is removed and is
-  -- used to pick the section of the "colors" table we need to parse out.
-  local function inner_hl(opts)
-    -- in this case that would be the opts table passed into this function
-    local hlink = opts.link_highlight or nil
-    -- this is either "theme" or "palette", and identifies the subsection of the
-    -- colorscheme that should be removed. When more colorschemes are accepted,
-    -- this is then going to be the union of all possible subdesignations.
-    local colordef_section = opts.colordef_section or "theme"
-    -- we need to toss these elements because of the fact that they are not
-    -- well-defined inputs for the final format, but we needed them to infer
-    -- behavior. moreover, there is impetus to do it this way to play nicely
-    -- with the vim.tbl_map function.
-    opts.link_highlight = nil
-    opts.colordef_section = nil
-
-    if hlink ~= nil then
-      return { link = hlink }
-    end
-  end
-
-  local function genfunc(colors, overrides)
-    return function(colors)
-      return vim.tbl_map(inner_hl, overrides)
-    end
-  end
-
-  return vim.tbl_map(inner_hl, overrides)
-end
 local hl_overrides = {
   TelescopeTitle = { fg = "ui.special", bold = true },
   TelescopePromptNormal = { bg = "ui.bg_p1" },
@@ -106,8 +74,24 @@ return {
           DropBarMenuCurrentContext = { bg = "NONE" },
           DropBarIconCurrentContext = { bg = "NONE" },
           DropBarPreview = { bg = "NONE" },
-          BiscuitColor = { link = "@comment" },
+          BiscuitColor = { link = "NightowlContextHints" },
           TreesitterContextBottom = { underline = true },
+          NightowlContextHints = {
+            italic = true,
+            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,
+          },
+          NightowlStartupEntry = {
+            bold = false,
+            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,
+          },
+          NightowlStartupHeader = {
+            bold = true,
+            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.waveRed,
+          },
+          NightowlStartupConvenience = {
+            bold = true,
+            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.waveBlue2,
+          },
         }
       end,
     },
@@ -152,6 +136,10 @@ return {
         DropBarIconCurrentContext = { bg = "NONE" },
         DropBarPreview = { bg = "NONE" },
         TreesitterContextBottom = { underline = true },
+        NightowlContextHints = {
+          italic = true,
+          fg = default_colorizer("@punctuation"),
+        },
       }, opts.highlight_groups or {})
     end,
     config = true,
@@ -165,6 +153,22 @@ return {
     lazy = true,
     opts = {
       style = bg_style,
+    },
+  },
+  {
+    "antonk52/lake.nvim",
+    priority = 995,
+    lazy = true,
+  },
+  {
+    "Verf/deepwhite.nvim",
+    lazy = true,
+    priority = 890,
+    config = function(_, opts)
+      require("deepwhite").setup(opts)
+    end,
+    opts = {
+      low_blue_light = true,
     },
   },
   { "LazyVim/LazyVim", opts = { colorscheme = env.default_colorscheme } },
