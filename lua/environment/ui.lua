@@ -1,6 +1,12 @@
 local toboolean = require("uutils.conversion").toboolean
 local env = {}
 
+function env.identify_highlight(hlgroup, link)
+  link = link or true
+  local labeled_hl = vim.api.nvim_get_hl(0, { name = hlgroup, link = link })
+  return labeled_hl.fg or labeled_hl.guifg
+end
+
 --- formats the necessary field access and method calls to bring in well-defined
 --- colors from the colorscheme Kanagawa. This will need to be remimplemented
 --- in the future to accept other themes as well.This gets around an apparent function call
@@ -31,7 +37,7 @@ end
 env.accelerated_jk = {}
 env.accelerated_jk.enable = false
 env.tabout = {}
-env.tabout.enable = false
+env.tabout.enable = true
 env.numbertoggle = {}
 env.numbertoggle.enable = false
 env.houdini = {}
@@ -46,13 +52,10 @@ env.houdini.enable = false
 env.borders = {}
 env.borders.main = "shadow"
 env.borders.alt = "solid"
-env.borders.main_accent = "shadow"
+env.borders.main_accent = "single"
 
 env.telescope = {}
 env.telescope.theme = "ivy"
-
-env.navic = {}
-env.navic.opts = {}
 
 env.bufferline = {}
 env.bufferline.tab_format = "slant"
