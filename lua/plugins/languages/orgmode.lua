@@ -182,13 +182,16 @@ local organization_tools = {
       {
         "nvim-neorg/neorg-telescope",
         dependencies = "nvim-telescope/telescope.nvim",
+        ft = "norg",
         config = function(_, opts)
           require("telescope").load_extension("neorg")
         end,
       },
       "lukas-reineke/headlines.nvim",
       -- "madskjeldgaard/neorg-figlet-module",
-      "pysan3/neorg-templates",
+      { "pysan3/neorg-templates", ft = "norg" },
+      { "tamton-aquib/neorg-jupyter", ft = "norg" },
+      { "laher/neorg-exec", ft = "norg" },
     },
     build = ":Neorg sync-parsers",
     cmd = "Neorg",
@@ -208,10 +211,8 @@ local organization_tools = {
               journal = "~/.notes/journal",
               tasks = "~/.notes/tasks",
               prj = "~/prj",
-              notes = "~/.notes/notes",
               life = "~/.notes",
             },
-            open_last_workspace = "default",
             index = "note-index.norg",
             default_workspace = "life",
           },
@@ -247,18 +248,22 @@ local organization_tools = {
             extensions = "all",
           },
         },
-        ["external.templates"] = {
-          config = {
-            templates_dir = vim.fn.stdpath("config")
-              .. "/templates/neorg-templates",
-          },
-        },
+        ["core.ui"] = {},
+        ["core.ui.calendar"] = {},
         ["core.esupports.metagen"] = {
           config = {
             type = "auto",
             update_date = true,
           },
         },
+        ["external.templates"] = {
+          config = {
+            templates_dir = vim.fn.stdpath("config")
+              .. "/templates/neorg-templates",
+          },
+        },
+        ["external.jupyter"] = {},
+        ["external.exec"] = {},
         -- ["external.integrations.figlet"] = {
         --   config = {
         --     font = "impossible",
@@ -322,14 +327,14 @@ local organization_tools = {
               binds.map(
                 "norg",
                 "n",
-                leader .. "im",
+                leader .. "mi",
                 "core.esupports.metagen.inject_metadata",
                 { buffer = true, desc = "neorg=> insert metadata" }
               )
               binds.map(
                 "norg",
                 "n",
-                leader .. "um",
+                leader .. "mu",
                 "core.esupports.metagen.update_metadata",
                 { buffer = true, desc = "neorg=> update metadata" }
               )

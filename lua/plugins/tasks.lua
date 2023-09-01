@@ -43,12 +43,25 @@ return {
     },
   },
   {
+    "nfrid/due.nvim",
+    config = true,
+    opts = {
+      prescript = "󰅑 due: ",
+      due_hi = "NightowlStartupEntry",
+      use_clock_time = true,
+      use_clock_today = true,
+      use_seconds = true,
+      overdue = "󱫧 overdue: "
+    },
+    event = "VeryLazy"
+  },
+  {
     "nocksock/do.nvim",
     config = true,
     cmd = { "Do", "Done", "DoEdit", "DoSave", "DoToggle" },
     opts = {
       message_timeout = 2000, -- how long notifications are shown
-      kaomoji_mode = 0, -- 0 kaomoji everywhere, 1 skip kaomoji in doing
+      kaomoji_mode = 0,       -- 0 kaomoji everywhere, 1 skip kaomoji in doing
       winbar = false,
       doing_prefix = " current:",
       store = {
@@ -104,82 +117,19 @@ return {
     },
   },
   { "wakatime/vim-wakatime", event = { "VeryLazy" }, enabled = true },
-  --   {
-  --     "soywod/unfog.vim",
-  --     config = false,
-  --     cmd = "Unfog",
-  --     keys = {
-  --       {
-  --         "<bar>U",
-  --         "<CMD>Unfog<CR>",
-  --         mode = "n",
-  --         desc = "unfog=> list tasks in the mist",
-  --       },
-  --     },
-  --     init = function()
-  --       local mapn = require("environment.keys").map("n")
-  --       vim.api.nvim_create_autocmd({ "FileType" }, {
-  --         pattern = { "*unfog*" },
-  --         callback = function(ev)
-  --           mapn(
-  --             "gd",
-  --             "<Plug>(unfog-list-done)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "gD",
-  --             "<Plug>(unfog-list-deleted)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "<CR>",
-  --             "<Plug>(unfog-toggle)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "K",
-  --             "<Plug>(unfog-info)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "gc",
-  --             "<Plug>(unfog-context)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "gw",
-  --             "<Plug>(unfog-worktime)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "<C-n>",
-  --             "<Plug>(unfog-next-cell)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "<C-p>",
-  --             "<Plug>(unfog-prev-cell)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "dic",
-  --             "<Plug>(unfog-delete-in-cell)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "cic",
-  --             "<Plug>(unfog-change-in-cell)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --           mapn(
-  --             "vic",
-  --             "<Plug>(unfog-visual-in-cell)",
-  --             { desc = "fog=> list done", buffer = ev.buf }
-  --           )
-  --         end,
-  --       })
-  --     end,
-  --   },
+  {
+    "gaborvecsei/usage-tracker.nvim",
+    event = "BufWinEnter",
+    enabled = true,
+    opts = {
+      keep_eventlog_days = 14,
+      cleanup_freq_days = 7,
+      event_wait_period_in_sec = 5,
+      inactivity_threshold_in_min = 5,
+      inactivity_check_freq_in_sec = 5,
+      verbose = 0,
+    },
+  },
   {
     "stevearc/overseer.nvim",
     config = true,
@@ -355,21 +305,6 @@ return {
       },
     },
   },
-  -- {
-  --   "mvllow/stand.nvim",
-  --   opts = {
-  --     minute_interval = 52,
-  --   },
-  --   config = true,
-  --   event = { "VeryLazy" },
-  --   cmd = {
-  --     "StandWhen",
-  --     "StandNow",
-  --     "StandEvery",
-  --     "StandEnable",
-  --     "StandDisable",
-  --   },
-  -- },
   {
     "aaditeynair/conduct.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },
@@ -407,7 +342,7 @@ return {
     keys = {
       {
         key_conduct .. "l",
-        inp.filename([[ConductLoadProject %s]]),
+        inp.name([[ConductLoadProject %s]]),
         mode = "n",
         desc = "conduct=> load project",
       },
@@ -418,8 +353,14 @@ return {
         desc = "conduct=> load last project",
       },
       {
+        key_conduct .. ".",
+        "<CMD>ConductLoadCwdProject<CR>",
+        mode = "n",
+        desc = "conduct=> load cwd project",
+      },
+      {
         key_conduct .. "n",
-        inp.filename([[ConductNewProject %s]]),
+        inp.name([[ConductNewProject %s]]),
         mode = "n",
         desc = "conduct=> new project",
       },
@@ -431,13 +372,13 @@ return {
       },
       {
         key_conduct .. "d",
-        inp.filename([[ConductDeleteProject %s]]),
+        inp.name([[ConductDeleteProject %s]]),
         mode = "n",
         desc = "conduct=> delete project",
       },
       {
         key_conduct .. "cp",
-        "<CMD>ConductLoadProjectConfig<CR>",
+        inp.name([[ConductLoadProjectConfig %s]]),
         mode = "n",
         desc = "conduct=> load project config",
       },
@@ -449,19 +390,19 @@ return {
       },
       {
         key_conduct .. "sn",
-        "<CMD>ConductProjectNewSession<CR>",
+        inp.name([[ConductProjectNewSession %s]]),
         mode = "n",
         desc = "conduct=> new session in project",
       },
       {
         key_conduct .. "sl",
-        "<CMD>ConductProjectLoadSession<CR>",
+        inp.name([[ConductProjectLoadSession %s]]),
         mode = "n",
         desc = "conduct=> load session in project",
       },
       {
         key_conduct .. "sd",
-        "<CMD>ConductProjectDeleteSession<CR>",
+        inp.name([[ConductProjectDeleteSession %s]]),
         mode = "n",
         desc = "conduct=> delete session in project",
       },
@@ -474,7 +415,7 @@ return {
       {
         "<leader>fp",
         function()
-          xtscope("projects", "conduct", {})
+          xtscope("conduct", "projects", {})
         end,
         mode = "n",
         desc = "conduct=> projects",
@@ -482,8 +423,10 @@ return {
       {
         "<leader>fs",
         function()
-          xtscope("sessions", "conduct", {})
+          xtscope("conduct", "sessions", {})
         end,
+        mode = "n",
+        desc = "conduct=> sessions",
       },
     },
   },

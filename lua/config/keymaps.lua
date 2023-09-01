@@ -32,13 +32,15 @@ mapx(
   helpmapper,
   { desc = "got=> get help", remap = false, nowait = true }
 )
--- stop it from showing up on any touch of the <f1> key by default.
--- mapx(
---   { "n", "i", "v", "c" },
---   "<F1>",
---   "<NOP>",
---   { desc = "got=> don't get help", remap = false, nowait = false }
--- )
+-- because I spam escape in the upper left corner sometimes, the following binds
+-- stop help from showing up on any touch of the <f1> key by default, which gets
+-- annoying as heck.
+mapx(
+  { "i" },
+  "<F1>",
+  "<NOP>",
+  { desc = "got=> don't get help", remap = false, nowait = false }
+)
 
 ---------------------------------------------------------------------------------
 -- Toggles autoformatting on insert by appending the appropriate character to
