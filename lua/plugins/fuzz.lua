@@ -9,9 +9,6 @@ return {
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
-    init = function()
-      require("fzf-lua").register_ui_select()
-    end,
     opts = {
       fenv.fzf_profile,
       winopts = {
@@ -40,7 +37,10 @@ return {
         preview_border = "FloatBorder",
       },
     },
-    config = true,
+    config = function(_, opts)
+      require("fzf-lua").setup(opts)
+      require("fzf-lua").register_ui_select()
+    end,
     keys = {
       {
         stem .. "/",
@@ -75,6 +75,14 @@ return {
         desc = "fuzz.fs=> files",
       },
       {
+        "<leader>ff",
+        function()
+          require("fzf-lua").files()
+        end,
+        mode = "n",
+        desc = "fuzz.fs=> files",
+      },
+      {
         fstem .. "fr",
         function()
           require("fzf-lua").oldfiles()
@@ -83,7 +91,23 @@ return {
         desc = "fuzz.fs=> recent files",
       },
       {
+        "<leader>" .. "fr",
+        function()
+          require("fzf-lua").oldfiles()
+        end,
+        mode = "n",
+        desc = "fuzz.fs=> recent files",
+      },
+      {
         fstem .. "bf",
+        function()
+          require("fzf-lua").buffers()
+        end,
+        mode = "n",
+        desc = "fuzz.buf=> buffers",
+      },
+      {
+        "<leader>fb",
         function()
           require("fzf-lua").buffers()
         end,
@@ -644,12 +668,22 @@ return {
         pattern = { "fzf" },
         group = vim.api.nvim_create_augroup("fzf_quit_on_q", {}),
         callback = function()
-          vim.keymap.set(
-            "n",
-            "q",
-            "<CMD>quit<CR>",
-            { desc = "quit", remap = false, nowait = true }
-          )
+          vim.keymap.set("n", "q", function()
+            vim.api.nvim_win_close(0, false)
+          end, {
+            buffer = true,
+            desc = "quit",
+            remap = false,
+            nowait = true,
+          })
+          vim.keymap.set("n", "Q", function()
+            vim.api.nvim_win_close(0, true)
+          end, {
+            buffer = true,
+            desc = "[!] quit",
+            remap = false,
+            nowait = true,
+          })
         end,
       })
     end,

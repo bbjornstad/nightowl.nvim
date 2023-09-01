@@ -1,11 +1,26 @@
 local mod = {}
 
 local scope_theme = "ivy"
+
+function mod.insert_source(configuration, extension)
+  extension = extension or false
+
+  local util = require("lazyvim.util")
+  local opts = util.opts("telescope")
+  local targeted
+  if extension then
+    targeted = opts.extensions
+  else
+    targeted = opts.pickers
+  end
+  table.insert(targeted, configuration)
+end
+
 function mod.setup_extension(extension, opts, theme, config)
   config[extension] = vim.tbl_deep_extend(
     "force",
     { theme = (theme or scope_theme) or "ivy" },
-    opts
+    opts or {}
   )
   -- require("telescope").load_extension(extension)
 end
@@ -62,7 +77,7 @@ function mod.extendoscope(extension_name, module_override, opts)
   module_override = module_override or extension_name
   local scope = require("telescope")
   return function()
-    scope.extensions[module_override][extension_name]()
+    scope.extensions[module_override][extension_name](opts)
   end
 end
 
