@@ -80,5 +80,6 @@ return {
     "andythigpen/nvim-coverage",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = true,
+    event = "LspAttach",
   },
 }

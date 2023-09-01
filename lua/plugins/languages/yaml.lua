@@ -19,9 +19,8 @@ return {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",
     },
-    opts = function(_, opts)
-      require("telescope").load_extension("yaml_schema")
-      opts.lspconfig = vim.tbl_extend("force", {
+    opts = {
+      lspconfig = {
         settings = {
           yaml = {
             format = {
@@ -29,7 +28,11 @@ return {
             },
           },
         },
-      }, opts.lspconfig or {})
+      },
+    },
+    config = function(_, opts)
+      require("yaml-companion").setup(opts)
+      require("telescope").load_extension("yaml_schema")
     end,
     init = function()
       toggle_fmtoption("l")

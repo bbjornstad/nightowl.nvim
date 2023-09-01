@@ -4,7 +4,7 @@ return {
     config = false,
     dependencies = {
       "Glench/Vim-Jinja2-Syntax",
-      "cespare/vim-toml",
+      { "cespare/vim-toml", ft = { "toml", "markdown", "html", "jinja" } },
     },
     ft = { "markdown", "html", "jinja" },
     enabled = true,
