@@ -1,5 +1,6 @@
 local key_repl = require("environment.keys").stems.base.repl
 local key_jupyter = key_repl .. "j"
+local key_fstring_toggle = "<leader>c"
 
 return {
   { "jmcantrell/vim-virtualenv", ft = { "python" } },
@@ -45,5 +46,20 @@ return {
         desc = "repl.py=> jupyter inspect",
       },
     },
+  },
+  {
+    "roobert/f-string-toggle.nvim",
+    config = function(_, opts)
+      require("f-string-toggle").setup(opts)
+    end,
+    ft = "python",
+    opts = {
+      key_binding = key_fstring_toggle,
+    },
+  },
+  {
+    "numirias/semshi",
+    build = ":UpdateRemotePlugins",
+    ft = "python",
   },
 }
