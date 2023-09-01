@@ -1,5 +1,5 @@
 local env = require("environment.ui")
-local key_sniprun = require("environment.keys").stems.sniprun
+local key_lsp = require("environment.keys").stems.base.lsp
 
 return {
   ---------------------------------------------------------------------------
@@ -25,7 +25,7 @@ return {
         "williamboman/mason-lspconfig.nvim",
         dependencies = {
           "williamboman/mason.nvim",
---           "VonHeikemen/lsp-zero.nvim",
+          --           "VonHeikemen/lsp-zero.nvim",
         },
       }, -- Optional but recommended
       { "jay-babu/mason-null-ls.nvim" },
@@ -74,6 +74,8 @@ return {
         },
       }))
 
+      lsp.skip_server_setup({ "rust_analyzer" })
+
       lsp.setup()
     end,
   },
@@ -92,19 +94,19 @@ return {
         mode = "n",
         desc = "lsp=> format current buffer",
       }
-      -- keys[#keys + 1] =
-      --   { "K", vim.lsp.buf.hover, "hover", desc = "lsp=> hover information" }
+      keys[#keys + 1] =
+        { "K", vim.lsp.buf.hover, "hover", desc = "lsp=> hover information" }
       keys[#keys + 1] = {
         "gk",
         vim.lsp.buf.signature_help,
         mode = "n",
         desc = "lsp=> symbol signature help",
       }
-      -- keys[#keys + 1] = {
-      --   "gl",
-      --   vim.diagnostic.open_float,
-      --   desc = "lsp=> show line diagnostics",
-      -- }
+      keys[#keys + 1] = {
+        "gll",
+        vim.diagnostic.open_float,
+        desc = "lsp=> show line diagnostics",
+      }
       keys[#keys + 1] = {
         "ga",
         vim.lsp.buf.code_action,
@@ -113,49 +115,42 @@ return {
       }
     end,
     dependencies = {
-      -- "folke/neoconf.nvim",
---       "VonHeikemen/lsp-zero.nvim",
       "nvim-treesitter/nvim-treesitter",
       "jose-elias-alvarez/null-ls.nvim",
       "williamboman/mason-lspconfig.nvim",
       "jay-babu/mason-null-ls.nvim",
---       "nvim-lua/lsp-status.nvim",
---       "jubnzv/virtual-types.nvim",
     },
   },
---   {
---     "jose-elias-alvarez/null-ls.nvim",
---     dependencies = { "VonHeikemen/lsp-zero.nvim" },
---   },
+  --   },
   {
     "jay-babu/mason-null-ls.nvim",
     dependencies = {
       "williamboman/mason.nvim",
       "jose-elias-alvarez/null-ls.nvim",
---       "VonHeikemen/lsp-zero.nvim",
+      --       "VonHeikemen/lsp-zero.nvim",
     },
   },
   {
-
-  }
---   {
---     "folke/neoconf.nvim",
---     event = "VimEnter",
---     config = true,
---     opts = {
---       import = {
---         vscode = false,
---         coc = false,
---         nlsp = false,
---       },
---     },
---   },
---   {
---     "folke/neodev.nvim",
---     event = "VimEnter",
---     dependencies = {
---       "folke/neoconf.nvim",
---     },
---     config = true,
---   },
+    "adoyle-h/lsp-toggle.nvim",
+    dependencies = {
+      "neovim/nvim-lspconfig",
+      "nvim-telescope/telescope.nvim",
+    },
+    opts = { create_cmds = true, telescope = true },
+    config = true,
+    keys = {
+      {
+        key_lsp .. "g",
+        "<CMD>ToggleLSP<CR>",
+        mode = "n",
+        desc = "lsp=> toggle buffer server",
+      },
+      {
+        key_lsp .. "n",
+        "<CMD>ToggleNullLSP<CR>",
+        mode = "n",
+        desc = "lsp=> toggle buffer null-ls",
+      },
+    },
+  },
 }
