@@ -26,6 +26,7 @@ local lazyconf = {
     { import = "lazyvim.plugins.extras.lang.clangd" },
     { import = "lazyvim.plugins.extras.lang.tailwind" },
     { import = "lazyvim.plugins.extras.lang.python" },
+    { import = "lazyvim.plugins.extras.lang.tex" },
     { import = "lazyvim.plugins.extras.ui.mini-animate" },
     { import = "lazyvim.plugins.extras.test.core" },
     { import = "lazyvim.plugins.extras.dap.core" },
@@ -67,7 +68,12 @@ local lazyconf = {
   },
   ui = { border = uienv.borders.main_accent },
   diff = "diffview.nvim",
-  debug = false,
+  debug = true,
+  dev = {
+    path = vim.fn.expand("~/prj/nvim-dev"),
+    patterns = {},
+    fallback = false,
+  },
 }
 
 local function genspec(conf)
