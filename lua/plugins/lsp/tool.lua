@@ -238,31 +238,63 @@ return {
     },
   },
   {
-    "haringsrob/nvim_context_vt",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    "code-biscuits/nvim-biscuits",
     event = "LspAttach",
-    config = true,
+    dependencies = {
+      {
+        "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate",
+      },
+    },
     opts = {
-      enabled = true,
-      prefix = " 󰁭 󰟵 󰙔 ",
-      disable_ft = { "markdown" },
-      min_rows = 0,
-    },
-    keys = {
-      {
-        key_ui .. "x",
-        "<CMD>NvimContextVtToggle<CR>",
-        mode = "n",
-        desc = "virt=> inline context toggle",
+      default_config = {
+        prefix_string = " 󰟵 󰙔 ",
+        max_length = 12,
+        min_distance = 3,
+        trim_by_words = true,
       },
-      {
-        key_ui .. "X",
-        "<CMD>NvimContextVtDebug<CR>",
-        mode = "n",
-        desc = "virt=> inline context debug",
+      language_config = {
+        norg = {
+          disabled = true,
+        },
+        vimdoc = {
+          disabled = true,
+        },
       },
+      toggle_keybind = "<leader>uvt",
+      on_events = { "InsertLeave", "CursorHoldI" },
     },
+    config = function(_, opts)
+      require("nvim-biscuits").setup(opts)
+    end,
   },
+  -- {
+  --   "haringsrob/nvim_context_vt",
+  --   dependencies = { "nvim-treesitter/nvim-treesitter" },
+  --   event = "LspAttach",
+  --   config = true,
+  --   opts = {
+  --     enabled = true,
+  --     prefix = " 󰁭 󰟵 󰙔 ",
+  --     disable_ft = env.ft_ignore_list,
+  --     min_rows = 0,
+  --     highlight = "NightowlContextHints",
+  --   },
+  --   keys = {
+  --     {
+  --       key_ui .. "vt",
+  --       "<CMD>NvimContextVtToggle<CR>",
+  --       mode = "n",
+  --       desc = "virt=> inline context toggle",
+  --     },
+  --     {
+  --       key_ui .. "vb",
+  --       "<CMD>NvimContextVtDebug<CR>",
+  --       mode = "n",
+  --       desc = "virt=> inline context debug",
+  --     },
+  --   },
+  -- },
   {
     "utilyre/sentiment.nvim",
     version = "*",
@@ -321,5 +353,67 @@ return {
       -- require("troublesum").override_config(opts)
       require("troublesum").setup(opts)
     end,
+  },
+  {
+    "roobert/action-hints.nvim",
+    event = "LspAttach",
+    opts = {
+      template = {
+        definition = {
+          text = " ",
+          color = require("kanagawa.colors").setup({ theme = "wave" }).theme.ui.fg,
+        },
+        references = {
+          text = "  ↱ %s",
+          color = require("kanagawa.colors").setup({ theme = "wave" }).theme.ui.fg,
+        },
+      },
+      use_virtual_text = true,
+    },
+    init = function()
+      vim.api.nvim_set_hl(
+        0,
+        "ActionHintsDefinition",
+        { link = "NightowlContextHints" }
+      )
+      vim.api.nvim_set_hl(
+        0,
+        "ActionHintsReferences",
+        { link = "NightowlContextHints" }
+      )
+    end,
+    config = function(_, opts)
+      require("action-hints").setup(opts)
+    end,
+  },
+  {
+    "aznhe21/actions-preview.nvim",
+    event = "LspAttach",
+    opts = {
+      diff = {
+        ctxlen = 3,
+      },
+      nui = {
+        preview = {
+          border = { style = env.borders.main, padding = { 1, 2 } },
+        },
+        select = {
+          border = { style = env.borders.main, padding = { 1, 2 } },
+        },
+      },
+    },
+    config = function(_, opts)
+      require("actions-preview").setup(opts)
+    end,
+    keys = {
+      {
+        "gpa",
+        function()
+          require("actions-preview").code_actions()
+        end,
+        mode = { "v", "n" },
+        desc = "lsp=> preview code actions",
+      },
+    },
   },
 }
