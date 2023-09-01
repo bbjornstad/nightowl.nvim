@@ -1,3 +1,4 @@
+-- vim: set ft=lua: --
 local env = require("environment.ui")
 local keystems = require("environment.keys").stems
 
@@ -5,6 +6,7 @@ local key_oil = keystems.oil
 local key_nnn = keystems.nnn
 local key_broot = keystems.broot
 local key_files = keystems.files
+local key_attempt = keystems.attempt
 
 local function term_broot()
   local Term = require("toggleterm.terminal").Terminal
@@ -27,54 +29,56 @@ return {
     enabled = false,
     module = false,
   },
-  {
-    "is0n/fm-nvim",
-    enabled = true,
-    cmd = {
-      -- "Lazygit",
-      "Joshuto",
-      "Ranger",
-      -- "Broot",
-      "Gitui",
-      "Xplr",
-      "Vifm",
-      -- "Skim",
-      -- "Nnn",
-      "Fff",
-      "Twf",
-      "Fzf",
-      "Fzy",
-      "Lf",
-      "Fm",
-    },
-    opts = {
-      edit_cmd = "edit",
-      ui = {
-        default = "float",
-        float = {
-          border = env.borders.main,
-          float_hl = "Normal",
-          border_hl = "FloatBorder",
-          blend = 20,
-          height = 0.6,
-          width = 0.6,
-        },
-        split = {
-          direction = "topleft",
-          size = 32,
-        },
-      },
-      broot_conf = vim.fs.normalize("~/.config/broot/conf.hjson"),
-      mappings = {
-        vert_split = "<C-v>",
-        horz_split = "<C-h>",
-        tabedit = "<C-t>",
-        edit = "<C-e>",
-        ESC = "<ESC>",
-      },
-    },
-    config = true,
-  },
+  -- {
+  --   "is0n/fm-nvim",
+  --   enabled = true,
+  --   cmd = {
+  --     -- "Lazygit",
+  --     "Joshuto",
+  --     "Ranger",
+  --     -- "Broot",
+  --     -- "Gitui",
+  --     "Xplr",
+  --     "Vifm",
+  --     "Skim",
+  --     -- "Nnn",
+  --     "Fff",
+  --     "Twf",
+  --     -- "Fzf",
+  --     -- "Fzy",
+  --     "Lf",
+  --     "Fm",
+  --   },
+  --   opts = {
+  --     edit_cmd = "edit",
+  --     ui = {
+  --       default = "float",
+  --       float = {
+  --         border = env.borders.main,
+  --         float_hl = "Normal",
+  --         border_hl = "FloatBorder",
+  --         blend = 20,
+  --         height = 0.6,
+  --         width = 0.6,
+  --       },
+  --       split = {
+  --         direction = "topleft",
+  --         size = 32,
+  --       },
+  --     },
+  --     broot_conf = vim.fs.normalize(
+  --       vim.fn.expand("~/.config/broot/conf.hjson")
+  --     ),
+  --     mappings = {
+  --       vert_split = "<C-v>",
+  --       horz_split = "<C-h>",
+  --       tabedit = "<C-t>",
+  --       edit = "<C-e>",
+  --       ESC = "<ESC>",
+  --     },
+  --   },
+  --   config = true,
+  -- },
   {
     "lstwn/broot.vim",
     cmd = { "Broot", "BrootCurrentDir", "BrootWorkingDir", "BrootHomeDir" },
@@ -92,37 +96,53 @@ return {
     keys = {
       {
         key_broot .. "e",
-        "<CMD>Broot<CR>",
+        "<CMD>Broot vsplit<CR>",
         mode = "n",
         desc = "br=> right here tree",
         -- silent = true,
       },
       {
         key_broot .. "c",
-        "<CMD>BrootCurrentDir<CR>",
+        "<CMD>BrootCurrentDir vsplit<CR>",
         mode = "n",
         desc = "br=> current directory tree",
         -- silent = true,
       },
       {
         key_broot .. "w",
-        "<CMD>BrootWorkingDir<CR>",
+        "<CMD>BrootWorkingDir vsplit<CR>",
         mode = "n",
         desc = "br=> working directory tree",
-        silent = true,
+        -- silent = true,
       },
       {
         key_broot .. "~",
-        "<CMD>BrootHomeDir<CR>",
+        "<CMD>BrootHomeDir vsplit<CR>",
         mode = "n",
         desc = "br=> home directory tree",
-        silent = true,
+        -- silent = true,
       },
     },
   },
+  -- {
+  --   "bbjornstad/broot.nvim",
+  --   dev = true,
+  --   config = false,
+  --   cmd = "Broot",
+  --   keys = {
+  --     {
+  --       key_broot .. "e",
+  --       "<CMD>Broot<CR>",
+  --       mode = "n",
+  --       desc = "br=> right here tree",
+  --       -- silent = true,
+  --     },
+  --   },
+  -- },
   {
     "stevearc/oil.nvim",
     cmd = "Oil",
+    event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       default_file_explorer = true,
@@ -159,15 +179,16 @@ return {
         },
       },
       keymaps = {
-        ["`"] = "actions.cd",
-        ["~"] = "actions.tcd",
+        ["`"] = "actions.tcd",
+        ["<A-CR>"] = "actions.tcd",
         ["<BS>"] = "actions.toggle_hidden",
+        ["."] = "actions.toggle_hidden",
         ["<C-BS>"] = "actions.parent",
         ["-"] = "actions.parent",
         ["_"] = "actions.open_cwd",
         ["q"] = "actions.close",
         [".."] = "actions.parent",
-        ["g."] = "actions.cd",
+        ["go."] = "actions.cd",
         ["<C-l>"] = "actions.refresh",
         ["<C-p>"] = "actions.preview",
         ["<C-c>"] = false,
@@ -189,7 +210,7 @@ return {
       {
         key_oil .. "O",
         function()
-          return require("oil").open()
+          require("oil").open()
         end,
         mode = { "n" },
         desc = "oil=> open oil (not float)",
@@ -197,7 +218,7 @@ return {
       {
         key_oil .. "q",
         function()
-          return require("oil").close()
+          require("oil").close()
         end,
         mode = { "n" },
         desc = "oil=> close oil",
@@ -205,7 +226,8 @@ return {
       {
         "<leader>e",
         function()
-          return require("oil").open_float()
+          local cwd = vim.b.netrw_curdir
+          require("oil").open_float(cwd)
         end,
         mode = { "n" },
         desc = "oil=> float oil",
@@ -213,7 +235,8 @@ return {
       {
         "<leader>E",
         function()
-          return require("oil").open()
+          local cwd = vim.b.netrw_curdir
+          require("oil").open(cwd)
         end,
         mode = { "n" },
         desc = "oil=> open oil",
@@ -241,7 +264,6 @@ return {
       }, opts.picker or {})
       local builtin = require("nnn").builtin
       opts.mappings = vim.tbl_deep_extend("force", {
-        { "g..", builtin.cd_to_path }, -- open file(s) in tab
         { "<C-t>", builtin.open_in_tab }, -- open file(s) in tab
         { "<C-s>", builtin.open_in_vsplit }, -- open file(s) in split
         { "<C-v>", builtin.open_in_vsplit }, -- open file(s) in vertical split
@@ -249,8 +271,14 @@ return {
         { "<C-p>", builtin.open_in_preview }, -- open file in preview split keeping nnn focused
         { "<C-y>", builtin.copy_to_clipboard }, -- copy file(s) to clipboard
         { "g.", builtin.cd_to_path }, -- cd to file directory
+        { "<A-CR>", builtin.cd_to_path }, -- cd to file directory
         { "<A-:>", builtin.populate_cmdline }, -- populate cmdline (:) with file(s)
       }, opts.mappings or {})
+      opts.auto_open = vim.tbl_deep_extend("force", {
+        tabpage = "picker",
+        empty = "explorer",
+        ft_ignore = env.ft_ignore_list,
+      }, opts.auto_open or {})
     end,
     keys = {
       {
@@ -284,5 +312,103 @@ return {
         desc = "fm.nnn=> explorer mode",
       },
     },
+  },
+  {
+    "m-demare/attempt.nvim",
+    opts = {
+      dir = vim.fs.normalize(vim.fn.stdpath("data") .. "attempt.nvim"),
+      autosave = false,
+      list_buffers = false, -- This will make them show on other pickers (like :Telescope buffers)
+      ext_options = {
+        "lua",
+        "rs",
+        "py",
+        "cpp",
+        "c",
+        "ml",
+        "md",
+        "norg",
+        "org",
+        "jl",
+        "hs",
+        "scala",
+        "sc",
+        "html",
+        "css",
+      }, -- Options to choose from
+    },
+    config = function(_, opts)
+      require("attempt").setup(opts)
+      require("telescope").load_extension("attempt")
+    end,
+    keys = {
+      {
+        key_attempt .. "n",
+        function()
+          require("attempt").new_select()
+        end,
+        mode = "n",
+        desc = "scratch=> new buffer",
+      },
+      {
+        key_attempt .. "i",
+        function()
+          require("attempt").new_input_ext()
+        end,
+        mode = "n",
+        desc = "scratch=> new buffer (custom extension)",
+      },
+      {
+        key_attempt .. "r",
+        function()
+          require("attempt").run()
+        end,
+        mode = "n",
+        desc = "scratch=> run",
+      },
+      {
+        key_attempt .. "d",
+        function()
+          require("attempt").delete_buf()
+        end,
+        mode = "n",
+        desc = "scratch=> delete buffer",
+      },
+      {
+        key_attempt .. "c",
+        function()
+          require("attempt").rename_buf()
+        end,
+        mode = "n",
+        desc = "scratch=> rename buffer",
+      },
+      {
+        key_attempt .. "l",
+        function()
+          require("attempt").open_select()
+        end,
+        mode = "n",
+        desc = "scratch=> select buffer",
+      },
+    },
+  },
+  {
+    "nathom/filetype.nvim",
+    init = function() end,
+    config = function(_, opts) end,
+    opts = {
+      overrides = {
+        extensions = {
+          pn = "potion",
+          nu = "nu",
+          tfy = "taffy",
+          lua = "lua",
+        },
+        complex = {
+          ["*git/config"] = "gitconfig",
+        },
+      },
+    },
+    event = "VimEnter",
   },
 }
