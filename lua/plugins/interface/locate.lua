@@ -35,6 +35,7 @@ return {
   },
   {
     "yamatsum/nvim-cursorline",
+    event = "VeryLazy",
     opts = {
       cursorline = { enable = true, timeout = 500, number = false },
       cursorword = {
@@ -186,7 +187,7 @@ return {
         desc = "grapple.tag=> toggle",
       },
       {
-        key_grapple_pop .. "t",
+        key_grapple_tag .. "p",
         function()
           require("grapple").popup_tags()
         end,
@@ -271,16 +272,84 @@ return {
     "cbochs/portal.nvim",
     keys = {
       {
-        key_portal .. "f",
-        "<CMD>Portal jumplist forward<CR>",
+        key_portal .. "c",
+        function()
+          require("portal.builtin").changelist.tunnel()
+        end,
         mode = "n",
-        desc = "portal=> forwards jumplist",
+        desc = "portal=> forward changelist",
+      },
+      {
+        key_portal .. "C",
+        function()
+          require("portal.builtin").changelist.tunnel_backward()
+        end,
+        mode = "n",
+        desc = "portal=> backward changelist",
+      },
+      {
+        key_portal .. "g",
+        function()
+          require("portal.builtin").grapple.tunnel()
+        end,
+        mode = "n",
+        desc = "portal=> forward grapple",
+      },
+      {
+        key_portal .. "G",
+        function()
+          require("portal.builtin").grapple.tunnel_backward()
+        end,
+        mode = "n",
+        desc = "portal=> backward grapple",
+      },
+      {
+        key_portal .. "q",
+        function()
+          require("portal.builtin").quickfix.tunnel()
+        end,
+        mode = "n",
+        desc = "portal=> forward quickfix",
+      },
+      {
+        key_portal .. "Q",
+        function()
+          require("portal.builtin").quickfix.tunnel_backward()
+        end,
+        mode = "n",
+        desc = "portal=> backward quickfix",
+      },
+      {
+        key_portal .. "j",
+        function()
+          require("portal.builtin").jumplist.tunnel()
+        end,
+        mode = "n",
+        desc = "portal=> backward jumplist",
+      },
+      {
+        key_portal .. "J",
+        function()
+          require("portal.builtin").jumplist.tunnel_backward()
+        end,
+        mode = "n",
+        desc = "portal=> forward jumplist",
+      },
+      {
+        key_portal .. "f",
+        function()
+          require("portal.builtin").jumplist.tunnel()
+        end,
+        mode = "n",
+        desc = "portal=> forward jumplist",
       },
       {
         key_portal .. "b",
-        "<CMD>Portal jumplist backward<CR>",
+        function()
+          require("portal.builtin").jumplist.tunnel_backward()
+        end,
         mode = "n",
-        desc = "portal=> backwards jumplist",
+        desc = "portal=> backward jumplist",
       },
     },
     opts = {
@@ -305,7 +374,7 @@ return {
       labels = { "a", "b", "c", "d", "e" },
 
       ---Select the first portal when there is only one result.
-      select_first = false,
+      select_first = true,
 
       ---Keys used for exiting portal selection. Disable with [{key}] = false
       ---to `false`.
@@ -332,6 +401,48 @@ return {
     dependencies = {
       "cbochs/grapple.nvim",
       "ThePrimeagen/harpoon",
+    },
+  },
+  {
+    "roobert/tabtree.nvim",
+    config = function(_, opts)
+      require("tabtree").setup(opts)
+    end,
+    event = "VeryLazy",
+    opts = {
+      -- print the capture group name when executing next/previous
+      --debug = true,
+      -- disable key bindings
+      -- key_bindings_disabled = true,
+      key_bindings = {
+        next = "<Tab>",
+        previous = "<S-Tab>",
+      },
+      -- use TSPlaygroundToggle to discover the (capture group)
+      -- @capture_name can be anything
+      language_configs = {
+        python = {
+          target_query = [[
+              (string) @string_capture
+              (interpolation) @interpolation_capture
+              (parameters) @parameters_capture
+              (argument_list) @argument_list_capture
+            ]],
+          -- experimental feature, to move the cursor in certain situations like when handling python f-strings
+          offsets = {
+            string_start_capture = 1,
+          },
+        },
+      },
+      default_config = {
+        target_query = [[
+              (string) @string_capture
+              (interpolation) @interpolation_capture
+              (parameters) @parameters_capture
+              (argument_list) @argument_list_capture
+          ]],
+        offsets = {},
+      },
     },
   },
 }
