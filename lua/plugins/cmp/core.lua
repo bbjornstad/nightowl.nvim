@@ -2,6 +2,52 @@ local ncmp = "hrsh7th/nvim-cmp"
 local env = require("environment.ui")
 local key_cmp = require("environment.keys").stems.cmp
 
+local function toggle_cmp_enabled()
+  local status
+  if not vim.fn.exists("b:enable_cmp_completion") then
+    status = not vim.g.enable_cmp_completion
+  else
+    status = not vim.b.enable_cmp_completion
+  end
+  vim.notify(("nvim-cmp: %s"):format(status))
+  vim.b.enable_cmp_completion = status
+end
+
+local function toggle_cmp_autocompletion()
+  local status
+  if not vim.fn.exists("b:enable_cmp_autocompletion") then
+    status = not vim.g.enable_cmp_autocompletion
+  else
+    status = not vim.b.enable_cmp_autocompletion
+  end
+  if status then
+    require("cmp").setup.buffer({
+      completion = {
+        autocomplete = {
+          require("cmp.types").cmp.TriggerEvent.InsertEnter,
+          require("cmp.types").cmp.TriggerEvent.TextChanged,
+        },
+      },
+    })
+  else
+    require("cmp").setup.buffer({
+      autocomplete = false,
+    })
+  end
+  vim.b.enable_cmp_autocompletion = status
+  vim.notify(("Autocompletion: %s"):format(vim.b.enable_cmp_autocompletion))
+end
+
+local function initialize_autocompletion()
+  if vim.g.enable_cmp_autocompletion then
+    return {
+      require("cmp.types").cmp.TriggerEvent.InsertEnter,
+      require("cmp.types").cmp.TriggerEvent.TextChanged,
+    }
+  end
+  return false
+end
+
 local function kf(key)
   return string.format("%s%s", key_cmp, key)
 end
@@ -60,7 +106,7 @@ return {
       opts = opts or {}
       opts.enabled = opts.enabled
         or function()
-          return vim.b.enable_cmp_completion
+          return vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
         end
       local cmp = require("cmp")
       local t_cmp = require("cmp.types")
@@ -111,7 +157,7 @@ return {
         {
           name = "treesitter",
           keyword_length = 4,
-          group_index = 3,
+          group_index = 1,
         },
         {
           name = "luasnip",
@@ -198,10 +244,7 @@ return {
       -- of the configured keys to be able to use the completion menu.
       opts.completion = vim.tbl_deep_extend("force", {
         -- autocomplete = false,
-        autocomplete = {
-          t_cmp.cmp.TriggerEvent.InsertEnter,
-          t_cmp.cmp.TriggerEvent.TextChanged,
-        },
+        autocomplete = initialize_autocompletion(),
         scrolloff = true,
       }, opts.completion or {})
 
@@ -490,36 +533,13 @@ return {
     keys = {
       {
         "<leader>uxe",
-        function()
-          vim.b.enable_cmp_completion = not vim.b.enable_cmp_completion
-          vim.notify(("nvim-cmp: %s"):format(vim.b.enable_cmp_completion))
-        end,
+        toggle_cmp_enabled,
         mode = "n",
         desc = "cmp=> toggle nvim-cmp enabled",
       },
       {
         "<leader>uxc",
-        function()
-          local oldstatus = not vim.b.enable_cmp_autocompletion
-          vim.b.enable_cmp_autocompletion = oldstatus
-          if oldstatus then
-            require("cmp").setup.buffer({
-              completion = {
-                autocomplete = {
-                  require("cmp.types").cmp.TriggerEvent.InsertEnter,
-                  require("cmp.types").cmp.TriggerEvent.TextChanged,
-                },
-              },
-            })
-          else
-            require("cmp").setup.buffer({
-              autocomplete = false,
-            })
-          end
-          vim.notify(
-            ("Autocompletion: %s"):format(vim.b.enable_cmp_autocompletion)
-          )
-        end,
+        toggle_cmp_autocompletion,
         mode = "n",
         desc = "cmp=> toggle autocompletion on insert",
       },
