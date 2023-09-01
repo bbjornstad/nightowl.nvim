@@ -1,10 +1,6 @@
 local env = require("environment.ui")
+local default_colorizer = env.identify_highlight
 local key_ccc = require("environment.keys").stems.ccc
-
-local function default_colorizer(hlgroup)
-  local labeled_hl = vim.api.nvim_get_hl(0, { name = hlgroup })
-  return labeled_hl.fg
-end
 
 return {
   {
@@ -23,7 +19,7 @@ return {
       },
       auto_close = true,
       preserve = true,
-      default_color = default_colorizer("@comment"),
+      default_color = default_colorizer("Delimiter"),
       recognize = {
         input = true,
         output = true,
@@ -36,43 +32,33 @@ return {
     keys = {
       {
         key_ccc .. "c",
-        function()
-          vim.cmd([[CccPick]])
-        end,
+        "<CMD>CccPick<CR>",
         mode = "n",
         desc = "ccc=> pick color interface",
       },
       {
         key_ccc .. "h",
-        function()
-          vim.cmd([[CccHighlighterToggle]])
-        end,
+        "<CMD>CccHighlighterToggle<CR>",
         mode = "n",
-        desc = "ccc=> toggle inline color highlighting",
+        desc = "ccc=> toggle inline highlighting",
       },
       {
         key_ccc .. "v",
-        function()
-          vim.cmd([[CccConvert]])
-        end,
+        "<CMD>CccConvert<CR>",
         mode = "n",
-        desc = "ccc=> convert color to another format",
+        desc = "ccc=> convert color",
       },
       {
         key_ccc .. "f",
-        function()
-          vim.cmd([[CccHighlighterDisable]])
-        end,
+        "<CMD>CccHighlighterDisable<CR>",
         mode = "n",
-        desc = "ccc=> turn off inline color highlighting",
+        desc = "ccc=> disable inline highlighting",
       },
       {
         key_ccc .. "o",
-        function()
-          vim.cmd([[CccHighlighterEnable]])
-        end,
+        "<CMD>CccHighlighterEnable<CR>",
         mode = "n",
-        desc = "ccc=> turn on inline color highlighting",
+        desc = "ccc=> enable inline highlighting",
       },
     },
   },
@@ -80,5 +66,47 @@ return {
     "echasnovski/mini.colors",
     event = "VeryLazy",
     version = false,
+  },
+  {
+    "nvim-colortils/colortils.nvim",
+    config = function(_, opts)
+      require("colortils").setup(opts)
+    end,
+    opts = {
+      border = env.borders.main,
+    },
+    cmd = "Colortils",
+    keys = {
+      {
+        key_ccc .. "t",
+        "<CMD>Colortils picker<CR>",
+        mode = "n",
+        desc = "'tils=> pick color",
+      },
+      {
+        key_ccc .. "l",
+        "<CMD>Colortils lighten<CR>",
+        mode = "n",
+        desc = "'tils=> lighten",
+      },
+      {
+        key_ccc .. "d",
+        "<CMD>Colortils darken<CR>",
+        mode = "n",
+        desc = "'tils=> darken",
+      },
+      {
+        key_ccc .. "g",
+        "<CMD>Colortils greyscale<CR>",
+        mode = "n",
+        desc = "'tils=> greyscale",
+      },
+      {
+        key_ccc .. "L",
+        "<CMD>Colortils greyscale<CR>",
+        mode = "n",
+        desc = "'tils=> css list",
+      },
+    },
   },
 }
