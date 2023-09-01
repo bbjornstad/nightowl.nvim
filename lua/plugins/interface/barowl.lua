@@ -98,7 +98,7 @@ return {
         }
       end,
       window = {
-        margin = { vertical = 1, horizontal = 1 },
+        margin = { vertical = 0, horizontal = 1 },
         padding = { left = 1, right = 1 },
         placement = { horizontal = "right", vertical = "top" },
         width = "fit",
@@ -271,10 +271,24 @@ return {
         },
         lualine_z = {
           {
-            require("nvim-possession").status,
-            cond = function()
-              return require("nvim-possession").status() ~= nil
+            "tabs",
+            mode = 2,
+            use_mode_colors = true,
+            max_length = vim.o.columns / 6, -- require("nvim-possession").status,
+            fmt = function(name, context)
+              -- Show + if buffer is modified in tab
+              local buflist = vim.fn.tabpagebuflist(context.tabnr)
+              local winnr = vim.fn.tabpagewinnr(context.tabnr)
+              local bufnr = buflist[winnr]
+              local mod = vim.fn.getbufvar(bufnr, "&mod")
+              local thisdir = vim.fn.getcwd(winnr, context.tabnr)
+              local dirtail = vim.fn.fnamemodify(thisdir, ":t")
+
+              return (dirtail or name) .. (mod == 1 and " +" or "")
             end,
+            -- cond = function()
+            --   return require("nvim-possession").status() ~= nil
+            -- end,
           },
         },
       },
@@ -358,22 +372,22 @@ return {
           },
         },
         keymaps = {
-          -- ["<tab>"] = function()
-          --   local api = require("dropbar.api")
-          --   local thismenu = api.get_current_dropbar_menu()
-          --   if not thismenu then
-          --     return
-          --   end
-          --   api.select_next_context()
-          -- end,
-          -- ["<shift-tab>"] = function()
-          --   local api = require("dropbar.api")
-          --   local thismenu = api.get_current_dropbar_menu()
-          --   if not thismenu then
-          --     return
-          --   end
-          --   thismenu:close()
-          -- end,
+          ["]"] = function()
+            local api = require("dropbar.api")
+            local thismenu = api.get_current_dropbar_menu()
+            if not thismenu then
+              return
+            end
+            api.select_next_context()
+          end,
+          ["["] = function()
+            local api = require("dropbar.api")
+            local thismenu = api.get_current_dropbar_menu()
+            if not thismenu then
+              return
+            end
+            return thismenu.prev_menu
+          end,
           ["q"] = function()
             local api = require("dropbar.api")
             local thismenu = api.get_current_dropbar_menu()

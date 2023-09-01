@@ -45,7 +45,7 @@ return { -- add folding range to capabilities
   },
   {
     "milisims/foldhue.nvim",
-    event = "BufWinEnter",
+    event = "BufEnter",
     config = function(_, opts)
       require("foldhue").enable()
     end,
@@ -54,10 +54,9 @@ return { -- add folding range to capabilities
     "kevinhwang91/nvim-ufo",
     dependencies = {
       "kevinhwang91/promise-async",
-      -- "milisims/foldhue.nvim",
-      -- "yaocccc/nvim-foldsign",
       "anuvyklack/pretty-fold.nvim",
     },
+    event = "BufEnter",
     opts = {
       fold_virt_text_handler = handler,
       preview = {
@@ -127,6 +126,7 @@ return { -- add folding range to capabilities
   {
     "anuvyklack/pretty-fold.nvim",
     config = true,
+    event = "BufEnter",
     opts = {
       sections = {
         left = {
@@ -171,7 +171,6 @@ return { -- add folding range to capabilities
         { "%(", ")" }, -- % to escape lua pattern char
         { "%[", "]" }, -- % to escape lua pattern char
         { "<", ">" },
-        { [[<CMD>]], [[<CR>]] }, -- % to escape lua pattern char
       },
 
       ft_ignore = mopts({ "neorg" }, env.ft_ignore_list, "suppress"),
@@ -185,12 +184,7 @@ return { -- add folding range to capabilities
       pauseFoldsOnSearch = true,
       setupFoldKeymaps = true,
     },
-    event = "VeryLazy",
-    dependencies = {
-      "anuvyklack/pretty-fold.nvim",
-      -- "yaocccc/nvim-foldsign",
-      -- "milisims/foldhue.nvim",
-    },
+    event = "BufEnter",
   },
   {
     "yaocccc/nvim-foldsign",
@@ -203,6 +197,38 @@ return { -- add folding range to capabilities
         open = "⌙",
         seps = { "│", "┃" },
       },
+    },
+  },
+  {
+    "anuvyklack/fold-preview.nvim",
+    event = "BufEnter",
+    dependencies = {
+      "anuvyklack/keymap-amend.nvim",
+      "neovim/nvim-lspconfig",
+    },
+    config = function(_, opts)
+      local fp = require("fold-preview")
+      local map = fp.mapping
+      local keymap = vim.keymap
+      keymap.amend = require("keymap-amend")
+      fp.setup(mopts({
+        default_keybindings = false,
+      }, opts))
+      keymap.amend("n", "K", function(original)
+        if not fp.toggle_preview() then
+          original()
+        end
+      end)
+      keymap.amend("n", "h", map.close_preview_open_fold)
+      keymap.amend("n", "l", map.close_preview_open_fold)
+      keymap.amend("n", "zo", map.close_preview)
+      keymap.amend("n", "zO", map.close_preview)
+      keymap.amend("n", "zc", map.close_preview_without_defer)
+      keymap.amend("n", "zR", map.close_preview)
+      keymap.amend("n", "zM", map.close_preview_without_defer)
+    end,
+    opts = {
+      border = env.borders.main,
     },
   },
 }
