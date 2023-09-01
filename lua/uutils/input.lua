@@ -10,25 +10,18 @@ function mod.varfmt(argtable, input)
   return res
 end
 
-local handler_defaults = {
-  ["vim.cmd"] = {
-    formatter = function(...) end,
-    call_to = vim.cmd,
-  },
-}
-
 --- Prompter creates an object whose purpose is to store a couple of key string
 --- formatting fields/components alongside a series of functional-style methods
 --- which wrap existing functions to create suitably formatted user input for
---- such functions.
+--- things like keymappings, custom commands, etc.
 mod.Prompter = {}
 mod.Prompter.__index = mod.Prompter
-
 function mod.Prompter.new(opts)
   opts = opts or {}
   local self = setmetatable(opts.existing_prompter or {}, mod.Prompter)
   self.default_action = opts.default_action or vim.cmd
   self.separator = opts.separator or " 󰟵 "
+  self.default_finput = opts.default_finput or vim.ui.input
 
   -- if opts.merge_handler_defaults then
   --   self.handlers = mopts(handler_defaults, opts, "suppress")
@@ -37,27 +30,47 @@ function mod.Prompter.new(opts)
   return self
 end
 
-mod.CommandPrompter = mod.Prompter.new()
-
-function mod.CommandPrompter.new(opts)
-  -- we will need to do more interesting things in here, probably set up the
-  -- caller to vim.cmd.
-  return mod.Prompter.new(opts)
+--- generates a function which when called will invoke an `finput` function using
+--- the given `input_prompt` as the descriptive field on the resultant input
+--- entry-box; the typical use case for this method is to create a tool as a
+--- function that will prompt for user input with a custom description box with
+--- special formatting if desired.
+---@param input_prompt? string the text which is to be displayed as the prompt
+---text, e.g. "filename:"; if not specified, uses `" :"` as a generic prompt.
+---@param finput function the function which handles the actual parsing of user
+---input, expected generally to resolve to a call to the bare vim.ui.input,
+---which is the default when no function is given.
+---@vararg any[]? any additional arguments to this function
+---@return function prompter when called, this function will prompt the user for
+---input using the given parameters to format the prompt description.
+function mod.Prompter:command(input_prompt, finput, ...)
+  input_prompt = input_prompt or " :"
+  finput = finput or self.default_finput
+  local argtable = { ... }
+  local function wrapper()
+    return finput({ prompt = input_prompt .. self.separator }, function(input)
+      local fargs = vim.tbl_map(function(val)
+        return val:format(input)
+      end, argtable)
+      return vim.cmd(unpack(fargs))
+    end)
+  end
+  return wrapper
 end
 
-function mod.Prompter:filename(...)
-  local argtable = { ... }
-  local function inner_wrapper()
-    return vim.ui.input(
-      { prompt = "filename" .. self.separator },
-      function(input)
-        local res = vim.cmd(unpack(argtable))
-        return res
-      end
-    )
+function mod.Prompter:callback(input_prompt, finput, ...)
+  input_prompt = input_prompt or " :"
+  finput = finput or vim.ui.input
+  local callbacks = { ... }
+  local function wrapper()
+    return finput({ prompt = input_prompt .. self.separator }, function(input)
+      local ret = vim.tbl_map(function(cfunc)
+        return cfunc(input)
+      end, callbacks)
+      return ret
+    end)
   end
-
-  return inner_wrapper
+  return wrapper
 end
 
 function mod.cmdtext_input(prompt, ...)
@@ -68,8 +81,9 @@ function mod.cmdtext_input(prompt, ...)
       local fargs = vim.tbl_map(function(val)
         return val:format(input)
       end, argtable)
-      local res = vim.cmd(unpack(fargs))
-      return res
+      vim.notify(vim.inspect(fargs))
+      vim.cmd(unpack(fargs))
+      -- vim.notify(vim.inspect(res))
     end)
   end
   return extrawrap
@@ -79,39 +93,28 @@ function mod.callback_input(prompt, ...)
   prompt = prompt or " :"
   local callbacks = { ... }
   local function extrawrap()
-    local res = {}
     vim.ui.input({ prompt = prompt }, function(input)
+      local res = {}
       for i, cfunc in ipairs(callbacks) do
         res[i] = cfunc(input)
-      end
-    end)
-    return res
-  end
-
-  return extrawrap
-end
-
-function mod.filename(...)
-  return mod.cmdtext_input("filename 󰟵 :", ...)
-end
-
-function mod.workspace(...)
-  return mod.cmdtext_input("workspace  :", ...)
-end
-
-function mod.pfilename(...)
-  local argtable = { ... }
-  local function extrawrap()
-    vim.ui.input({ prompt = "filename 󰟵" }, function(input)
-      local ok, res = pcall(vim.cmd, unpack(argtable), input)
-      if not ok then
-        -- failure to execute cmd
-        return nil
       end
       return res
     end)
   end
+
   return extrawrap
+end
+
+function mod.name(...)
+  return mod.cmdtext_input("name 󰟵 ", ...)
+end
+
+function mod.filename(...)
+  return mod.cmdtext_input("filename 󰟵 ", ...)
+end
+
+function mod.workspace(...)
+  return mod.cmdtext_input("workspace  ", ...)
 end
 
 return mod
