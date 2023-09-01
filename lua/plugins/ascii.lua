@@ -268,7 +268,7 @@ return {
         end,
         "<CMD>Fig<CR>",
         mode = { "n" },
-        { desc = "figlet=> ascii interface" },
+        desc = "figlet=> ascii interface",
       },
       {
         key_figlet .. "c",
@@ -296,6 +296,7 @@ return {
   },
   {
     "samodostal/image.nvim",
+    event = "VeryLazy",
     dependencies = { "nvim-lua/plenary.nvim", "m00qek/baleia.nvim" },
     -- event = "VeryLazy",
     opts = {
