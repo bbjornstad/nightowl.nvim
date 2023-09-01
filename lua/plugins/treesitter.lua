@@ -67,6 +67,17 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
+    keys = {
+      {
+        "[c",
+        function()
+          require("treesitter-context").go_to_context()
+        end,
+        mode = "n",
+        silent = true,
+        desc = "ctx=> upwards to context",
+      },
+    },
     opts = { mode = "cursor" }, -- separator = "🮩" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
