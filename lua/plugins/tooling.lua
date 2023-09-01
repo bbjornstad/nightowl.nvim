@@ -2,7 +2,13 @@ local env = require("environment.ui")
 local kenv = require("environment.keys")
 local mapx = vim.keymap.set
 local key_tterm = kenv.stems.toggleterm
+local key_cterm = kenv.stems.customterm
 local key_treesj = kenv.stems.treesj
+local key_code_shot = kenv.stems.code_shot
+
+local utiliterm = require("environment.utiliterm")
+
+local inp = require("uutils.input")
 
 return {
   {
@@ -29,6 +35,9 @@ return {
         end
       end,
       shading_factor = 2,
+      winbar = {
+        enabled = false,
+      },
     },
     keys = {
       {
@@ -62,6 +71,25 @@ return {
         end,
         mode = { "n", "t" },
         desc = "term=> toggle tabbed layout",
+      },
+      -- custom terminal mappings go here.
+      {
+        key_cterm .. "b",
+        utiliterm.btop,
+        mode = "n",
+        desc = "term.mon=> btop",
+      },
+      {
+        key_cterm .. "t",
+        utiliterm.broot,
+        mode = "n",
+        desc = "term.mon=> broot",
+      },
+      {
+        key_cterm .. "s",
+        utiliterm.sysz,
+        mode = "n",
+        desc = "term.mon=> sysz",
       },
     },
     init = function()
@@ -268,6 +296,72 @@ return {
 
       -- Use `dot` for repeat action
       dot_repeat = true,
+    },
+  },
+  {
+    "niuiic/code-shot.nvim",
+    config = true,
+    dependencies = {
+      "niuiic/core.nvim",
+    },
+    opts = {
+      ---@return string output file path
+      output = function()
+        local core = require("core")
+        local buf_name = vim.api.nvim_buf_get_name(0)
+        return core.file.name(buf_name) .. ".png"
+      end,
+      ---@return string[]
+      -- select_area: {s_start: {row: number, col: number}, s_end: {row: number, col: number}} | nil
+      options = function(select_area)
+        if not select_area then
+          return {}
+        end
+        return {
+          "--line-offset",
+          select_area.s_start.row,
+        }
+      end,
+    },
+    keys = {
+      {
+        key_code_shot,
+        function()
+          require("code-shot").shot()
+        end,
+        mode = { "n", "v" },
+        desc = "code=> screen shot",
+      },
+    },
+  },
+  {
+    "cshuaimin/ssr.nvim",
+    opts = {
+      border = env.borders.main,
+      min_width = 50,
+      min_height = 5,
+      max_width = 120,
+      max_height = 25,
+      keymaps = {
+        close = "q",
+        next_match = "n",
+        prev_match = "N",
+        replace_confirm = "<cr>",
+        replace_all = "<leader><cr>",
+      },
+    },
+    config = function(_, opts)
+      require("ssr").setup(opts)
+    end,
+    keys = {
+      {
+        "<leader>sp",
+        function()
+          require("ssr").open()
+        end,
+        mode = "n",
+        desc = "search=> structural search replace",
+      },
     },
   },
 }
