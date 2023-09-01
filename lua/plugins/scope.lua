@@ -5,6 +5,26 @@
 -- performance reasons.
 local key_scope = require("environment.keys").stems.telescope
 local key_notice = require("environment.keys").stems.notice
+local util = require("lazyvim.util")
+
+local function insert_into_lazyspec(spec, item) end
+
+local function insert_source(configuration, extension)
+  extension = extension or false
+  local opts = util.opts("telescope")
+  local targeted
+  if extension then
+    targeted = opts.extensions
+  else
+    targeted = opts.pickers
+  end
+  table.insert(targeted, configuration)
+end
+
+function builtin(opts)
+  opts = opts or {}
+  local scope = require("telescope")
+end
 
 local target_pickers = {
   "find_files",
@@ -161,13 +181,6 @@ return {
         dependencies = { "junegunn/fzf", "junegunn/fzf.vim" },
         config = function()
           require("telescope").load_extension("fzf")
-        end,
-      },
-      {
-        "nvim-telescope/telescope-ui-select.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("ui-select")
         end,
       },
       {
@@ -350,23 +363,6 @@ return {
         config = function()
           require("telescope").load_extension("find_pickers")
         end,
-        keys = {
-          -- {
-          --   key_scope .. "<leader>",
-          --   funext("find_pickers"),
-          --   mode = "n",
-          --   desc = "scope=> extensions and pickers",
-          -- },
-        },
-      },
-      {
-        "adoyle-h/lsp-toggle.nvim",
-        dependencies = {
-          "neovim/nvim-lspconfig",
-          "nvim-telescope/telescope.nvim",
-        },
-        opts = { create_cmds = true, telescope = true },
-        config = true,
       },
       {
         "AckslD/nvim-neoclip.lua",
@@ -393,14 +389,14 @@ return {
         "prochri/telescope-all-recent.nvim",
         dependencies = {
           "nvim-telescope/telescope.nvim",
-          config = function()
-            require("telescope-all-recent").setup({
-              default = {
-                sorting = "frecency",
-              },
-            })
-          end,
         },
+        config = function()
+          require("telescope-all-recent").setup({
+            default = {
+              sorting = "frecency",
+            },
+          })
+        end,
       },
       {
         "lpoto/telescope-tasks.nvim",
@@ -408,16 +404,6 @@ return {
           require("telescope").load_extension("tasks")
         end,
       },
-      -- {
-      --   "mrcjkb/telescope-manix",
-      --   dependencies = {
-      --     "nvim-lua/plenary.nvim",
-      --     "nvim-telescope/telescope.nvim",
-      --   },
-      --   config = function()
-      --     require("telescope").load_extension("manix")
-      --   end,
-      -- },
     },
     opts = {
       defaults = {
