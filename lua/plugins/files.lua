@@ -7,21 +7,7 @@ local key_nnn = keystems.nnn
 local key_broot = keystems.broot
 local key_files = keystems.files
 local key_attempt = keystems.attempt
-
-local function term_broot()
-  local Term = require("toggleterm.terminal").Terminal
-  local broot = Term:new({ cmd = "br", hidden = true })
-  local function _broot_toggle()
-    broot:toggle()
-  end
-  -- now just map this.
-  vim.keymap.set(
-    { "n" },
-    key_broot .. "e",
-    _broot_toggle,
-    { desc = "br=> tree view" }
-  )
-end
+local key_traveller = keystems.traveller
 
 return {
   {
@@ -29,56 +15,56 @@ return {
     enabled = false,
     module = false,
   },
-  -- {
-  --   "is0n/fm-nvim",
-  --   enabled = true,
-  --   cmd = {
-  --     -- "Lazygit",
-  --     "Joshuto",
-  --     "Ranger",
-  --     -- "Broot",
-  --     -- "Gitui",
-  --     "Xplr",
-  --     "Vifm",
-  --     "Skim",
-  --     -- "Nnn",
-  --     "Fff",
-  --     "Twf",
-  --     -- "Fzf",
-  --     -- "Fzy",
-  --     "Lf",
-  --     "Fm",
-  --   },
-  --   opts = {
-  --     edit_cmd = "edit",
-  --     ui = {
-  --       default = "float",
-  --       float = {
-  --         border = env.borders.main,
-  --         float_hl = "Normal",
-  --         border_hl = "FloatBorder",
-  --         blend = 20,
-  --         height = 0.6,
-  --         width = 0.6,
-  --       },
-  --       split = {
-  --         direction = "topleft",
-  --         size = 32,
-  --       },
-  --     },
-  --     broot_conf = vim.fs.normalize(
-  --       vim.fn.expand("~/.config/broot/conf.hjson")
-  --     ),
-  --     mappings = {
-  --       vert_split = "<C-v>",
-  --       horz_split = "<C-h>",
-  --       tabedit = "<C-t>",
-  --       edit = "<C-e>",
-  --       ESC = "<ESC>",
-  --     },
-  --   },
-  --   config = true,
-  -- },
+  {
+    "is0n/fm-nvim",
+    enabled = true,
+    cmd = {
+      -- "Lazygit",
+      "Joshuto",
+      "Ranger",
+      -- "Broot",
+      -- "Gitui",
+      "Xplr",
+      "Vifm",
+      "Skim",
+      -- "Nnn",
+      "Fff",
+      "Twf",
+      -- "Fzf",
+      -- "Fzy",
+      "Lf",
+      "Fm",
+    },
+    opts = {
+      edit_cmd = "edit",
+      ui = {
+        default = "float",
+        float = {
+          border = env.borders.main,
+          float_hl = "Normal",
+          border_hl = "FloatBorder",
+          blend = 20,
+          height = 0.6,
+          width = 0.6,
+        },
+        split = {
+          direction = "topleft",
+          size = 32,
+        },
+      },
+      broot_conf = vim.fs.normalize(
+        vim.fn.expand("~/.config/broot/conf.hjson")
+      ),
+      mappings = {
+        vert_split = "<C-v>",
+        horz_split = "<C-h>",
+        tabedit = "<C-t>",
+        edit = "<C-e>",
+        ESC = "<ESC>",
+      },
+    },
+    config = true,
+  },
   {
     "lstwn/broot.vim",
     cmd = { "Broot", "BrootCurrentDir", "BrootWorkingDir", "BrootHomeDir" },
@@ -145,7 +131,7 @@ return {
     event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
-      default_file_explorer = true,
+      default_file_explorer = false,
       prompt_save_on_select_new_entry = true,
       columns = {
         "icon",
@@ -248,6 +234,8 @@ return {
     config = true,
     cmd = { "NnnExplorer", "NnnPicker" },
     opts = function(_, opts)
+      opts.replace_netrw = opts.replace_netrw or "explorer"
+      opts.quitcd = opts.quitcd or "tcd"
       opts.explorer = vim.tbl_deep_extend("force", {
         width = 28,
         side = "topleft",
@@ -274,6 +262,7 @@ return {
         { "<A-CR>", builtin.cd_to_path }, -- cd to file directory
         { "<A-:>", builtin.populate_cmdline }, -- populate cmdline (:) with file(s)
       }, opts.mappings or {})
+      opts.auto_close = opts.auto_close or true
       opts.auto_open = vim.tbl_deep_extend("force", {
         tabpage = "picker",
         empty = "explorer",
@@ -393,22 +382,44 @@ return {
     },
   },
   {
-    "nathom/filetype.nvim",
-    init = function() end,
-    config = function(_, opts) end,
+    "Norlock/nvim-traveller",
+    event = "VeryLazy",
+    enabled = false,
+    config = function(_, opts)
+      require("nvim-traveller").setup(opts)
+    end,
     opts = {
-      overrides = {
-        extensions = {
-          pn = "potion",
-          nu = "nu",
-          tfy = "taffy",
-          lua = "lua",
-        },
-        complex = {
-          ["*git/config"] = "gitconfig",
-        },
+      show_hidden = true,
+      mappings = {
+        directories_tab = "<Tab>",
+        directories_delete = "<C-d>",
       },
     },
-    event = "VimEnter",
+    keys = {
+      {
+        key_traveller .. "o",
+        function()
+          require("nvim-traveller").open_navigation()
+        end,
+        mode = "n",
+        desc = "fm.travel=> open",
+      },
+      {
+        key_traveller .. "d",
+        function()
+          require("nvim-traveller").last_directories_search()
+        end,
+        mode = "n",
+        desc = "fm.travel=> last directories",
+      },
+      {
+        key_traveller .. "t",
+        function()
+          require("nvim-traveller").open_terminal()
+        end,
+        mode = "n",
+        desc = "fm.travel=> terminal mode",
+      },
+    },
   },
 }
