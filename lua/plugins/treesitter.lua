@@ -1,3 +1,5 @@
+local env = require("environment.ui")
+
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -92,5 +94,27 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-refactor",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
+  },
+  {
+    "sustech-data/wildfire.nvim",
+    event = "VeryLazy",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function(_, opts)
+      require("wildfire").setup(opts)
+    end,
+    opts = {
+      surrounds = {
+        { "(", ")" },
+        { "{", "}" },
+        { "<", ">" },
+        { "[", "]" },
+      },
+      keymaps = {
+        init_selection = "<S-CR>",
+        node_incremental = "<CR>",
+        node_decremental = "<BS>",
+      },
+      filetype_exclude = env.ft_ignore_list,
+    },
   },
 }
