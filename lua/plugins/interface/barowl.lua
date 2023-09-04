@@ -374,7 +374,7 @@ return {
         keymaps = {
           ["]"] = function()
             local api = require("dropbar.api")
-            local thismenu = api.get_current_dropbar_menu()
+            local thismenu = api.utils.menu.get_current()
             if not thismenu then
               return
             end
@@ -382,7 +382,7 @@ return {
           end,
           ["["] = function()
             local api = require("dropbar.api")
-            local thismenu = api.get_current_dropbar_menu()
+            local thismenu = api.utils.menu.get_current()
             if not thismenu then
               return
             end
@@ -390,7 +390,7 @@ return {
           end,
           ["q"] = function()
             local api = require("dropbar.api")
-            local thismenu = api.get_current_dropbar_menu()
+            local thismenu = api.api.utils.menu.get_current()
             if not thismenu then
               return
             end
@@ -413,6 +413,14 @@ return {
       },
     },
     keys = {
+      {
+        "g-",
+        function()
+          require("dropbar.api").pick()
+        end,
+        mode = "n",
+        desc = "lsp=> pick grains from breadcrumbs",
+      },
       {
         "g_",
         function()
