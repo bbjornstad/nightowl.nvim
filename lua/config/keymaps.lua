@@ -53,13 +53,30 @@ end, { desc = "ui=> toggle insert autoformat" })
 -- Some basic line breaks using comment characters.
 -- There are more advanced text-generation and commented breakline methods
 -- available using the figlet and comment-box plugins (in extras.lua)
-mapx("n", key_cline .. "b", function()
-  edit_tools.InsertCommentBreak(tonumber(vim.o.textwidth), "-")
-end, { desc = "brk=> insert comment break" })
-
+--
+-- dash break, simply puts '-' until the color-column width.
 mapx("n", key_cline .. "d", function()
   edit_tools.InsertDashBreak(tonumber(vim.o.textwidth), "-")
 end, { desc = "brk=> insert dash break" })
+
+-- comment break, puts the comment string for the language followed by '-' until
+-- the column width.
+mapx("n", key_cline .. "b", function()
+  edit_tools.InsertCommentBreak(tonumber(vim.o.textwidth), "-")
+end, { desc = "brk=> insert comment break" })
+mapx("n", key_cline .. "B", function()
+  edit_tools.InsertCommentBreak(tonumber(vim.o.textwidth), "-", true)
+end, { desc = "brk=> insert comment break (incl space)" })
+
+-- selected comment break, puts the comment string for the language and a
+-- character of user specification (prompted through vim.ui.input) until the
+-- target column width.
+mapx("n", key_cline .. "s", function()
+  edit_tools.SelectedCommentBreak(tonumber(vim.o.textwidth))
+end, { desc = "brk=> selected comment break" })
+mapx("n", key_cline .. "S", function()
+  edit_tools.SelectedCommentBreak(tonumber(vim.o.textwidth))
+end, { desc = "brk=> selected comment break (incl space)" })
 
 -- -----------------------------------------------------------------------------
 -- this simply binds a key to be able to turn off any temporary highlighting
