@@ -5,7 +5,7 @@ local key_figlet = stems.figlet
 local key_editor = stems.base.editor
 local mopts = require("uutils.functional").mopts
 local inp = require("uutils.input")
-local compute_effective_width = require("uutils.text").compute_effective_width
+local compute_remaining_width = require("uutils.text").compute_remaining_width
 
 local function change_figlet_font(fontopts)
   vim.g.figban_fontstyle = fontopts.name or "Impossible"
@@ -15,7 +15,6 @@ end
 return {
   {
     "LudoPinelli/comment-box.nvim",
-    -- event = "VeryLazy",
     opts = {
       doc_width = tonumber(vim.opt.textwidth:get()),
       box_width = (3 / 4) * tonumber(vim.opt.textwidth:get()),
@@ -178,13 +177,13 @@ return {
       start_str = "//",
 
       -- end the comment line with this string
-
       end_str = "//",
+
       -- fill the comment frame border with this character
       fill_char = "-",
 
       -- width of the comment frame
-      frame_width = compute_effective_width(),
+      frame_width = compute_remaining_width(),
 
       -- wrap the line after 'n' characters
       line_wrap_len = 50,
@@ -298,7 +297,6 @@ return {
     "samodostal/image.nvim",
     event = "VeryLazy",
     dependencies = { "nvim-lua/plenary.nvim", "m00qek/baleia.nvim" },
-    -- event = "VeryLazy",
     opts = {
       render = {
         min_padding = 5,

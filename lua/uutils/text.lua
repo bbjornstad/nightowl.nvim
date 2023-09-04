@@ -7,6 +7,7 @@
 -- @module `uutils.text` -- this is the main file containing definitions for
 -- functions that can help to move text around, or put text places.
 local api = vim.api
+local inp = require("uutils.input")
 
 local mod = {}
 
@@ -23,11 +24,13 @@ function mod.toggle_fmtopt(char)
   end
 end
 
-function mod.compute_effective_width(offset)
+function mod.compute_remaining_width(offset)
   offset = offset or 0
-  local res = (tonumber(vim.opt.colorcolumn:get())
+  local res = (
+    tonumber(vim.opt.colorcolumn:get())
     or tonumber(vim.opt.textwidth:get())
-    or 80)
+    or 80
+  )
   return res - offset
 end
 
@@ -46,7 +49,7 @@ function mod.InsertDashBreak(colstop, dashchar)
   local row, col = unpack(api.nvim_win_get_cursor(0))
   local dashtil
   if colstop == 0 then
-    dashtil = mod.compute_effective_width()
+    dashtil = mod.compute_remaining_width()
   else
     dashtil = tonumber(colstop) or 0
   end
@@ -95,6 +98,14 @@ function mod.InsertCommentBreak(colstop, dashchar, include_space)
   end
   api.nvim_buf_set_text(0, row - 1, 0, row - 1, 0, { printstr })
   return mod.InsertDashBreak(colstop, dashchar)
+end
+
+function mod.SelectedCommentBreak(colstop, include_space)
+  colstop = tonumber(colstop) or 0
+  include_space = include_space or false
+  inp.callback_input("break character: ", function(input)
+    mod.InsertCommentBreak(colstop, input, include_space)
+  end)()
 end
 
 return mod
