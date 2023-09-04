@@ -48,8 +48,15 @@ local function initialize_autocompletion()
   return false
 end
 
-local function kf(key)
-  return string.format("%s%s", key_cmp, key)
+local function kf(key, persisted_ctrl)
+  persisted_ctrl = persisted_ctrl or true
+  local strfmt
+  if persisted_ctrl then
+    strfmt = "%s<C-%s>"
+  else
+    strfmt = "%s%s"
+  end
+  return string.format(strfmt, key_cmp, key)
 end
 
 return {
