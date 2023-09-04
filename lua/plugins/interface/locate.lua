@@ -445,4 +445,19 @@ return {
       },
     },
   },
+  {
+    "gorbit99/codewindow.nvim",
+    event = "LspAttach",
+    config = function(_, opts)
+      local cw = require("codewindow")
+      cw.setup(opts)
+      cw.apply_default_keybinds()
+    end,
+    opts = {
+      auto_enable = true,
+      exclude_file_types = env.ft_ignore_list,
+      minimap_width = 20,
+      window_border = env.borders.main,
+    },
+  },
 }
