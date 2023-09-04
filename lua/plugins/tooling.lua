@@ -91,6 +91,12 @@ return {
         mode = "n",
         desc = "term.mon=> sysz",
       },
+      {
+        key_cterm .. "w",
+        utiliterm.weechat,
+        mode = "n",
+        desc = "term.mon=> weechat",
+      },
     },
     init = function()
       vim.g.hidden = true
@@ -99,15 +105,6 @@ return {
         mapx(
           "t",
           "<esc>",
-          [[<C-\><C-n>]],
-          vim.tbl_deep_extend("force", {
-            nowait = true,
-            desc = "term=> escape",
-          }, opts)
-        )
-        mapx(
-          "t",
-          "jk",
           [[<C-\><C-n>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
@@ -362,6 +359,32 @@ return {
         mode = "n",
         desc = "search=> structural search replace",
       },
+    },
+  },
+  {
+    "rareitems/printer.nvim",
+    config = function(_, opts)
+      require("printer").setup(opts)
+    end,
+    opts = {
+      keymap = "gp",
+      behavior = "insert_below",
+    },
+  },
+  {
+    "AckslD/muren.nvim",
+    config = function(_, opts)
+      require("muren").setup(opts)
+    end,
+    cmd = {
+      "MurenToggle",
+      "MurenOpen",
+      "MurenClose",
+      "MurenFresh",
+      "MurenUnique",
+    },
+    opts = {
+      cwd = true,
     },
   },
 }
