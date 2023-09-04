@@ -73,9 +73,9 @@ return {
       filter_kind = false,
       show_guides = true,
       guides = {
-        mid_item = "╞",
-        last_item = "╘	",
-        nested_top = "│",
+        mid_item = "┣",
+        last_item = "┗",
+        nested_top = "┃",
         whitespace = " ",
       },
       highlight_on_hover = true,
