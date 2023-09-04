@@ -5,7 +5,7 @@ local inp = require("uutils.input")
 local user_bookmarks = vim.g.startup_bookmarks
 
 local bookmark_texts = {
-  " bookmarks ====>>====>>====>>====>>====>>====>>====>>====>>====>>====>><",
+  " bookmarks =====>>=====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>",
   "",
 }
 local user_bookmark_mappings = {}
@@ -46,34 +46,13 @@ function _G.FZNightowlNewFile()
   return inp.filename("edit %s")()
 end
 
--- local function define_conduct_commands(opts)
---   vim.api.nvim_buf_create_user_command(
---     0,
---     "FZNightOwlConductProject",
---     FZNightowlConductProject,
---     opts
---   )
---   vim.api.nvim_buf_create_user_command(
---     0,
---     "FZNightOwlConductSession",
---     FZNightowlConductSession,
---     opts
---   )
---   vim.api.nvim_buf_create_user_command(
---     0,
---     "FZNightowlNewFile",
---     FZNightowlNewFile,
---     opts
---   )
--- end
-
 -- NOTE: lua dump(vim.fn.expand("#<1")) to get newest oldfile
 
 local settings = {
   header = {
     type = "text",
     oldfiles_directory = false,
-    align = "center",
+    align = "left",
     fold_section = false,
     title = "nightowl.nvim",
     margin = 32,
@@ -86,7 +65,7 @@ local settings = {
     type = "oldfiles",
     oldfiles_directory = false,
     align = "left",
-    fold_section = false,
+    fold_section = true,
     title = "recently edited (all)",
     margin = 32,
     content = "",
@@ -154,17 +133,17 @@ local settings = {
       {
         "󱨰 daily journal",
         "Neorg journal daily",
-        "jd",
+        "Jd",
       },
       {
         "󱚃 tomorrow's journal",
         "Neorg journal tomorrow",
-        "jt",
+        "Jt",
       },
       {
         "󱚁 yesterday's journal",
         "Neorg journal yesterday",
-        "jy",
+        "Jy",
       },
       {
         " fzf::git files",
