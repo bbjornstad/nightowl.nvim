@@ -1,3 +1,4 @@
+-- vim: set ft=lua: -0-
 local env = require("environment.ui")
 local keystems = require("environment.keys").stems.base
 
@@ -55,5 +56,22 @@ return {
         [keystems.fuzzy] = { name = "+fuzzy find with fzf" },
       },
     },
+  },
+  {
+    "jokajak/keyseer.nvim",
+    opts = {},
+    config = function(_, opts)
+      require("keyseer").setup(opts)
+    end,
+    version = false,
+    keys = {
+      {
+        "<leader>k",
+        "<CMD>KeySeer<CR>",
+        mode = "n",
+        desc = "seer=> keys mapped",
+      },
+    },
+    cmd = "KeySeer",
   },
 }
