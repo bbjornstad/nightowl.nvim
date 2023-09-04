@@ -171,5 +171,29 @@ return {
       low_blue_light = true,
     },
   },
+  {
+    "wuelnerdotexe/vim-enfocado",
+    lazy = true,
+    priority = 997,
+    config = function()
+      vim.g.enfocado_style = "nature"
+    end,
+  },
+  {
+    "nyoom-engineering/oxocarbon.nvim",
+    lazy = true,
+    priority = 996,
+    config = function() end,
+  },
+  {
+    "olimorris/onedarkpro.nvim",
+    lazy = true,
+    priority = 992,
+    opts = {},
+    config = function(_, opts)
+      require("onedarkpro").setup(opts)
+    end,
+  },
+
   { "LazyVim/LazyVim", opts = { colorscheme = env.default_colorscheme } },
 }
