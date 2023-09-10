@@ -1,6 +1,7 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local colors = require("kanagawa.colors").setup({ theme = "wave" }).palette
 local inp = require("uutils.input")
+local key_journal = require("environment.keys").stems.base.neorg .. "j"
 
 local function colorize(bg, fg, opts)
   opts = opts or {}
@@ -395,6 +396,16 @@ local organization_tools = {
               )
             end,
             neorg_leader = "'", -- kenv.stems.base.tasks,
+          },
+          keys = {
+            {
+              key_journal .. "d",
+              function()
+                vim.cmd([[Neorg journal daily]])
+              end,
+              mode = "n",
+              desc = "neorg=> daily journal (today)",
+            },
           },
         },
       },
