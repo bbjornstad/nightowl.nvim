@@ -1,6 +1,6 @@
 local env = require("environment.ui")
 local key_bufmenu = require("environment.keys").stems.base.buffers
-local key_focus = require("environment.keys").stems.focus
+local key_files = require("environment.keys").stems.base.files
 local mopts = require("uutils.functional").mopts
 
 local function pdel(mode, keys, opts)
@@ -730,5 +730,22 @@ return {
     config = function(_, opts)
       require("flatten").setup(opts)
     end,
+  },
+  {
+    "tiagovla/scope.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function(_, opts)
+      require("scope").setup(opts)
+      require("telescope").load_extension("scope")
+    end,
+    opts = {},
+    keys = {
+      {
+        key_files .. "B",
+        "<CMD>Telescope scope buffers<CR>",
+        mode = "n",
+        desc = "scope.buf=> view buffers",
+      },
+    },
   },
 }
