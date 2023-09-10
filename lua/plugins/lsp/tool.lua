@@ -4,6 +4,7 @@ local key_vista = keystems.vista
 local key_aerial = key_vista .. "a"
 local key_lens = keystems.lens
 local key_ui = keystems.base.ui
+local key_cp = keystems.control_panel
 
 return {
   {
@@ -413,6 +414,52 @@ return {
         end,
         mode = { "v", "n" },
         desc = "lsp=> preview code actions",
+      },
+    },
+  },
+  {
+    "mhanberg/control-panel.nvim",
+    event = "LspAttach",
+    config = function(_, opts)
+      local cp = require("control_panel")
+      cp.register({
+        id = "output-panel",
+        title = "Output Panel",
+      })
+
+      local handler = vim.lsp.handlers["window/logMessage"]
+
+      vim.lsp.handlers["window/logMessage"] = function(err, result, context)
+        handler(err, result, context)
+        if not err then
+          local client_id = context.client_id
+          local client = vim.lsp.get_client_by_id(client_id)
+          if client ~= nil then
+            if not cp.panel("output-panel"):has_tab(client.name) then
+              cp.panel("output-panel"):tab({
+                name = client.name,
+                key = tostring(#cp.panel("output-panel"):tabs() + 1),
+              })
+            end
+
+            cp.panel("output-panel"):append({
+              tab = client.name,
+              text = "["
+                .. vim.lsp.protocol.MessageType[result.type]
+                .. "] "
+                .. result.message,
+            })
+          end
+        end
+      end
+    end,
+    opts = {},
+    keys = {
+      {
+        key_cp,
+        "<CMD>ControlPanel toggle output-panel",
+        mode = "n",
+        desc = "lsp=> toggle control panel",
       },
     },
   },
