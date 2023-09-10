@@ -1,0 +1,7 @@
+return {
+  {
+    "JuliaEditorSupport/julia-vim",
+    ft = { "julia", "jl" },
+    config = false,
+  },
+}
