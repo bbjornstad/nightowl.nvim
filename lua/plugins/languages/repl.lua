@@ -3,11 +3,12 @@ local mapn = require("environment.keys").map("n")
 local key_repl = stems.base.repl
 local key_iron = key_repl .. "r"
 local key_sniprun = key_repl .. "s"
+local key_magma = key_repl .. "m"
 
 return {
   {
     "vlime/vlime",
-    ft = { "lisp", "julia", "python", "clojure", "fennel", "conjure" },
+    ft = { "lisp" },
     config = function(plugin)
       vim.opt.rtp:append((plugin.dir .. "vim/"))
     end,
@@ -162,20 +163,57 @@ return {
     end,
   },
   {
-    "google/executor.nvim",
-    config = true,
-    opts = {
-      use_split = true,
-      split = {
-        position = "right",
-      },
+    "dccsillag/magma-nvim",
+    build = ":UpdateRemotePlugins",
+    cmd = {
+      "MagmaEvaluateOperator",
+      "MagmaEvaluateLine",
+      "MagmaEvaluateVisual",
+      "MagmaReevaluateCell",
+      "MagmaDelete",
+      "MagmaShowOutput",
     },
+    init = function()
+      vim.g.magma_automatically_open_output = false
+      vim.g.magma_image_provider = "kitty"
+      vim.g.magma_output_window_borders = false
+    end,
     keys = {
       {
-        key_repl .. "e",
-        "<CMD>ExecutorRun<CMD>",
+        key_magma .. "e",
+        "<CMD>MagmaEvaluateOperator<CR>",
         mode = "n",
-        desc = "repl.gexec=> run",
+        desc = "magma=> evaluate",
+      },
+      {
+        key_magma .. "l",
+        "<CMD>MagmaEvaluateLine<CR>",
+        mode = "n",
+        desc = "magma=> evaluate line",
+      },
+      {
+        key_magma .. "e",
+        "<CMD>MagmaEvaluateVisual<CR>",
+        mode = "x",
+        desc = "magma=> evaluate",
+      },
+      {
+        key_magma .. "r",
+        "<CMD>MagmaReevaluateCell<CR>",
+        mode = "n",
+        desc = "magma=> evaluate cell",
+      },
+      {
+        key_magma .. "d",
+        "<CMD>MagmaDelete<CR>",
+        mode = "n",
+        desc = "magma=> delete",
+      },
+      {
+        key_magma .. "s",
+        "<CMD>MagmaShowOutput<CR>",
+        mode = "n",
+        desc = "magma=> show output",
       },
     },
   },
