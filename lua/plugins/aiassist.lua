@@ -21,6 +21,9 @@ local key_doctor = stems.doctor
 local key_llm = stems.llm
 local key_backseat = stems.backseat
 local key_wtf = stems.wtf
+local key_prompter = stems.prompter
+local key_gptnvim = stems.gptnvim
+local key_ollero = stems.ollero
 
 -- show a menu, but only if the user has selected the appropriate option.
 -- This menu is supposed to inform the user which plugins might send -- their code off to an external service for analysis.
@@ -47,6 +50,13 @@ AI Plugin Status:
   -> **llm**: %s
   -> **backseat**: %s
   -> **wtf**: %s
+  -> **prompter**: %s
+  -> **aider**: %s
+  -> **jogpt**: %s
+  -> **gpt.nvim**: %s
+  -> **llama**: %s
+  -> **ollero**: %s
+
 
 *plugin is used during nvim-cmp autocompletion, and will therefore connect to an external service without explicit instruction to do so*
 **plugin uses proprietary, non-free, non-open, or non-libre backend (namely ChatGPT)**
@@ -68,7 +78,13 @@ AI Plugin Status:
       enb.llm.enable,
       enb.doctor.enable,
       enb.backseat.enable,
-      enb.wtf.enable
+      enb.wtf.enable,
+      enb.prompter.enable,
+      enb.aider.enable,
+      enb.jogpt.enable,
+      enb.gptnvim.enable,
+      enb.llama.enable,
+      enb.ollero.enable
     ),
     vim.log.levels.INFO
   )
@@ -125,7 +141,6 @@ return {
         build = "cargo build --workspace --release",
       },
       "nvim-lua/plenary.nvim",
-      -- "hrsh7th/nvim-cmp",
     },
     cmd = "Codeium",
     enabled = enb.codeium.enable,
@@ -783,6 +798,7 @@ return {
     "james1236/backseat.nvim",
     event = "VeryLazy",
     cmd = { "Backseat", "BackseatAsk", "BackseatClear", "BackseatClearLine" },
+    enabled = enb.backseat.enable,
     opts = {
       openai_model_id = "gpt-4",
       additional_instruction = "Respond as if you were George Carlin, but also the best programmer",
@@ -820,6 +836,7 @@ return {
   },
   {
     "piersolenski/wtf.nvim",
+    enabled = enb.wtf.enable,
     dependencies = {
       "MunifTanjim/nui.nvim",
     },
@@ -845,6 +862,143 @@ return {
           require("wtf").search()
         end,
         desc = "Search diagnostic with Google",
+      },
+    },
+  },
+  {
+    "ribelo/prompter.nvim",
+    enabled = enb.prompter.enable,
+    cmd = {
+      "PrompterContinue",
+      "PrompterReplace",
+      "PrompterEdit",
+      "PrompterBrowser",
+    },
+    config = function(_, opts)
+      require("prompter_nvim").setup(opts)
+    end,
+    keys = {
+      {
+        key_prompter .. "r",
+        "<CMD>PrompterReplace<CR>",
+        mode = "n",
+        desc = "ai.prompt=> replace prompt",
+      },
+      {
+        key_prompter .. "e",
+        "<CMD>PrompterEdit<CR>",
+        mode = "n",
+        desc = "ai.prompt=> edit prompt",
+      },
+      {
+        key_prompter .. "c",
+        "<CMD>PrompterContinue<CR>",
+        mode = "n",
+        desc = "ai.prompt=> continue prompt",
+      },
+      {
+        key_prompter .. "b",
+        "<CMD>PrompterReplace<CR>",
+        mode = "n",
+        desc = "ai.prompt=> browser prompt",
+      },
+    },
+  },
+  {
+    "joshuavial/aider.nvim",
+    enabled = enb.aider.enable,
+    cmd = { "OpenAider" },
+    opts = {},
+    config = function(_, opts)
+      require("aider").setup(opts)
+    end,
+  },
+  {
+    "juliusolson/gpt.nvim",
+    enabled = enb.jogpt.enable,
+    name = "jogpt",
+    opts = {},
+    config = function(_, opts) end,
+    cmd = { "GPTEDIT", "GPTGEN", "GPTCOMP" },
+  },
+  {
+    "thmsmlr/gpt.nvim",
+    enabled = enb.gptnvim.enable,
+    config = function(_, opts) end,
+    opts = {},
+    keys = {
+      {
+        key_gptnvim .. "r",
+        function()
+          require("gpt").replace()
+        end,
+        mode = "v",
+        desc = "ai.gpt=> replace selected",
+        silent = true,
+        noremap = true,
+      },
+      {
+        key_gptnvim .. "v",
+        function()
+          require("gpt").visual_prompt()
+        end,
+        mode = "v",
+        desc = "ai.gpt=> visual prompt",
+        silent = false,
+        noremap = true,
+      },
+      {
+        key_gptnvim .. "p",
+        function()
+          require("gpt").prompt()
+        end,
+        mode = "i",
+        desc = "ai.gpt=> prompt",
+        silent = true,
+        noremap = true,
+      },
+      {
+        key_gptnvim .. "c",
+        function()
+          require("gpt").cancel()
+        end,
+        mode = "n",
+        desc = "ai.gpt=> cancel",
+        silent = true,
+        noremap = true,
+      },
+      {
+        key_gptnvim .. "p",
+        function()
+          require("gpt").prompt()
+        end,
+        mode = "n",
+        desc = "ai.gpt=> prompt",
+        silent = true,
+        noremap = true,
+      },
+    },
+  },
+  {
+    "jpmcb/nvim-llama",
+    enabled = enb.llama.enable,
+    config = function(_, opts)
+      require("nvim-llama").setup(opts)
+    end,
+  },
+  {
+    "marco-souza/ollero.nvim",
+    enabled = enb.ollero.enable,
+    config = function(_, opts) end,
+    opts = {},
+    keys = {
+      {
+        key_ollero .. "o",
+        function()
+          require("ollero.nvim").open()
+        end,
+        mode = "n",
+        desc = "ai.ollero=> open",
       },
     },
   },

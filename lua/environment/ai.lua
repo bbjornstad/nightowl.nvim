@@ -42,6 +42,12 @@ env.enabled = {
   llm = { env = true, fallback = false },
   backseat = { env = true, fallback = false },
   wtf = { env = true, fallback = false },
+  prompter = { env = true, fallback = false },
+  aider = { env = true, fallback = false },
+  jogpt = { env = true, fallback = false },
+  gptnvim = { env = true, fallback = false },
+  llama = { env = true, fallback = false },
+  ollero = { env = true, fallback = false },
 }
 env.status_notify_on_startup = false
 
