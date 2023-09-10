@@ -52,7 +52,9 @@ env.houdini.enable = false
 env.borders = {}
 env.borders.main = "shadow"
 env.borders.alt = "solid"
-env.borders.main_accent = "single"
+-- env.borders.main_accent = "single"
+env.borders.main_accent =
+  { "🭽", "▔", "🭾", "▕", "🭿", "▁", "🭼", "▏" }
 
 env.telescope = {}
 env.telescope.theme = "ivy"
