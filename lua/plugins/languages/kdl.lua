@@ -1,5 +1,7 @@
 return {
-  "imsnif/kdl.vim",
-  ft = "kdl",
-  init = function() end,
+  {
+    "imsnif/kdl.vim",
+    ft = "kdl",
+    init = function() end,
+  },
 }
