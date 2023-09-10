@@ -7,6 +7,9 @@ local key_do = keystems._do
 local key_conduct = keystems.conduct
 local key_taskorg = keystems.base.tasks
 local key_memento = keystems.memento
+local key_pulse = keystems.pulse
+local key_mountaineer = keystems.mountaineer
+local key_executor = keystems.executor
 local xtscope = require("uutils.scope").extendoscope
 
 return {
@@ -51,9 +54,9 @@ return {
       use_clock_time = true,
       use_clock_today = true,
       use_seconds = true,
-      overdue = "󱫧 overdue: "
+      overdue = "󱫧 overdue: ",
     },
-    event = "VeryLazy"
+    event = "VeryLazy",
   },
   {
     "nocksock/do.nvim",
@@ -61,7 +64,7 @@ return {
     cmd = { "Do", "Done", "DoEdit", "DoSave", "DoToggle" },
     opts = {
       message_timeout = 2000, -- how long notifications are shown
-      kaomoji_mode = 0,       -- 0 kaomoji everywhere, 1 skip kaomoji in doing
+      kaomoji_mode = 0, -- 0 kaomoji everywhere, 1 skip kaomoji in doing
       winbar = false,
       doing_prefix = " current:",
       store = {
@@ -306,6 +309,24 @@ return {
     },
   },
   {
+    "elmarsto/mountaineer.nvim",
+    cmd = "Himalaya",
+    keys = {
+      {
+        key_mountaineer,
+        "<CMD>Telescope mountaineer<CR>",
+        mode = "n",
+        desc = "mail=> telescope view mail",
+      },
+      {
+        "<F12>",
+        "<CMD>Telescope mountaineer<CR>",
+        mode = "n",
+        desc = "mail=> telescope view mail",
+      },
+    },
+  },
+  {
     "aaditeynair/conduct.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },
     opts = {
@@ -461,10 +482,105 @@ return {
     },
   },
   {
+    "linguini1/pulse.nvim",
+    version = "*",
+    cmd = {
+      "PulseEnable",
+      "PulseDisable",
+      "Pulses",
+      "PulseList",
+      "PulseStatus",
+    },
+    opts = {
+      level = vim.log.levels.INFO,
+    },
+    config = function(_, opts)
+      require("pulse").setup(opts)
+    end,
+    init = function()
+      require("pulse").add("standard pom", 53, "work time...", false)
+      require("pulse").add("standard break", 17, "take a break...", false)
+    end,
+    keys = {
+      {
+        key_pulse .. "n",
+        function()
+          inp.callback_input("timer:", function(input)
+            require("pulse").add(
+              "custom_timer" .. input,
+              input,
+              "work time...",
+              true
+            )
+          end)
+        end,
+        mode = "n",
+        desc = "pulse=> new custom timer",
+      },
+      {
+        key_pulse .. "N",
+        function()
+          inp.callback_input("timer:", function(input)
+            require("pulse").add(
+              "custom_timer" .. input,
+              input,
+              "work time...",
+              false
+            )
+          end)
+        end,
+        mode = "n",
+        desc = "pulse=> new custom timer (no enable)",
+      },
+      {
+        key_pulse .. "t",
+        function()
+          require("pulse").enable("standard pom")
+        end,
+        mode = "n",
+        desc = "pulse=> standard timer",
+      },
+      {
+        key_pulse .. "T",
+        function()
+          require("pulse").disable("standard pom")
+        end,
+        mode = "n",
+        desc = "pulse=> standard timer",
+      },
+      {
+        key_pulse .. "p",
+        function()
+          require("pulse").pick_timers()
+        end,
+        mode = "n",
+        desc = "pulse=> standard timer",
+      },
+    },
+  },
+  {
     "folke/which-key.nvim",
     opts = {
       defaults = {
         [key_taskorg] = { name = "task/time management" },
+      },
+    },
+  },
+  {
+    "google/executor.nvim",
+    config = true,
+    opts = {
+      use_split = true,
+      split = {
+        position = "right",
+      },
+    },
+    keys = {
+      {
+        key_executor,
+        "<CMD>ExecutorRun<CMD>",
+        mode = "n",
+        desc = "repl.gexec=> run",
       },
     },
   },
