@@ -422,7 +422,7 @@ return {
         winblend = 10,
         prompt_prefix = " ",
         selection_caret = " ",
-        initial_mode = "normal",
+        initial_mode = "insert",
         dynamic_preview_window = true,
         prompt_title = "scope::searching...",
       },
