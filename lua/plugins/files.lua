@@ -2,10 +2,10 @@
 local env = require("environment.ui")
 local keystems = require("environment.keys").stems
 
-local key_oil = keystems.oil
-local key_nnn = keystems.nnn
-local key_broot = keystems.broot
 local key_files = keystems.files
+local key_nnn = keystems.nnn
+local key_bolt = keystems.bolt
+local key_broot = keystems.broot
 local key_attempt = keystems.attempt
 local key_traveller = keystems.traveller
 
@@ -186,7 +186,7 @@ return {
     },
     keys = {
       {
-        key_oil .. "o",
+        key_files .. "o",
         function()
           return require("oil").open_float()
         end,
@@ -194,20 +194,12 @@ return {
         desc = "oil=> open oil (float)",
       },
       {
-        key_oil .. "O",
+        key_files .. "O",
         function()
           require("oil").open()
         end,
         mode = { "n" },
         desc = "oil=> open oil (not float)",
-      },
-      {
-        key_oil .. "q",
-        function()
-          require("oil").close()
-        end,
-        mode = { "n" },
-        desc = "oil=> close oil",
       },
       {
         "<leader>e",
@@ -419,6 +411,24 @@ return {
         end,
         mode = "n",
         desc = "fm.travel=> terminal mode",
+      },
+    },
+  },
+  {
+    "ripxorip/bolt.nvim",
+    build = ":UpdateRemotePlugins",
+    keys = {
+      {
+        key_bolt .. "o",
+        "<CMD>Bolt<CR>",
+        mode = "n",
+        desc = "fm.bolt=> open project root",
+      },
+      {
+        key_bolt .. "O",
+        "<CMD>BoltCwd<CR>",
+        mode = "n",
+        desc = "fm.bolt=> open cwd",
       },
     },
   },
