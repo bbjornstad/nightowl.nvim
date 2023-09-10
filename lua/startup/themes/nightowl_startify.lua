@@ -5,8 +5,8 @@ local inp = require("uutils.input")
 local user_bookmarks = vim.g.startup_bookmarks
 
 local bookmark_texts = {
-  " bookmarks =====>>=====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>",
-  "",
+  "====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>",
+  " bookmarks ====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>",
 }
 local user_bookmark_mappings = {}
 
@@ -66,7 +66,7 @@ local settings = {
     oldfiles_directory = false,
     align = "left",
     fold_section = true,
-    title = "recently edited (all)",
+    title = "recently edited (all) >>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>",
     margin = 32,
     content = "",
     highlight = "NightowlStartupEntry",
@@ -78,7 +78,7 @@ local settings = {
     oldfiles_directory = true,
     align = "left",
     fold_section = true,
-    title = "recently edited (cwd)",
+    title = "recently edited (cwd) >>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>",
     margin = 32,
     content = "",
     highlight = "NightowlStartupEntry",
@@ -96,7 +96,7 @@ local settings = {
     oldfiles_directory = false,
     align = "left",
     fold_section = true,
-    title = "convenience operations",
+    title = "convenient operations >>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>====>>",
     margin = 32,
     highlight = "NightowlStartupConvenience",
     content = {
