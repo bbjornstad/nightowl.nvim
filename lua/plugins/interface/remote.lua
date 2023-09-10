@@ -1,4 +1,4 @@
-local key_remote = require("environment.keys").stems.remote
+local key_remote = require("environment.keys").stems.base.remote
 
 return {
   {

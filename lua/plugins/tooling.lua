@@ -363,11 +363,12 @@ return {
   },
   {
     "rareitems/printer.nvim",
+    event = "VeryLazy",
     config = function(_, opts)
       require("printer").setup(opts)
     end,
     opts = {
-      keymap = "gp",
+      keymap = "gpp",
       behavior = "insert_below",
     },
   },
