@@ -62,6 +62,14 @@ local function diff_source()
   end
 end
 
+local function recording_status()
+  if not require("noice").api.status.mode.has() then
+    return
+  end
+  local recording = require("noice").api.status.mode.get()
+  return recording .. " | "
+end
+
 return {
   {
     "akinsho/bufferline.nvim",
@@ -87,7 +95,11 @@ return {
     opts = {
       render = function(props)
         return {
-          { require("wpm").historic_graph() },
+          { recording_status(), unpack(kcolors({ guifg = "dragon-red" })) },
+          {
+            require("wpm").historic_graph(),
+            unpack(kcolors({ guifg = "fujiWhite" })),
+          },
           { "  / 󰌓 " },
           { require("wpm").wpm() },
           { " | " },
