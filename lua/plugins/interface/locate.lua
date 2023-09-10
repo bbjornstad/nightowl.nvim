@@ -22,6 +22,7 @@ return {
   },
   {
     "lukas-reineke/indent-blankline.nvim",
+    event = "VeryLazy",
     init = function()
       vim.opt.list = true
       vim.opt.listchars:append("space:⋅")
