@@ -290,7 +290,11 @@ return {
             { name = "conventionalcommits", group_index = 1 },
             { name = "commit", group_index = 1 },
             { name = "gitcommit", group_index = 1 },
-            { name = "gitlog", group_index = 1, max_item_count = 5 },
+            {
+              name = "gitlog",
+              group_index = 1,
+              max_item_count = 5,
+            },
           }),
         }
       )
@@ -560,9 +564,16 @@ return {
   -- --------------
   { "hrsh7th/cmp-buffer", dependencies = { ncmp } },
   { "hrsh7th/cmp-path", dependencies = { ncmp } },
-  { "tzachar/cmp-fuzzy-path", dependencies = { ncmp, "tzachar/fuzzy.nvim" } },
+  {
+    "tzachar/cmp-fuzzy-path",
+    dependencies = { ncmp, "tzachar/fuzzy.nvim" },
+  },
   { "hrsh7th/cmp-cmdline", dependencies = { ncmp } },
-  { "hrsh7th/cmp-nvim-lua", dependencies = { ncmp }, ft = "lua" },
+  {
+    "hrsh7th/cmp-nvim-lua",
+    dependencies = { ncmp },
+    ft = "lua",
+  },
   { "hrsh7th/cmp-nvim-lsp-signature-help", dependencies = { ncmp } },
   { "hrsh7th/cmp-nvim-lsp-document-symbol", dependencies = { ncmp } },
   { "lukas-reineke/cmp-rg", dependencies = { ncmp } },
