@@ -26,11 +26,18 @@ return {
       auto_install = true,
       indent = { enable = true },
       highlight = { enable = true },
-      incremental_selection = { enable = false },
+      incremental_selection = {
+        enable = false,
+        keymaps = {
+          init_selection = "<A-CR>",
+          node_incremental = "<A-CR>",
+          node_decremental = "<A-BS>",
+        },
+      },
       autotag = {
         enable = true,
         enable_rename = true,
-        enable_close = true,
+        enablescope_incremental_close = true,
         enable_close_on_slash = true,
       },
       endwise = { enable = true },
@@ -41,11 +48,11 @@ return {
       },
       textsubjects = {
         enable = true,
-        prev_selection = "<C-<>", -- (Optional) keymap to select the previous selection
+        prev_selection = "gpp", -- (Optional) keymap to select the previous selection
         keymaps = {
-          ["."] = "textsubjects-smart",
-          [";"] = "textsubjects-container-outer",
-          ["i;"] = "textsubjects-container-inner",
+          ["gpN"] = "textsubjects-smart",
+          ["gpn"] = "textsubjects-container-outer",
+          ["gpi"] = "textsubjects-container-inner",
         },
       },
       refactor = {
@@ -111,8 +118,8 @@ return {
       },
       keymaps = {
         init_selection = "<S-CR>",
-        node_incremental = "<CR>",
-        node_decremental = "<BS>",
+        node_incremental = "<S-CR>",
+        node_decremental = "<S-BS>",
       },
       filetype_exclude = env.ft_ignore_list,
     },

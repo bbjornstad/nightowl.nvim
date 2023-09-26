@@ -3,14 +3,11 @@ local inp = require("uutils.input")
 local keystems = require("environment.keys").stems
 local key_pomodoro = keystems.pomodoro
 local key_overseer = keystems.overseer
-local key_do = keystems._do
-local key_conduct = keystems.conduct
 local key_taskorg = keystems.base.tasks
 local key_memento = keystems.memento
 local key_pulse = keystems.pulse
 local key_mountaineer = keystems.mountaineer
 local key_executor = keystems.executor
-local xtscope = require("uutils.scope").extendoscope
 
 return {
   {
@@ -57,67 +54,6 @@ return {
       overdue = "󱫧 overdue: ",
     },
     event = "VeryLazy",
-  },
-  {
-    "nocksock/do.nvim",
-    config = true,
-    cmd = { "Do", "Done", "DoEdit", "DoSave", "DoToggle" },
-    opts = {
-      message_timeout = 2000, -- how long notifications are shown
-      kaomoji_mode = 0, -- 0 kaomoji everywhere, 1 skip kaomoji in doing
-      winbar = false,
-      doing_prefix = " current:",
-      store = {
-        auto_create_file = true, -- automatically create a .do_tasks when calling :Do
-        file_name = ".taskmaster_do",
-      },
-    },
-    keys = {
-      {
-        key_do .. "t",
-        function()
-          vim.ui.input({
-            prompt = "Task Description: ",
-          }, function(input)
-            vim.cmd(string.format([[Do %s]], input))
-          end)
-        end,
-        mode = "n",
-        desc = "do=> add a task",
-      },
-      {
-        key_do .. "T",
-        function()
-          vim.cmd([[DoToggle]])
-        end,
-        mode = "n",
-        desc = "do=> toggle tasklist view",
-      },
-      {
-        key_do .. "w",
-        function()
-          vim.cmd([[DoSave]])
-        end,
-        mode = "n",
-        desc = "do=> save tasklist",
-      },
-      {
-        key_do .. "e",
-        function()
-          vim.cmd([[DoEdit]])
-        end,
-        mode = "n",
-        desc = "do=> edit tasklist in buffer",
-      },
-      {
-        key_do .. "d",
-        function()
-          vim.cmd([[Done!]])
-        end,
-        mode = "n",
-        desc = "do=> remove task from tasklist",
-      },
-    },
   },
   { "wakatime/vim-wakatime", event = { "VeryLazy" }, enabled = true },
   {
@@ -323,131 +259,6 @@ return {
         "<CMD>Telescope mountaineer<CR>",
         mode = "n",
         desc = "mail=> telescope view mail",
-      },
-    },
-  },
-  {
-    "aaditeynair/conduct.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    opts = {
-      functions = {},
-      presets = {},
-      hooks = {
-        before_session_save = function() end,
-        before_session_load = function() end,
-        after_session_load = function() end,
-        before_project_load = function() end,
-        after_project_load = function() end,
-      },
-    },
-    config = function(_, opts)
-      require("conduct").setup(opts)
-      require("telescope").load_extension("conduct")
-    end,
-    cmd = {
-      -- project commands
-      "ConductNewProject",
-      "ConductLoadProject",
-      "ConductLoadLastProject",
-      "ConductLoadCwdProject",
-      "ConductRenameProject",
-      "ConductDeleteProject",
-      "ConductLoadProjectConfig",
-      "ConductReloadProjectConfig",
-      -- session commands
-      "ConductProjectNewSession",
-      "ConductProjectLoadSession",
-      "ConductProjectDeleteSession",
-      "ConductProjectRenameSession",
-    },
-    keys = {
-      {
-        key_conduct .. "l",
-        inp.name([[ConductLoadProject %s]]),
-        mode = "n",
-        desc = "conduct=> load project",
-      },
-      {
-        key_conduct .. "L",
-        "<CMD>ConductLoadLastProject<CR>",
-        mode = "n",
-        desc = "conduct=> load last project",
-      },
-      {
-        key_conduct .. ".",
-        "<CMD>ConductLoadCwdProject<CR>",
-        mode = "n",
-        desc = "conduct=> load cwd project",
-      },
-      {
-        key_conduct .. "n",
-        inp.name([[ConductNewProject %s]]),
-        mode = "n",
-        desc = "conduct=> new project",
-      },
-      {
-        key_conduct .. "r",
-        "<CMD>ConductRenameProject<CR>",
-        mode = "n",
-        desc = "conduct=> rename project",
-      },
-      {
-        key_conduct .. "d",
-        inp.name([[ConductDeleteProject %s]]),
-        mode = "n",
-        desc = "conduct=> delete project",
-      },
-      {
-        key_conduct .. "cp",
-        inp.name([[ConductLoadProjectConfig %s]]),
-        mode = "n",
-        desc = "conduct=> load project config",
-      },
-      {
-        key_conduct .. "cr",
-        "<CMD>ConductReloadProjectConfig<CR>",
-        mode = "n",
-        desc = "conduct=> reload project config",
-      },
-      {
-        key_conduct .. "sn",
-        inp.name([[ConductProjectNewSession %s]]),
-        mode = "n",
-        desc = "conduct=> new session in project",
-      },
-      {
-        key_conduct .. "sl",
-        inp.name([[ConductProjectLoadSession %s]]),
-        mode = "n",
-        desc = "conduct=> load session in project",
-      },
-      {
-        key_conduct .. "sd",
-        inp.name([[ConductProjectDeleteSession %s]]),
-        mode = "n",
-        desc = "conduct=> delete session in project",
-      },
-      {
-        key_conduct .. "sr",
-        "<CMD>ConductProjectRenameSession<CR>",
-        mode = "n",
-        desc = "conduct=> rename session in project",
-      },
-      {
-        "<leader>fp",
-        function()
-          xtscope("conduct", "projects", {})
-        end,
-        mode = "n",
-        desc = "conduct=> projects",
-      },
-      {
-        "<leader>fs",
-        function()
-          xtscope("conduct", "sessions", {})
-        end,
-        mode = "n",
-        desc = "conduct=> sessions",
       },
     },
   },

@@ -1,4 +1,5 @@
 local env = require("environment.ui")
+local opt = require('environment.optional')
 local stems = require("environment.keys").stems
 local key_git = stems.git
 local key_undotree = stems.undotree
@@ -22,6 +23,7 @@ return {
   },
   {
     "jiaoshijie/undotree",
+    enabled = opt.undotree.enable,
     -- event = "VeryLazy",
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -95,6 +97,7 @@ return {
     cmd = { "GitBlameToggle", "GitBlameEnable" },
     init = function()
       vim.g.gitblame_delay = 1000
+      vim.g.gitblame_message_template = "<committer>@<committer-time>  󱛠 <summary>"
     end,
     keys = {
       {
@@ -199,7 +202,7 @@ return {
       vim.g.blamer_delay = 1000
       vim.g.blamer_show_in_visual_modes = 0
       vim.g.blamer_prefix = "  "
-      vim.g.blamer_template = "<committer>@<committer-time>  <summary>"
+      vim.g.blamer_template = "<committer>@<committer-time>  󱛠 <summary>"
       vim.g.blamer_relative_time = 1
     end,
     keys = {
@@ -242,6 +245,7 @@ return {
   },
   {
     "topaxi/gh-actions.nvim",
+    enabled = opt.gh_actions.enable,
     cmd = "GhActions",
     keys = {
       {

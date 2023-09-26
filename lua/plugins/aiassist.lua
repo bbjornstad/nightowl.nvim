@@ -1,13 +1,14 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local env = require("environment.ui")
 local aienv = require("environment.ai")
-local enb = aienv.enablements(aienv.enabled)
+local enb = aienv.enabled
 local notify_on_startup = require("environment.ai").status_notify_on_startup
 
 local stems = require("environment.keys").stems
 local key_ai = stems.base.ai
 local key_copilot = stems.copilot
-local key_hfllm = stems.hfllm
+local key_codeium = stems.codeium
+local key_llm = stems.llm
 local key_neural = stems.neural
 local key_chatgpt = stems.chatgpt
 local key_neoai = stems.neoai
@@ -17,13 +18,14 @@ local key_rgpt = stems.rgpt
 local key_cmpai = stems.cmp_ai
 local key_explain_it = stems.explain_it
 local key_tabnine = stems.tabnine
-local key_doctor = stems.doctor
-local key_llm = stems.llm
+local key_gllm = stems.gllm
 local key_backseat = stems.backseat
 local key_wtf = stems.wtf
 local key_prompter = stems.prompter
 local key_gptnvim = stems.gptnvim
 local key_ollero = stems.ollero
+local key_aider = stems.aider
+local key_accept_codeium = stems.accept
 
 -- show a menu, but only if the user has selected the appropriate option.
 -- This menu is supposed to inform the user which plugins might send -- their code off to an external service for analysis.
@@ -35,7 +37,7 @@ local function notify_agents()
 AI Plugin Status:
 -----------------
 
-  -> *huggingface*: %s
+  -> *llm[llm-ls]*: %s
   -> *codeium*: %s
   -> *tabnine*: %s (cmp-source: %s)
   -> *cmp_ai*: %s
@@ -47,7 +49,7 @@ AI Plugin Status:
   -> **ReviewGPT**: %s
   -> **naVi** %s
   -> **explain-it** %s
-  -> **llm**: %s
+  -> **gllm**: %s
   -> **backseat**: %s
   -> **wtf**: %s
   -> **prompter**: %s
@@ -62,7 +64,7 @@ AI Plugin Status:
 **plugin uses proprietary, non-free, non-open, or non-libre backend (namely ChatGPT)**
 ***plugin has both of the above listed attributes***
 ]],
-      enb.hfllm.enable,
+      enb.llm.enable,
       enb.codeium.enable,
       enb.tabnine.enable,
       enb.cmp_tabnine.enable,
@@ -75,8 +77,7 @@ AI Plugin Status:
       enb.rgpt.enable,
       enb.navi.enable,
       enb.explain_it.enable,
-      enb.llm.enable,
-      enb.doctor.enable,
+      enb.gllm.enable,
       enb.backseat.enable,
       enb.wtf.enable,
       enb.prompter.enable,
@@ -118,23 +119,68 @@ return {
         [key_neoai] = { name = "ai=> +neoai" },
         [key_chatgpt] = { name = "ai=> +chatgpt (openai original)" },
         [key_copilot] = { name = "ai=> +copilot" },
-        [key_hfllm] = { name = "ai=> +huggingface" },
+        [key_llm] = { name = "ai=> +huggingface" },
         [key_codegpt] = { name = "ai=> +codegpt" },
         [key_neural] = { name = "ai=> +neural" },
         [key_rgpt] = { name = "ai=> +rgpt" },
         [key_navi] = { name = "ai=> +navi" },
         [key_cmpai] = { name = "ai=> +cmp-ai" },
         [key_tabnine] = { name = "ai=> +tabnine" },
-        [key_llm] = { name = "ai=> +llms" },
+        [key_gllm] = { name = "ai=> +llms" },
         [key_explain_it] = { name = "ai=> +explain it" },
-        [key_doctor] = { name = "ai=> the doc is in" },
         -- TODO Add a few more of these baseline name mappings
         -- directly onto the which-key configuration here.
       },
     },
   },
   {
+    "Exafunction/codeium.vim",
+    event = "BufEnter",
+    config = function(_, opts)
+      vim.g.codeium_no_map_tab = not opts.accept_keybind == "<Tab>" or 0
+      local ignore_ft = {}
+      for _, v in pairs(opts.ignore_ft or {}) do
+        ignore_ft[v] = false
+      end
+      vim.g.codeium_filetypes = ignore_ft
+    end,
+    init = function()
+      vim.keymap.set(
+        "i",
+        stems.accept or "<C-;>",
+        function()
+          return vim.fn["codeium#Accept"]()
+        end,
+        { expr = true, desc = "ai.codeium=> accept suggestion", buffer = true }
+      )
+    end,
+    opts = {
+      ignore_ft = vim.list_extend({ "md", "norg", "org" }, env.ft_ignore_list),
+    },
+    keys = {
+      {
+        key_codeium .. "d",
+        "<CMD>CodeiumDisable<CR>",
+        mode = "n",
+        desc = "ai.codeium=> disable",
+      },
+      {
+        key_codeium .. "e",
+        "<CMD>CodeiumEnable<CR>",
+        mode = "n",
+        desc = "ai.codeium=> enable",
+      },
+      {
+        key_codeium .. "a",
+        "<CMD>Codeium Auth<CR>",
+        mode = "n",
+        desc = "ai.codeium=> authenticate",
+      },
+    },
+  },
+  {
     "jcdickinson/codeium.nvim",
+    event = "BufEnter",
     dependencies = {
       {
         "jcdickinson/http.nvim",
@@ -143,21 +189,22 @@ return {
       "nvim-lua/plenary.nvim",
     },
     cmd = "Codeium",
-    enabled = enb.codeium.enable,
+    enabled = false, --enb.codeium.enable,
   },
   {
     "huggingface/llm.nvim",
-    name = aienv.hf.llm.name or "llms",
+    name = aienv.hf.llm.name or "llm",
     opts = {
       model = aienv.hf.llm.model or "bigcode/starcoder",
+      model_eos = "<|endoftext|>",
       query_params = aienv.hf.llm.params or {
         max_new_tokens = 60,
-        temperature = 0.2,
+        temperature = 0.3,
         top_p = 0.95,
-        stop_token = "<|endoftext|>",
+        stop_tokens = nil,
       },
-      accept_keymap = "<C-=>",
-      dismiss_keymap = "<C-->",
+      accept_keymap = stems.accept,
+      dismiss_keymap = stems.cancel,
       fim = aienv.hf.llm.fim or {
         enabled = true,
         prefix = "<fim_prefix>",
@@ -166,28 +213,17 @@ return {
       },
       lsp = aienv.hf.llm.lsp
         or {
-          enabled = true,
           bin_path = vim.fs.normalize(
             vim.fs.joinpath(vim.fn.stdpath("data") .. "/llm_nvim/bin")
           ),
         },
+      context_window = 8192,
     },
-    enabled = enb.hfllm.enable,
-    cmd = { "HugMyFace", "LLMToggleAutoSuggest" },
-    init = function()
-      vim.api.nvim_create_user_command("HugMyFace", function()
-        require("lmm.completion").complete()
-      end, {})
-    end,
+    enabled = enb.llm.enable,
+    cmd = { "LLMToggleAutoSuggest" },
     keys = {
       {
-        key_hfllm .. "F",
-        "<CMD>LLMToggleAutoSuggest<CR>",
-        mode = "n",
-        desc = "ai.llm=> toggle insert mode autosuggest",
-      },
-      {
-        key_hfllm .. "a",
+        key_llm .. "a",
         "<CMD>LLMToggleAutoSuggest<CR>",
         mode = "n",
         desc = "ai.llm=> toggle insert mode autosuggest",
@@ -197,9 +233,7 @@ return {
   {
     "zbirenbaum/copilot.lua",
     enabled = enb.copilot.enable,
-    module = enb.copilot.enable,
     cmd = "Copilot",
-    -- event = { "InsertEnter" },
     opts = { suggestion = { enabled = true }, panel = { enabled = true } },
     keys = {
       {
@@ -242,7 +276,6 @@ return {
       "nvim-lua/plenary.nvim",
       -- "hrsh7th/nvim-cmp",
     },
-    event = "VeryLazy",
     config = function(_, opts)
       require("cmp_ai.config"):setup(vim.tbl_deep_extend("force", {
         max_lines = 1000,
@@ -748,20 +781,13 @@ return {
     },
   },
   {
-    "iagoleal/doctor.nvim",
-    enabled = enb.doctor.enable,
-    cmd = "TalkToTheDoctor",
-    keys = {
-      {
-        key_doctor,
-        "<CMD>TalkToTheDoctor<CR>",
-        mode = "n",
-        desc = "ai.doc=> talk to a fake doctor",
-      },
-    },
-  },
-  {
+    -- we have a name conflict on this plugin, due to the fact that HF renamed
+    -- their llm plugin to just llm like this one. We are making a deliberate
+    -- choice to try and minimize the amount of naming separation we have
+    -- between the two, so that more commands/keys are accessible under the llm
+    -- semantic-level
     "gsuuon/llm.nvim",
+    name = "gllm",
     cmd = {
       "Llm",
       "LlmSelect",
@@ -772,9 +798,9 @@ return {
       "LlmShow",
     },
     opts = function(_, opts)
-      opts.prompts = require("llm.util").module.autoload("prompt_library")
+      opts.prompts = require("gllm.util").module.autoload("prompt_library")
     end,
-    enabled = enb.llm.enable,
+    enabled = enb.gllm.enable,
     keys = {
       {
         key_llm .. "L",
@@ -796,7 +822,6 @@ return {
   },
   {
     "james1236/backseat.nvim",
-    event = "VeryLazy",
     cmd = { "Backseat", "BackseatAsk", "BackseatClear", "BackseatClearLine" },
     enabled = enb.backseat.enable,
     opts = {
@@ -840,7 +865,6 @@ return {
     dependencies = {
       "MunifTanjim/nui.nvim",
     },
-    event = "VeryLazy",
     cmd = { "Wtf", "WtfSearch" },
     opts = {
       openai_model_id = "gpt-4",
@@ -910,8 +934,40 @@ return {
     cmd = { "OpenAider" },
     opts = {},
     config = function(_, opts)
-      require("aider").setup(opts)
+      local aider = require("aider")
     end,
+    keys = {
+      {
+        key_aider .. "O",
+        function()
+          require("aider").OpenAider("aider", "float")
+        end,
+        mode = "n",
+        desc = "ai.aider=> open aider",
+      },
+      {
+        key_aider .. "o",
+        function()
+          require("aider").OpenAider(
+            "aider --show-diffs --no-auto-commits",
+            "float"
+          )
+        end,
+        mode = "n",
+        desc = "ai.aider=> open aider",
+      },
+      {
+        key_aider .. "3",
+        function()
+          require("aider").OpenAider(
+            "aider -3 --show-diffs --no-auto-commits",
+            "float"
+          )
+        end,
+        mode = "n",
+        desc = "ai.aider=> open aider",
+      },
+    },
   },
   {
     "juliusolson/gpt.nvim",
@@ -924,59 +980,48 @@ return {
   {
     "thmsmlr/gpt.nvim",
     enabled = enb.gptnvim.enable,
-    config = function(_, opts) end,
-    opts = {},
-    keys = {
-      {
+    config = function(_, opts)
+      require("gpt").setup(opts)
+      local kopts = function(op)
+        return vim.tbl_deep_extend(
+          "force",
+          { silent = true, noremap = true },
+          op
+        )
+      end
+      vim.keymap.set(
+        "v",
         key_gptnvim .. "r",
-        function()
-          require("gpt").replace()
-        end,
-        mode = "v",
-        desc = "ai.gpt=> replace selected",
-        silent = true,
-        noremap = true,
-      },
-      {
+        require("gpt").replace,
+        kopts({ desc = "ai.gpt=> replace selected" })
+      )
+      vim.keymap.set(
+        "v",
         key_gptnvim .. "v",
-        function()
-          require("gpt").visual_prompt()
-        end,
-        mode = "v",
-        desc = "ai.gpt=> visual prompt",
-        silent = false,
-        noremap = true,
-      },
-      {
+        require("gpt").visual_prompt,
+        kopts({ desc = "ai.gpt=> visual prompt" })
+      )
+      vim.keymap.set(
+        "i",
         key_gptnvim .. "p",
-        function()
-          require("gpt").prompt()
-        end,
-        mode = "i",
-        desc = "ai.gpt=> prompt",
-        silent = true,
-        noremap = true,
-      },
-      {
+        require("gpt").prompt,
+        kopts({ desc = "ai.gpt=> prompt" })
+      )
+      vim.keymap.set(
+        "n",
         key_gptnvim .. "c",
-        function()
-          require("gpt").cancel()
-        end,
-        mode = "n",
-        desc = "ai.gpt=> cancel",
-        silent = true,
-        noremap = true,
-      },
-      {
+        require("gpt").cancel,
+        kopts({ desc = "ai.gpt=> cancel" })
+      )
+      vim.keymap.set(
+        "n",
         key_gptnvim .. "p",
-        function()
-          require("gpt").prompt()
-        end,
-        mode = "n",
-        desc = "ai.gpt=> prompt",
-        silent = true,
-        noremap = true,
-      },
+        require("gpt").prompt,
+        kopts({ desc = "ai.gpt=> prompt" })
+      )
+    end,
+    opts = {
+      api_key = os.getenv("OPENAI_API_KEY"),
     },
   },
   {

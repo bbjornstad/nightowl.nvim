@@ -18,9 +18,7 @@ return {
       },
       triggers_nowait = {
         "g`",
-        "g'",
-        -- registers
-        '"',
+        "g'", -- registers '"',
         "<c-r>",
         -- spelling
         -- "z=",
@@ -50,12 +48,20 @@ return {
         [keystems.repl] = { name = "+repl-style" }, -- TODO Add a few more of these baseline name mappings -- directly onto the which-key configuration here.
         [keystems.fuzzy] = { name = "+fuzzy find with fzf" },
         [keystems.buffers] = { name = "+quitbuf utilities" },
-        [keystems.telescope] = { name = "+fuzzy find with telescope" },
+        [keystems.scope] = { name = "+fuzzy find with telescope" },
         [keystems.ui] = { name = "+user interface" },
         [keystems.code] = { name = "+act on code" },
         [keystems.fuzzy] = { name = "+fuzzy find with fzf" },
       },
     },
+    keys = {
+      {
+        "<C-g>h",
+        "<CMD>WhichKey '' i<CR>",
+        mode = "i",
+        desc = "which=> key help"
+      }
+    }
   },
   {
     "jokajak/keyseer.nvim",

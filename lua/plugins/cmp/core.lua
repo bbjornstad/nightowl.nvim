@@ -49,7 +49,7 @@ local function initialize_autocompletion()
 end
 
 local function kf(key, persisted_ctrl)
-  persisted_ctrl = persisted_ctrl or true
+  persisted_ctrl = persisted_ctrl or false
   local strfmt
   if persisted_ctrl then
     strfmt = "%s<C-%s>"
@@ -68,6 +68,7 @@ return {
   },
   {
     ncmp,
+    version = false,
     dependencies = {
       "VonHeikemen/lsp-zero.nvim",
       -- "onsails/lspkind.nvim",
@@ -104,27 +105,39 @@ return {
       "barklan/cmp-gitlog",
       "uga-rosa/cmp-latex-symbol",
       "octaltree/cmp-look",
+      {
+        "folke/which-key.nvim",
+        opts = function(_, opts)
+          opts.triggers_nowait =
+              vim.list_extend(opts.triggers_nowait, {
+                "<C-;>",
+                "<C-x>",
+              })
+        end,
+      },
     },
     init = function()
       vim.g.enable_cmp_completion = true
-      vim.g.enable_cmp_autocompletion = false
+      vim.g.enable_cmp_autocompletion = true
     end,
     opts = function(_, opts)
       opts = opts or {}
       opts.enabled = opts.enabled
-        or function()
-          return vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
-        end
+          or function()
+            return vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
+          end
       local cmp = require("cmp")
       local t_cmp = require("cmp.types")
       require("luasnip.loaders.from_vscode").lazy_load()
       require("luasnip.loaders.from_snipmate").lazy_load()
+
+      require("lsp-zero").extend_cmp()
       -- configure the display parameters for teh window, in particular
       -- changing the border and border padding options.
       opts.sources = opts.sources or {}
       opts.performance = vim.tbl_deep_extend("force", {
         debounce = 100,
-        max_view_entries = 200,
+        max_view_entries = 500,
       }, opts.performance or {})
 
       opts.window = vim.tbl_deep_extend("force", {
@@ -178,6 +191,10 @@ return {
         --   name = "dynamic",
         --   group_index = 1,
         -- },
+        {
+          name = "look",
+          group_index = 3,
+        },
         {
           name = "rg",
           keyword_length = 4,
@@ -286,10 +303,10 @@ return {
         { "gitconfig", "gitcommit", "gitattributes", "gitignore", "gitrebase" },
         {
           sources = vim.list_extend(vim.deepcopy(default_sources), {
-            { name = "git", group_index = 1 },
+            { name = "git",                 group_index = 1 },
             { name = "conventionalcommits", group_index = 1 },
-            { name = "commit", group_index = 1 },
-            { name = "gitcommit", group_index = 1 },
+            { name = "commit",              group_index = 1 },
+            { name = "gitcommit",           group_index = 1 },
             {
               name = "gitlog",
               group_index = 1,
@@ -306,13 +323,13 @@ return {
       cmp.setup.filetype({ "sass", "scss" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
           { name = "sass-variables", group_index = 1 },
-          { name = "cmp-tw2css", group_index = 1 },
+          { name = "cmp-tw2css",     group_index = 1 },
         }),
       })
       cmp.setup.filetype({ "lua" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
           { name = "nvim_lua", group_index = 1 },
-          { name = "plugins", group_index = 2 },
+          { name = "plugins",  group_index = 2 },
         }),
       })
 
@@ -320,11 +337,11 @@ return {
         { "markdown", "quarto", "org", "norg", "latex", "tex" },
         {
           sources = vim.list_extend(vim.deepcopy(default_sources), {
-            { name = "otter", group_index = 1 },
+            { name = "otter",             group_index = 1 },
             { name = "pandoc-references", group_index = 1 },
-            { name = "dictionary", group_index = 1 },
-            { name = "spell", group_index = 1 },
-            { name = "latex_symbol", group_index = 1 },
+            { name = "dictionary",        group_index = 1 },
+            { name = "spell",             group_index = 1 },
+            { name = "latex_symbol",      group_index = 1 },
           }),
         }
       )
@@ -345,201 +362,201 @@ return {
       -- submenus with more semantic meaning behind them for more directed
       -- completion results from specific sources.
       opts.mapping =
-        require("cmp").mapping.preset.insert(vim.tbl_deep_extend("force", {
-          ["<CR>"] = require("cmp").mapping({
-            i = function(fallback)
-              if
-                require("cmp").visible() and require("cmp").get_active_entry()
-              then
-                require("cmp").mapping.confirm({
-                  behavior = require("cmp").ConfirmBehavior.Replace,
-                  select = false,
-                })
-              else
-                fallback()
-              end
-            end,
-            s = require("cmp").mapping.confirm({ select = true }),
-            c = require("cmp").mapping.confirm({
-              behavior = require("cmp").ConfirmBehavior.Replace,
-              select = false,
+          require("cmp").mapping.preset.insert(vim.tbl_deep_extend("force", {
+            ["<CR>"] = require("cmp").mapping({
+              i = function(fallback)
+                if
+                    require("cmp").visible() and require("cmp").get_active_entry()
+                then
+                  require("cmp").mapping.confirm({
+                    behavior = require("cmp").ConfirmBehavior.Replace,
+                    select = false,
+                  })
+                else
+                  fallback()
+                end
+              end,
+              s = require("cmp").mapping.confirm({ select = true }),
+              c = require("cmp").mapping.confirm({
+                behavior = require("cmp").ConfirmBehavior.Replace,
+                select = true,
+              }),
             }),
-          }),
-          ["<Tab>"] = require("lsp-zero").cmp_action().luasnip_supertab(),
-          ["<S-Tab>"] = require("lsp-zero")
-            .cmp_action()
-            .luasnip_shift_supertab(),
-          ["<A-[>"] = require("lsp-zero").cmp_action().luasnip_jump_backward(),
-          ["<A-]>"] = require("lsp-zero").cmp_action().luasnip_jump_forward(),
-          ["<C-b>"] = require("cmp").mapping.scroll_docs(-4),
-          ["<C-f>"] = require("cmp").mapping.scroll_docs(4),
-          ["<C-x>"] = require("cmp").mapping.complete_common_string(),
-          ["<C-y>"] = require("cmp").mapping({
-            i = function(fallback)
-              if
-                require("cmp").visible() and require("cmp").get_active_entry()
-              then
-                require("cmp").mapping.confirm({
-                  behavior = require("cmp").ConfirmBehavior.Replace,
-                  select = false,
-                })
-              else
-                fallback()
-              end
-            end,
-          }),
-          ["<C-e>"] = require("cmp").mapping({
-            i = function(fallback)
-              if require("cmp").visible() then
-                require("cmp").abort()
-              else
-                fallback()
-              end
-            end,
-          }),
+            ["<Tab>"] = require("lsp-zero").cmp_action().luasnip_supertab(),
+            ["<S-Tab>"] = require("lsp-zero")
+                .cmp_action()
+                .luasnip_shift_supertab(),
+            ["<A-[>"] = require("lsp-zero").cmp_action().luasnip_jump_backward(),
+            ["<A-]>"] = require("lsp-zero").cmp_action().luasnip_jump_forward(),
+            ["<C-b>"] = require("cmp").mapping.scroll_docs(-4),
+            ["<C-f>"] = require("cmp").mapping.scroll_docs(4),
+            ["<A-x>"] = require("cmp").mapping.complete_common_string(),
+            ["<C-y>"] = require("cmp").mapping({
+              i = function(fallback)
+                if
+                    require("cmp").visible() and require("cmp").get_active_entry()
+                then
+                  require("cmp").mapping.confirm({
+                    behavior = require("cmp").ConfirmBehavior.Replace,
+                    select = false,
+                  })
+                else
+                  fallback()
+                end
+              end,
+            }),
+            ["<C-e>"] = require("cmp").mapping({
+              i = function(fallback)
+                if require("cmp").visible() then
+                  require("cmp").abort()
+                else
+                  fallback()
+                end
+              end,
+            }),
 
-          -- we are going to make a mapping that will allow us to access focused
-          -- groups of the completion menu with certain keystrokes. In particular, we
-          -- have that Ctrl+Space should be the way that we bring up a completion
-          -- menu. If we remap this so that it includes a submenu, we can have
-          -- individual keymappings to access, say for instance, the fonts completion
-          -- options specifically (C+o+f).
-          [kf("a")] = require("cmp").mapping({
-            i = function(fallback)
-              if
-                not require("cmp").mapping.complete({
-                  config = {
-                    sources = require("cmp").config.sources({
-                      { name = "codeium" },
-                      { name = "cmp_tabnine" },
-                    }),
-                  },
-                })
-              then
-                fallback()
-              end
-            end,
-          }),
-          [kf("g")] = require("cmp").mapping({
-            i = function(fallback)
-              if
-                not require("cmp").mapping.complete({
-                  config = {
-                    sources = require("cmp").mapping.sources({
-                      { name = "git" },
-                      { name = "conventionalcommits" },
-                      { name = "commit" },
-                    }),
-                  },
-                })
-              then
-                fallback()
-              end
-            end,
-          }),
-          [kf("s")] = require("cmp").mapping({
-            i = function(fallback)
-              if
-                not require("cmp").mapping.complete({
-                  config = {
-                    sources = require("cmp").config.sources({
-                      { name = "zsh" },
-                      { name = "fish" },
-                    }, {
-                      { name = "buffer" },
-                      { name = "rg" },
-                    }),
-                  },
-                })
-              then
-                fallback()
-              end
-            end,
-          }),
-          [kf("i")] = require("cmp").mapping({
-            i = function(fallback)
-              if
-                not require("cmp").mapping.complete({
-                  config = {
-                    sources = require("cmp").config.sources({
-                      {
-                        name = "fonts",
-                        option = { space_filter = "-" },
+            -- we are going to make a mapping that will allow us to access focused
+            -- groups of the completion menu with certain keystrokes. In particular, we
+            -- have that Ctrl+Space should be the way that we bring up a completion
+            -- menu. If we remap this so that it includes a submenu, we can have
+            -- individual keymappings to access, say for instance, the fonts completion
+            -- options specifically (C+o+f).
+            [kf("a")] = require("cmp").mapping({
+              i = function(fallback)
+                if
+                    not require("cmp").mapping.complete({
+                      config = {
+                        sources = require("cmp").config.sources({
+                          { name = "codeium" },
+                          { name = "cmp_tabnine" },
+                        }),
                       },
-                      { name = "nerdfont" },
-                      { name = "emoji" },
-                    }),
-                  },
-                })
-              then
-                fallback()
-              end
-            end,
-          }),
-          [kf("l")] = require("cmp").mapping({
-            i = function(fallback)
-              if
-                not require("cmp").mapping.complete({
-                  config = {
-                    sources = require("cmp").config.sources({
-                      { name = "nvim_lsp" },
-                      { name = "nvim_lsp_signature_help" },
-                      { name = "nvim_lsp_document_symbol" },
-                      { name = "luasnip" },
-                      { name = "dap" },
-                      { name = "diag-codes" },
-                    }),
-                  },
-                })
-              then
-                fallback()
-              end
-            end,
-          }),
-          [kf(".")] = require("cmp").mapping({
-            i = function(fallback)
-              if
-                not require("cmp").mapping.complete({
-                  config = {
-                    sources = require("cmp").config.sources({
-                      { name = "git" },
-                      { name = "path" },
-                      { name = "cmdline" },
-                      { name = "look" },
-                    }, {
-                      { name = "rg" },
-                      { name = "env" },
-                      { name = "buffer" },
-                    }),
-                  },
-                })
-              then
-                fallback()
-              end
-            end,
-          }),
-          [kf(":")] = require("cmp").mapping({
-            i = function(fallback)
-              if
-                not require("cmp").mapping.complete({
-                  config = {
-                    sources = require("cmp").config.sources({
-                      { name = "copilot" },
-                      { name = "codeium" },
-                      { name = "cmp_tabnine" },
-                      { name = "cmp_ai" },
-                      { name = "nvim_lsp" },
-                      { name = "nvim_lsp_signature_help" },
-                      { name = "nvim_lsp_document_symbol" },
-                    }),
-                  },
-                })
-              then
-                fallback()
-              end
-            end,
-          }),
-        }, opts.mapping or {}))
+                    })
+                then
+                  fallback()
+                end
+              end,
+            }),
+            [kf("g")] = require("cmp").mapping({
+              i = function(fallback)
+                if
+                    not require("cmp").mapping.complete({
+                      config = {
+                        sources = require("cmp").config.sources({
+                          { name = "git" },
+                          { name = "conventionalcommits" },
+                          { name = "commit" },
+                        }),
+                      },
+                    })
+                then
+                  fallback()
+                end
+              end,
+            }),
+            [kf("s")] = require("cmp").mapping({
+              i = function(fallback)
+                if
+                    not require("cmp").mapping.complete({
+                      config = {
+                        sources = require("cmp").config.sources({
+                          { name = "zsh" },
+                          { name = "fish" },
+                        }, {
+                          { name = "buffer" },
+                          { name = "rg" },
+                        }),
+                      },
+                    })
+                then
+                  fallback()
+                end
+              end,
+            }),
+            [kf("i")] = require("cmp").mapping({
+              i = function(fallback)
+                if
+                    not require("cmp").mapping.complete({
+                      config = {
+                        sources = require("cmp").config.sources({
+                          {
+                            name = "fonts",
+                            option = { space_filter = "-" },
+                          },
+                          { name = "nerdfont" },
+                          { name = "emoji" },
+                        }),
+                      },
+                    })
+                then
+                  fallback()
+                end
+              end,
+            }),
+            [kf("l")] = require("cmp").mapping({
+              i = function(fallback)
+                if
+                    not require("cmp").mapping.complete({
+                      config = {
+                        sources = require("cmp").config.sources({
+                          { name = "nvim_lsp" },
+                          { name = "nvim_lsp_signature_help" },
+                          { name = "nvim_lsp_document_symbol" },
+                          { name = "luasnip" },
+                          { name = "dap" },
+                          { name = "diag-codes" },
+                        }),
+                      },
+                    })
+                then
+                  fallback()
+                end
+              end,
+            }),
+            [kf(".")] = require("cmp").mapping({
+              i = function(fallback)
+                if
+                    not require("cmp").mapping.complete({
+                      config = {
+                        sources = require("cmp").config.sources({
+                          { name = "git" },
+                          { name = "path" },
+                          { name = "cmdline" },
+                          { name = "look" },
+                        }, {
+                          { name = "rg" },
+                          { name = "env" },
+                          { name = "buffer" },
+                        }),
+                      },
+                    })
+                then
+                  fallback()
+                end
+              end,
+            }),
+            [kf(":")] = require("cmp").mapping({
+              i = function(fallback)
+                if
+                    not require("cmp").mapping.complete({
+                      config = {
+                        sources = require("cmp").config.sources({
+                          { name = "copilot" },
+                          { name = "codeium" },
+                          { name = "cmp_tabnine" },
+                          { name = "cmp_ai" },
+                          { name = "nvim_lsp" },
+                          { name = "nvim_lsp_signature_help" },
+                          { name = "nvim_lsp_document_symbol" },
+                        }),
+                      },
+                    })
+                then
+                  fallback()
+                end
+              end,
+            }),
+          }, opts.mapping or {}))
     end,
     keys = {
       {
@@ -563,30 +580,30 @@ return {
   -- First Up: Core
   -- --------------
   { "hrsh7th/cmp-buffer", dependencies = { ncmp } },
-  { "hrsh7th/cmp-path", dependencies = { ncmp } },
+  { "hrsh7th/cmp-path",   dependencies = { ncmp } },
   {
     "tzachar/cmp-fuzzy-path",
     dependencies = { ncmp, "tzachar/fuzzy.nvim" },
   },
-  { "hrsh7th/cmp-cmdline", dependencies = { ncmp } },
+  { "hrsh7th/cmp-cmdline",                  dependencies = { ncmp } },
   {
     "hrsh7th/cmp-nvim-lua",
     dependencies = { ncmp },
     ft = "lua",
   },
-  { "hrsh7th/cmp-nvim-lsp-signature-help", dependencies = { ncmp } },
+  { "hrsh7th/cmp-nvim-lsp-signature-help",  dependencies = { ncmp } },
   { "hrsh7th/cmp-nvim-lsp-document-symbol", dependencies = { ncmp } },
-  { "lukas-reineke/cmp-rg", dependencies = { ncmp } },
-  { "rcarriga/cmp-dap", dependencies = { ncmp } },
-  { "hrsh7th/cmp-calc", dependencies = { ncmp } },
-  { "ray-x/cmp-treesitter", dependencies = { ncmp } },
-  { "bydlw98/cmp-env", dependencies = { ncmp } },
-  { "saadparwaiz1/cmp_luasnip", dependencies = { ncmp } },
-  { "JMarkin/cmp-diag-codes", dependencies = { ncmp } },
-  { "octaltree/cmp-look", dependencies = { ncmp } },
+  { "lukas-reineke/cmp-rg",                 dependencies = { ncmp } },
+  { "rcarriga/cmp-dap",                     dependencies = { ncmp } },
+  { "hrsh7th/cmp-calc",                     dependencies = { ncmp } },
+  { "ray-x/cmp-treesitter",                 dependencies = { ncmp } },
+  { "bydlw98/cmp-env",                      dependencies = { ncmp } },
+  { "saadparwaiz1/cmp_luasnip",             dependencies = { ncmp } },
+  { "JMarkin/cmp-diag-codes",               dependencies = { ncmp } },
+  { "octaltree/cmp-look",                   dependencies = { ncmp } },
   -- { "uga-rosa/cmp-dynamic", dependencies = { ncmp } },
-  { "uga-rosa/cmp-dictionary", dependencies = { ncmp } },
-  { "barklan/cmp-gitlog", dependencies = { ncmp } },
+  { "uga-rosa/cmp-dictionary",              dependencies = { ncmp } },
+  { "barklan/cmp-gitlog",                   dependencies = { ncmp } },
 
   -- Next Up: Filetype Specific
   -- -- git
@@ -616,7 +633,7 @@ return {
     dependencies = { ncmp },
   },
   -- -- shell items
-  { "tamago324/cmp-zsh", dependencies = { ncmp }, ft = "zsh" },
+  { "tamago324/cmp-zsh",  dependencies = { ncmp }, ft = "zsh" },
   { "mtoohey31/cmp-fish", dependencies = { ncmp }, ft = { "fish" } },
   -- -- other random stuff
   {
@@ -629,8 +646,8 @@ return {
     ft = { "markdown", "quarto", "org", "norg", "latex", "tex" },
     dependencies = { ncmp },
   },
-  { "Saecki/crates.nvim", dependencies = { ncmp }, ft = "rust" },
-  { "KadoBOT/cmp-plugins", ft = { "lua" }, dependencies = { ncmp } },
+  { "Saecki/crates.nvim",  dependencies = { ncmp }, ft = "rust" },
+  { "KadoBOT/cmp-plugins", ft = { "lua" },          dependencies = { ncmp } },
   {
     "uga-rosa/cmp-latex-symbol",
     ft = { "markdown", "quarto", "org", "norg", "latex", "tex" },
@@ -639,11 +656,10 @@ return {
 
   -- Next, AI tooling...these are selectively available but I'm not sure how to fix that.
   -- TODO figure out the above and determine what to do to fix the issue.
-  { "tzachar/cmp-ai", optional = true, dependencies = { ncmp } },
+  { "tzachar/cmp-ai",           optional = true, dependencies = { ncmp } },
   { "jcdickinson/codeium.nvim", optional = true, dependencies = { ncmp } },
-  { "zbirenbaum/copilot-cmp", optional = true, dependencies = { ncmp } },
-  { "tzachar/cmp-tabnine", optional = true, dependencies = { ncmp } },
-
+  { "zbirenbaum/copilot-cmp",   optional = true, dependencies = { ncmp } },
+  { "tzachar/cmp-tabnine",      optional = true, dependencies = { ncmp } },
   -- Lastly: Extra Things
   {
     "nat-418/cmp-color-names.nvim",
@@ -652,10 +668,10 @@ return {
     ft = { "html", "css", "js", "md", "org", "norg" },
     opts = {},
   },
-  { "hrsh7th/cmp-emoji", dependencies = { ncmp } },
+  { "hrsh7th/cmp-emoji",         dependencies = { ncmp } },
   { "chrisgrieser/cmp-nerdfont", dependencies = { ncmp } },
-  { "davidmh/cmp-nerdfonts", dependencies = { ncmp } },
-  { "amarakon/nvim-cmp-fonts", dependencies = { ncmp } },
-  { "f3fora/cmp-spell", dependencies = { ncmp } },
-  { "jcha0713/cmp-tw2css", dependencies = { ncmp } },
+  { "davidmh/cmp-nerdfonts",     dependencies = { ncmp } },
+  { "amarakon/nvim-cmp-fonts",   dependencies = { ncmp } },
+  { "f3fora/cmp-spell",          dependencies = { ncmp } },
+  { "jcha0713/cmp-tw2css",       dependencies = { ncmp } },
 }

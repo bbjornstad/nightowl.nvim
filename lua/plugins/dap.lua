@@ -70,7 +70,6 @@ return {
   },
   {
     "andrewferrier/debugprint.nvim",
-    event = "LspAttach",
     opts = {
       create_keymaps = false,
     },
@@ -80,6 +79,5 @@ return {
     "andythigpen/nvim-coverage",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = true,
-    event = "LspAttach",
   },
 }

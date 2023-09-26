@@ -1,9 +1,10 @@
 return {
   {
     "hrsh7th/nvim-cmp",
-    dependencies = { "onsails/lspkind.nvim" },
+    dependencies = { "VonHeikemen/lsp-zero.nvim", "onsails/lspkind.nvim" },
     opts = function(_, opts)
       local cmp = require("cmp")
+      local cmp_format = require("lsp-zero").cmp_format()
       --------------------------------------------------------------------------
       -- The following changes the appearance of the menu. Noted changes:
       -- - different row field order
@@ -21,7 +22,7 @@ return {
           maxwidth = 60,
           ellipsis_char = "",
         }),
-      }, opts.formatting or {})
+      }, vim.tbl_extend("force", cmp_format, opts.formatting or {}))
     end,
   },
 }

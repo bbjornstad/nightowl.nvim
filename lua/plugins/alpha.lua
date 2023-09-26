@@ -1,8 +1,10 @@
 -- vim: set ft=lua: --
 local env = require("environment.ui")
-local nightowl_splash = require("environment.startup").nightowl_splash
+local nightowl_splash = require("environment.alpha").nightowl_splash
 local nightowl_splash_frames =
-  require("environment.startup").nightowl_splash_frames
+    require("environment.alpha").nightowl_splash_frames
+local nightowl_splash_compact_frames =
+    require("environment.alpha").nightowl_splash_compact_frames
 
 local function ai_quote(opts)
   opts = opts or {}
@@ -15,7 +17,7 @@ return {
   },
   {
     "startup-nvim/startup.nvim",
-    lazy = false,
+    enabled = false,
     dependencies = {
       "nvim-telescope/telescope.nvim",
       "ibhagwan/fzf-lua",
@@ -64,8 +66,9 @@ return {
   },
   {
     "jovanlanik/fsplash.nvim",
+    event = "VeryLazy",
     config = true,
-    event = "FileType startup",
+    -- enabled = false,
     opts = {
       lines = nightowl_splash,
       autocmds = {
@@ -81,6 +84,7 @@ return {
   },
   {
     "willothy/veil.nvim",
+    event = "VimEnter",
     enabled = false,
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -89,17 +93,12 @@ return {
     opts = function()
       return {
         sections = {
-          -- builtin.sections.animated({
-          --   nightowl_splash,
-          -- }, {}),
-          require("veil.builtin").sections.animated(
-            nightowl_splash_frames,
-            -- builtin.headers.frames_days_of_week[os.date("%A")],
-            {
-              hl = "@constructor",
-              spacing = 2,
-            }
-          ),
+          -- require("veil.builtin").sections.animated(nightowl_splash_frames, {
+          --   hl = "@constructor",
+          -- }),
+          require("veil.builtin").sections.oldfiles({
+            align = "center",
+          }),
           require("veil.builtin").sections.buttons({
             {
               icon = "",
@@ -180,14 +179,12 @@ return {
               end,
             },
           }, { hl = "@string" }),
-          require("veil.builtin").sections.oldfiles(),
         },
         mappings = {},
         startup = true,
         listed = false,
       }
     end,
-    event = { "VimEnter" },
     config = function(_, opts)
       -- do somme stuff
       require("veil").setup(opts)

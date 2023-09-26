@@ -1,3 +1,4 @@
+-- vim: set ft=lua sts=2 ts=2 sw=2 et:
 local env = require("environment.ui")
 local kenv = require("environment.keys")
 local mapx = vim.keymap.set
@@ -8,9 +9,10 @@ local key_code_shot = kenv.stems.code_shot
 
 local utiliterm = require("environment.utiliterm")
 
-local inp = require("uutils.input")
-
 return {
+  {
+    "b0o/SchemaStore.nvim",
+  },
   {
     "akinsho/toggleterm.nvim",
     version = "*",
@@ -21,7 +23,7 @@ return {
         border = env.borders.main,
         winblend = 10,
       },
-      insert_mappings = false,
+      insert_mappings = true,
       terminal_mappings = true,
       autochdir = true,
       direction = "float",
@@ -75,25 +77,25 @@ return {
       -- custom terminal mappings go here.
       {
         key_cterm .. "b",
-        utiliterm.btop,
+        utiliterm.btop(),
         mode = "n",
         desc = "term.mon=> btop",
       },
       {
         key_cterm .. "t",
-        utiliterm.broot,
+        utiliterm.broot({ direction = "float" }),
         mode = "n",
         desc = "term.mon=> broot",
       },
       {
         key_cterm .. "s",
-        utiliterm.sysz,
+        utiliterm.sysz(),
         mode = "n",
         desc = "term.mon=> sysz",
       },
       {
         key_cterm .. "w",
-        utiliterm.weechat,
+        utiliterm.weechat(),
         mode = "n",
         desc = "term.mon=> weechat",
       },
@@ -104,7 +106,7 @@ return {
         local opts = { buffer = bufnr or 0 }
         mapx(
           "t",
-          "<esc>",
+          "<leader><esc>",
           [[<C-\><C-n>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
@@ -158,7 +160,7 @@ return {
         )
         mapx(
           "t",
-          "q",
+          [[<C-\><C-q>]],
           "<CMD>quit<CR>",
           vim.tbl_deep_extend("force", {
             remap = false,
@@ -244,7 +246,7 @@ return {
     "Wansmer/treesj",
     keys = {
       {
-        key_treesj .. "j",
+        key_treesj .. "p",
         function()
           require("treesj").toggle()
         end,
@@ -252,7 +254,7 @@ return {
         desc = "treesj=> toggle fancy splitjoin",
       },
       {
-        key_treesj .. "J",
+        key_treesj .. "j",
         function()
           require("treesj").join()
         end,
@@ -260,7 +262,7 @@ return {
         desc = "treesj=> join with splitjoin",
       },
       {
-        key_treesj .. "p",
+        key_treesj .. "s",
         function()
           require("treesj").split()
         end,
@@ -352,7 +354,7 @@ return {
     end,
     keys = {
       {
-        "<leader>sp",
+        "gsp",
         function()
           require("ssr").open()
         end,
@@ -363,12 +365,11 @@ return {
   },
   {
     "rareitems/printer.nvim",
-    event = "VeryLazy",
     config = function(_, opts)
       require("printer").setup(opts)
     end,
     opts = {
-      keymap = "gpp",
+      keymap = "<leader>dPp",
       behavior = "insert_below",
     },
   },
@@ -386,6 +387,39 @@ return {
     },
     opts = {
       cwd = true,
+    },
+    keys = {
+      {
+        -- "go substitute/replace"
+        "gsr",
+        "<CMD>MurenToggle<CR>",
+        mode = "n",
+        desc = "muren=> toggle replacer",
+      },
+      {
+        "gsR",
+        "<CMD>MurenOpen<CR>",
+        mode = "n",
+        desc = "muren=> open [!] replacer",
+      },
+      {
+        "gsq",
+        "<CMD>MurenClose<CR>",
+        mode = "n",
+        desc = "muren=> close [!] replacer",
+      },
+      {
+        "gsf",
+        "<CMD>MurenFresh<CR>",
+        mode = "n",
+        desc = "muren=> toggle replacer",
+      },
+      {
+        "gsu",
+        "<CMD>MurenUnique<CR>",
+        mode = "n",
+        desc = "muren=> toggle replacer",
+      },
     },
   },
 }

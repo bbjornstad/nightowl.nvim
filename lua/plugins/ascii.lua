@@ -295,7 +295,6 @@ return {
   },
   {
     "samodostal/image.nvim",
-    event = "VeryLazy",
     dependencies = { "nvim-lua/plenary.nvim", "m00qek/baleia.nvim" },
     opts = {
       render = {
@@ -360,7 +359,7 @@ return {
             { noremap = true }
           )
         else
-          vim.cmd([[setlocal ve=]])
+          vim.cmd([[setlocal virtualedit]])
           vim.cmd([[mapclear <buffer>]])
           vim.b.venn_enabled = nil
         end
@@ -368,8 +367,8 @@ return {
       -- toggle keymappings for venn using <leader>v
       vim.api.nvim_set_keymap(
         "n",
-        "<leader>V",
-        "<CMD>lua ToggleVenn()<CR>",
+        "V",
+        key_editor .. "<CMD>lua ToggleVenn()<CR>",
         { noremap = true }
       )
     end,

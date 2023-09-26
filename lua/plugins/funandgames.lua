@@ -1,4 +1,5 @@
 local env = require("environment.ui")
+local opt = require('environment.optional')
 
 return {
   {
@@ -62,7 +63,7 @@ return {
   },
   {
     "tamton-aquib/zone.nvim",
-    enabled = env.screensaver.enabled,
+    enabled = opt.screensaver.enable,
     cmd = {
       "Treadmill",
       "DVD",
@@ -70,23 +71,21 @@ return {
       "Vanish",
     },
     opts = {
-      style = env.screensaver.selections[math.random(
-        #env.screensaver.selections
+      style = opt.screensaver.selections[math.random(
+        #opt.screensaver.selections
       )],
       after = 6000,
       exclude_filetypes = env.ft_ignore_list,
       treadmill = {
         direction = "left",
         headache = true,
-        tick_time = 30, -- Lower, the faster
-        -- Opts for Treadmill style
+        tick_time = 500, -- Lower, the faster
       },
       epilepsy = {
         stage = "aura", -- "aura" or "ictal"
         tick_time = 100,
       },
       dvd = {
-        -- text = {"line1", "line2", "line3", "etc"}
         tick_time = 100,
       },
       -- Opts for Dvd style

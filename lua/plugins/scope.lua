@@ -3,7 +3,7 @@
 -- opposed to the global telescope setup.
 -- TODO update the keymappings so that FZF-lua is preferred in most cases for
 -- performance reasons.
-local key_scope = require("environment.keys").stems.telescope
+local key_scope = require("environment.keys").stems.base.scope
 local key_notice = require("environment.keys").stems.notice
 local util = require("lazyvim.util")
 
@@ -136,9 +136,9 @@ local extspec = scopeutils.setup_extensions(target_extensions, {
   tasks = {
     theme = "ivy",
     output = {
-      style = "float", -- "split" | "float" | "tab"
+      style = "float",   -- "split" | "float" | "tab"
       layout = "center", -- "left" | "right" | "center" | "below" | "above"
-      scale = 0.6, -- output window to editor size ratio
+      scale = 0.6,       -- output window to editor size ratio
       -- NOTE: scale and "center" layout are only relevant when style == "float"
     },
   },
@@ -160,251 +160,6 @@ return {
   },
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = {
-      "BurntSushi/ripgrep",
-      {
-        "https://git.sr.ht/~havi/telescope-toggleterm.nvim",
-        dependencies = {
-          "akinsho/toggleterm.nvim",
-          "nvim-telescope/telescope.nvim",
-          "nvim-lua/popup.nvim",
-          "nvim-lua/plenary.nvim",
-        },
-        event = "TermOpen",
-        config = function()
-          require("telescope").load_extension("toggleterm")
-        end,
-      },
-      {
-        "nvim-telescope/telescope-fzf-native.nvim",
-        build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release; cmake --build build --config Release; cmake --install build --prefix build",
-        dependencies = { "junegunn/fzf", "junegunn/fzf.vim" },
-        config = function()
-          require("telescope").load_extension("fzf")
-        end,
-      },
-      {
-        "nvim-telescope/telescope-file-browser.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("file_browser")
-        end,
-      },
-      {
-        "cljoly/telescope-repo.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("repo")
-        end,
-      },
-      {
-        "LinArcX/telescope-env.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("env")
-        end,
-      },
-      {
-        "LinArcX/telescope-changes.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("changes")
-        end,
-      },
-      {
-        "LinArcX/telescope-command-palette.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("command_palette")
-        end,
-      },
-      {
-        "tsakirist/telescope-lazy.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("lazy")
-        end,
-      },
-      {
-        "octarect/telescope-menu.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("menu")
-        end,
-      },
-      {
-        "smartpde/telescope-recent-files",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("recent_files")
-        end,
-      },
-      {
-        "MaximilianLloyd/adjacent.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("adjacent")
-        end,
-      },
-      {
-        "benfowler/telescope-luasnip.nvim",
-        module = "telescope._extensions.luasnip",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("luasnip")
-        end,
-      },
-      {
-        "crispgm/telescope-heading.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("heading")
-        end,
-      },
-      {
-        "nvim-telescope/telescope-project.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("project")
-        end,
-      },
-      {
-        "jvgrootveld/telescope-zoxide",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("zoxide")
-        end,
-      },
-      {
-        "nvim-telescope/telescope-dap.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("dap")
-        end,
-      },
-      {
-        "nvim-telescope/telescope-symbols.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function() end,
-      },
-      {
-        "ghassan0/telescope-glyph.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("glyph")
-        end,
-      },
-      {
-        "nvim-telescope/telescope-frecency.nvim",
-        dependencies = {
-          "kkharji/sqlite.lua",
-          "nvim-tree/nvim-web-devicons",
-          "nvim-telescope/telescope.nvim",
-        },
-        config = function()
-          require("telescope").load_extension("frecency")
-        end,
-      },
-      {
-        "nvim-telescope/telescope-media-files.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("media_files")
-        end,
-      },
-      {
-        "olacin/telescope-cc.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("conventional_commits")
-        end,
-      },
-      {
-        "HUAHUAI23/telescope-session.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("xray23")
-        end,
-      },
-      {
-        "paopaol/telescope-git-diffs.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("git_diffs")
-        end,
-      },
-      {
-        "debugloop/telescope-undo.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("undo")
-        end,
-      },
-      {
-        "princejoogie/dir-telescope.nvim",
-        opts = {
-          hidden = true,
-          no_ignore = false,
-          show_preview = true,
-        },
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = true,
-      },
-      {
-        "nat-418/telescope-color-names.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("color_names")
-        end,
-      },
-      {
-        "keyvchan/telescope-find-pickers.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("find_pickers")
-        end,
-      },
-      {
-        "AckslD/nvim-neoclip.lua",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("neoclip")
-        end,
-      },
-      {
-        "barrett-ruth/telescope-http.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("http")
-        end,
-      },
-      {
-        "LinArcX/telescope-ports.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        config = function()
-          require("telescope").load_extension("ports")
-        end,
-      },
-      {
-        "prochri/telescope-all-recent.nvim",
-        dependencies = {
-          "nvim-telescope/telescope.nvim",
-        },
-        config = function()
-          require("telescope-all-recent").setup({
-            default = {
-              sorting = "frecency",
-            },
-          })
-        end,
-      },
-      {
-        "lpoto/telescope-tasks.nvim",
-        config = function()
-          require("telescope").load_extension("tasks")
-        end,
-      },
-    },
     opts = {
       defaults = {
         layout_stragegy = "bottom_pane",
@@ -428,6 +183,9 @@ return {
       },
       pickers = pickspec,
       extensions = extspec,
+    },
+    dependencies = {
+      "BurntSushi/ripgrep",
     },
     keys = {
       ---
@@ -590,5 +348,248 @@ return {
         desc = "scope=> search tasks",
       },
     },
+  },
+  {
+    "https://git.sr.ht/~havi/telescope-toggleterm.nvim",
+    dependencies = {
+      "akinsho/toggleterm.nvim",
+      "nvim-telescope/telescope.nvim",
+      "nvim-lua/popup.nvim",
+      "nvim-lua/plenary.nvim",
+    },
+    event = "TermOpen",
+    config = function()
+      require("telescope").load_extension("toggleterm")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-fzf-native.nvim",
+    build =
+    "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release; cmake --build build --config Release; cmake --install build --prefix build",
+    dependencies = { "junegunn/fzf", "junegunn/fzf.vim" },
+    config = function()
+      require("telescope").load_extension("fzf")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-file-browser.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("file_browser")
+    end,
+  },
+  {
+    "cljoly/telescope-repo.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("repo")
+    end,
+  },
+  {
+    "LinArcX/telescope-env.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("env")
+    end,
+  },
+  {
+    "LinArcX/telescope-changes.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("changes")
+    end,
+  },
+  {
+    "LinArcX/telescope-command-palette.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("command_palette")
+    end,
+  },
+  {
+    "tsakirist/telescope-lazy.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("lazy")
+    end,
+  },
+  {
+    "octarect/telescope-menu.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("menu")
+    end,
+  },
+  {
+    "smartpde/telescope-recent-files",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("recent_files")
+    end,
+  },
+  {
+    "MaximilianLloyd/adjacent.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("adjacent")
+    end,
+  },
+  {
+    "benfowler/telescope-luasnip.nvim",
+    module = "telescope._extensions.luasnip",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("luasnip")
+    end,
+  },
+  {
+    "crispgm/telescope-heading.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("heading")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-project.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("project")
+    end,
+  },
+  {
+    "jvgrootveld/telescope-zoxide",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("zoxide")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-dap.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("dap")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-symbols.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function() end,
+  },
+  {
+    "ghassan0/telescope-glyph.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("glyph")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-frecency.nvim",
+    dependencies = {
+      "kkharji/sqlite.lua",
+      "nvim-tree/nvim-web-devicons",
+      "nvim-telescope/telescope.nvim",
+    },
+    config = function()
+      require("telescope").load_extension("frecency")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-media-files.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("media_files")
+    end,
+  },
+  {
+    "olacin/telescope-cc.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("conventional_commits")
+    end,
+  },
+  {
+    "HUAHUAI23/telescope-session.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("xray23")
+    end,
+  },
+  {
+    "paopaol/telescope-git-diffs.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("git_diffs")
+    end,
+  },
+  {
+    "debugloop/telescope-undo.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("undo")
+    end,
+  },
+  {
+    "princejoogie/dir-telescope.nvim",
+    opts = {
+      hidden = true,
+      no_ignore = false,
+      show_preview = true,
+    },
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = true,
+  },
+  {
+    "nat-418/telescope-color-names.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("color_names")
+    end,
+  },
+  {
+    "keyvchan/telescope-find-pickers.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("find_pickers")
+    end,
+  },
+  {
+    "AckslD/nvim-neoclip.lua",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("neoclip")
+    end,
+  },
+  {
+    "barrett-ruth/telescope-http.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("http")
+    end,
+  },
+  {
+    "LinArcX/telescope-ports.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function()
+      require("telescope").load_extension("ports")
+    end,
+  },
+  {
+    "prochri/telescope-all-recent.nvim",
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+    },
+    config = function()
+      require("telescope-all-recent").setup({
+        default = {
+          sorting = "frecency",
+        },
+      })
+    end,
+  },
+  {
+    "lpoto/telescope-tasks.nvim",
+    config = function()
+      require("telescope").load_extension("tasks")
+    end,
   },
 }

@@ -32,16 +32,16 @@ end
 return { -- add folding range to capabilities
   {
     "neovim/nvim-lspconfig",
-    opts = {
-      capabilities = {
+    opts = function(_, opts)
+      opts.capabilities = vim.tbl_deep_extend("force", opts.capabilities or {}, {
         textDocument = {
           foldingRange = {
             dynamicRegistration = false,
             lineFoldingOnly = true,
-          },
-        },
-      },
-    },
+          }
+        }
+      })
+    end,
   },
   {
     "milisims/foldhue.nvim",
@@ -167,10 +167,10 @@ return { -- add folding range to capabilities
       add_close_pattern = true, -- true, 'last_line' or false
 
       matchup_patterns = {
-        { "{", "}" },
+        { "{",  "}" },
         { "%(", ")" }, -- % to escape lua pattern char
         { "%[", "]" }, -- % to escape lua pattern char
-        { "<", ">" },
+        { "<",  ">" },
       },
 
       ft_ignore = mopts({ "neorg" }, env.ft_ignore_list, "suppress"),
@@ -191,44 +191,12 @@ return { -- add folding range to capabilities
     event = "CursorHold",
     config = true,
     opts = {
-      offset = -6,
+      offset = 2,
       foldsigns = {
         close = "⌐",
         open = "⌙",
         seps = { "│", "┃" },
       },
-    },
-  },
-  {
-    "anuvyklack/fold-preview.nvim",
-    event = "BufEnter",
-    dependencies = {
-      "anuvyklack/keymap-amend.nvim",
-      "neovim/nvim-lspconfig",
-    },
-    config = function(_, opts)
-      local fp = require("fold-preview")
-      local map = fp.mapping
-      local keymap = vim.keymap
-      keymap.amend = require("keymap-amend")
-      fp.setup(mopts({
-        default_keybindings = false,
-      }, opts))
-      keymap.amend("n", "K", function(original)
-        if not fp.toggle_preview() then
-          original()
-        end
-      end)
-      keymap.amend("n", "h", map.close_preview_open_fold)
-      keymap.amend("n", "l", map.close_preview_open_fold)
-      keymap.amend("n", "zo", map.close_preview)
-      keymap.amend("n", "zO", map.close_preview)
-      keymap.amend("n", "zc", map.close_preview_without_defer)
-      keymap.amend("n", "zR", map.close_preview)
-      keymap.amend("n", "zM", map.close_preview_without_defer)
-    end,
-    opts = {
-      border = env.borders.main,
     },
   },
 }

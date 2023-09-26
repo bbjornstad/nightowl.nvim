@@ -78,31 +78,44 @@ return {
           TreesitterContextBottom = { underline = true },
           NightowlContextHints = {
             italic = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,
+            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette
+            .springViolet2,
+          },
+          NightowlContextHintsBright = {
+            italic = true,
+            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette
+            .dragonBlue,
           },
           NightowlStartupEntry = {
             bold = false,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,
+            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette
+            .springViolet2,
           },
           NightowlStartupHeader = {
             bold = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.waveRed,
+            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette
+            .waveRed,
           },
           NightowlStartupConvenience = {
             bold = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.waveBlue2,
+            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette
+            .waveBlue2,
           },
         }
       end,
     },
   },
   {
-    "projekt0n/github-nvim-theme",
+    "lewpoly/sherbet.nvim",
     config = function(_, opts)
-      require("github-theme").setup(opts)
+      vim.g.sherbet_italic_keywords = false
+      vim.g.sherbet_italic_functions = true
+      vim.g.sherbet_italic_comments = true
+      vim.g.sherbet_italic_loops = true
+      vim.g.sherbet_italic_conditionals = true
     end,
     lazy = true,
-    priority = 901,
+    priority = 997
   },
   {
     "rose-pine/neovim",
@@ -156,11 +169,6 @@ return {
     },
   },
   {
-    "antonk52/lake.nvim",
-    priority = 995,
-    lazy = true,
-  },
-  {
     "Verf/deepwhite.nvim",
     lazy = true,
     priority = 890,
@@ -171,29 +179,5 @@ return {
       low_blue_light = true,
     },
   },
-  {
-    "wuelnerdotexe/vim-enfocado",
-    lazy = true,
-    priority = 997,
-    config = function()
-      vim.g.enfocado_style = "nature"
-    end,
-  },
-  {
-    "nyoom-engineering/oxocarbon.nvim",
-    lazy = true,
-    priority = 996,
-    config = function() end,
-  },
-  {
-    "olimorris/onedarkpro.nvim",
-    lazy = true,
-    priority = 992,
-    opts = {},
-    config = function(_, opts)
-      require("onedarkpro").setup(opts)
-    end,
-  },
-
   { "LazyVim/LazyVim", opts = { colorscheme = env.default_colorscheme } },
 }
