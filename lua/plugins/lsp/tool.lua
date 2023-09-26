@@ -1,10 +1,12 @@
 local keystems = require("environment.keys").stems
 local env = require("environment.ui")
+local opt = require('environment.optional')
 local key_vista = keystems.vista
 local key_aerial = key_vista .. "a"
 local key_lens = keystems.lens
 local key_ui = keystems.base.ui
 local key_cp = keystems.control_panel
+local key_lsp = require("environment.keys").stems.base.lsp
 
 return {
   {
@@ -13,7 +15,7 @@ return {
     event = "LspAttach",
     opts = function(_, opts)
       vim.diagnostic.config({
-        virtual_text = false,
+        uvirtual_text = false,
         virtual_lines = { only_current_line = true },
       })
     end,
@@ -30,7 +32,6 @@ return {
   },
   {
     "stevearc/aerial.nvim",
-    event = "LspAttach",
     opts = {
       layout = {
         max_width = { 36, 0.2 },
@@ -121,43 +122,42 @@ return {
         key_aerial .. "a",
         "<CMD>AerialToggle<CR>",
         mode = "n",
-        desc = "vista=> toggle symbols outline",
+        desc = "symb=> toggle symbols outline",
       },
       {
         key_aerial .. "q",
         "<CMD>AerialClose<CR>",
         mode = "n",
-        desc = "vista=> close symbols outline",
+        desc = "symb=> close symbols outline",
       },
       {
         key_aerial .. "o",
         "<CMD>AerialOpen<CR>",
         mode = "n",
-        desc = "vista=> open symbols outline",
+        desc = "symb=> open symbols outline",
       },
       {
         key_aerial .. "A",
         "<CMD>AerialToggle<CR>",
         mode = "n",
-        desc = "vista=> toggle[!] symbols outline",
+        desc = "symb=> toggle[!] symbols outline",
       },
       {
         key_aerial .. "Q",
         "<CMD>AerialClose<CR>",
         mode = "n",
-        desc = "vista=> close[!] symbols outline",
+        desc = "symb=> close[!] symbols outline",
       },
       {
         key_aerial .. "O",
         "<CMD>AerialOpen<CR>",
         mode = "n",
-        desc = "vista=> open[!] symbols outline",
+        desc = "symb=> open[!] symbols outline",
       },
     },
   },
   {
     "simrat39/symbols-outline.nvim",
-    event = "LspAttach",
     cmd = { "SymbolsOutline", "SymbolsOutlineOpen", "SymbolsOutlineClose" },
     opts = {
       highlight_hovered_item = true,
@@ -207,7 +207,7 @@ return {
     "VidocqH/lsp-lens.nvim",
     opts = {
       enable = true,
-      include_declaration = true,
+      include_declaration = false,
       sections = {
         definition = true,
         references = true,
@@ -240,6 +240,7 @@ return {
   },
   {
     "code-biscuits/nvim-biscuits",
+    enabled = false,
     event = "LspAttach",
     dependencies = {
       {
@@ -248,9 +249,10 @@ return {
       },
     },
     opts = {
+      cursor_line_only = true,
       default_config = {
-        prefix_string = " 󰟵 󰙔 ",
-        max_length = 12,
+        prefix_string = " 󰡱 󱛠 ",
+        max_length = 10,
         min_distance = 3,
         trim_by_words = true,
       },
@@ -269,40 +271,39 @@ return {
       require("nvim-biscuits").setup(opts)
     end,
   },
-  -- {
-  --   "haringsrob/nvim_context_vt",
-  --   dependencies = { "nvim-treesitter/nvim-treesitter" },
-  --   event = "LspAttach",
-  --   config = true,
-  --   opts = {
-  --     enabled = true,
-  --     prefix = " 󰁭 󰟵 󰙔 ",
-  --     disable_ft = env.ft_ignore_list,
-  --     min_rows = 0,
-  --     highlight = "NightowlContextHints",
-  --   },
-  --   keys = {
-  --     {
-  --       key_ui .. "vt",
-  --       "<CMD>NvimContextVtToggle<CR>",
-  --       mode = "n",
-  --       desc = "virt=> inline context toggle",
-  --     },
-  --     {
-  --       key_ui .. "vb",
-  --       "<CMD>NvimContextVtDebug<CR>",
-  --       mode = "n",
-  --       desc = "virt=> inline context debug",
-  --     },
-  --   },
-  -- },
+  {
+    "haringsrob/nvim_context_vt",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = "LspAttach",
+    config = true,
+    opts = {
+      enabled = true,
+      prefix = " 󰡱 󰟵 ",
+      disable_ft = env.ft_ignore_list,
+      min_rows = 0,
+      highlight = "NightowlContextHintsBright",
+    },
+    keys = {
+      {
+        key_ui .. "vt",
+        "<CMD>NvimContextVtToggle<CR>",
+        mode = "n",
+        desc = "virt=> inline context toggle",
+      },
+      {
+        key_ui .. "vb",
+        "<CMD>NvimContextVtDebug<CR>",
+        mode = "n",
+        desc = "virt=> inline context debug",
+      },
+    },
+  },
   {
     "utilyre/sentiment.nvim",
     version = "*",
     event = "LspAttach", -- keep for lazy loading
     opts = {
       pairs = {
-        { "<CMD>", "<CR>" },
         { "(", ")" },
         { "{", "}" },
         { "[", "]" },
@@ -315,33 +316,33 @@ return {
     end,
   },
   {
-    "jubnzv/virtual-types.nvim",
-    event = "LspAttach",
-  },
-  {
     "echasnovski/mini.operators",
     event = "VeryLazy",
     version = false,
+    config = function(_, opts)
+      require('mini.operators').setup(opts)
+    end,
     opts = {
       evaluate = {
-        prefix = "g=",
+        prefix = "gE",
       },
       exchange = {
-        prefix = "gx",
+        prefix = "gX",
       },
       multiply = {
-        prefix = "gm",
+        prefix = "gM",
       },
       replace = {
         prefix = "gR",
       },
       sort = {
-        prefix = "gs",
+        prefix = "gS",
       },
     },
   },
   {
     "ivanjermakov/troublesum.nvim",
+    enabled = opt.troublesum.enable,
     event = "LspAttach",
     opts = {
       enabled = true,
@@ -353,38 +354,6 @@ return {
     config = function(_, opts)
       -- require("troublesum").override_config(opts)
       require("troublesum").setup(opts)
-    end,
-  },
-  {
-    "roobert/action-hints.nvim",
-    event = "LspAttach",
-    opts = {
-      template = {
-        definition = {
-          text = " ",
-          color = require("kanagawa.colors").setup({ theme = "wave" }).theme.ui.fg,
-        },
-        references = {
-          text = "  ↱ %s",
-          color = require("kanagawa.colors").setup({ theme = "wave" }).theme.ui.fg,
-        },
-      },
-      use_virtual_text = true,
-    },
-    init = function()
-      vim.api.nvim_set_hl(
-        0,
-        "ActionHintsDefinition",
-        { link = "NightowlContextHints" }
-      )
-      vim.api.nvim_set_hl(
-        0,
-        "ActionHintsReferences",
-        { link = "NightowlContextHints" }
-      )
-    end,
-    config = function(_, opts)
-      require("action-hints").setup(opts)
     end,
   },
   {
@@ -418,48 +387,40 @@ return {
     },
   },
   {
-    "mhanberg/control-panel.nvim",
-    event = "LspAttach",
+    "mhanberg/output-panel.nvim",
+    cmd = "OutputPanel",
     config = function(_, opts)
-      local cp = require("control_panel")
-      cp.register({
-        id = "output-panel",
-        title = "Output Panel",
-      })
-
-      local handler = vim.lsp.handlers["window/logMessage"]
-
-      vim.lsp.handlers["window/logMessage"] = function(err, result, context)
-        handler(err, result, context)
-        if not err then
-          local client_id = context.client_id
-          local client = vim.lsp.get_client_by_id(client_id)
-          if client ~= nil then
-            if not cp.panel("output-panel"):has_tab(client.name) then
-              cp.panel("output-panel"):tab({
-                name = client.name,
-                key = tostring(#cp.panel("output-panel"):tabs() + 1),
-              })
-            end
-
-            cp.panel("output-panel"):append({
-              tab = client.name,
-              text = "["
-                .. vim.lsp.protocol.MessageType[result.type]
-                .. "] "
-                .. result.message,
-            })
-          end
-        end
-      end
+      require("output_panel").setup()
     end,
-    opts = {},
     keys = {
       {
         key_cp,
-        "<CMD>ControlPanel toggle output-panel",
+        "<CMD>OutputPanel<CR>",
         mode = "n",
-        desc = "lsp=> toggle control panel",
+        desc = "lsp=> toggle log panel",
+      },
+    },
+  },
+  {
+    "adoyle-h/lsp-toggle.nvim",
+    dependencies = {
+      "neovim/nvim-lspconfig",
+      "nvim-telescope/telescope.nvim",
+    },
+    opts = { create_cmds = true, telescope = true },
+    config = true,
+    keys = {
+      {
+        key_lsp .. "g",
+        "<CMD>ToggleLSP<CR>",
+        mode = "n",
+        desc = "lsp=> toggle buffer server",
+      },
+      {
+        key_lsp .. "n",
+        "<CMD>ToggleNullLSP<CR>",
+        mode = "n",
+        desc = "lsp=> toggle buffer null-ls",
       },
     },
   },
