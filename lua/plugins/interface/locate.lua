@@ -1,7 +1,7 @@
 local env = require("environment.ui")
+local opt = require('environment.optional')
 local kenv = require("environment.keys")
 local kcolors = env.kanacolors
-local key_grapple_pop = kenv.stems.base.grapple.popup
 local key_grapple_tag = kenv.stems.base.grapple.tag
 local key_portal = kenv.stems.base.portal
 
@@ -38,7 +38,7 @@ return {
     "yamatsum/nvim-cursorline",
     event = "VeryLazy",
     opts = {
-      cursorline = { enable = true, timeout = 500, number = false },
+      cursorline = { enable = true, timeout = 300, number = false },
       cursorword = {
         enable = true,
         min_length = 3,
@@ -48,6 +48,7 @@ return {
   },
   {
     "edluffy/specs.nvim",
+    enabled = opt.specs.enable,
     config = true,
     opts = function()
       local opts = {
@@ -110,7 +111,7 @@ return {
   },
   {
     "rainbowhxch/accelerated-jk.nvim",
-    enabled = env.accelerated_jk.enable,
+    enabled = opt.accelerated_jk.enable,
     event = "VeryLazy",
     opts = {
       mode = "time_driven",
@@ -125,7 +126,7 @@ return {
   },
   {
     "abecodes/tabout.nvim",
-    enabled = env.tabout.enable,
+    enabled = opt.tabout.enable,
     event = "VeryLazy",
     opts = {
       tabkey = "<Tab>",
@@ -410,9 +411,10 @@ return {
       require("tabtree").setup(opts)
     end,
     event = "VeryLazy",
+    enabled = opt.tabtree.enable,
     opts = {
       -- print the capture group name when executing next/previous
-      --debug = true,
+      debug = true,
       -- disable key bindings
       -- key_bindings_disabled = true,
       key_bindings = {
@@ -456,8 +458,11 @@ return {
     end,
     opts = {
       auto_enable = true,
-      exclude_file_types = env.ft_ignore_list,
-      minimap_width = 20,
+      exclude_file_types = vim.list_extend(
+        env.ft_ignore_list,
+        { "mail", "himalaya-email-listing" }
+      ),
+      minimap_width = 16,
       window_border = env.borders.main,
     },
   },

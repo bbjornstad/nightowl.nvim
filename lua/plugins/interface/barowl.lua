@@ -1,74 +1,81 @@
 local env = require("environment.ui")
-local custom_fname = require("lualine.components.filename"):extend()
-local highlight = require("lualine.highlight")
+local sts = require('environment.statusline')
 local util = require("lazyvim.util")
 local kcolors = env.kanacolors
 
-function custom_fname:init(options)
-  local default_status_colors = kcolors({
-    saved = "lotusBlue3",
-    modified = "lotusGreen",
-  })
-  custom_fname.super.init(self, options)
-  self.status_colors = {
-    saved = highlight.create_component_highlight_group(
-      { fg = default_status_colors.saved },
-      "filename_status_saved",
-      self.options
-    ),
-    modified = highlight.create_component_highlight_group(
-      { fg = default_status_colors.modified },
-      "filename_status_modified",
-      self.options
-    ),
-  }
-  if self.options.color == nil then
-    self.options.color = ""
-  end
-end
-
-function custom_fname:update_status()
-  local data = custom_fname.super.update_status(self)
-  data = highlight.component_format_highlight(
-    vim.bo.modified and self.status_colors.modified or self.status_colors.saved
-  ) .. data
-  return data
-end
-
-local function memory_use()
-  local free = (1 - (vim.loop.get_free_memory() / vim.loop.get_total_memory()))
-    * 100
-  return ("󱈯 %.2f"):format(free) .. "%"
-end
-
-local function pom_status()
-  local ok, pom = pcall(require, "pomodoro")
-  return ok and pom.statusline
-end
-
-local function escape_wait()
-  local ok, m = pcall(require, "better_escape")
-  return ok and m.waiting and " 󱎙 " or ""
-end
-
-local function diff_source()
-  local gitsigns = vim.b.gitsigns_status_dict
-  if gitsigns then
-    return {
-      added = gitsigns.added,
-      modified = gitsigns.changed,
-      removed = gitsigns.removed,
-    }
-  end
-end
-
-local function recording_status()
-  if not require("noice").api.status.mode.has() then
-    return
-  end
-  local recording = require("noice").api.status.mode.get()
-  return recording .. " | "
-end
+--function custom_fname:init(options)
+--  local default_status_colors = kcolors({
+--    saved = "lotusBlue3",
+--    modified = "lotusGreen",
+--  })
+--  custom_fname.super.init(self, options)
+--  self.status_colors = {
+--    saved = highlight.create_component_highlight_group(
+--      { fg = default_status_colors.saved },
+--      "filename_status_saved",
+--      self.options
+--    ),
+--    modified = highlight.create_component_highlight_group(
+--      { fg = default_status_colors.modified },
+--      "filename_status_modified",
+--      self.options
+--    ),
+--  }
+--  if self.options.color == nil then
+--    self.options.color = ""
+--  end
+--end
+--
+--function custom_fname:update_status()
+--  local data = custom_fname.super.update_status(self)
+--  data = highlight.component_format_highlight(
+--    vim.bo.modified and self.status_colors.modified or self.status_colors.saved
+--  ) .. data
+--  return data
+--end
+--
+--local function memory_use()
+--  local free = (1 - (vim.loop.get_free_memory() / vim.loop.get_total_memory()))
+--    * 100
+--  return ("󱈯 %.2f"):format(free) .. "%"
+--end
+--
+--local function pom_status()
+--  local ok, pom = pcall(require, "pomodoro")
+--  return ok and pom.statusline
+--end
+--
+--local function escape_wait()
+--  local ok, m = pcall(require, "better_escape")
+--  return ok and m.waiting and " 󱎙 " or ""
+--end
+--
+--local function diff_source()
+--  local gitsigns = vim.b.gitsigns_status_dict
+--  if gitsigns then
+--    return {
+--      added = gitsigns.added,
+--      modified = gitsigns.changed,
+--      removed = gitsigns.removed,
+--    }
+--  end
+--end
+--
+--local function recording_status()
+--  if not require("noice").api.status.mode.has() then
+--    return
+--  end
+--  local recording = require("noice").api.status.mode.get()
+--  return recording .. " | "
+--end
+--
+--local function codeium()
+--  if not util.has("codeium.vim") then
+--    return
+--  end
+--  local status = vim.fn["codeium#GetStatusString"]()
+--  return status .. " | "
+--end
 
 return {
   {
@@ -95,10 +102,10 @@ return {
     opts = {
       render = function(props)
         return {
-          { recording_status(), unpack(kcolors({ guifg = "dragon-red" })) },
+          { sts.codeium() },
+          { sts.recording_status(), unpack(kcolors({ guifg = "dragon-red" })) },
           {
             require("wpm").historic_graph(),
-            unpack(kcolors({ guifg = "fujiWhite" })),
           },
           { "  / 󰌓 " },
           { require("wpm").wpm() },
@@ -106,10 +113,11 @@ return {
           { " " },
           { require("local-highlight").match_count(props.buf) },
           { " | " },
-          { memory_use() },
+          { sts.memory_use() },
         }
       end,
       window = {
+        -- overlap = { winbar = false, tabline = false },
         margin = { vertical = 0, horizontal = 1 },
         padding = { left = 1, right = 1 },
         placement = { horizontal = "right", vertical = "top" },
@@ -145,9 +153,9 @@ return {
       gitsigns = {
         enable = true,
         signs = {
-          add = "|",
-          change = "|",
-          delete = "-",
+          add = "┊",
+          change = "│	",
+          delete = "═",
         },
       },
       marks = {
@@ -171,10 +179,9 @@ return {
       "rebelot/kanagawa.nvim",
       "Bekaboo/dropbar.nvim",
       "cbochs/grapple.nvim",
-      "gennaro-tedesco/nvim-possession",
       "wthollingsworth/pomodoro.nvim",
     },
-    event = "VimEnter",
+    event = "VeryLazy",
     opts = {
       options = {
         theme = "auto",
@@ -184,8 +191,8 @@ return {
         section_separators = { left = "", right = "" },
         refresh = {
           statusline = 10,
-          tabline = 10,
-          winbar = 10,
+          tabline = 1000,
+          winbar = 1000,
         },
         disabled_filetypes = {
           lualine = env.ft_ignore_list,
@@ -214,18 +221,9 @@ return {
               require("grapple").exists()
             end,
           },
-          {
-            escape_wait,
-          },
-          {
-            require("noice").api.status.command.get,
-          },
-          {
-            "fancy_location",
-          },
-          {
-            "fancy_searchcount",
-          },
+          { function() require("noice").api.status.command.get() end },
+          { "fancy_location" },
+          { "fancy_searchcount" },
         },
         lualine_y = {
           {
@@ -255,12 +253,12 @@ return {
         },
         lualine_x = {
           {
-            require("noice").api.status.mode.get,
-            cond = require("noice").api.status.mode.has,
+            function() require("noice").api.status.mode.get() end,
+            cond = function() require("noice").api.status.mode.has() end,
             color = kcolors({ fg = "dragonRed" }),
           },
           {
-            custom_fname,
+            function() sts.cust_fname() end,
             path = 0,
             symbols = {
               modified = "",
@@ -272,7 +270,7 @@ return {
         },
         lualine_y = {
           {
-            require("pomodoro").statusline,
+            function() require("pomodoro").statusline() end,
             cond = function()
               if not util.has("pomodoro") then
                 return false
@@ -286,7 +284,7 @@ return {
             "tabs",
             mode = 2,
             use_mode_colors = true,
-            max_length = vim.o.columns / 6, -- require("nvim-possession").status,
+            max_length = vim.o.columns / 6,
             fmt = function(name, context)
               -- Show + if buffer is modified in tab
               local buflist = vim.fn.tabpagebuflist(context.tabnr)
@@ -298,9 +296,6 @@ return {
 
               return (dirtail or name) .. (mod == 1 and " +" or "")
             end,
-            -- cond = function()
-            --   return require("nvim-possession").status() ~= nil
-            -- end,
           },
         },
       },
@@ -332,7 +327,7 @@ return {
               modified = " ",
               removed = " ",
             },
-            source = diff_source,
+            source = sts.diff_source,
           },
         },
         lualine_z = {},
@@ -443,4 +438,5 @@ return {
       },
     },
   },
-}
+  }
+  

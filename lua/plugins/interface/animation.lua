@@ -1,4 +1,5 @@
 local sound_dir = vim.fn.expand("config") .. "/interface_sounds"
+local opt = require('environment.optional')
 
 return {
   {
@@ -62,7 +63,8 @@ return {
   },
   {
     "whleucka/reverb.nvim",
-    event = "BufReadPre",
+    enabled = opt.reverb.enable,
+    event = "VeryLazy",
     opts = {
       sounds = {
         BufRead = vim.fs.joinpath(sound_dir, "start.ogg"),
