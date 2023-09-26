@@ -29,7 +29,7 @@ vim.opt.mousemoveevent = true
 
 -- timeout configuration for neovim mappings, affects WhichKey predominantly
 vim.opt.ttimeout = true
-vim.opt.ttimeoutlen = 50
+vim.opt.ttimeoutlen = 75
 vim.opt.timeoutlen = 300
 
 -- turn on default hard word-wrapping and further extend the keys which can wrap
@@ -49,17 +49,13 @@ vim.opt.smartcase = true
 vim.opt.wrapscan = true
 vim.opt.scrolloff = 10
 
--- >>> these are overwritten by our .editorconfig file in this directory.
---vim.opt.tabstop = 4
---vim.opt.shiftwidth = 4
---vim.opt.textwidth = 80
--- >>>
-
 vim.opt.ruler = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true
+vim.opt.synmaxcol = 200
 
+vim.opt.swapfile = false
 vim.opt.spelllang = "en_us"
 vim.opt.formatoptions = "tcroqb"
 vim.opt.laststatus = 3
