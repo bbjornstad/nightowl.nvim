@@ -2,11 +2,62 @@ local OSet = require("uutils.orderedset")
 
 local mod = {}
 
+--- directly accesses the given plugin's definitions as a part of lazy.nvim.
+--- This provides either the table specification or a field thereof, if a field
+--- is given.
+---@param name string plugin name/uri as a part of lazy.nvim specification.
+---@param field string? name of a lazy.nvim spec field to access, if none is
+---given the whole specification is returned.
+---@return table?|any? spec the plugin's specification within lazy.nvim. This
+---can be used to make adjustments.
+function mod.spec(name, field)
+  local plugin = require('lazy.core.config').plugins[name]
+  if not plugin then
+    return {}
+  end
+  local Plugin = require('lazy.core.plugin')
+  if field == nil then
+    return plugin
+  end
+  return Plugin.values(plugin, field, false)
+end
+
+--- adds items to a lazy.nvim plugin specification under the given field. This
+--- can be used to make adjustments to plugin specifications from files other
+--- than the main configuration for that plugin.
+---@param name string plugin name/uri as part of lazy.nvim specification.
+---@param field string name of the lazy.nvim spec field to which the values
+---should be added.``
+---@param value any value to be added under the specified field name.
+function mod.inject(name, field, value)
+  local plg = mod.spec(name, field)
+  if type(value) == "table" and vim.tbl_islist(value) then
+    plg = plg and table.insert(plg, value)
+  else
+    plg = vim.tbl_deep_extend("force", plg, value)
+  end
+end
+
+function mod.recurser(fn)
+  local function recurse_wrap(targ, ...)
+    local args = { ... }
+    if type(targ) == "table" then
+      return vim.tbl_map(function(t)
+        return fn(t, unpack(args))
+      end, targ)
+    end
+    return fn(targ, ...)
+  end
+
+  return recurse_wrap
+end
+
 --- a helper function for this module, which helps the helper function
 --- functional.unpacker by doing the "rezipping" of slices out of their
 --- constitutent table parent items.
----@vararg any set of arbitrarily sized tables, whose elements should be
+---@param arguments any set of arbitrarily sized tables, whose elements should be
 ---unpacked slice-wise.
+---@return table list containing a slice of each table at the top-level
 local function rezip(arguments)
   local res = {}
   local indices = vim.iter(vim.tbl_map(function(val)
@@ -79,6 +130,10 @@ function mod.batch(func, pretreat, override_opts)
   return funcwrap
 end
 
+---@alias MOptsError
+---| '"suppress"' # error on merging of input tables is not propogated
+---| '"error"' # error on merging of input tables is propogated
+---
 --- recursively merges two sets of options, given as table items with optional named keys;
 --- this is a deep merge, so fully recursive down each table for the merge. This
 --- is most frequently used to add user-defined parameters to plugins which have
@@ -88,7 +143,7 @@ end
 ---no user overrides for the matching key.
 ---@param overrides table the options which should override the defaults by
 ---passing values explicitly in this table.
----@param error string? one of "suppress" or "raise", indicating what should
+---@param error MOptsError? one of "suppress" or "raise", indicating what should
 ---happen if there is no passed overrides to this function. This is helpful in
 ---cases where it is not clear if the user has passed additional options.
 ---@return table results the table that results from merging the options deeply
@@ -113,7 +168,7 @@ function mod.mopts(defaults, overrides, error)
     -- function to handle it.
   end
 
-  return overridden
+  return overridden or {}
 end
 
 --- wraps a function in such a way that its implementation can now accept merged
@@ -177,10 +232,6 @@ function mod.prot_lazy_defer(callable, _return)
   return deferred
 end
 
-function mod.string_lazy_defer(callable, _return)
-  --please hold.
-end
-
 --- defers the importation of a module file in its immediate context by simply
 --- adding a level of function nesting. This is to ideally prevent issues where
 --- requiring an item in the opts field when represented as a table fails due to
@@ -227,9 +278,8 @@ function mod.conditionalize(func, condition)
   return condition_wrapper
 end
 
---- the simplest function, denoted eff for f while also meaning fuck
----@vararg _ these are unused in the case of eff, only here for compatibility
----reasons with other functions.
-function eff(...) end
+--- the simplest possible function that can accept arbitrary arguments
+---@vararg unused, these exist purely for compatibility with other functions
+function mod.eff(...) end
 
 return mod

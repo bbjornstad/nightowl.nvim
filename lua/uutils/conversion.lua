@@ -6,7 +6,7 @@ function mod.from_env(varname, caster)
   end
 
   local res = os.getenv(varname)
-  return res
+  return caster(res)
 end
 
 function mod.bool_from_env(varname)

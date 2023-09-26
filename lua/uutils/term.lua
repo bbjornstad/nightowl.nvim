@@ -1,7 +1,4 @@
-local kenv = require("environment.keys")
 local mopts = require("uutils.functional").mopts
-local key_broot = kenv.stems.broot
-local key_htop = kenv.stems.htop
 
 local mod = {}
 
@@ -9,6 +6,11 @@ function mod.term(opts)
   local Term = require("toggleterm.terminal").Terminal
   local new_term = Term:new(opts)
   return new_term
+end
+
+function mod.spawn()
+  local Term = require('toggleterm.terminal').Terminal
+  return Term:spawn()
 end
 
 function mod.toggler(term, opts)
