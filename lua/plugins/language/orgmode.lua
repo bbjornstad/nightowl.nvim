@@ -189,7 +189,7 @@ local organization_tools = {
         end,
       },
       "lukas-reineke/headlines.nvim",
-      -- "madskjeldgaard/neorg-figlet-module",
+      { "madskjeldgaard/neorg-figlet-module", ft = "norg" },
       { "pysan3/neorg-templates", ft = "norg" },
       { "tamton-aquib/neorg-jupyter", ft = "norg" },
       { "laher/neorg-exec", ft = "norg" },
@@ -265,12 +265,12 @@ local organization_tools = {
         },
         ["external.jupyter"] = {},
         ["external.exec"] = {},
-        -- ["external.integrations.figlet"] = {
-        --   config = {
-        --     font = "impossible",
-        --     wrapInCodeTags = true,
-        --   },
-        -- },
+        ["external.integrations.figlet"] = {
+          config = {
+            font = "impossible",
+            wrapInCodeTags = true,
+          },
+        },
         ["core.keybinds"] = {
           config = {
             default_keybinds = true,

@@ -1,10 +1,18 @@
 local add_cmp_source = require("uutils.cmp").add_source
-local key_repl = require("environment.keys").stems.base.repl
+local def = require('uutils.lazy').lang
 
 return {
   {
     "clojure-vim/acid.nvim",
-    config = function() end,
+    config = function()
+      def({"clojure", "clj"}, function(opts)
+        return vim.tbl_deep_extend("force", {
+          exe = "cljfmt",
+          args = {},
+          stdin = true
+        }, opts)
+      end, "clj-kondo")
+    end,
     build = ":UpdateRemotePlugins",
     ft = { "clojure" },
   },

@@ -1,10 +1,15 @@
 local env = require("environment.ui")
 local key_glow = require("environment.keys").stems.glow
 
+local def = require('uutils.lazy').lang
+
 return {
   {
     "preservim/vim-markdown",
     ft = { "markdown", "md", "rmd" },
+    config = function()
+      def({"markdown", "md"}, "prettierd", "vale")
+    end,
     init = function()
       vim.g.vim_markdown_folding_disabled = 1
       vim.g.vim_markdown_math = 1

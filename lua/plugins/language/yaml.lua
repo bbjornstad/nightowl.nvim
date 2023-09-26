@@ -1,8 +1,40 @@
-local stems = require("environment.keys").stems
 local mapn = require("environment.keys").map("n")
 local toggle_fmtoption = require("uutils.text").toggle_fmtopt
+local def = require("uutils.lazy").implang
+local masonry = require('uutils.lazy').masonry
 
 return {
+  def({ "yaml", "yml" }, "yamlfmt", "yamllint"),
+  masonry({ name = "yamlls", lang = "yaml" }, {
+    schemaStore = {
+      enable = false,
+      url = "",
+    },
+    schemas = require('schemastore').yaml.schemas(),
+  }, { "b0o/SchemaStore.nvim" }),
+  -- {
+  --   "williamboman/mason-lspconfig.nvim",
+  --   dependencies = { "neovim/nvim-lspconfig", "b0o/SchemaStore.nvim" },
+  --   opts = function(_, opts)
+  --     opts = vim.tbl_deep_extend("force", opts, {
+  --       handlers = {
+  --         yamlls = function()
+  --           require("lspconfig").yamlls.setup({
+  --             settings = {
+  --               yaml = {
+  --                 schemaStore = {
+  --                   enable = false,
+  --                   url = "",
+  --                 },
+  --                 schemas = require("schemastore").yaml.schemas(),
+  --               },
+  --             },
+  --           })
+  --         end,
+  --       },
+  --     })
+  --   end,
+  -- },
   {
     "cuducos/yaml.nvim",
     ft = { "yaml" },

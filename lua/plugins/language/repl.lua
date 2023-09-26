@@ -141,7 +141,7 @@ return {
       "nvim-treesitter/nvim-treesitter",
     },
     ft = { "quarto", "qmd" },
-    init = function()
+    config = function(_, opts)
       local otter = require("otter")
       mapn(
         "gd",

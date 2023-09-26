@@ -1,8 +1,10 @@
 local key_repl = require("environment.keys").stems.base.repl
 local key_jupyter = key_repl .. "j"
 local key_fstring_toggle = "<leader>c"
+local def = require('uutils.lazy').implang
 
 return {
+  def({"python", "py"}, "black", {"ruff", "pycodestyle", "pydocstyle"}),
   { "jmcantrell/vim-virtualenv", ft = { "python" } },
   {
     "mfussenegger/nvim-dap-python",
