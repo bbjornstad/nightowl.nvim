@@ -24,22 +24,22 @@ function env.enablements(tbl_enable)
   return res
 end
 
-env.enabled = {
+env.enabled = env.enablements({
   copilot = { env = true, fallback = false },
   cmp_ai = { env = true, fallback = false },
   chatgpt = { env = true, fallback = false },
   codegpt = { env = true, fallback = false },
   neural = { env = true, fallback = false },
   neoai = { env = true, fallback = false },
-  hfllm = { env = true, fallback = true },
-  tabnine = { env = true, fallback = true },
-  cmp_tabnine = { env = true, fallback = true },
-  codeium = { env = true, fallback = true },
+  llm = { env = true, fallback = false },
+  tabnine = { env = true, fallback = false },
+  cmp_tabnine = { env = true, fallback = false },
+  codeium = { env = true, fallback = false },
   rgpt = { env = true, fallback = false },
   navi = { env = true, fallback = false },
   explain_it = { env = true, fallback = false },
   doctor = { env = true, fallback = false },
-  llm = { env = true, fallback = false },
+  gllm = { env = true, fallback = false },
   backseat = { env = true, fallback = false },
   wtf = { env = true, fallback = false },
   prompter = { env = true, fallback = false },
@@ -48,7 +48,7 @@ env.enabled = {
   gptnvim = { env = true, fallback = false },
   llama = { env = true, fallback = false },
   ollero = { env = true, fallback = false },
-}
+})
 env.status_notify_on_startup = false
 
 -- -----------------------------------------------------------------------------
@@ -60,23 +60,7 @@ env.status_notify_on_startup = false
 -- have the name conflict, so we have to rename one of them appropriately.
 env.hf = {}
 env.hf.llm = {}
-env.hf.llm.name = "hfllm"
+env.hf.llm.name = "llm"
 env.hf.llm.model = "bigcode/starcoder"
-env.hf.llm.params = {
-  max_new_tokens = 60,
-  temperature = 0.2,
-  top_p = 0.95,
-  stop_token = "<|endoftext|>",
-}
-env.hf.llm.fim = {
-  enabled = true,
-  prefix = "<fim_prefix>",
-  middle = "<fim_middle>",
-  suffix = "<fim_suffix>",
-}
-env.hf.llm.lsp = {
-  enabled = true,
-  bin_path = vim.fs.normalize(vim.fn.stdpath("data") .. "/llm_nvim/bin"),
-}
 
 return env

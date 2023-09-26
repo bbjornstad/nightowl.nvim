@@ -16,9 +16,9 @@ env.fullscreen = false
 env.preview = {
   -- default     = 'bat',           -- override the default previewer?
   -- default uses the 'builtin' previewer
-  border = "border", -- border|noborder, applies only to
+  border = "noborder", -- border|noborder, applies only to
   -- native fzf previewers (bat/cat/git/etc)
-  wrap = "nowrap", -- wrap|nowrap
+  wrap = "wrap", -- wrap|nowrap
   hidden = "nohidden", -- hidden|nohidden
   vertical = "down:45%", -- up|down:size
   horizontal = "right:60%", -- right|left:size

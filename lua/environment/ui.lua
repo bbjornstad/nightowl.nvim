@@ -1,4 +1,3 @@
-local toboolean = require("uutils.conversion").toboolean
 local env = {}
 
 function env.identify_highlight(hlgroup, link)
@@ -34,40 +33,23 @@ function env.kanacolors(opts)
   return env.colors(opts, "kanagawa.colors", { theme = "wave" })
 end
 
-env.accelerated_jk = {}
-env.accelerated_jk.enable = false
-env.tabout = {}
-env.tabout.enable = true
-env.numbertoggle = {}
-env.numbertoggle.enable = false
-env.houdini = {}
-env.houdini.enable = false
-
 --------------------------------------------------------------------------------
 -- UI: Borders
 -- ===========
 -- Spec is that the main border should be shadow. We want this to apply to all
 -- borders that are not made by mason or lazy, the package management tools.
 -- Those receive the alt border, which is the double.
-env.borders = {}
-env.borders.main = "shadow"
-env.borders.alt = "solid"
--- env.borders.main_accent = "single"
-env.borders.main_accent =
-  { "🭽", "▔", "🭾", "▕", "🭿", "▁", "🭼", "▏" }
+env.borders = {
+  main = "shadow",
+  alt = "solid",
+  main_accent = "single"
+}
+-- env.borders.main_accent =
+-- { "🭽", "▔", "🭾", "▕", "🭿", "▁", "🭼", "▏" }
 
-env.telescope = {}
-env.telescope.theme = "ivy"
-
-env.bufferline = {}
-env.bufferline.tab_format = "slant"
-
-env.enable_vim_strict = false
-
-env.screensaver = {}
-env.screensaver.enabled = toboolean(os.getenv("NIGHTOWL_ENABLE_SCREENSAVER"))
-  or false
-env.screensaver.selections = { "treadmill", "epilepsy", "dvd" }
+env.telescope = {
+  theme = "ivy"
+}
 
 env.ft_ignore_list = {
   "oil",
@@ -98,8 +80,26 @@ env.ft_ignore_list = {
 -- UI: Colorscheme Options
 -- ===========
 env.default_colorscheme = "kanagawa"
-env.colorscheme = {}
 
-env.lualine_theme = "auto" -- env.default_colorscheme
+env.oil = {
+  columns = {
+    extended = {
+      "icon",
+      "type",
+      "permissions",
+      "birthtime",
+      "atime",
+      "mtime",
+      "ctime",
+      "size",
+    },
+    succinct = {
+      "icon",
+      "type",
+      "ctime",
+      "size",
+    },
+  },
+}
 
 return env
