@@ -1,5 +1,4 @@
 -- vim: set ft=lua: --
-local env = require("environment.ui")
 local inp = require("uutils.input")
 
 local user_bookmarks = vim.g.startup_bookmarks
@@ -136,34 +135,14 @@ local settings = {
         "Jd",
       },
       {
-        "󱚃 tomorrow's journal",
-        "Neorg journal tomorrow",
-        "Jt",
-      },
-      {
-        "󱚁 yesterday's journal",
-        "Neorg journal yesterday",
-        "Jy",
-      },
-      {
         " fzf::git files",
         "lua require('fzf-lua').git_files()",
         "vf",
       },
       {
-        " fzf::git branches",
-        "lua require('fzf-lua').git_branches()",
-        "vb",
-      },
-      {
         " fzf::git commits",
         "lua require('fzf-lua').git_commits()",
         "vc",
-      },
-      {
-        " fzf::git stash",
-        "lua require('fzf-lua').git_stash()",
-        "vh",
       },
       {
         " fzf::git status",
