@@ -2,10 +2,7 @@
   "neodev": {
     "library": {
       "enabled": true,
-      "plugins": [
-        "neoconf.nvim",
-        "nvim-lspconfig"
-      ]
+      "plugins": true
     }
   },
   "neoconf": {
@@ -17,8 +14,7 @@
   },
   "lspconfig": {
     "lua_ls": {
-      "Lua.hint.enabled": true,
-      "Lua.workspace.checkThirdParty": false
+      "Lua.hint.enabled": true
     }
   }
 }
