@@ -7,7 +7,7 @@ function mod.btop(opts)
 end
 
 function mod.broot(opts)
-  return termlib.toggleable("commandline (broot)", opts)
+  return termlib.toggleable("commandline (br)", opts)
 end
 
 function mod.sysz(opts)

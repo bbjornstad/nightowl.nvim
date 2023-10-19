@@ -27,7 +27,7 @@ env.preview = {
   -- Only used with the builtin previewer:
   title = true, -- preview border title (file/buf)?
   title_pos = "right", -- left|center|right, title alignment
-  scrollbar = "border", -- `false` or string:'float|border'
+  scrollbar = "float", -- `false` or string:'float|border'
   -- float:  in-window floating border
   -- border: in-border chars (see below)
   scrolloff = "-2", -- float scrollbar offset from right
@@ -43,7 +43,7 @@ env.preview = {
     cursorlineopt = "both",
     cursorcolumn = false,
     signcolumn = "yes",
-    list = false,
+    list = true,
     foldenable = false,
     foldmethod = "manual",
   },

@@ -1,4 +1,4 @@
-local env_bool = require("uutils.conversion").bool_from_env
+local env_bool = require("funsak.convert").bool_from_env
 
 --- The AI environment module contains the necessary configuration and setupthat
 --- that is exposed to the user, specifically for a selection of AI agent plugins
@@ -13,7 +13,7 @@ function env.enablements(tbl_enable)
   for k, val in pairs(tbl_enable) do
     local inner_result
     res[k] = {}
-    local varname = ("NIGHTOWL_AI_FEATURE_%s"):format(string.upper(k))
+    local varname = ("NIGHTOWL_FEATURE_%s"):format(string.upper(k))
     if val.env then
       inner_result = env_bool(varname)
       res[k].enable = inner_result or (val.fallback or false)
@@ -51,9 +51,9 @@ env.enabled = env.enablements({
 })
 env.status_notify_on_startup = false
 
--- -----------------------------------------------------------------------------
+-- =============================================================================
 -- HuggingFace: Large Language Models
--- -----
+-- ==================================
 -- llm.nvim: from huggingface
 -- this plugin's name conflicts with another large language model plugin, this
 -- one is also included in the same file as the huggingface option, but we can't

@@ -1,46 +1,82 @@
 local env = {}
-local toboolean = require("uutils.conversion").toboolean
+local bfe = require("funsak.convert").bool_from_env
 
 env.accelerated_jk = {
-  enable = false
+  enable = false,
 }
 env.tabout = {
-  enable = true
+  enable = true,
 }
 env.screensaver = {
-  enable = toboolean(os.getenv("NIGHTOWL_ENABLE_SCREENSAVER")) or false,
-  selections = { "treadmill", "epilepsy", "dvd" }
+  enable = bfe("NIGHTOWL_ENABLE_SCREENSAVER") or false,
+  selections = { "treadmill", "epilepsy", "dvd" },
 }
 env.hardtime = {
-  enable = false
+  enable = false,
 }
 env.file_managers = {
   fm_nvim = {
-    enable = false
+    enable = false,
   },
   bolt = {
-    enable = false
+    enable = true,
   },
   attempt = {
-    enable = false
-  }
+    enable = true,
+  },
+  broot = {
+    enable = true,
+  },
 }
 env.specs = {
-  enable = false
-}
-env.tabtree = {
-  enable = false
-}
-env.troublesum = {
   enable = false,
 }
+env.tabtree = {
+  enable = true,
+}
+env.troublesum = {
+  enable = true,
+}
 env.undotree = {
-  enable = false
+  enable = false,
 }
 env.reverb = {
-  enable = false
+  enable = false,
 }
 env.gh_actions = {
   enable = false,
 }
+env.lsp = {
+  diagnostics = {
+    lsp_lines = {
+      enable = true,
+    },
+  },
+}
+env.symbol = {
+  aerial = {
+    enable = true,
+  },
+  outline = {
+    enable = true,
+  },
+}
+env.games = {
+  blackjack = {
+    enable = false,
+  },
+  killersheep = {
+    enable = false,
+  },
+  nvimesweeper = {
+    enable = false,
+  },
+  sudoku = {
+    enable = false,
+  },
+  tetris = {
+    enable = false,
+  },
+}
+
 return env
