@@ -1,8 +1,8 @@
---- owl.OrderedSet implementation
---------------------------------------------------------------------------------
+--- funsak_OrderedSet implementation
+--  ============================================================================
 --- defines a set-like construct with some typical set operations, but makes
 --- sure to preserve the ordering of item insertion if needed.
-OrderedSet = {}
+local OrderedSet = {}
 OrderedSet.__index = OrderedSet
 
 function OrderedSet:add(element)
@@ -58,4 +58,5 @@ function OrderedSet:union(otherSet)
   end
   return unionSet
 end
+
 return OrderedSet

@@ -1,16 +1,14 @@
-local mod = {}
-
-function mod.from_env(varname, caster)
+local function from_env(varname, caster)
   caster = caster or function(...)
-    return ...
+    return unpack({ ... })
   end
 
-  local res = os.getenv(varname)
+  local res = vim.env[varname]
   return caster(res)
 end
 
-function mod.bool_from_env(varname)
-  return mod.from_env(varname, function(val)
+local function bool_from_env(varname)
+  return from_env(varname, function(val)
     if val == "true" then
       return true
     end
@@ -18,7 +16,7 @@ function mod.bool_from_env(varname)
   end)
 end
 
-function mod.toboolean(v)
+local function toboolean(v)
   local ok, res = pcall(tonumber, v)
   if ok then
     return res
@@ -31,4 +29,8 @@ function mod.toboolean(v)
   return nil
 end
 
-return mod
+return {
+  from_env = from_env,
+  bool_from_env = bool_from_env,
+  toboolean = toboolean,
+}

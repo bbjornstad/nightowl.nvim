@@ -80,7 +80,6 @@ function mod.cmdtext_input(opts, ...)
       local fargs = vim.tbl_map(function(val)
         return val:format(input)
       end, argtable)
-      vim.notify(vim.inspect(fargs))
       vim.cmd(unpack(fargs))
     end)
   end
