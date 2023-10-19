@@ -1,123 +1,27 @@
 local env = require("environment.ui")
-local sts = require('environment.statusline')
+local sts = require("environment.status")
 local util = require("lazyvim.util")
-local kcolors = env.kanacolors
-
---function custom_fname:init(options)
---  local default_status_colors = kcolors({
---    saved = "lotusBlue3",
---    modified = "lotusGreen",
---  })
---  custom_fname.super.init(self, options)
---  self.status_colors = {
---    saved = highlight.create_component_highlight_group(
---      { fg = default_status_colors.saved },
---      "filename_status_saved",
---      self.options
---    ),
---    modified = highlight.create_component_highlight_group(
---      { fg = default_status_colors.modified },
---      "filename_status_modified",
---      self.options
---    ),
---  }
---  if self.options.color == nil then
---    self.options.color = ""
---  end
---end
---
---function custom_fname:update_status()
---  local data = custom_fname.super.update_status(self)
---  data = highlight.component_format_highlight(
---    vim.bo.modified and self.status_colors.modified or self.status_colors.saved
---  ) .. data
---  return data
---end
---
---local function memory_use()
---  local free = (1 - (vim.loop.get_free_memory() / vim.loop.get_total_memory()))
---    * 100
---  return ("󱈯 %.2f"):format(free) .. "%"
---end
---
---local function pom_status()
---  local ok, pom = pcall(require, "pomodoro")
---  return ok and pom.statusline
---end
---
---local function escape_wait()
---  local ok, m = pcall(require, "better_escape")
---  return ok and m.waiting and " 󱎙 " or ""
---end
---
---local function diff_source()
---  local gitsigns = vim.b.gitsigns_status_dict
---  if gitsigns then
---    return {
---      added = gitsigns.added,
---      modified = gitsigns.changed,
---      removed = gitsigns.removed,
---    }
---  end
---end
---
---local function recording_status()
---  if not require("noice").api.status.mode.has() then
---    return
---  end
---  local recording = require("noice").api.status.mode.get()
---  return recording .. " | "
---end
---
---local function codeium()
---  if not util.has("codeium.vim") then
---    return
---  end
---  local status = vim.fn["codeium#GetStatusString"]()
---  return status .. " | "
---end
+local kcolors = require("funsak.colors").kanacolors
 
 return {
-  {
-    "akinsho/bufferline.nvim",
-    enabled = false,
-    module = false,
-  },
   {
     "b0o/incline.nvim",
     event = "VeryLazy",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
-      {
-        "jcdickinson/wpm.nvim",
-        opts = {
-          sample_count = 10,
-          sample_interval = 2000,
-          percentile = 0.8,
-        },
-        config = true,
-      },
       "tzachar/local-highlight.nvim",
     },
     opts = {
       render = function(props)
         return {
-          { sts.codeium() },
-          { sts.recording_status(), unpack(kcolors({ guifg = "dragon-red" })) },
-          {
-            require("wpm").historic_graph(),
-          },
-          { "  / 󰌓 " },
-          { require("wpm").wpm() },
-          { " | " },
-          { " " },
-          { require("local-highlight").match_count(props.buf) },
-          { " | " },
+          { sts.recording_status() },
+          { " ~ " },
+          { " " .. require("local-highlight").match_count(props.buf) },
+          { " ~ " },
           { sts.memory_use() },
         }
       end,
       window = {
-        -- overlap = { winbar = false, tabline = false },
         margin = { vertical = 0, horizontal = 1 },
         padding = { left = 1, right = 1 },
         placement = { horizontal = "right", vertical = "top" },
@@ -155,7 +59,7 @@ return {
         signs = {
           add = "┊",
           change = "│	",
-          delete = "═",
+          delete = "⌁",
         },
       },
       marks = {
@@ -180,6 +84,15 @@ return {
       "Bekaboo/dropbar.nvim",
       "cbochs/grapple.nvim",
       "wthollingsworth/pomodoro.nvim",
+      {
+        "jcdickinson/wpm.nvim",
+        opts = {
+          sample_count = 10,
+          sample_interval = 2000,
+          percentile = 0.8,
+        },
+        config = true,
+      },
     },
     event = "VeryLazy",
     opts = {
@@ -203,7 +116,21 @@ return {
         },
       },
       sections = {
-        lualine_a = { { "fancy_mode", width = 7 } },
+        lualine_a = {
+          {
+            "mode",
+            fmt = function(mode, _)
+              local res
+              for k, v in pairs(env.icons.lualine.mode) do
+                if string.gmatch(mode, k) then
+                  res = env.icons.lualine.mode[mode]
+                  break
+                end
+              end
+              return string.format("󰩀 %s %s 󰨿", res or "", mode)
+            end,
+          },
+        },
         lualine_b = { { "b:gitsigns_head", icon = "" } },
         lualine_c = {
           {
@@ -218,10 +145,20 @@ return {
               return "󰓼 ⋊ " .. key .. " ⋉"
             end,
             cond = function()
-              require("grapple").exists()
+              return require("grapple").exists()
             end,
           },
-          { function() require("noice").api.status.command.get() end },
+          {
+            function()
+              local wpm = require("wpm")
+              return wpm.historic_graph() .. " 󱤘 " .. wpm.wpm() .. "  "
+            end,
+          },
+          {
+            function()
+              return require("noice").api.status.command.get()
+            end,
+          },
           { "fancy_location" },
           { "fancy_searchcount" },
         },
@@ -253,12 +190,18 @@ return {
         },
         lualine_x = {
           {
-            function() require("noice").api.status.mode.get() end,
-            cond = function() require("noice").api.status.mode.has() end,
+            function()
+              return require("noice").api.status.mode.get()
+            end,
+            cond = function()
+              return require("noice").api.status.mode.has()
+            end,
             color = kcolors({ fg = "dragonRed" }),
           },
           {
-            function() sts.cust_fname() end,
+            function()
+              return sts.cust_fname()
+            end,
             path = 0,
             symbols = {
               modified = "",
@@ -270,9 +213,11 @@ return {
         },
         lualine_y = {
           {
-            function() require("pomodoro").statusline() end,
+            function()
+              return require("pomodoro").statusline()
+            end,
             cond = function()
-              if not util.has("pomodoro") then
+              if not util.has("pomodoro.nvim") then
                 return false
               end
               return require("pomodoro").status
@@ -311,10 +256,10 @@ return {
           {
             "diagnostics",
             symbols = {
-              error = require("lazyvim.config").icons.diagnostics.Error,
-              warn = require("lazyvim.config").icons.diagnostics.Warn,
-              info = require("lazyvim.config").icons.diagnostics.Info,
-              hint = require("lazyvim.config").icons.diagnostics.Hint,
+              error = env.icons.diagnostic.Error,
+              warn = env.icons.diagnostic.Warn,
+              info = env.icons.diagnostic.Info,
+              hint = env.icons.diagnostic.Hint,
             },
           },
         },
@@ -350,6 +295,9 @@ return {
         "fzf",
         "lazy",
         "man",
+        "neo-tree",
+        "nerdtree",
+        "nvim-tree",
         "nvim-dap-ui",
         "overseer",
         "symbols-outline",
@@ -380,28 +328,32 @@ return {
         },
         keymaps = {
           ["]"] = function()
-            local api = require("dropbar.api")
-            local thismenu = api.utils.menu.get_current()
+            local dutil = require("dropbar.utils")
+            local thismenu = dutil.menu.get_current()
             if not thismenu then
               return
             end
-            api.select_next_context()
+            require("dropbar.api").select_next_context()
           end,
           ["["] = function()
-            local api = require("dropbar.api")
-            local thismenu = api.utils.menu.get_current()
+            local dutil = require("dropbar.utils")
+            local thismenu = dutil.menu.get_current()
             if not thismenu then
               return
             end
             return thismenu.prev_menu
           end,
           ["q"] = function()
-            local api = require("dropbar.api")
-            local thismenu = api.api.utils.menu.get_current()
+            local api = require("dropbar.utils")
+            local thismenu = api.menu.get_current()
             if not thismenu then
               return
             end
             thismenu:close()
+          end,
+          ["<leader>"] = function()
+            local menu = require("dropbar.utils").menu.get_current()
+            menu:fuzzy_find_open()
           end,
         },
       },
@@ -409,13 +361,89 @@ return {
         padding = { left = 2, right = 2 },
       },
       icons = {
+        enable = true,
         bar = {
           separator = "  ",
-          extends = "  ",
+          extends = "...",
         },
         menu = {
           separator = " ",
-          indicator = "",
+          indicator = "⨽ ",
+        },
+        kinds = {
+          use_devicons = true,
+          symbols = require("funsak.table").mopts({
+            Array = "󰅪 ",
+            Boolean = " ",
+            BreakStatement = "󰙧 ",
+            Call = "󰃷 ",
+            CaseStatement = "󱃙 ",
+            Class = " ",
+            Color = "󰏘 ",
+            Constant = "󰏿 ",
+            Constructor = " ",
+            ContinueStatement = "→ ",
+            Copilot = " ",
+            Declaration = "󰙠 ",
+            Delete = "󰩺 ",
+            DoStatement = "󰑖 ",
+            Enum = " ",
+            EnumMember = " ",
+            Event = " ",
+            Field = " ",
+            File = "󰈔 ",
+            Folder = "󰉋 ",
+            ForStatement = "󰑖 ",
+            Function = "󰊕 ",
+            H1Marker = "󰉫 ", -- Used by markdown treesitter parser
+            H2Marker = "󰉬 ",
+            H3Marker = "󰉭 ",
+            H4Marker = "󰉮 ",
+            H5Marker = "󰉯 ",
+            H6Marker = "󰉰 ",
+            Identifier = "󰀫 ",
+            IfStatement = "󰇉 ",
+            Interface = " ",
+            Keyword = "󰌋 ",
+            List = "󰅪 ",
+            Log = "󰦪 ",
+            Lsp = " ",
+            Macro = "󰁌 ",
+            MarkdownH1 = "󰉫 ", -- Used by builtin markdown source
+            MarkdownH2 = "󰉬 ",
+            MarkdownH3 = "󰉭 ",
+            MarkdownH4 = "󰉮 ",
+            MarkdownH5 = "󰉯 ",
+            MarkdownH6 = "󰉰 ",
+            Method = "󰆧 ",
+            Module = "󰏗 ",
+            Namespace = "󰅩 ",
+            Null = "󰢤 ",
+            Number = "󰎠 ",
+            Object = "󰅩 ",
+            Operator = "󰆕 ",
+            Package = "󰆦 ",
+            Pair = "󰅪 ",
+            Property = " ",
+            Reference = "󰦾 ",
+            Regex = " ",
+            Repeat = "󰑖 ",
+            Scope = "󰅩 ",
+            Snippet = "󰩫 ",
+            Specifier = "󰦪 ",
+            Statement = "󰅩 ",
+            String = "󰉾 ",
+            Struct = " ",
+            SwitchStatement = "󰺟 ",
+            Terminal = " ",
+            Text = " ",
+            Type = " ",
+            TypeParameter = "󰆩 ",
+            Unit = " ",
+            Value = "󰎠 ",
+            Variable = "󰀫 ",
+            WhileStatement = "󰑖 ",
+          }, env.icons.kinds),
         },
       },
     },
@@ -438,5 +466,15 @@ return {
       },
     },
   },
-  }
-  
+  {
+    "lukas-reineke/virt-column.nvim",
+    event = "VeryLazy",
+    config = function(_, opts)
+      require("virt-column").setup(opts)
+    end,
+    opts = {
+      enabled = true,
+      char = "║",
+    },
+  },
+}

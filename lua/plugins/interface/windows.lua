@@ -1,7 +1,9 @@
 local env = require("environment.ui")
-local key_bufmenu = require("environment.keys").stems.base.buffers
-local key_files = require("environment.keys").stems.base.files
-local mopts = require("uutils.functional").mopts
+local kenv = require("environment.keys")
+local key_bufmenu = kenv.buffer:leader()
+local key_files = kenv.fm:leader()
+local kwin = kenv.window
+local mopts = require("funsak.table").mopts
 
 local function pdel(mode, keys, opts)
   local ok, res = pcall(vim.keymap.del, mode, keys, opts)
@@ -15,24 +17,6 @@ return {
   {
     "williamboman/mason.nvim",
     opts = { ui = { border = env.borders.main } },
-  },
-  {
-    "folke/lazy.nvim",
-    init = function()
-      pdel({ "n", "<leader>l" })
-    end,
-    keys = {
-      {
-        "<leader>l",
-        vim.NIL,
-      },
-      {
-        "<leader>L",
-        "<CMD>Lazy<CR>",
-        mode = "n",
-        desc = "lazy=> home",
-      },
-    },
   },
   {
     "folke/noice.nvim",
@@ -50,8 +34,8 @@ return {
         },
       },
       presets = {
-        bottom_search = false,        -- use a classic bottom cmdline for search
-        command_palette = false,      -- position the cmdline and popupmenu together
+        bottom_search = false, -- use a classic bottom cmdline for search
+        command_palette = false, -- position the cmdline and popupmenu together
         long_message_to_split = true, -- long messages will be sent to a split
         inc_rename = true,
       },
@@ -230,17 +214,27 @@ return {
   },
   {
     "rcarriga/nvim-notify",
-    opts = function(_, opts)
-      opts.top_down = opts.top_down or true
-      opts.render = opts.render or "compact"
-      opts.on_open = opts.on_open
-          or function(win)
-            vim.api.nvim_win_set_config(win, {
-              border = env.borders.main,
-            })
-          end
-      opts.background_colour = opts.background_colour or "Normal"
-    end,
+    opts = {
+      top_down = true,
+      render = "wrapped-compact",
+      on_open = function(win)
+        vim.api.nvim_win_set_config(win, {
+          border = env.borders.main,
+        })
+      end,
+      background_colour = "Pmenu",
+    },
+    -- opts = function(_, opts)
+    --   opts.top_down = opts.top_down or true
+    --   opts.render = opts.render or "wrapped-compact"
+    --   opts.on_open = opts.on_open
+    --       or function(win)
+    --         vim.api.nvim_win_set_config(win, {
+    --           border = env.borders.main,
+    --         })
+    --       end
+    --   opts.background_colour = opts.background_colour or "Pmenu"
+    -- end,
   },
   {
     "stevearc/dressing.nvim",
@@ -364,10 +358,10 @@ return {
     },
     opts = {
       position = { "right", "top" },
-      width = 40,
+      width = 80,
       height = 20,
       border = env.borders.main,
-      preview_position = "left",
+      preview_position = "right",
       preview = {
         width = 80,
         height = 36,
@@ -388,6 +382,7 @@ return {
         preview = "p",
       },
       use_devicons = true,
+      sort_mru = true,
     },
     config = true,
   },
@@ -448,16 +443,17 @@ return {
   },
   {
     "anuvyklack/help-vsplit.nvim",
+    event = "VeryLazy",
     config = function(_, opts)
       require("help-vsplit").setup(opts)
     end,
     opts = {
-      always = false,
+      always = true,
       side = "right",
       buftype = { "help" },
       filetype = { "man" },
     },
-    -- ft = { "man", "vimdoc", "help" },
+    ft = { "man", "vimdoc", "help" },
   },
   {
     "folke/edgy.nvim",
@@ -496,7 +492,7 @@ return {
             end,
           },
           { ft = "Trouble", title = "diag::trouble" },
-          { ft = "qf",      title = "edit::quickfix" },
+          { ft = "qf", title = "edit::quickfix" },
           {
             ft = "spectre_panel",
             title = "edit::search/replace",
@@ -540,12 +536,12 @@ return {
           height = 0.6,
         },
         pinned = true,
-        open = require('environment.utiliterm').broot({
+        open = require("environment.utiliterm").broot({
           direction = "horizontal",
           on_open = function(term)
-            set_term_options(term, { filetype = "broot", })
-          end
-        })
+            set_term_options(term, { filetype = "broot" })
+          end,
+        }),
       })
       condition("symbols-outline.nvim", "right", {
         title = "symb::outline",
@@ -587,9 +583,9 @@ return {
       -- Or use a function to enable `detached` only when the active window is too small
       -- (default behavior)
       opts.detached = opts.detached
-          or function(winid)
-            return vim.api.nvim_win_get_width(winid) < 100
-          end
+        or function(winid)
+          return vim.api.nvim_win_get_width(winid) < 100
+        end
 
       opts.preview_win_opts = mopts({
         -- Configure preview window
@@ -604,20 +600,19 @@ return {
       }, opts.border)
       opts.list = mopts({
         position = "right", -- Position of the list window 'left'|'right'
-        width = 0.33,       -- 33% width relative to the active window, min 0.1, max 0.5
+        width = 0.33, -- 33% width relative to the active window, min 0.1, max 0.5
       }, opts.list)
-      opts.theme = mopts(
-        {                -- This feature might not work properly in nvim-0.7.2
-          enable = true, -- Will generate colors for the plugin based on your current colorscheme
-          mode = "auto", -- 'brighten'|'darken'|'auto', 'auto' will set mode based on the brightness of your colorscheme
-        }, opts.theme)
+      opts.theme = mopts({ -- This feature might not work properly in nvim-0.7.2
+        enable = true, -- Will generate colors for the plugin based on your current colorscheme
+        mode = "auto", -- 'brighten'|'darken'|'auto', 'auto' will set mode based on the brightness of your colorscheme
+      }, opts.theme)
       opts.mappings = mopts({
         list = {
-          ["j"] = actions.next,     -- Bring the cursor to the next item in the list
+          ["j"] = actions.next, -- Bring the cursor to the next item in the list
           ["k"] = actions.previous, -- Bring the cursor to the previous item in the list
           ["<Down>"] = actions.next,
           ["<Up>"] = actions.previous,
-          ["<Tab>"] = actions.next_location,       -- Bring the cursor to the next location skipping groups in the list
+          ["<Tab>"] = actions.next_location, -- Bring the cursor to the next location skipping groups in the list
           ["<S-Tab>"] = actions.previous_location, -- Bring the cursor to the previous location skipping groups in the list
           ["<C-u>"] = actions.preview_scroll_win(5),
           ["<C-d>"] = actions.preview_scroll_win(-5),
@@ -660,25 +655,25 @@ return {
     end,
     keys = {
       {
-        "glr",
+        "gr",
         "<CMD>Glance references<CR>",
         mode = "n",
         desc = "glance=> references",
       },
       {
-        "gld",
+        "gd",
         "<CMD>Glance definitions<CR>",
         mode = "n",
         desc = "glance=> definitions",
       },
       {
-        "glt",
+        "gy",
         "<CMD>Glance type_definitions<CR>",
         mode = "n",
         desc = "glance=> type definitions",
       },
       {
-        "gli",
+        "gI",
         "<CMD>Glance implementations<CR>",
         mode = "n",
         desc = "glance=> implementations",
@@ -694,10 +689,10 @@ return {
         -- do any required filtration prior to using default settings.
         local bufft = vim.api.nvim_buf_get_option(bufnr, "filetype")
         if
-            vim.list_contains({
-              "Outline",
-              "nnn",
-            }, bufft)
+          vim.list_contains({
+            "Outline",
+            "nnn",
+          }, bufft)
         then
           return "filetype"
         end
@@ -769,6 +764,34 @@ return {
         "<CMD>Telescope scope buffers<CR>",
         mode = "n",
         desc = "scope.buf=> view buffers",
+      },
+    },
+  },
+  {
+    "jyscao/ventana.nvim",
+    cmd = {
+      "VentanaTranspose",
+      "VentanaShift",
+      "VentanaShiftMaintainLinear",
+    },
+    keys = {
+      {
+        kwin.ventana.transpose,
+        "<CMD>VentanaTranspose<CR>",
+        mode = "n",
+        desc = "win.vent=> transpose",
+      },
+      {
+        kwin.ventana.shift,
+        "<CMD>VentanaShift<CR>",
+        mode = "n",
+        desc = "win.vent=> shift",
+      },
+      {
+        kwin.ventana.linear_shift,
+        "<CMD>VentanaShiftMaintainLinear<CR>",
+        mode = "n",
+        desc = "win.vent=> linear shift",
       },
     },
   },

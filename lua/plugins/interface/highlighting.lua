@@ -1,5 +1,5 @@
 local env = require("environment.ui")
-local kenv = require("environment.keys").stems
+local kenv = require("environment.keys").ui
 local key_easyread = kenv.easyread
 local key_block = kenv.block
 
@@ -19,7 +19,7 @@ return {
       extras = { named_parameters = true },
     },
     config = true,
-    event = "LspAttach",
+    event = "VeryLazy",
   },
   {
     "tzachar/highlight-undo.nvim",

@@ -1,5 +1,5 @@
 local sound_dir = vim.fn.expand("config") .. "/interface_sounds"
-local opt = require('environment.optional')
+local opt = require("environment.optional")
 
 return {
   {
@@ -58,20 +58,6 @@ return {
         enable = true,
         head = { cursor = "󰵵" },
         body = {},
-      },
-    },
-  },
-  {
-    "whleucka/reverb.nvim",
-    enabled = opt.reverb.enable,
-    event = "VeryLazy",
-    opts = {
-      sounds = {
-        BufRead = vim.fs.joinpath(sound_dir, "start.ogg"),
-        CursorMovedI = vim.fs.joinpath(sound_dir, "click.ogg"),
-        InsertLeave = vim.fs.joinpath(sound_dir, "toggle.ogg"),
-        ExitPre = vim.fs.joinpath(sound_dir, "exit.ogg"),
-        BufWrite = vim.fs.joinpath(sound_dir, "save.ogg"),
       },
     },
   },
