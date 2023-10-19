@@ -1,24 +1,24 @@
-local keystems = require("environment.keys").stems
+local stems = require("environment.keys")
 local env = require("environment.ui")
-local opt = require('environment.optional')
-local key_vista = keystems.vista
+local opt = require("environment.optional")
+local key_vista = stems.tool.vista
 local key_aerial = key_vista .. "a"
-local key_lens = keystems.lens
-local key_ui = keystems.base.ui
-local key_cp = keystems.control_panel
-local key_lsp = require("environment.keys").stems.base.lsp
+local key_ui = stems.ui:leader()
+local key_lens = stems.ui.lens
+local key_cp = stems.lsp.output_panel
+local key_lsp = stems.lsp:leader()
 
 return {
   {
     "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
-    config = true,
-    event = "LspAttach",
-    opts = function(_, opts)
-      vim.diagnostic.config({
-        uvirtual_text = false,
-        virtual_lines = { only_current_line = true },
-      })
+    config = function(_, opts)
+      vim.diagnostic.config(opts)
     end,
+    enabled = opt.lsp.diagnostics.lsp_lines.enable,
+    event = "VeryLazy",
+    opts = {
+      virtual_lines = { only_current_line = true },
+    },
     keys = {
       {
         key_ui .. "D",
@@ -32,6 +32,7 @@ return {
   },
   {
     "stevearc/aerial.nvim",
+    enabled = opt.symbol.aerial.enable,
     opts = {
       layout = {
         max_width = { 36, 0.2 },
@@ -122,42 +123,43 @@ return {
         key_aerial .. "a",
         "<CMD>AerialToggle<CR>",
         mode = "n",
-        desc = "symb=> toggle symbols outline",
+        desc = "symbol.aerial=> toggle",
       },
       {
         key_aerial .. "q",
         "<CMD>AerialClose<CR>",
         mode = "n",
-        desc = "symb=> close symbols outline",
+        desc = "symbol.aerial=> close",
       },
       {
         key_aerial .. "o",
         "<CMD>AerialOpen<CR>",
         mode = "n",
-        desc = "symb=> open symbols outline",
+        desc = "symbol.aerial=> open ",
       },
       {
         key_aerial .. "A",
         "<CMD>AerialToggle<CR>",
         mode = "n",
-        desc = "symb=> toggle[!] symbols outline",
+        desc = "symbol.aerial=> toggle[!]",
       },
       {
         key_aerial .. "Q",
         "<CMD>AerialClose<CR>",
         mode = "n",
-        desc = "symb=> close[!] symbols outline",
+        desc = "symbol.aerial=> close[!]",
       },
       {
         key_aerial .. "O",
         "<CMD>AerialOpen<CR>",
         mode = "n",
-        desc = "symb=> open[!] symbols outline",
+        desc = "symbol.aerial=> open[!]",
       },
     },
   },
   {
     "simrat39/symbols-outline.nvim",
+    enabled = opt.symbol.outline.enable,
     cmd = { "SymbolsOutline", "SymbolsOutlineOpen", "SymbolsOutlineClose" },
     opts = {
       highlight_hovered_item = true,
@@ -169,7 +171,7 @@ return {
       winblend = 20,
       keymaps = {
         code_actions = { "a", "ga", "<leader>ca" },
-        close = { "Q" },
+        close = { "<C-q>" },
         toggle_preview = "<C-p>",
         hover_symbol = "K",
         rename_symbol = "r",
@@ -187,36 +189,42 @@ return {
         key_vista .. "s",
         "<CMD>SymbolsOutline<CR>",
         mode = "n",
-        desc = "symb=> toggle outline",
+        desc = "symbol.outline=> toggle outline",
       },
       {
         key_vista .. "q",
         "<CMD>SymbolsOutlineClose<CR>",
         mode = "n",
-        desc = "symb=> close outline",
+        desc = "symbol.outline=> close outline",
       },
       {
         key_vista .. "o",
         "<CMD>SymbolsOutlineOpen<CR>",
         mode = "n",
-        desc = "symb=> open outline",
+        desc = "symbol.outline=> open outline",
       },
     },
   },
   {
     "VidocqH/lsp-lens.nvim",
+    event = "VeryLazy",
     opts = {
       enable = true,
       include_declaration = false,
       sections = {
-        definition = true,
-        references = true,
-        implements = true,
+        definition = function(count)
+          return "def#󰡱 " .. count
+        end,
+        references = function(count)
+          return "ref#󰡱 " .. count
+        end,
+        implements = function(count)
+          return "imp#󰡱 " .. count
+        end,
       },
       ignore_filetype = env.ft_ignore_list,
     },
     cmd = { "LspLensOn", "LspLensOff", "LspLensToggle" },
-    event = "LspAttach",
     keys = {
       {
         key_lens .. "o",
@@ -274,7 +282,8 @@ return {
   {
     "haringsrob/nvim_context_vt",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    event = "LspAttach",
+    -- event = "LspAttach",
+    event = "VeryLazy",
     config = true,
     opts = {
       enabled = true,
@@ -301,7 +310,7 @@ return {
   {
     "utilyre/sentiment.nvim",
     version = "*",
-    event = "LspAttach", -- keep for lazy loading
+    event = "VeryLazy",
     opts = {
       pairs = {
         { "(", ")" },
@@ -320,7 +329,7 @@ return {
     event = "VeryLazy",
     version = false,
     config = function(_, opts)
-      require('mini.operators').setup(opts)
+      require("mini.operators").setup(opts)
     end,
     opts = {
       evaluate = {
@@ -342,8 +351,7 @@ return {
   },
   {
     "ivanjermakov/troublesum.nvim",
-    enabled = opt.troublesum.enable,
-    event = "LspAttach",
+    event = "VeryLazy",
     opts = {
       enabled = true,
       autocmd = true,
@@ -358,7 +366,7 @@ return {
   },
   {
     "aznhe21/actions-preview.nvim",
-    event = "LspAttach",
+    -- event = "LspAttach",
     opts = {
       diff = {
         ctxlen = 3,
@@ -388,7 +396,7 @@ return {
   },
   {
     "mhanberg/output-panel.nvim",
-    cmd = "OutputPanel",
+    cmd = { "OutputPanel" },
     config = function(_, opts)
       require("output_panel").setup()
     end,
