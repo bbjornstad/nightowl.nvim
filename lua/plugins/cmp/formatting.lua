@@ -1,11 +1,16 @@
+local env = require("environment.ui")
+
 return {
   {
     "hrsh7th/nvim-cmp",
-    dependencies = { "VonHeikemen/lsp-zero.nvim", "onsails/lspkind.nvim" },
+    dependencies = {
+      -- "VonHeikemen/lsp-zero.nvim",
+      "onsails/lspkind.nvim",
+    },
     opts = function(_, opts)
       local cmp = require("cmp")
-      local cmp_format = require("lsp-zero").cmp_format()
-      --------------------------------------------------------------------------
+      -- local cmp_format = require("lsp-zero").cmp_format()
+      -- =======================================================================
       -- The following changes the appearance of the menu. Noted changes:
       -- - different row field order
       -- - vscode codicons
@@ -22,7 +27,20 @@ return {
           maxwidth = 60,
           ellipsis_char = "",
         }),
-      }, vim.tbl_extend("force", cmp_format, opts.formatting or {}))
+      }, opts.formatting or {})
+      -- set up window parameters and other main display settings. I don't know
+      -- why the documentation is not following the same pattern. Padding does
+      -- not seem to be applied.
+      opts.window = vim.tbl_deep_extend("force", {
+        completion = cmp.config.window.bordered({
+          border = env.borders.main,
+          side_padding = 2,
+        }),
+        documentation = cmp.config.window.bordered({
+          border = env.borders.main,
+          side_padding = 2,
+        }),
+      }, opts.window or {})
     end,
   },
 }
