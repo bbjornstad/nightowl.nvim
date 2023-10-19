@@ -1,153 +1,432 @@
+---@module environment_keys definintions of keybindings together in a single
+---file which is to be used during plugin specification
+---@author Bailey Bjornstad
+---@license MIT
+
+-- vim: set ft=lua sts=2 ts=2 sw=2 et: --
+
 local mod = {}
 
-function mod.map(modes)
-  local function returnable(lhs, rhs, opts)
-    vim.keymap.set(modes, lhs, rhs, opts)
-  end
+-- =============================================================================
+-- Leader Definitions...........................................................
+-- ==================
+local leader_definitions = require("environment.keys.leaders")
+local leader_core = leader_definitions.__leader__ or "<leader>"
+local __special_keys__ = leader_definitions.__special_keys__
 
-  return returnable
+local function leader(name, default)
+  return leader_definitions[name] or default or ""
 end
 
---- set up a table that will hold all of the keystem selections for access in
---- other files. this serves as a master record.
-mod.stems = {}
+local function kmod(ldr, map_tbl, opts)
+  ldr = ldr or ""
+  map_tbl = vim.tbl_map(function(t)
+    if type(t) == "table" then
+      local lead_add = t.__leaderadd__ or false
+      t.__leaderadd__ = nil
 
---- the stems.base item holds the baseline keystems for the various groups of
---- keybindings that are made using nightowl.nvim
-mod.stems.base = {}
+      local ret = kmod(ldr .. (lead_add or ""), t, opts)
+      return ret
+    end
+    return ldr .. t
+  end, map_tbl)
 
---------------------------------------------------------------------------------
--- Leader Definitions...........................................................
--- ------------------
-mod.stems.base.core = "<leader>"
-mod.stems.base.tasks = "<localleader>"
-mod.stems.base.editor = "\\"
-mod.stems.base.ai = ";"
-mod.stems.base.fuzzy = mod.stems.base.core .. "<leader>"
-mod.stems.base.buffers = "q"
-mod.stems.base.repl = "<F2>"
+  function map_tbl:leader()
+    return ldr
+  end
+  function map_tbl:accept()
+    return "<C-Space>"
+  end
+  function map_tbl:cancel()
+    return "<C-e>"
+  end
+  function map_tbl:close()
+    return "<C-q>"
+  end
+  function map_tbl:split()
+    return "<C-s>"
+  end
+  function map_tbl:hsplit()
+    return "<C-h>"
+  end
+  function map_tbl:modify()
+    return "<C-m>"
+  end
 
---------------------------------------------------------------------------------
+  return map_tbl
+end
+
+local function sk(opts)
+  return vim.tbl_deep_extend("force", opts, {
+    special_fmt = __special_keys__,
+  })
+end
+
+-- =============================================================================
 -- Core Keybind Stem............................................................
--- -----------------
-mod.stems.base.ui = mod.stems.base.core .. "u"
-mod.stems.base.scope = "Z"
-mod.stems.base.remote = mod.stems.base.core .. "r"
-mod.stems.base.code = mod.stems.base.core .. "c"
-mod.stems.base.grapple = {}
-mod.stems.base.grapple.popup = "gp"
-mod.stems.base.grapple.tag = "gt"
-mod.stems.base.portal = "go"
-mod.stems.base.neorg = "'"
-mod.stems.base.lsp = "gl"
-mod.stems.base.godocs = "gH"
-mod.stems.base.files = mod.stems.base.core .. "f"
-mod.stems.base.mail = mod.stems.base.core .. "m"
+-- =================
+local leader_competitive = leader("competitive") or ""
+mod.competitive = kmod(leader_competitive, {
+  core = {
+    __leaderadd__ = "<leader>",
+    files = {
+      __leaderadd__ = "f",
+      find = "f",
+      find_cwd = "F",
+      recent = "r",
+      recent_cwd = "R",
+    },
+    explore = {
+      primary = "e",
+      secondary = "E",
+    },
+    grep = {
+      live = "/",
+    },
+  },
+}, sk({ tag = "competitive" }))
 
---------------------------------------------------------------------------------
+local leader_buffer = leader("buffer")
+mod.buffer = kmod(leader_buffer, {}, sk({ tag = "buffer" }))
+
+local leader_window = leader("window")
+mod.window = kmod(leader_window, {
+  ventana = {
+    transpose = "t",
+    shift = "s",
+    linear_shift = "S",
+  },
+}, sk({ tag = "window" }))
+
+local leader_motion = leader("motion")
+mod.motion = kmod(leader_motion, {
+  grapple = {
+    popup = "p",
+    tag = "t",
+  },
+  portal = "o",
+}, sk({ tag = "motion" }))
+
+local leader_lazy = leader("lazy")
+mod.lazy = kmod(leader_lazy, {}, sk({ tag = "lazy" }))
+
+-- =============================================================================
+-- language server operatives...................................................
+-- ==========================
+local leader_lsp = leader("lsp")
+mod.lsp = kmod(leader_lsp, {
+  hover = "K",
+  definition = "d",
+  declaration = "D",
+  implementation = "I",
+  type_definition = "y",
+  references = "r",
+  signature_help = "k",
+  rename = "R",
+  format = "f",
+  code_action = "a",
+  open_float = "o",
+  goto_prev = "[d",
+  goto_next = "]d",
+  output_panel = "p",
+}, sk({ tag = "lsp" }))
+
+-- =============================================================================
+-- coding operatives............................................................
+-- =================
+local leader_code = leader("code")
+mod.code = kmod(leader_code, {
+  mason = "m",
+  venv = "v",
+  cmp = "x",
+}, sk({ tag = "code" }))
+
+-- =============================================================================
 -- UI Tooling...................................................................
--- ----------
-mod.stems.ccc = mod.stems.base.core .. "uk"
-mod.stems.easyread = mod.stems.base.core .. "uB"
-mod.stems.rest = mod.stems.base.core .. "R"
-mod.stems.lsp = mod.stems.base.core .. "c"
-mod.stems.lazy = mod.stems.base.core .. "L"
-mod.stems.cmp = "<C-o>"
+-- ==========
+local leader_ui = leader("ui")
+mod.ui = kmod(leader_ui, {
+  color = "k",
+  easyread = "B",
+  block = "b",
+  lens = "o",
+  context = "v",
+}, sk({ tag = "ui" }))
 
---------------------------------------------------------------------------------
+-- =============================================================================
+-- CMP Tooling...................................................................
+-- ===========
+-- TODO: fix this mapping...generally maybe just rework this again.
+mod.completion = kmod(false, {
+  toggle = {
+    __leaderadd__ = leader_code .. "x",
+    enabled = "e",
+    autocompletion = "c",
+  },
+  external = {
+    __leaderadd__ = "<C-x>",
+    complete_common_string = "<C-s>",
+    complete_fuzzy_path = "<C-f>",
+  },
+  submenus = {
+    __leaderadd__ = "<C-x>",
+    ai = {
+      libre = "a",
+      langfull = ":",
+    },
+    git = "g",
+    shell = "s",
+    glyph = "y",
+    lsp = "l",
+    location = ".",
+  },
+  docs = { forward = "<C-f>", backward = "<C-b>" },
+  jump = {
+    forward = "<Tab>",
+    backward = "<S-Tab>",
+  },
+  confirm = "<CR>",
+}, sk({ tag = "completion" }))
+
+-- =============================================================================
+-- build Tooling................................................................
+-- =============
+local leader_build = leader("build")
+mod.build = kmod(leader_build, {
+  executor = "e",
+  overseer = "o",
+  runner = "r",
+  compiler = "c",
+  rapid = leader_build,
+  launch = {
+    __leaderadd__ = "l",
+    task = "t",
+    ft_task = "T",
+    config_show = "c",
+    ft_config_show = "C",
+    active = "a",
+    debugger = "d",
+    ft_debugger = "D",
+    config_debug = "g",
+    ft_config_debug = "G",
+    config_edit = "e",
+  },
+}, sk({ tag = "build" }))
+
+-- =============================================================================
 -- Task Tooling.................................................................
--- ------------
-mod.stems.pomodoro = mod.stems.base.tasks .. "t"
-mod.stems.overseer = mod.stems.base.tasks .. "v"
-mod.stems.unfog = mod.stems.base.tasks .. "u"
-mod.stems._do = mod.stems.base.tasks .. "d"
-mod.stems.conduct = mod.stems.base.tasks .. "c"
-mod.stems.memento = mod.stems.base.tasks .. "m"
-mod.stems.pulse = mod.stems.base.tasks .. "p"
-mod.stems.executor = mod.stems.base.tasks .. "e"
+-- ============
+local leader_time = leader("time")
+mod.time = kmod(leader_time, {
+  pomodoro = "t",
+  unfog = "u",
+  do_ = "d",
+  conduct = "c",
+  pulse = "p",
+  neorg = leader("time"),
+  org = leader("time"),
+}, sk({ tag = "time" }))
 
---------------------------------------------------------------------------------
+-- =============================================================================
 -- AI Tooling...................................................................
--- ----------
-mod.stems.accept = "<C-Space>"
-mod.stems.cancel = "<C-e>"
-mod.stems.neural = mod.stems.base.ai .. "n"
-mod.stems.copilot = mod.stems.base.ai .. "g"
-mod.stems.codeium = mod.stems.base.ai .. "d"
-mod.stems.neoai = mod.stems.base.ai .. "e"
-mod.stems.cmp_ai = mod.stems.base.ai .. "a"
-mod.stems.llm = mod.stems.base.ai .. "h"
-mod.stems.chatgpt = mod.stems.base.ai .. "c"
-mod.stems.codegpt = mod.stems.base.ai .. "O"
-mod.stems.rgpt = mod.stems.base.ai .. "r"
-mod.stems.navi = mod.stems.base.ai .. "v"
-mod.stems.explain_it = mod.stems.base.ai .. "x"
-mod.stems.tabnine = mod.stems.base.ai .. "9"
-mod.stems.doctor = mod.stems.base.ai .. "d"
-mod.stems.gllm = mod.stems.base.ai .. "l"
-mod.stems.wtf = mod.stems.base.ai .. "w"
-mod.stems.backseat = mod.stems.base.ai .. "b"
-mod.stems.prompter = mod.stems.base.ai .. "p"
-mod.stems.gptnvim = mod.stems.base.ai .. "m"
-mod.stems.ollero = mod.stems.base.ai .. "o"
-mod.stems.aider = mod.stems.base.ai .. "y"
+-- ==========
+local leader_ai = leader("ai")
+mod.ai = kmod(leader_ai, {
+  neural = "n",
+  copilot = "g",
+  codeium = "d",
+  neoai = "e",
+  cmp_ai = "a",
+  llm = "h",
+  chatgpt = "c",
+  codegpt = "O",
+  rgpt = "r",
+  navi = "v",
+  explain_it = "x",
+  tabnine = "9",
+  doctor = "d",
+  gllm = "l",
+  wtf = "w",
+  backseat = "b",
+  prompter = "p",
+  gptnvim = "m",
+  ollero = "o",
+  aider = "y",
+}, sk({ tag = "ai" }))
 
---------------------------------------------------------------------------------
+-- =============================================================================
 -- file managers................................................................
--- -------------
-mod.stems.files = mod.stems.base.core .. "f"
-mod.stems.oil = mod.stems.base.files
-mod.stems.traveller = mod.stems.base.files .. "t"
-mod.stems.nnn = mod.stems.base.core .. "nn"
-mod.stems.broot = mod.stems.base.files .. "e"
-mod.stems.bolt = mod.stems.base.files .. "l"
+-- =============
+local leader_fm = leader("fm")
+mod.fm = kmod(leader_fm, {
+  oil = "o",
+  traveller = "e",
+  nnn = "n",
+  broot = "t",
+  bolt = "l",
+  memento = "m",
+  attempt = "a",
+}, sk({ tag = "fm" }))
 
---------------------------------------------------------------------------------
+-- =============================================================================
 -- repl types...................................................................
--- ----------
-mod.stems.sniprun = mod.stems.base.repl .. "s"
-mod.stems.iron = mod.stems.base.repl .. "r"
-mod.stems.vlime = mod.stems.base.repl .. "v"
-mod.stems.acid = mod.stems.base.repl .. "a"
-mod.stems.conjure = mod.stems.base.repl .. "c"
-mod.stems.jupyter = mod.stems.base.repl .. "j"
-mod.stems.iron = mod.stems.base.core .. "r"
+-- ==========
+local leader_repl = leader("repl")
+mod.repl = kmod(leader_repl, {
+  iron = "r",
+  vlime = "v",
+  acid = "a",
+  conjure = "c",
+  jupyter = "j",
+  sniprun = "s",
+  molten = "m",
+}, sk({ tag = "repl" }))
 
---------------------------------------------------------------------------------
--- core plugins.................................................................
--- ------------
-mod.stems.telescope = mod.stems.base.scope
-mod.stems.glow = mod.stems.base.core .. "P"
-mod.stems.notify = mod.stems.base.core .. "N"
-mod.stems.vista = mod.stems.base.core .. "v"
-mod.stems.neogen = mod.stems.base.core .. "D"
-mod.stems.lens = mod.stems.base.ui .. "o"
-mod.stems.git = mod.stems.base.core .. "g"
-mod.stems.block = mod.stems.base.ui .. "b"
-mod.stems.toggleterm = mod.stems.base.core .. "T"
-mod.stems.customterm = mod.stems.base.core .. "m"
-mod.stems.navbuddy = mod.stems.base.core .. "v"
-mod.stems.undotree = mod.stems.base.core .. "U"
-mod.stems.based = mod.stems.base.core .. "B"
-mod.stems.notice = mod.stems.base.core .. "N"
-mod.stems.focus = mod.stems.base.ui .. "W"
-mod.stems.devdocs = mod.stems.base.godocs
-mod.stems.treesj = mod.stems.base.core .. "p"
-mod.stems.attempt = mod.stems.base.core .. "a"
-mod.stems.regex = mod.stems.base.core .. "R"
-mod.stems.control_panel = mod.stems.base.lsp .. "c"
-mod.stems.mountaineer = mod.stems.base.mail .. "c"
+-- =============================================================================
+-- fuzzy search operatives......................................................
+-- =======================
+local leader_fuzzy = leader("fuzzy")
+mod.fuzzy = kmod(leader_fuzzy, {}, sk({ tag = "fuzzy" }))
 
---------------------------------------------------------------------------------
+local leader_scope = leader("scope")
+mod.scope = kmod(leader_scope, {
+  telescope = "i",
+}, sk({ tag = "scope" }))
+
+local leader_mpick = leader("mini.pick")
+mod.mpick = kmod(leader_mpick, {
+  registry = "p",
+  cli = "c",
+}, sk({ tag = "mpick" }))
+
+-- =============================================================================
+-- debug tooling...................................................................
+-- =============
+local leader_debug = leader("debug")
+mod.debug = kmod(leader_debug, {
+  adapters = "a",
+  printer = "P",
+})
+
+-- =============================================================================
+-- terminal tooling.............................................................
+-- ================
+local leader_term = leader("term")
+mod.term = kmod(leader_term, {
+  layout = {
+    vertical = "v",
+    horizontal = "h",
+    float = "f",
+    tabbed = "<tab>",
+  },
+  utiliterm = {
+    broot = "t",
+    weechat = "w",
+    sysz = "s",
+    btop = "b",
+  },
+}, sk({ tag = "term" }))
+
+mod.versioning = kmod(leader_core, {
+  git = "g",
+  undotree = "U",
+}, sk({ tag = "versioning" }))
+
+-- =============================================================================
+-- email operatives.............................................................
+-- ================
+local leader_mail = leader("mail")
+mod.mail = kmod(leader_mail, {
+  himalaya = "m",
+  mountaineer = "M",
+}, sk({ tag = "mail" }))
+
+-- =============================================================================
+-- other tooling................................................................
+-- =============
+mod.tool = kmod(leader_core, {
+  vista = "v",
+  neogen = "D",
+  regex = "R",
+  splitjoin = "p",
+  glow = "P",
+  preview = "P",
+  notice = "N",
+  devdocs = "H",
+  rest = "r",
+  remote = "r",
+}, sk({ tag = "tool" }))
+
+-- =============================================================================
+-- search tooling...............................................................
+-- ==============
+local leader_search = leader("search")
+mod.search = kmod(leader_search, {
+  register = "\"",
+  autocmd = "a",
+  buffer = "b",
+  command = "C",
+  command_history = "c",
+  diagnostics = {
+    document = "d",
+    workspace = "D",
+  },
+  grep = {
+    cwd = "G",
+    root = "g",
+  },
+  highlight = "H",
+  help = "h",
+  keymap = "k",
+  mark = "m",
+  man = "M",
+  option = "o",
+  replace = {
+    spectre = "rp",
+    others = "rp",
+  },
+  resume = "R",
+  symbol = {
+    workspace = "Y",
+    document = "y",
+  },
+  spelling = "s",
+  todo = {
+    todofixme = "T",
+    todo = "T",
+  },
+  word = {
+    cwd = "W",
+    root = "w",
+  },
+  noice = "n",
+}, sk({ tag = "search" }))
+
+-- =============================================================================
 -- text editing.................................................................
--- ------------
-mod.stems.figlet = mod.stems.base.editor .. "i"
-mod.stems.figban = mod.stems.base.editor .. "f"
-mod.stems.textgen = mod.stems.base.editor .. "t"
-mod.stems.cbox = mod.stems.base.editor .. "b"
-mod.stems.cline = mod.stems.base.editor .. "l"
-mod.stems.precede = mod.stems.base.editor .. "p"
-mod.stems.code_shot = mod.stems.base.editor .. "s"
-mod.stems.modeline = mod.stems.base.editor .. "m"
+-- ============
+local leader_editor = leader("editor")
+mod.editor = kmod(leader_editor, {
+  figlet = "i",
+  figban = "f",
+  textgen = "t",
+  cbox = "b",
+  cline = "l",
+  precede = "p",
+  code_shot = "s",
+  modeline = "m",
+  licenses = "c",
+}, sk({ tag = "editor" }))
+
+local leader_metakey = "<leader>"
+mod.metakey = kmod(leader_metakey, {
+  keyseer = "k",
+})
+
+-- local ret = kmod(leader_core, mod, sk({ tag = "core" }))
+
+function mod:leader()
+  return leader_core
+end
 
 return mod
