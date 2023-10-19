@@ -1,6 +1,6 @@
 local env = require("environment.ui")
-local stems = require("environment.keys").stems
-local key_devdocs = stems.devdocs
+local stems = require("environment.keys")
+local key_devdocs = stems.tool.devdocs
 
 return {
   "luckasRanarison/nvim-devdocs",

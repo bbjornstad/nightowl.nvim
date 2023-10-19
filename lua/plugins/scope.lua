@@ -1,10 +1,5 @@
--- TODO update the keymappings in the keys item of the below lazyspec and make
--- it such that the keymappings are made in each individual extension's setup as
--- opposed to the global telescope setup.
--- TODO update the keymappings so that FZF-lua is preferred in most cases for
--- performance reasons.
-local key_scope = require("environment.keys").stems.base.scope
-local key_notice = require("environment.keys").stems.notice
+local key_scope = require("environment.keys").scope:leader()
+local key_notice = require("environment.keys").tool.notice
 local util = require("lazyvim.util")
 
 local function insert_into_lazyspec(spec, item) end
@@ -136,9 +131,9 @@ local extspec = scopeutils.setup_extensions(target_extensions, {
   tasks = {
     theme = "ivy",
     output = {
-      style = "float",   -- "split" | "float" | "tab"
+      style = "float", -- "split" | "float" | "tab"
       layout = "center", -- "left" | "right" | "center" | "below" | "above"
-      scale = 0.6,       -- output window to editor size ratio
+      scale = 0.6, -- output window to editor size ratio
       -- NOTE: scale and "center" layout are only relevant when style == "float"
     },
   },
@@ -153,8 +148,6 @@ return {
     opts = {
       defaults = {
         [key_scope] = { name = "+telescope" },
-        -- TODO Add a few more of these baseline name mappings
-        -- directly onto the which-key configuration here.
       },
     },
   },
@@ -167,16 +160,29 @@ return {
           i = {
             ["<C-h>"] = "which_key",
             ["<C-q>"] = "close",
+            ["<C-j>"] = "move_selection_next",
+            ["<C-k>"] = "move_selection_previous",
+            ["<C-x>"] = function(prompt_bufnr)
+              require("telescope.actions").smart_send_to_qflist(prompt_bufnr)
+              require("telescope.actions").open_qflist(prompt_bufnr)
+            end,
           },
           n = {
             ["q"] = "close",
             ["qq"] = "close",
+            ["<C-q>"] = "close",
             ["gh"] = "which_key",
+            ["<C-j>"] = "move_selection_next",
+            ["<C-k>"] = "move_selection_previous",
+            ["<C-x>"] = function(prompt_bufnr)
+              require("telescope.actions").smart_send_to_qflist(prompt_bufnr)
+              require("telescope.actions").open_qflist(prompt_bufnr)
+            end,
           },
         },
         winblend = 10,
-        prompt_prefix = " ",
-        selection_caret = " ",
+        prompt_prefix = "... ",
+        selection_caret = "    ",
         initial_mode = "insert",
         dynamic_preview_window = true,
         prompt_title = "scope::searching...",
@@ -192,133 +198,133 @@ return {
       -- @module telescope.core: core keymappings.
       -- telescope.core: Find Files
       -- {
-      --   key_scope .. "ff",
+      --   key_scope and key_scope .. "ff",
       --   funblt("find_files"),
       --   mode = "n",
       --   desc = "scope=> search local files",
       -- },
       -- telescope.core: Old Files
       -- {
-      --   key_scope .. "fo",
+      --   key_scope and key_scope .. "fo",
       --   funblt("oldfiles"),
       --   mode = "n",
       --   desc = "scope=> search oldfiles",
       -- },
       -- telescope.core: Global Tags
       -- {
-      --   key_scope .. "g",
+      --   key_scope and key_scope .. "g",
       --   funblt("tags"),
       --   mode = "n",
       --   desc = "scope=> search tags",
       -- },
       -- telescope.core: Vim Commands
       -- {
-      --   key_scope .. "c",
+      --   key_scope and key_scope .. "c",
       --   funblt("commands"),
       --   mode = "n",
       --   desc = "scope=> scope through vim commands",
       -- },
       -- telescope.cort:. Help Tags
       -- {
-      --   key_scope .. "ht",
+      --   key_scope and key_scope .. "ht",
       --   funblt("help_tags"),
       --   mode = "n",
       --   desc = "scope=> search help tags",
       -- },
       -- telescope.core: Manual Pages
       -- {
-      --   key_scope .. "hm",
+      --   key_scope and key_scope .. "hm",
       --   funblt("man_pages"),
       --   mode = "n",
       --   desc = "scope=> search man pages",
       -- },
       -- telescope.core: Search History
       -- {
-      --   key_scope .. "hs",
+      --   key_scope and key_scope .. "hs",
       --   funblt("search_history"),
       --   mode = "n",
       --   desc = "scope=> scope history",
       -- },
       -- telescope.core: Command History
       -- {
-      --   key_scope .. "hc",
+      --   key_scope and key_scope .. "hc",
       --   funblt("command_history"),
       --   mode = "n",
       --   desc = "scope=> command history",
       -- },
       -- telescope.core: telescope builtins
       {
-        key_scope .. "i",
+        key_scope and key_scope .. "i",
         funblt("builtin"),
         mode = "n",
         desc = "scope=> search telescope",
       },
       -- telescope.core: open buffers
       -- {
-      --   key_scope .. "b",
+      --   key_scope and key_scope .. "b",
       --   funblt("buffers"),
       --   mode = "n",
       --   desc = "scope=> search open buffers",
       -- },
       -- telescope.core: treesitter nodes
       {
-        key_scope .. "e",
+        key_scope and key_scope .. "e",
         funblt("treesitter"),
         mode = "n",
         desc = "scope=> search treesitter nodes",
       },
       -- telescope.core: current buffer tags
       -- {
-      --   key_scope .. "t",
+      --   key_scope and key_scope .. "t",
       --   funblt("current_buffer_tags"),
       --   mode = "n",
       --   desc = "scope=> search current buffer's tags",
       -- },
       -- telescope.core: vim marks
       -- {
-      --   key_scope .. "m",
+      --   key_scope and key_scope .. "m",
       --   funblt("marks"),
       --   mode = "n",
       --   desc = "scope=> search marks",
       -- },
       -- telescope.core: loclist
       -- {
-      --   key_scope .. "y",
+      --   key_scope and key_scope .. "y",
       --   funblt("loclist"),
       --   mode = "n",
       --   desc = "scope=> search loclist",
       -- },
       -- telescope.core: keymappings
       -- {
-      --   key_scope .. "k",
+      --   key_scope and key_scope .. "k",
       --   funblt("keymaps"),
       --   mode = "n",
       --   desc = "scope=> search defined keymappings",
       -- },
       -- telescope.core: builtin pickers
       {
-        key_scope .. "o",
+        key_scope and key_scope .. "o",
         funblt("pickers"),
         mode = "n",
         desc = "scope=> search telescope",
       },
       -- telescope.core: vim options
       -- {
-      --   key_scope .. "v",
+      --   key_scope and key_scope .. "v",
       --   funblt("vim_options"),
       --   mode = "n",
       --   desc = "scope=> search vim options",
       -- },
       -- telescope.core: luasnip snippets
       {
-        key_scope .. "s",
+        key_scope and key_scope .. "s",
         funext("luasnip"),
         mode = "n",
         desc = "scope=> search defined snippets",
       },
       -- telescope.core: notifications
       {
-        key_scope .. "N",
+        key_scope and key_scope .. "N",
         funext("notify"),
         mode = "n",
         desc = "scope=> search notifications",
@@ -342,7 +348,7 @@ return {
       --   nowait = true,
       -- },
       {
-        key_scope .. "T",
+        key_scope and key_scope .. "T",
         funext("tasks"),
         mode = "n",
         desc = "scope=> search tasks",
@@ -362,15 +368,14 @@ return {
       require("telescope").load_extension("toggleterm")
     end,
   },
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build =
-    "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release; cmake --build build --config Release; cmake --install build --prefix build",
-    dependencies = { "junegunn/fzf", "junegunn/fzf.vim" },
-    config = function()
-      require("telescope").load_extension("fzf")
-    end,
-  },
+  -- {
+  --   "nvim-telescope/telescope-fzf-native.nvim",
+  --   build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release; cmake --build build --config Release; cmake --install build --prefix build",
+  --   dependencies = { "junegunn/fzf", "junegunn/fzf.vim" },
+  --   config = function()
+  --     require("telescope").load_extension("fzf")
+  --   end,
+  -- },
   {
     "nvim-telescope/telescope-file-browser.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },

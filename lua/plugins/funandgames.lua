@@ -1,5 +1,5 @@
 local env = require("environment.ui")
-local opt = require('environment.optional')
+local opt = require("environment.optional")
 
 return {
   {
@@ -22,6 +22,7 @@ return {
   },
   {
     "alec-gibson/nvim-tetris",
+    enabled = opt.games.tetris.enable,
     cmd = "Tetris",
     config = function() end,
     keys = {
@@ -35,6 +36,7 @@ return {
   },
   {
     "jim-fx/sudoku.nvim",
+    enabled = opt.games.sudoku.enable,
     cmd = "Sudoku",
     config = function()
       require("sudoku").setup({
@@ -44,6 +46,7 @@ return {
   },
   {
     "alanfortlink/blackjack.nvim",
+    enabled = opt.games.blackjack.enable,
     dependencies = { "nvim-lua/plenary.nvim" },
     cmd = "BlackJackNewGame",
     opts = {
@@ -52,6 +55,7 @@ return {
   },
   {
     "seandewar/killersheep.nvim",
+    enabled = opt.games.killersheep.enable,
     cmd = "KillKillKill",
     opts = {
       gore = true,
@@ -59,6 +63,7 @@ return {
   },
   {
     "seandewar/nvimesweeper",
+    enabled = opt.games.nvimesweeper.enable,
     cmd = "Nvimesweeper",
   },
   {

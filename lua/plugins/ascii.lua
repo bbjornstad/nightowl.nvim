@@ -1,9 +1,9 @@
-local stems = require("environment.keys").stems
-local key_cbox = stems.cbox
-local key_cline = stems.cline
-local key_figlet = stems.figlet
-local key_editor = stems.base.editor
-local mopts = require("uutils.functional").mopts
+local stems = require("environment.keys")
+local key_cbox = stems.editor.cbox
+local key_cline = stems.editor.cline
+local key_figlet = stems.editor.figlet
+local key_editor = stems.editor:leader()
+local mopts = require("funsak.table").mopts
 local inp = require("uutils.input")
 local compute_remaining_width = require("uutils.text").compute_remaining_width
 
@@ -364,6 +364,7 @@ return {
           vim.b.venn_enabled = nil
         end
       end
+
       -- toggle keymappings for venn using <leader>v
       vim.api.nvim_set_keymap(
         "n",

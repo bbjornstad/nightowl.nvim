@@ -29,9 +29,9 @@ return {
       incremental_selection = {
         enable = false,
         keymaps = {
-          init_selection = "<A-CR>",
-          node_incremental = "<A-CR>",
-          node_decremental = "<A-BS>",
+          init_selection = "<C-CR>",
+          node_incremental = "<C-CR>",
+          node_decremental = "<C-BS>",
         },
       },
       autotag = {
@@ -87,7 +87,10 @@ return {
         desc = "ctx=> upwards to context",
       },
     },
-    opts = { mode = "cursor" }, -- separator = "🮩" },
+    opts = {
+      enable = true,
+      mode = "cursor",
+    }, -- separator = "🮩" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   {

@@ -1,6 +1,6 @@
 local env = require("environment.ui")
-local default_colorizer = env.identify_highlight
-local key_ccc = require("environment.keys").stems.ccc
+local default_colorizer = require("funsak.colors").identify_highlight
+local key_ccc = require("environment.keys").ui.color
 
 return {
   {

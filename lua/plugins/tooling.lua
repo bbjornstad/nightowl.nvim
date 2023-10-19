@@ -1,17 +1,43 @@
 -- vim: set ft=lua sts=2 ts=2 sw=2 et:
 local env = require("environment.ui")
 local kenv = require("environment.keys")
+local kenv_term = kenv.term
 local mapx = vim.keymap.set
-local key_tterm = kenv.stems.toggleterm
-local key_cterm = kenv.stems.customterm
-local key_treesj = kenv.stems.treesj
-local key_code_shot = kenv.stems.code_shot
+local key_treesj = kenv.tool.splitjoin
+local key_code_shot = kenv.editor.code_shot
 
 local utiliterm = require("environment.utiliterm")
 
 return {
   {
-    "b0o/SchemaStore.nvim",
+    "smjonas/inc-rename.nvim",
+    cmd = { "IncRename" },
+    dependencies = {
+      {
+        "folke/noice.nvim",
+        optional = true,
+        opts = {
+          presets = {
+            inc_rename = true,
+          },
+        },
+      },
+    },
+    config = function(_, opts)
+      require("inc-rename").setup(opts)
+    end,
+    opts = {
+      preview_empty_name = false,
+      input_buffer_type = "dressing",
+    },
+    keys = {
+      {
+        "<leader>sr",
+        "<CMD>IncRename<CR>",
+        mode = "n",
+        desc = "search=> incremental",
+      },
+    },
   },
   {
     "akinsho/toggleterm.nvim",
@@ -36,14 +62,14 @@ return {
           return 85
         end
       end,
-      shading_factor = 2,
+      shading_factor = 4,
       winbar = {
         enabled = false,
       },
     },
     keys = {
       {
-        key_tterm .. "v",
+        kenv_term.layout.vertical,
         function()
           require("toggleterm").setup({ direction = "vertical" })
         end,
@@ -51,7 +77,7 @@ return {
         desc = "term=> toggle vertical layout",
       },
       {
-        key_tterm .. "h",
+        kenv_term.layout.horizontal,
         function()
           require("toggleterm").setup({ direction = "horizontal" })
         end,
@@ -59,7 +85,7 @@ return {
         desc = "term=> toggle horizontal layout",
       },
       {
-        key_tterm .. "f",
+        kenv_term.layout.float,
         function()
           require("toggleterm").setup({ direction = "float" })
         end,
@@ -67,7 +93,7 @@ return {
         desc = "term=> toggle float layout",
       },
       {
-        key_tterm .. "b",
+        kenv_term.layout.tabbed,
         function()
           require("toggleterm").setup({ direction = "tabbed" })
         end,
@@ -76,25 +102,19 @@ return {
       },
       -- custom terminal mappings go here.
       {
-        key_cterm .. "b",
+        kenv_term.utiliterm.btop,
         utiliterm.btop(),
         mode = "n",
         desc = "term.mon=> btop",
       },
       {
-        key_cterm .. "t",
-        utiliterm.broot({ direction = "float" }),
-        mode = "n",
-        desc = "term.mon=> broot",
-      },
-      {
-        key_cterm .. "s",
+        kenv_term.utiliterm.sysz,
         utiliterm.sysz(),
         mode = "n",
         desc = "term.mon=> sysz",
       },
       {
-        key_cterm .. "w",
+        kenv_term.utiliterm.weechat,
         utiliterm.weechat(),
         mode = "n",
         desc = "term.mon=> weechat",
@@ -181,23 +201,6 @@ return {
     end,
   },
   {
-    "folke/flash.nvim",
-    ---@type Flash.Config
-    opts = {
-      label = {
-        rainbow = {
-          enabled = true,
-        },
-        style = "overlay",
-      },
-      modes = {
-        char = {
-          keys = { "f", "F", "t", "T", "," },
-        },
-      },
-    },
-  },
-  {
     "kevinhwang91/nvim-bqf",
     ft = "qf",
     opts = {
@@ -207,7 +210,7 @@ return {
         win_height = 16,
         win_vheight = 2,
         delay_syntax = 80,
-        border = { "┏", "━", "┓", "┃", "┛", "━", "┗", "┃" },
+        border = env.borders.main,
         show_title = false,
         should_preview_cb = function(bufnr, winid)
           local ret = true
@@ -364,16 +367,6 @@ return {
     },
   },
   {
-    "rareitems/printer.nvim",
-    config = function(_, opts)
-      require("printer").setup(opts)
-    end,
-    opts = {
-      keymap = "<leader>dPp",
-      behavior = "insert_below",
-    },
-  },
-  {
     "AckslD/muren.nvim",
     config = function(_, opts)
       require("muren").setup(opts)
@@ -419,6 +412,32 @@ return {
         "<CMD>MurenUnique<CR>",
         mode = "n",
         desc = "muren=> toggle replacer",
+      },
+    },
+  },
+  {
+    "echasnovski/mini.comment",
+    event = "VeryLazy",
+    opts = {
+      start_of_line = false,
+      pad_comment_parts = true,
+      ignore_blank_line = false,
+    },
+    version = false,
+  },
+  {
+    "echasnovski/mini.surround",
+    event = "VeryLazy",
+    version = false,
+  },
+  {
+    "echasnovski/mini.align",
+    event = "VeryLazy",
+    version = false,
+    opts = {
+      mappings = {
+        start = "ga",
+        start_with_previw = "gA",
       },
     },
   },

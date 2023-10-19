@@ -1,12 +1,15 @@
 local env = require("environment.ui")
 local fenv = require("environment.fuzz")
-local fstem = require("environment.keys").stems.base.fuzzy
-local sstem = require("environment.keys").stems.base.scope
-local stem = require("environment.keys").stems.base.core
+local stems = require("environment.keys")
+local fstem = stems.fuzzy:leader()
+local sstem = stems.scope:leader()
+local stem = stems:leader()
 
 local function fza(target)
   return function()
-    require("fzf-lua")[target]({ winopts = { title = "query: " .. target } })
+    require("fzf-lua")[target]({
+      winopts = { title = "󱈇 query: " .. target },
+    })
   end
 end
 
@@ -17,7 +20,15 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     opts = {
-      -- fenv.fzf_profile,
+      keymap = {
+        builtin = {
+          ["<Ctrl-q>"] = "abort",
+        },
+        fzf = {
+          ["ctrl-j"] = "next-selected",
+          ["ctrl-k"] = "prev-selected",
+        },
+      },
       fzf_opts = {
         ["--cycle"] = "",
         ["--scroll-off"] = 4,
@@ -57,6 +68,15 @@ return {
     end,
     keys = {
       {
+        "<C-x><C-f>",
+        function()
+          require("fzf-lua").complete_path()
+        end,
+        mode = { "n", "v", "i" },
+        silent = true,
+        desc = "fuzz.path=> complete path",
+      },
+      {
         stem .. "/",
         fza("live_grep"),
         mode = "n",
@@ -68,12 +88,12 @@ return {
         mode = "n",
         desc = "fuzz.rg=> live grep",
       },
-      {
-        sstem .. "/",
-        fza("live_grep"),
-        mode = "n",
-        desc = "fuzz.rg=> live grep",
-      },
+      -- {
+      --   sstem .. "/",
+      --   fza("live_grep"),
+      --   mode = "n",
+      --   desc = "fuzz.rg=> live grep",
+      -- },
       {
         fstem .. "ff",
         fza("files"),
@@ -105,19 +125,19 @@ return {
         desc = "fuzz.buf=> buffers",
       },
       {
-        fstem .. "bff",
+        fstem .. "bf",
         fza("buffers"),
         mode = "n",
         desc = "fuzz.buf=> buffers",
       },
       {
-        fstem .. "bfl",
+        fstem .. "bl",
         fza("blines"),
         mode = "n",
         desc = "fuzz.buf=> lines in current buffer",
       },
       {
-        fstem .. "bfL",
+        fstem .. "bL",
         fza("lines"),
         mode = "n",
         desc = "fuzz.buf=> lines in all buffers",
@@ -453,7 +473,7 @@ return {
         desc = "fuzz.vc=> changes",
       },
       {
-        fstem .. '"',
+        fstem .. "\"",
         fza("registers"),
         mode = "n",
         desc = "fuzz.vim=> registers",

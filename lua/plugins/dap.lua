@@ -1,3 +1,5 @@
+local kenv = require("environment.keys").debug
+
 return {
   {
     "mfussenegger/nvim-dap",
@@ -16,16 +18,24 @@ return {
         "theHamsta/nvim-dap-virtual-text",
         dependencies = { "mfussenegger/nvim-dap" },
       },
+      {
+        "daic0r/dap-helper.nvim",
+        dependencies = {
+          "rcarriga/nvim-dap-ui",
+          "mfussenegger/nvim-dap",
+        },
+        config = function(_, opts)
+          require("dap-helper").setup()
+        end,
+      },
 
       -- which key integration
       {
         "folke/which-key.nvim",
         opts = {
           defaults = {
-            ["<leader>d"] = { name = "+debug" },
-            ["<leader>da"] = { name = "dap=> +adapters" },
-            -- TODO Add a few more of these baseline name mappings
-            -- directly onto the which-key configuration here.
+            [kenv:leader()] = { name = "+debug" },
+            [kenv.adapters] = { name = "dap=> +adapters" },
           },
         },
       }, -- mason.nvim integration
@@ -67,17 +77,31 @@ return {
       "mfussenegger/nvim-dap",
       "nvim-treesitter/nvim-treesitter",
     },
+    build = ":TSInstall dap_repl",
   },
   {
     "andrewferrier/debugprint.nvim",
+    event = "VeryLazy",
     opts = {
-      create_keymaps = false,
+      create_keymaps = true,
+      move_to_debugline = true,
     },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   {
     "andythigpen/nvim-coverage",
+    event = "VeryLazy",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = true,
+  },
+  {
+    "rareitems/printer.nvim",
+    config = function(_, opts)
+      require("printer").setup(opts)
+    end,
+    opts = {
+      keymap = kenv.printer .. "p",
+      behavior = "insert_below",
+    },
   },
 }

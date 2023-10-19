@@ -1,4 +1,4 @@
-local key_editor = require("environment.keys").stems.base.editor
+local key_editor = require("environment.keys").editor:leader()
 local tempath = vim.fn.stdpath("config") .. "/templates/template.nvim"
 
 return {

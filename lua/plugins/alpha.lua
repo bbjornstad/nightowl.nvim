@@ -2,73 +2,24 @@
 local env = require("environment.ui")
 local nightowl_splash = require("environment.alpha").nightowl_splash
 local nightowl_splash_frames =
-    require("environment.alpha").nightowl_splash_frames
+  require("environment.alpha").nightowl_splash_frames
 local nightowl_splash_compact_frames =
-    require("environment.alpha").nightowl_splash_compact_frames
+  require("environment.alpha").nightowl_splash_compact_frames
 
 local function ai_quote(opts)
   opts = opts or {}
 end
 
+local function alpha_state()
+  vim.cmd([[Veil]])
+  require("fsplash").open_window()
+end
+
 return {
   {
-    "goolord/alpha-nvim",
-    enabled = false,
-  },
-  {
-    "startup-nvim/startup.nvim",
-    enabled = false,
-    dependencies = {
-      "nvim-telescope/telescope.nvim",
-      "ibhagwan/fzf-lua",
-      "nvim-lua/plenary.nvim",
-    },
-    config = function(_, opts)
-      require("startup").setup(opts)
-      vim.g.startup_bookmarks = {
-        ["D"] = "~/.candy.d",
-        ["C"] = "~/.config/nvim",
-        ["P"] = "~/prj",
-        ["N"] = "~/.notes/note-index.norg",
-        ["T"] = "~/.notes/todo/junkdrawer.norg",
-        ["~"] = "~",
-      }
-    end,
-    opts = {
-      theme = "nightowl_startify",
-    },
-    keys = {
-      {
-        "<Home>",
-        function()
-          require("startup").display(true)
-        end,
-        mode = "n",
-        desc = "א.α => return to alpha state",
-      },
-      {
-        "gss",
-        function()
-          require("startup").display(true)
-        end,
-        mode = "n",
-        desc = "א.α => return to alpha state",
-      },
-      {
-        "gsk",
-        function()
-          require("startup.utils").key_help()
-        end,
-        mode = "n",
-        desc = "א.α => startup key mappings",
-      },
-    },
-  },
-  {
     "jovanlanik/fsplash.nvim",
-    event = "VeryLazy",
+    event = "VimEnter",
     config = true,
-    -- enabled = false,
     opts = {
       lines = nightowl_splash,
       autocmds = {
@@ -81,21 +32,29 @@ return {
       border = env.borders.main,
       winblend = 10,
     },
+    keys = {
+      {
+        "<S-Home>",
+        function()
+          require("fsplash").open_window()
+        end,
+        mode = "n",
+        desc = "א.α => splash screen",
+      },
+    },
   },
   {
     "willothy/veil.nvim",
-    event = "VimEnter",
-    enabled = false,
+    lazy = false,
+    enabled = true,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "ibhagwan/fzf-lua",
+      "jovanlanik/fsplash.nvim",
     },
     opts = function()
       return {
         sections = {
-          -- require("veil.builtin").sections.animated(nightowl_splash_frames, {
-          --   hl = "@constructor",
-          -- }),
           require("veil.builtin").sections.oldfiles({
             align = "center",
           }),
@@ -192,7 +151,7 @@ return {
     keys = {
       {
         "<Home>",
-        "<CMD>Veil<CR>",
+        alpha_state,
         mode = { "n" },
         desc = "א.α => return to alpha state",
       },

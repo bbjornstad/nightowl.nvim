@@ -1,5 +1,5 @@
 local env = require("environment.ui")
-local mopts = require("uutils.functional").mopts
+local mopts = require("funsak.table").mopts
 
 local handler = function(virtText, lnum, endLnum, width, truncate)
   local newVirtText = {}

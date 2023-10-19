@@ -1,6 +1,6 @@
 -- vim: set ft=lua: -0-
 local env = require("environment.ui")
-local keystems = require("environment.keys").stems.base
+local stems = require("environment.keys")
 
 return {
   {
@@ -17,6 +17,9 @@ return {
         zindex = 80,
       },
       triggers_nowait = {
+        "g",
+        "gc",
+        "gz",
         "g`",
         "g'", -- registers '"',
         "<c-r>",
@@ -41,17 +44,18 @@ return {
         group = " ",
       },
       defaults = {
-        [keystems.core] = { name = "+nvim core fxns" },
-        [keystems.editor] = { name = "+metadata/special editor cmds" },
-        [keystems.tasks] = { name = "+task/time management" },
-        [keystems.ai] = { name = "+ai and language models" },
-        [keystems.repl] = { name = "+repl-style" }, -- TODO Add a few more of these baseline name mappings -- directly onto the which-key configuration here.
-        [keystems.fuzzy] = { name = "+fuzzy find with fzf" },
-        [keystems.buffers] = { name = "+quitbuf utilities" },
-        [keystems.scope] = { name = "+fuzzy find with telescope" },
-        [keystems.ui] = { name = "+user interface" },
-        [keystems.code] = { name = "+act on code" },
-        [keystems.fuzzy] = { name = "+fuzzy find with fzf" },
+        [stems:leader()] = { name = "+nvim core fxns" },
+        [stems.editor:leader()] = { name = "+metadata/special editor cmds" },
+        [stems.time:leader()] = { name = "+task/time management" },
+        [stems.ai:leader()] = { name = "+ai and language models" },
+        [stems.repl:leader()] = { name = "+repl-style" },
+        [stems.fuzzy:leader()] = { name = "+fuzzy find with fzf" },
+        [stems.buffer:leader()] = { name = "+quitbuf utilities" },
+        [stems.scope:leader()] = { name = "+fuzzy find with telescope" },
+        [stems.ui:leader()] = { name = "+user interface" },
+        [stems.code:leader()] = { name = "+act on code" },
+        [stems.fuzzy:leader()] = { name = "+fuzzy find with fzf" },
+        [stems.fm:leader()] = { name = "+file managers" },
       },
     },
     keys = {
@@ -59,9 +63,9 @@ return {
         "<C-g>h",
         "<CMD>WhichKey '' i<CR>",
         mode = "i",
-        desc = "which=> key help"
-      }
-    }
+        desc = "which=> key help",
+      },
+    },
   },
   {
     "jokajak/keyseer.nvim",
@@ -72,7 +76,7 @@ return {
     version = false,
     keys = {
       {
-        "<leader>k",
+        stems.metakey.keyseer,
         "<CMD>KeySeer<CR>",
         mode = "n",
         desc = "seer=> keys mapped",

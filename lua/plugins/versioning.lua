@@ -1,8 +1,8 @@
 local env = require("environment.ui")
 local opt = require('environment.optional')
-local stems = require("environment.keys").stems
-local key_git = stems.git
-local key_undotree = stems.undotree
+local stems = require("environment.keys")
+local key_git = stems.versioning.git
+local key_undotree = stems.versioning.undotree
 local key_versioning = "gs"
 
 return {
@@ -62,7 +62,7 @@ return {
       },
     },
     opts = {
-      float_diff = false, -- using float window previews diff, set this `true` will disable layout option
+      float_diff = false,          -- using float window previews diff, set this `true` will disable layout option
       layout = "left_left_bottom", -- "left_bottom", "left_left_bottom"
       ignore_filetype = env.ft_ignore_list,
       window = {
@@ -97,7 +97,8 @@ return {
     cmd = { "GitBlameToggle", "GitBlameEnable" },
     init = function()
       vim.g.gitblame_delay = 1000
-      vim.g.gitblame_message_template = "<committer>@<committer-time>  󱛠 <summary>"
+      vim.g.gitblame_message_template =
+      "<committer>@<committer-time>  󱛠 <summary>"
     end,
     keys = {
       {
@@ -280,55 +281,20 @@ return {
     },
   },
   {
-    "gennaro-tedesco/nvim-possession",
-    dependencies = {
-      "ibhagwan/fzf-lua",
-    },
+    "echasnovski/mini.sessions",
+    version = false,
     opts = {
-      sessions = {
-        sessions_path = vim.fn.stdpath("data") .. "/sessions/",
-      },
-      autoload = true,
-      autosave = true,
-      autoswitch = {
-        enable = true,
-      },
-      fzf_winopts = {},
+      autoread = false,
+      autowrite = true,
+      directory = vim.fn.stdpath("data") .. "mini.sessions/",
+      file = "session-local.vim",
+      force = { read = false, write = true, delete = false },
+      hooks = {},
+      verbose = { read = false, write = true, delete = true },
     },
-    config = true,
-    keys = {
-      {
-        "<leader>Sl",
-        function()
-          require("nvim-possession").list()
-        end,
-        mode = "n",
-        desc = "session=> fuzzylist",
-      },
-      {
-        "<leader>Sn",
-        function()
-          require("nvim-possession").new()
-        end,
-        mode = "n",
-        desc = "session=> new",
-      },
-      {
-        "<leader>Su",
-        function()
-          require("nvim-possession").update()
-        end,
-        mode = "n",
-        desc = "session=> update",
-      },
-      {
-        "<leader>Sl",
-        function()
-          require("nvim-possession").delete()
-        end,
-        mode = "n",
-        desc = "session=> delete",
-      },
-    },
-  },
+    config = function(_, opts)
+      require('mini.sessions').setup(opts)
+    end,
+    event = "VeryLazy",
+  }
 }

@@ -1,14 +1,61 @@
 -- vim: set ft=lua: --
 local env = require("environment.ui")
-local keystems = require("environment.keys").stems
-local opt = require('environment.optional')
+local kenv = require("environment.keys")
+local kenv_term = kenv.term
+local stems = require("environment.keys").fm
+local opt = require("environment.optional")
+local utiliterm = require("environment.utiliterm")
 
-local key_files = keystems.files
-local key_nnn = keystems.nnn
-local key_bolt = keystems.bolt
-local key_attempt = keystems.attempt
+local key_files = stems:leader()
+local key_nnn = stems.nnn
+local key_bolt = stems.bolt
+local key_attempt = stems.attempt
+local key_broot = stems.broot
+local kenv_term = kenv_term.utiliterm
 
 return {
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    enabled = false,
+    module = false,
+  },
+  {
+    "lstwn/broot.vim",
+    enabled = opt.file_managers.broot.enable,
+    init = function()
+      vim.g.broot_default_conf_path = (
+        vim.env.XDG_CONFIG_HOME .. "/broot/conf.hjson"
+      )
+      vim.g.broot_replace_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
+      vim.g.broot_command = "commandline (broot)"
+    end,
+    keys = {
+      {
+        key_broot .. "o",
+        "<CMD>BrootWorkingDir<CR>",
+        mode = "n",
+        desc = "fm.broot=> working directory",
+      },
+      {
+        key_broot .. "O",
+        "<CMD>BrootCurrentDir<CR>",
+        mode = "n",
+        desc = "fm.broot=> current directory",
+      },
+    },
+  },
+  -- {
+  --   "akinsho/toggleterm.nvim",
+  --   keys = {
+  --     {
+  --       kenv_term.broot,
+  --       utiliterm.broot({ direction = "float" }),
+  --       mode = "n",
+  --       desc = "term.mon=> broot",
+  --     },
+  --   },
+  -- },
   {
     "is0n/fm-nvim",
     enabled = opt.file_managers.fm_nvim.enable,
@@ -50,7 +97,7 @@ return {
         vert_split = "<C-v>",
         horz_split = "<C-h>",
         tabedit = "<C-t>",
-        edit = "<C-e>",
+        edit = "<C-m>",
         ESC = "<ESC>",
       },
     },
@@ -66,7 +113,7 @@ return {
       vim.g.oil_extended_column_mode = false
     end,
     opts = {
-      default_file_explorer = true,
+      default_file_explorer = false,
       prompt_save_on_select_new_entry = true,
       columns = {
         "icon",
@@ -100,42 +147,46 @@ return {
         },
       },
       keymaps = {
-        ["`"] = "actions.tcd",
+        ["<A-`>"] = "actions.tcd",
         ["<A-CR>"] = "actions.tcd",
         ["<BS>"] = "actions.toggle_hidden",
         ["."] = "actions.toggle_hidden",
-        ["<C-BS>"] = "actions.parent",
         ["-"] = "actions.parent",
         ["_"] = "actions.open_cwd",
         ["q"] = "actions.close",
         [".."] = "actions.parent",
-        ["go."] = "actions.cd",
         ["<C-l>"] = "actions.refresh",
         ["<C-p>"] = "actions.preview",
-        ["<C-c>"] = { callback = function()
-          local extended_is_target = not (vim.b.oil_extended_column_mode or
-            vim.g.oil_extended_column_mode)
-          require('oil').set_columns(extended_is_target and
-            env.oil.columns.extended or env.oil.columns.succinct)
-          vim.b.oil_extended_column_mode = extended_is_target
-        end, desc = "fm.oil=> toggle column succinct mode" },
+        ["<C-c>"] = {
+          callback = function()
+            local extended_is_target = not (
+              vim.b.oil_extended_column_mode
+              or vim.g.oil_extended_column_mode
+            )
+            require("oil").set_columns(
+              extended_is_target and env.oil.columns.extended
+                or env.oil.columns.succinct
+            )
+            vim.b.oil_extended_column_mode = extended_is_target
+          end,
+          desc = "fm.oil=> toggle column succinct mode",
+        },
         ["<C-s>"] = "actions.select_vsplit",
         ["<C-h>"] = "actions.select_split",
-        ["g?"] = "actions.show_help",
         ["?"] = "actions.show_help",
       },
       view_options = {
         sort = {
-          { "type",  "asc", },
-          { "name",  "asc", },
+          { "type", "asc" },
+          { "name", "asc" },
           { "ctime", "desc" },
-          { "size",  "asc", }
-        }
-      }
+          { "size", "asc" },
+        },
+      },
     },
     keys = {
       {
-        key_files .. "oo",
+        key_files .. "o",
         function()
           return require("oil").open_float()
         end,
@@ -143,10 +194,10 @@ return {
         desc = "fm.oil=> open oil (float)",
       },
       {
-        key_files .. "os",
+        key_files .. "s",
         function()
           vim.cmd([[vsplit]])
-          require('oil').open()
+          require("oil").open()
         end,
         mode = "n",
         desc = "fm.oil=> open oil (split)",
@@ -162,8 +213,8 @@ return {
       {
         "<leader>e",
         function()
-          local root = require('lazyvim.util').get_root()
-          require("oil").open(root)
+          -- local root = require('lazyvim.util').get_root()
+          require("oil").open()
         end,
         mode = { "n" },
         desc = "fm.oil=> open oil (root)",
@@ -171,8 +222,8 @@ return {
       {
         "<leader>E",
         function()
-          local cwd = vim.loop.cwd() or "."
-          require('oil').open(cwd)
+          -- local cwd = vim.loop.cwd() or "."
+          require("oil").open()
         end,
         mode = { "n" },
         desc = "fm.oil=> open oil (cwd)",
@@ -184,7 +235,7 @@ return {
     config = true,
     cmd = { "NnnExplorer", "NnnPicker" },
     opts = function(_, opts)
-      opts.replace_netrw = opts.replace_netrw or "explorer"
+      opts.replace_netrw = opts.replace_netrw or nil
       opts.quitcd = opts.quitcd or "tcd"
       opts.explorer = vim.tbl_deep_extend("force", {
         width = 28,
@@ -202,15 +253,15 @@ return {
       }, opts.picker or {})
       local builtin = require("nnn").builtin
       opts.mappings = vim.tbl_deep_extend("force", {
-        { "<C-t>",  builtin.open_in_tab },       -- open file(s) in tab
-        { "<C-s>",  builtin.open_in_vsplit },    -- open file(s) in split
-        { "<C-v>",  builtin.open_in_vsplit },    -- open file(s) in vertical split
-        { "<C-h>",  builtin.open_in_split },     -- open file(s) in vertical split
-        { "<C-p>",  builtin.open_in_preview },   -- open file in preview split keeping nnn focused
-        { "<C-y>",  builtin.copy_to_clipboard }, -- copy file(s) to clipboard
-        { "g.",     builtin.cd_to_path },        -- cd to file directory
-        { "<A-CR>", builtin.cd_to_path },        -- cd to file directory
-        { "<A-:>",  builtin.populate_cmdline },  -- populate cmdline (:) with file(s)
+        { "<C-t>", builtin.open_in_tab }, -- open file(s) in tab
+        { "<C-s>", builtin.open_in_vsplit }, -- open file(s) in split
+        { "<C-v>", builtin.open_in_vsplit }, -- open file(s) in vertical split
+        { "<C-h>", builtin.open_in_split }, -- open file(s) in vertical split
+        { "<C-p>", builtin.open_in_preview }, -- open file in preview split keeping nnn focused
+        { "<C-y>", builtin.copy_to_clipboard }, -- copy file(s) to clipboard
+        { "g.", builtin.cd_to_path }, -- cd to file directory
+        { "<A-CR>", builtin.cd_to_path }, -- cd to file directory
+        { "<A-:>", builtin.populate_cmdline }, -- populate cmdline (:) with file(s)
       }, opts.mappings or {})
       opts.auto_close = opts.auto_close or true
       opts.auto_open = vim.tbl_deep_extend("force", {
