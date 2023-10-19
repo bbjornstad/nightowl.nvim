@@ -5,9 +5,9 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace=true
 
-# -----------------------------------------------------------------------------
+# =============================================================================
 # Org and Neorg: Organizational Tools
-# -----------------------------------
+# ===================================
 [*.{org,norg}]
 indent_style = space
 indent_size = 2

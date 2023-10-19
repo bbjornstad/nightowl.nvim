@@ -14,7 +14,17 @@
   },
   "lspconfig": {
     "lua_ls": {
-      "Lua.hint.enabled": true
+      "Lua.hint": {
+        "enabled": true,
+        "setType": true,
+        "arrayIndex": "Enable",
+        "paramType": true,
+        "await": true,
+        "paramName": "All",
+        "semicolon": "SameLine"
+      },
+      "Lua.codeLens.enable": true,
+      "Lua.workspace.checkThirdParty": false
     }
   }
 }
