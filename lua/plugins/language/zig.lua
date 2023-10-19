@@ -1,4 +1,7 @@
+local deflang = require('funsak.lazy').language
+
 return {
+  unpack(deflang({ "zig" }, { "zigfmt" }, {})),
   {
     "NTBBloodbath/zig-tools.nvim",
     ft = "zig",

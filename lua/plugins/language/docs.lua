@@ -1,5 +1,5 @@
-local stems = require("environment.keys").stems
-local key_neogen = stems.neogen
+local stems = require("environment.keys")
+local key_neogen = stems.tool.neogen
 
 return {
   {
@@ -12,7 +12,7 @@ return {
       {
         "<leader>Do",
         function()
-          require('auto-pandoc').run_pandoc()
+          require("auto-pandoc").run_pandoc()
         end,
         mode = "n",
         desc = "docs=> convert with pandoc",
@@ -43,7 +43,7 @@ return {
           return require("neogen").generate({ type = "any" })
         end,
         mode = "n",
-        desc = "gendoc=> generic docstring",
+        desc = "docs=> generic docstring",
       },
       {
         key_neogen .. "c",
@@ -51,7 +51,7 @@ return {
           return require("neogen").generate({ type = "class" })
         end,
         mode = "n",
-        desc = "gendoc=> class/obj docstring",
+        desc = "docs=> class/obj docstring",
       },
       {
         key_neogen .. "t",
@@ -59,7 +59,7 @@ return {
           return require("neogen").generate({ type = "type" })
         end,
         mode = "n",
-        desc = "gendoc=> type docstring",
+        desc = "docs=> type docstring",
       },
       {
         key_neogen .. "f",
@@ -67,7 +67,7 @@ return {
           return require("neogen").generate({ type = "func" })
         end,
         mode = "n",
-        desc = "gendoc=> function docstring",
+        desc = "docs=> function docstring",
       },
     },
   },

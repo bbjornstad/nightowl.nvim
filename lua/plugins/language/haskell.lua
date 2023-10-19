@@ -1,4 +1,4 @@
-local def = require('uutils.lazy').lang
+local deflang = require('funsak.lazy').language
 
 return {
   {
@@ -9,8 +9,11 @@ return {
     },
     branch = "1.x.x",
     ft = { "haskell", "hl" },
-    config = function(_, opts)
-      def({"haskell", "hl"}, "stylish_haskell", "hlint")
-    end
+    config = function(_, opts) end
   },
+  unpack(deflang("haskell", {
+    ormolu = {
+      command = "ormolu"
+    }
+  }, { "hlint" }))
 }

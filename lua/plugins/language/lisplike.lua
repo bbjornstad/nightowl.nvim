@@ -1,17 +1,11 @@
 local add_cmp_source = require("uutils.cmp").add_source
-local def = require('uutils.lazy').lang
+local deflang = require('funsak.lazy').language
 
 return {
+  unpack(deflang("clojure", "cljstyle", "clj-kondo")),
   {
     "clojure-vim/acid.nvim",
     config = function()
-      def({"clojure", "clj"}, function(opts)
-        return vim.tbl_deep_extend("force", {
-          exe = "cljfmt",
-          args = {},
-          stdin = true
-        }, opts)
-      end, "clj-kondo")
     end,
     build = ":UpdateRemotePlugins",
     ft = { "clojure" },

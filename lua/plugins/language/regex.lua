@@ -1,5 +1,5 @@
 local env = require("environment.ui")
-local key_regex = require("environment.keys").stems.regex
+local key_regex = require("environment.keys").tool.regex
 
 return {
   {

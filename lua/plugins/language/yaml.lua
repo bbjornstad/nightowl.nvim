@@ -1,10 +1,9 @@
-local mapn = require("environment.keys").map("n")
 local toggle_fmtoption = require("uutils.text").toggle_fmtopt
-local def = require("uutils.lazy").implang
-local masonry = require('uutils.lazy').masonry
+local deflang = require("funsak.lazy").language
+local masonry = require('funsak.lazy').masonry
 
 return {
-  def({ "yaml", "yml" }, "yamlfmt", "yamllint"),
+  unpack(deflang({ "yaml", "yml" }, { "yamlfmt" }, { "yamllint" })),
   masonry({ name = "yamlls", lang = "yaml" }, {
     schemaStore = {
       enable = false,
@@ -12,29 +11,6 @@ return {
     },
     schemas = require('schemastore').yaml.schemas(),
   }, { "b0o/SchemaStore.nvim" }),
-  -- {
-  --   "williamboman/mason-lspconfig.nvim",
-  --   dependencies = { "neovim/nvim-lspconfig", "b0o/SchemaStore.nvim" },
-  --   opts = function(_, opts)
-  --     opts = vim.tbl_deep_extend("force", opts, {
-  --       handlers = {
-  --         yamlls = function()
-  --           require("lspconfig").yamlls.setup({
-  --             settings = {
-  --               yaml = {
-  --                 schemaStore = {
-  --                   enable = false,
-  --                   url = "",
-  --                 },
-  --                 schemas = require("schemastore").yaml.schemas(),
-  --               },
-  --             },
-  --           })
-  --         end,
-  --       },
-  --     })
-  --   end,
-  -- },
   {
     "cuducos/yaml.nvim",
     ft = { "yaml" },
@@ -68,12 +44,17 @@ return {
     end,
     init = function()
       toggle_fmtoption("l")
-      vim.opt.formatoptions = vim.opt.formatoptions + "o"
-      mapn(
-        "<leader>M",
-        require("yaml-companion").open_ui_select,
-        { desc = "schema=> select YAML schemas" }
-      )
+      vim.opt.formatoptions:append("o")
     end,
+    keys = {
+      {
+        "<leader>M",
+        function()
+          require('yaml-companion').open_ui_select()
+        end,
+        mode = "n",
+        desc = "schema=> yaml schema",
+      },
+    },
   },
 }

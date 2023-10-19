@@ -1,9 +1,10 @@
-local stems = require("environment.keys").stems
-local mapn = require("environment.keys").map("n")
-local key_repl = stems.base.repl
-local key_iron = key_repl .. "r"
-local key_sniprun = key_repl .. "s"
-local key_magma = key_repl .. "m"
+local env = require("environment.ui")
+local stems = require("environment.keys")
+local mapn = require("funsak.keys").kmap("n")
+local key_repl = stems.repl:leader()
+local key_iron = stems.repl.iron
+local key_sniprun = stems.repl.sniprun
+local key_molten = stems.repl.molten
 
 return {
   {
@@ -163,57 +164,65 @@ return {
     end,
   },
   {
-    "dccsillag/magma-nvim",
+    "benlubas/molten-nvim",
     build = ":UpdateRemotePlugins",
     cmd = {
-      "MagmaEvaluateOperator",
-      "MagmaEvaluateLine",
-      "MagmaEvaluateVisual",
-      "MagmaReevaluateCell",
-      "MagmaDelete",
-      "MagmaShowOutput",
+      "MoltenInit",
+      "MoltenDeinit",
+      "MoltenEvaluateOperator",
+      "MoltenEvaluateLine",
+      "MoltenEvaluateVisual",
+      "MoltenReevaluateCell",
+      "MoltenDelete",
+      "MoltenShowOutput",
+      "MoltenHideOutput",
+      "MoltenInterrupt",
+      "MoltenRestart",
+      "MoltenSave",
+      "MoltenInterrupt",
     },
     init = function()
-      vim.g.magma_automatically_open_output = false
-      vim.g.magma_image_provider = "kitty"
-      vim.g.magma_output_window_borders = false
+      vim.g.molten_auto_open_output = false
+      vim.g.molten_copy_output = false
+      vim.g.molten_image_provider = "image_nvim"
+      vim.g.molten_output_crop_border = true
+      vim.g.molten_output_show_more = true
+      vim.g.molten_output_virt_lines = true
+      vim.g.molten_output_win_border = env.borders.main
+      vim.g.molten_output_win_cover_gutter = true
+      vim.g.molten_use_border_highlights = true
+      vim.g.molten_wrap_output = true
     end,
     keys = {
       {
-        key_magma .. "e",
-        "<CMD>MagmaEvaluateOperator<CR>",
+        key_molten .. "l",
+        "<CMD>MoltenEvaluateLine<CR>",
         mode = "n",
-        desc = "magma=> evaluate",
+        desc = "molten=> evaluate line",
       },
       {
-        key_magma .. "l",
-        "<CMD>MagmaEvaluateLine<CR>",
-        mode = "n",
-        desc = "magma=> evaluate line",
-      },
-      {
-        key_magma .. "e",
-        "<CMD>MagmaEvaluateVisual<CR>",
+        key_molten .. "e",
+        "<CMD>MoltenEvaluateVisual<CR>",
         mode = "x",
-        desc = "magma=> evaluate",
+        desc = "molten=> evaluate",
       },
       {
-        key_magma .. "r",
-        "<CMD>MagmaReevaluateCell<CR>",
+        key_molten .. "r",
+        "<CMD>MoltenReevaluateCell<CR>",
         mode = "n",
-        desc = "magma=> evaluate cell",
+        desc = "molten=> evaluate cell",
       },
       {
-        key_magma .. "d",
-        "<CMD>MagmaDelete<CR>",
+        key_molten .. "d",
+        "<CMD>MoltenDelete<CR>",
         mode = "n",
-        desc = "magma=> delete",
+        desc = "molten=> delete",
       },
       {
-        key_magma .. "s",
-        "<CMD>MagmaShowOutput<CR>",
+        key_molten .. "s",
+        "<CMD>MoltenShowOutput<CR>",
         mode = "n",
-        desc = "magma=> show output",
+        desc = "molten=> show output",
       },
     },
   },

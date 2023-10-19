@@ -1,10 +1,15 @@
-local key_repl = require("environment.keys").stems.base.repl
-local key_jupyter = key_repl .. "j"
-local key_fstring_toggle = "<leader>c"
-local def = require('uutils.lazy').implang
+local key_jupyter = require("environment.keys").repl.jupyter
+local key_fstring_toggle = require("environment.keys").code:leader() .. "f"
+local deflang = require("funsak.lazy").language
 
 return {
-  def({"python", "py"}, "black", {"ruff", "pycodestyle", "pydocstyle"}),
+  unpack(
+    deflang(
+      { "python", "py" },
+      { "black", "isort", "ruff-fix", "ruff-format" },
+      { "ruff" }
+    )
+  ),
   { "jmcantrell/vim-virtualenv", ft = { "python" } },
   {
     "mfussenegger/nvim-dap-python",
@@ -60,8 +65,8 @@ return {
     },
   },
   {
-    "numirias/semshi",
-    build = ":UpdateRemotePlugins",
+    "wookayin/semshi",
+    build = [[:UpdateRemotePlugins]],
     ft = "python",
   },
 }

@@ -1,5 +1,6 @@
-local stems = require("environment.keys").stems
-local key_rest = stems.rest
+local stems = require("environment.keys")
+local key_rest = stems.tool.rest
+local key_licenses = stems.editor.licenses
 
 return {
   {
@@ -96,5 +97,31 @@ return {
     },
     config = true,
     cmd = { "LicenseInsert", "LicenseFetch", "LicenseUpdate", "LicenseWrite" },
+    keys = {
+      {
+        key_licenses .. "i",
+        "<CMD>LicenseInsert<CR>",
+        mode = "n",
+        desc = "license=> insert",
+      },
+      {
+        key_licenses .. "f",
+        "<CMD>LicenseFetch<CR>",
+        mode = "n",
+        desc = "license=> fetch",
+      },
+      {
+        key_licenses .. "u",
+        "<CMD>LicenseUpdate<CR>",
+        mode = "n",
+        desc = "license=> update",
+      },
+      {
+        key_licenses .. "w",
+        "<CMD>LicenseWrite<CR>",
+        mode = "n",
+        desc = "license=> write",
+      },
+    },
   },
 }

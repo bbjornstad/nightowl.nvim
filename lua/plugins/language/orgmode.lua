@@ -1,7 +1,8 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local colors = require("kanagawa.colors").setup({ theme = "wave" }).palette
 local inp = require("uutils.input")
-local key_journal = require("environment.keys").stems.base.neorg .. "j"
+local key_time = require('environment.keys').time:leader()
+local key_journal = require("environment.keys").time.neorg .. "j"
 
 local function colorize(bg, fg, opts)
   opts = opts or {}
@@ -123,7 +124,8 @@ local organization_tools = {
         },
         tf = {
           description = "Full",
-          template = "* TODO %? | [%]\n  SCHEDULED: <%^{Start: |%<%Y-%m-%d %a>}> DEADLINE: <%^{End: |%<%Y-%m-%d %a>}>",
+          template =
+          "* TODO %? | [%]\n  SCHEDULED: <%^{Start: |%<%Y-%m-%d %a>}> DEADLINE: <%^{End: |%<%Y-%m-%d %a>}>",
         },
         e = "Event",
         eu = {
@@ -136,7 +138,8 @@ local organization_tools = {
         },
         er = {
           description = "Range",
-          template = "* TODO %? | [%]\n  <%^{Start: |%<%Y-%m-%d %a>}>--<%^{End: |%<%Y-%m-%d %a>}>",
+          template =
+          "* TODO %? | [%]\n  <%^{Start: |%<%Y-%m-%d %a>}>--<%^{End: |%<%Y-%m-%d %a>}>",
         },
       },
       mappings = {
@@ -190,9 +193,9 @@ local organization_tools = {
       },
       "lukas-reineke/headlines.nvim",
       { "madskjeldgaard/neorg-figlet-module", ft = "norg" },
-      { "pysan3/neorg-templates", ft = "norg" },
-      { "tamton-aquib/neorg-jupyter", ft = "norg" },
-      { "laher/neorg-exec", ft = "norg" },
+      { "pysan3/neorg-templates",             ft = "norg" },
+      { "tamton-aquib/neorg-jupyter",         ft = "norg" },
+      { "laher/neorg-exec",                   ft = "norg" },
     },
     build = ":Neorg sync-parsers",
     cmd = "Neorg",
@@ -260,7 +263,7 @@ local organization_tools = {
         ["external.templates"] = {
           config = {
             templates_dir = vim.fn.stdpath("config")
-              .. "/templates/neorg-templates",
+                .. "/templates/neorg-templates",
           },
         },
         ["external.jupyter"] = {},
@@ -395,7 +398,7 @@ local organization_tools = {
                 }
               )
             end,
-            neorg_leader = "'", -- kenv.stems.base.tasks,
+            neorg_leader = key_time,
           },
           keys = {
             {
@@ -412,14 +415,12 @@ local organization_tools = {
     },
   },
   {
-    {
-      "lukas-reineke/headlines.nvim",
-      ft = { "org", "norg", "markdown", "md", "rmd", "quarto" },
-      dependencies = {
-        "nvim-treesitter/nvim-treesitter",
-      },
-      config = true,
+    "lukas-reineke/headlines.nvim",
+    ft = { "org", "norg", "markdown", "md", "rmd", "quarto" },
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
     },
+    config = true,
   },
 }
 

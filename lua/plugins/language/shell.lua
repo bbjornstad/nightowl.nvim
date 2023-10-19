@@ -1,10 +1,12 @@
 local stems = require("environment.keys").stems
+local deflang = require('funsak.lazy').language
 
 return {
   {
     "LhKipp/nvim-nu",
     dependencies = {
       "zioroboco/nu-ls.nvim",
+      "nvim-treesitter/nvim-treesitter",
     },
     build = ":TSInstall nu",
     ft = { "nu" },
@@ -27,15 +29,17 @@ return {
 
     config = function(_, opts)
       require("nu-ls").setup(opts)
-      require('null-ls').setup({
-        sources = {
-          require('nu-ls'),
-        }
-      })
     end,
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "jose-elias-alvarez/null-ls.nvim",
+      {
+        "nvimtools/none-ls.nvim",
+        opts = function(_, opts)
+          opts.sources = vim.tbl_deep_extend("force", {
+            require('nu-ls')
+          }, opts.sources or {})
+        end
+      },
     },
   },
 }

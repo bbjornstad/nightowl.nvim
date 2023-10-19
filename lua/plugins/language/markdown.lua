@@ -1,15 +1,15 @@
 local env = require("environment.ui")
-local key_glow = require("environment.keys").stems.glow
+local key_glow = require("environment.keys").tool.glow
 
-local def = require('uutils.lazy').lang
+local deflang = require('funsak.lazy').language
 
 return {
+  unpack(deflang({ "markdown", "md", "rmd" },
+    { "markdown-toc", "markdownlint", "mdformat" }, "markdownlint")),
   {
     "preservim/vim-markdown",
     ft = { "markdown", "md", "rmd" },
-    config = function()
-      def({"markdown", "md"}, "prettierd", "vale")
-    end,
+    config = function() end,
     init = function()
       vim.g.vim_markdown_folding_disabled = 1
       vim.g.vim_markdown_math = 1
@@ -36,7 +36,7 @@ return {
     "ellisonleao/glow.nvim",
     opts = {
       border = env.borders.main,
-      style = os.getenv("NIGHTOWL_BACKGROUND_STYLE"),
+      style = vim.env.NIGHTOWL_BACKGROUND_STYLE,
     },
     cmd = "Glow",
     ft = { "markdown", "mkd", "md", "rmd", "qmd" },
