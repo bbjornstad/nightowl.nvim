@@ -66,7 +66,17 @@ local lazyconf = {
       },
     },
     -- Extra LazyVim bundled plugin specifications
-    -- - language definitions and tooling
+    -- We want basically everything that we can stuff into this specification,
+    -- so we are enabling almost all of the extra options.
+    --  Note that as of more recent versions of LazyVim (nightowl.nvim should be
+    --  kept as up to date as possible ideally), the `LazyExtras` command in
+    --  neovim provides a popup menu a-la lazy.nvim for (un)installation of any
+    --  of the extras. Neat...
+
+    -- ~~ lsp tooling ~~
+    { import = "lazyvim.plugins.extras.lsp.none-ls" },
+
+    -- ~~ language specification ~~
     { import = "lazyvim.plugins.extras.lang.typescript" },
     { import = "lazyvim.plugins.extras.lang.json" },
     { import = "lazyvim.plugins.extras.lang.rust" },
@@ -75,32 +85,34 @@ local lazyconf = {
     { import = "lazyvim.plugins.extras.lang.python" },
     { import = "lazyvim.plugins.extras.lang.python-semshi" },
     { import = "lazyvim.plugins.extras.lang.tex" },
+    { import = "lazyvim.plugins.extras.lang.markdown" },
+    { import = "lazyvim.plugins.extras.lang.yaml" },
 
-    -- lsp tooling
-    { import = "lazyvim.plugins.extras.lsp.none-ls" },
+    -- - ~~ ui tooling ~~
+    { import = "lazyvim.plugins.extras.ui.mini-animate" },
+    { import = "lazyvim.plugins.extras.ui.edgy" },
+    -- { import = "lazyvim.plugins.extras.ui.mini-starter" },
+
+    -- ~~ formatting and linting ~~
+    { import = "lazyvim.plugins.extras.formatting.black" },
+    { import = "lazyvim.plugins.extras.formatting.prettier" },
+    { import = "lazyvim.plugins.extras.linting.eslint" },
 
     -- - debugging, adapters, and testing
     { import = "lazyvim.plugins.extras.test.core" },
     { import = "lazyvim.plugins.extras.dap.core" },
     { import = "lazyvim.plugins.extras.dap.nlua" },
-    { import = "lazyvim.plugins.extras.ui.edgy" },
-    { import = "lazyvim.plugins.extras.ui.mini-animate" },
-    { import = "lazyvim.plugins.extras.ui.mini-starter" },
 
-    -- - utility tooling
+    -- - ~~ utility tooling ~~
     { import = "lazyvim.plugins.extras.util.project" },
     { import = "lazyvim.plugins.extras.util.dot" },
     { import = "lazyvim.plugins.extras.editor.aerial" },
     { import = "lazyvim.plugins.extras.editor.symbols-outline" },
 
-    -- - ui tooling
-    { import = "lazyvim.plugins.extras.ui.mini-animate" },
-    { import = "lazyvim.plugins.extras.ui.edgy" },
-    { import = "lazyvim.plugins.extras.ui.mini-starter" },
-
-    -- ai tooling
+    -- ~~ ai tooling ~~
     { import = "lazyvim.plugins.extras.coding.copilot" },
     { import = "lazyvim.plugins.extras.coding.codeium" },
+    { import = "lazyvim.plugins.extras.coding.tabnine" },
 
     -- user-level plugin configuration
     -- - exists namely to allow for modularziation of the specification
