@@ -44,7 +44,7 @@ env.default_sources = {
   },
   {
     name = "omni",
-    group_index = 1,
+    group_index = 2,
   },
   {
     name = "rg",
@@ -83,17 +83,17 @@ env.default_sources = {
   {
     name = "emoji",
     trigger_characters = { ":" },
-    group_index = 2,
+    group_index = 1,
   },
   {
     name = "nerdfont",
     trigger_characters = { ":" },
-    group_index = 2,
+    group_index = 1,
   },
   {
     name = "nerdfonts",
     trigger_characters = { "nf" },
-    group_index = 2,
+    group_index = 1,
   },
   {
     name = "color_names",
