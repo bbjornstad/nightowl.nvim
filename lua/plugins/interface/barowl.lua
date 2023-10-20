@@ -45,7 +45,7 @@ return {
       winblend = 50,
       zindex = 40,
       excluded_filetypes = env.ft_ignore_list,
-      width = 2,
+      width = 4,
       search = {
         enable = true,
       },
@@ -58,7 +58,7 @@ return {
         enable = true,
         signs = {
           add = "┊",
-          change = "│	",
+          change = "│",
           delete = "⌁",
         },
       },
@@ -68,7 +68,7 @@ return {
         key = "m",
       },
       quickfix = {
-        signs = { "-", "=", "≡" },
+        signs = { "⫞", "⫤", "⟚" },
       },
     },
     config = true,

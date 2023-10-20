@@ -150,8 +150,8 @@ return {
         env.ft_ignore_list,
         { "mail", "himalaya-email-listing" }
       ),
-      minimap_width = 16,
-      window_border = env.borders.main,
+      minimap_width = 12,
+      window_border = env.borders.alt,
     },
   },
 }
