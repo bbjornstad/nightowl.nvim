@@ -6,14 +6,13 @@ local leader_definitions = {
   window = leader_core .. "w",
   motion = "g",
   lazy = leader_core .. "L",
-  completion = false,
   build = "`",
   time = "<localleader>",
   ai = ";",
   fm = leader_core .. "f",
   repl = "`",
-  fuzzy = leader_core .. leader_core,
-  scope = "Z",
+  fuzz = leader_core .. leader_core,
+  scope = leader_core .. "s",
   lsp = leader_core .. "l",
   code = leader_core .. "c",
   term = leader_core .. "m",
@@ -25,6 +24,10 @@ local leader_definitions = {
   ui = leader_core .. "u",
   debug = leader_core .. "d",
   competitive = false,
+  view = leader_core .. "v",
+  action = leader_core .. "a",
+  docs = leader_core .. "D",
+  git = leader_core .. "g",
 }
 
 return leader_definitions

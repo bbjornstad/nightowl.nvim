@@ -1,22 +1,31 @@
-local mod = {}
+---@module "funsak.keys" functional swiss-army-knife attachments for management of
+---keybinds for lazy.nvim-vim.keymap agnosticity and semantic consistency
+---improvements.
+---@author Bailey Bjornstad | ursa-major
+---@license MIT
 
-function mod.kmap(modes)
-  local function returnable(lhs, rhs, opts)
-    vim.keymap.set(modes, lhs, rhs, opts)
+---@class funsak.keys
+local M = {}
+
+M.keygroup = require("funsak.keys.group").keygroup
+M.from_file = require("funsak.keys.group").from_file
+
+-- TODO: This is maybe a bit of a reach item at the moment, but it might be kind
+-- of nice to have a keygroup be capable of checking map consistency against a
+-- set of allowed keys, e.g. with a specific set of keys being allowed in the
+-- creation of the universe that lhs specifications in user config files would
+-- represent.
+
+function M.kfnmap(mode)
+  return function(lhs, rhs, opts)
+    vim.keymap.set(mode, lhs, rhs, opts)
   end
-
-  return returnable
 end
 
-mod.KeyModule = require("funsak.keys.kmod")
-mod.kbind = require("funsak.keys.binding")
-
-function mod.kmod(leader, map_tbl, opts)
-  local ret = KeyModule:new(map_tbl, opts):with_leader(leader):wrap(opts)
-  -- vim.notify(vim.inspect(ret))
-  return ret
+function M.kfndel(mode)
+  return function(lhs, opts)
+    vim.keymap.del(lhs, opts)
+  end
 end
 
-local requisition = require("funsak.masquerade").requisition
-
-return requisition(mod)
+return M
