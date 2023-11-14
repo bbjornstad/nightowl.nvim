@@ -1,11 +1,25 @@
----@module funsak_lazy defines mechanisms to inject formatting and linting
----specifications for a given language
+---@module "funsak.lazy" utilities for operating on specifications that are used
+---in lazy.nvim and LazyVim neovim package management/configuration setups.
 ---@author Bailey Bjornstad
 ---@license MIT
 
-local mod = {}
+local mopts = require("funsak.table").mopts
 
-function mod.linter(linter, ftype, lopts)
+---@class funsak.lazy
+local M = {}
+
+---@alias LintSakOptions
+---| { [string]: any } # options table for linters
+
+--- adds linter definitions to the given filetype to nvim-lint.
+---@param linter (string | string[] | table)? the linter or linter names that
+---should be associated with the following filetypes
+---@param ftype (string | string[])? the filetypes that are supposed to be
+---asscociated with the given linter.
+---@param lopts LintSakOptions
+---@return LazyPlugin can be easily inset alongside existing language
+---definitions.
+function M.linter(linter, ftype, lopts)
   ftype = (
     type(ftype) == "table" and vim.tbl_islist(ftype) and ftype
     or { ftype }
@@ -32,7 +46,16 @@ function mod.linter(linter, ftype, lopts)
   return ret
 end
 
-function mod.conform(formatter, ftype, fopts)
+--- adds formatter definitions for the given filetype to conform's
+--- specifications.
+---@param formatter (string | string[] | table)? formatter or formatters to
+---associate with the filetype
+---@param ftype (string | string[])? filetypes that are associated with the
+---given formatters.
+---@param fopts table? additional formatter options.
+---@return LazySpec spec a table which is easily inset alongside existing
+---language definitions.
+function M.conform(formatter, ftype, fopts)
   ftype = (type(ftype) == "table" and vim.tbl_islist(ftype)) and ftype
     or (ftype and { ftype })
     or {}
@@ -49,7 +72,7 @@ function mod.conform(formatter, ftype, fopts)
     or {}
   )
   local target = "stevearc/conform.nvim"
-  local ret = vim.tbl_deep_extend("force", { formatters = custom_formatters }, {
+  local ret = mopts({ formatters = custom_formatters }, {
     target,
     opts = function(_, opts)
       opts.formatters_by_ft = vim.tbl_deep_extend(
@@ -64,32 +87,60 @@ function mod.conform(formatter, ftype, fopts)
   return ret
 end
 
-function mod.language(ft, formatter, linter, opts)
+--- adds language formatter and linter definitions to lazy spec items by
+--- returning the properly formatted table item which is supposed to be inset
+--- in the specification.
+---@param ft string | string[] associated filetypes for the language, to be
+---used to add linter and format definitions.
+---@param formatter string | string[] the formatter names that are supposed to
+---be attached.
+---@param linter string | string[] the linter names that are supposed to be
+---attached.
+---@param opts table? additional options passed to internal linter and conform
+---wrappers.
+---@return LazySpec[] tables representing the appropriate Lazy Specification
+---stem portions that can be added alongside other language options.
+function M.language(ft, formatter, linter, opts)
   opts = opts or {}
-  linter = mod.linter(linter, ft, opts.linter or {})
-  formatter = mod.conform(formatter, ft, opts.formatter or {})
-  -- vim.notify("format: %s lint: %s", vim.inspect(formatter), vim.inspect(linter))
+  linter = M.linter(linter, ft, opts.linter or {})
+  formatter = M.conform(formatter, ft, opts.formatter or {})
   return { linter, formatter }
 end
 
-function mod.masonry(lserv, lopts, extradeps)
-  extradeps = extradeps or {}
-  local target = "neovim/nvim-lspconfig"
+--- injects the options that are needed for language server configuration for a
+--- specific server, designed to facilitate the componentization of the lsp
+--- configuration into individual language defintiions files.
+---@param server { name: string, lang: string } a table specification of the
+---language server names a that are targeted
+---@param target "setup" | "server"? name of the field to inject into in the
+---original lspconfig spec. Defaults to "setup".
+---@param opts table? language server configuration options.
+---@param dependencies LazySpec[]? list of additional dependency
+---specifications that are required for this configuration.
+---@return LazyPlugin spec the lspconfig item that is added to a lazy
+---specification.
+function M.masonry(server, target, opts, dependencies)
+  target = target or "setup"
+  opts = opts or {}
+  dependencies = dependencies or {}
+  dependencies = type(dependencies) ~= "table" and { dependencies }
+    or dependencies
+  local plugin_target = "neovim/nvim-lspconfig"
   local ret = {
-    target,
-    dependencies = vim.tbl_deep_extend("force", {}, extradeps),
-    opts = function(_, opts)
-      opts.servers = require("funsak.table").mopts(opts.servers or {}, {
-        [lserv.name] = lopts,
-        -- function()
-        --   lopts = vim.is_callable(lopts) and lopts()
-        --     or {
-        --       settings = {
-        --         [lserv.lang] = lopts,
-        --       },
-        --     }
-        --   require("lspconfig")[lserv.name].setup(lopts)
-        -- end,
+    plugin_target,
+    dependencies = mopts({}, dependencies),
+    opts = function(_, _opts)
+      local prev = _opts[target] or {}
+      _opts[target] = mopts(prev, {
+        [server.name] = function(serv, o)
+          o = vim.is_callable(o) and o(serv)
+            or {
+              settings = {
+                [server.lang] = o,
+              },
+            }
+          require("lspconfig")[server.name].setup(o)
+        end,
       })
     end,
   }
@@ -98,22 +149,24 @@ end
 
 --- directly accesses the given plugin's definitions as a part of lazy.nvim.
 --- This provides either the table specification or a field thereof, if a field
---- is given.
+--- is given. This function is styled in similar fashion to how the function
+--- `lazyvim.util.opts` is implemented.
 ---@param name string plugin name/uri as a part of lazy.nvim specification.
 ---@param field string? name of a lazy.nvim spec field to access, if none is
 ---given the whole specification is returned.
----@return table?|any? spec the plugin's specification within lazy.nvim. This
----can be used to make adjustments.
-function mod.spec(name, field)
+---@return LazySpec? | any? spec the plugin's specification within lazy.nvim.
+---This can be used to make adjustments.
+function M.spec(name, field)
   local plugin = require("lazy.core.config").plugins[name]
   if not plugin then
     return {}
   end
-  local Plugin = require("lazy.core.plugin")
   if field == nil then
     return plugin
   end
-  return Plugin.values(plugin, field, false)
+  local Plugin = require("lazy.core.plugin")
+  local ret = Plugin.values(plugin, field, false)
+  return ret
 end
 
 --- adds items to a lazy.nvim plugin specification under the given field. This
@@ -123,8 +176,8 @@ end
 ---@param field string name of the lazy.nvim spec field to which the values
 ---should be added.``
 ---@param value any value to be added under the specified field name.
-function mod.inject(name, field, value)
-  local plg = mod.spec(name, field)
+function M.inject(name, field, value)
+  local plg = M.spec(name, field)
   if type(value) == "table" and vim.tbl_islist(value) then
     plg = plg and table.insert(plg, value)
   else
@@ -132,60 +185,38 @@ function mod.inject(name, field, value)
   end
 end
 
---- defers the given callable from evaluation in its immediate context by
---- wrapping it in a secondary function, much like decorators in python.
----@param callable function callable whose evaluation is to be deferred for the
----immediate context.
----@param _return boolean? whether or not the value of the evaluating the
----callable should be returned to the user when calling this function.
----@return function fn wrapper around the argument given as the deferrable
----callable thing.
-function mod.lazy_defer(callable, _return)
-  _return = _return or false
-  local function deferred(...)
-    local res = callable(...)
-    if _return then
-      return res
-    end
+--- uses function composition to add additional configuration setup tasks at
+--- the end of a function-valued field in a LazySpec, such as the `config`
+--- field.
+---@param name string plugin name that is to be targeted
+---@param field string field name of the item within the plugin's LazySpec which
+---should be composed with the given.
+---@param fn fun(...)
+---@return function fn the composed function
+function M.compose(name, field, fn)
+  local plg = M.spec(name, field)
+  -- plg is old function, fn is the new function. We want to make sure that
+  -- both are applied in the right order
+  -- plg has to come last to make this work correctly, since the hope is to use
+  -- this to add tasks at the end of loading the standard lspconfig materials.
+
+  return function(...)
+    return plg and vim.is_callable(plg) and fn(plg(...))
   end
-  return deferred
 end
 
---- defers the given callable from evaluation in its immediate context by
---- wrapping it in a secondary function, much like python decorators. This
---- differs from the similar function `lazy_defer` as it uses a pcall under the
---- hood to catch any errors during evaluation of callable.
----@param callable function callable whose evaluation is to be deferred for the
----immediate context.
----@param _return boolean? whether or not the value of the evaluating the
----callable should be returned to the user when calling this function.
----@return function fn wrapper around the argument given as the deferrable
----callable thing.
-function mod.prot_lazy_defer(callable, _return)
-  _return = _return or false
-  local function deferred(...)
-    local status, res = pcall(callable, ...)
-    if not status then
-      return false
-    end
-    if _return then
-      return res
-    end
+--- does the same thing as the compose function, but inverts the operation order
+--- of the given user `fn` and the pre-specified `plg` function.
+---@param name string name of the lazy plugin that is targeted
+---@param field string name of the field of the lazy spec that is targeted
+---@param fn fun(...) a callback which will be called on the arguments to the
+---preexisting plg.
+---@return function fn the composed function
+function M.compinvert(name, field, fn)
+  local plg = M.spec(name, field)
+  return function(...)
+    return plg and vim.is_callable(plg) and plg(fn(...))
   end
-  return deferred
 end
 
---- defers the importation of a module file in its immediate context by simply
---- adding a level of function nesting. This is to ideally prevent issues where
---- requiring an item in the opts field when represented as a table fails due to
---- an apparent timing mismatch issue determining which modules are available at
---- a given moment.
----@param name string name of the module that is to be required using this
----function.
----@return table deferred the module is returned if it was required
--- successfully.
-function mod.defer_require(name)
-  return require(name)
-end
-
-return mod
+return M

@@ -1,3 +1,11 @@
+---@module "funsak.masquerade" tools for improving the general usability of of custom
+---modules written for lazy.nvim specifications and configurations.
+---@author Bailey Bjornstad | ursa-major
+---@license MIT
+
+---@class funsak.masquerade
+local M = {}
+
 --- creates a proxy object that is to be returned as the result of a module
 --- importation, and serves to prevent the unnecessary loading of component
 --- pieces. In other words, this is used to wrap modules that are imported with
@@ -11,7 +19,7 @@ local ModReturner = {}
 --- proxied table containing defined submodules.
 ---@param names string|string[]? name or list of names to retrieve from proxied
 ---table. If none provided, then function returns the entire proxied table.
----@return {string: table}
+---@return table<string, table>
 function ModReturner:get_mods(names)
   if not names then
     return self
@@ -109,27 +117,47 @@ local function returner(rt_modules, opts)
   return rt
 end
 
---- this simple function sets the metatable for the module which is to be
---- returned to a form wherein dynamically loaded submodules can lazily defer
---- their requisition. Note that this really will only work with tables and not
---- anything like a class or something that has to adjust its own metatable.
-local function requisition(mod, inject)
-  local mopts = require("funsak.table").mopts
-  inject = inject or {}
-  return setmetatable(
-    mod,
-    mopts({
-      __index = function(t, k)
-        t[k] = require(mod .. "." .. k)
-        return t[k]
-      end,
-    }, inject)
-  )
+--- requires a module in protected fashion; the `name` argument is passed to a
+--- call to `require` by way of `pcall`, and this function will return either
+--- the result if the requirement is successful, and the status code otherwise.
+---@param name string name of the module to require
+---@return table | boolean mod the required module or the boolean status code.
+function M.preq(name)
+  local ok, req = pcall(require, name)
+  return ok and req or ok
 end
 
-local function masquerade(mod, opts) end
+--- adjusts the metatable of a given table which is supposed to be imported as a
+--- submodule, such that the requirement is delayed and unused
+--- definitions/declarations from files other than what is imported are not
+--- honored unless explicitly asked.
+---@param mod table module to wrap in masqued behavior.
+---@param root T_Path? location of the modules in configurable components
+---@param opts T_Opts? additional options that should be passed, and I believe
+---that I may have your motivation somewhere in the car instead.
+function M.masque(mod, root, opts)
+  opts = opts or {}
+  root = root and root .. "." or ""
+  return setmetatable(mod, {
+    __index = function(t, k)
+      t[k] = require(root .. "." .. k)
+      return t[k]
+    end,
+  })
+end
 
-return {
-  requisition = requisition,
-  masquerade = masquerade,
-}
+--- a functional wrapper around the masque function, this defines how the
+--- deferred importation mechanism should work in context. Generally speaking,
+--- this is the main user-facing interface for configuration of the masquerade
+--- behavior.
+---@param root T_Path root folder of the modules that should be treated
+---@param opts T_Opts
+---@return fun(mod: any, opts: T_Opts): any |
+function M.requisition(root, opts)
+  return function(mod, o)
+    opts = require("funsak.table").mopts(opts, o)
+    return M.masque(mod, root, opts)
+  end
+end
+
+return M

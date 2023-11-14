@@ -1,4 +1,5 @@
----@module rendezvous tools for merging lazy.nvim spec tables.
+---@module "funsak.rendezvous" tools for creating a rendezvous point for data and
+---specification options before main use.
 ---@author Bailey Bjornstad
 ---@license MIT
 -- vim: set ft=lua ts=2 sw=2 sts=2 et:
@@ -14,6 +15,7 @@ local MergerSpecialField = {
   MergePriority = "__data_merge_priority__", -- out of the set, which items should take priority during merge
 }
 
+---@class funsak.rendezvous
 local Merger = {}
 Merger[MergerSpecialField.DataIndices] = {}
 
