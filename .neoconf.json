@@ -24,7 +24,16 @@
         "semicolon": "SameLine"
       },
       "Lua.codeLens.enable": true,
-      "Lua.workspace.checkThirdParty": false
+      "Lua.workspace.checkThirdParty": false,
+      "Lua.completion": {
+        "callSnippet": "Both",
+        "displayContext": "Both"
+      },
+      "Lua.diagnostics": {
+        "workspaceDelay": 500,
+        "globals": ["vim"]
+      },
+      "Lua.runtime.version": "LuaJIT"
     }
   }
 }
