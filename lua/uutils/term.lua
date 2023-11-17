@@ -9,7 +9,7 @@ function mod.term(opts)
 end
 
 function mod.spawn()
-  local Term = require('toggleterm.terminal').Terminal
+  local Term = require("toggleterm.terminal").Terminal
   return Term:spawn()
 end
 

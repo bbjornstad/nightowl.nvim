@@ -20,8 +20,8 @@ function mod.toggle_fmtopt(char)
     vim.opt.formatoptions:append(char)
   end
 end
-
 --- computes the remaining number of characters between the current cursor
+
 --- position and the colorcolumn or textwidth variables (in this order).
 ---@param offset number? the target width can be "shifted" by adding or removing
 ---a number of characters with this parameter.

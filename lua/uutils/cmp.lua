@@ -1,12 +1,65 @@
-local mod = {}
+---@module "uutils.cmp" user-facing utilities for management of nvim-cmp
+---interface
+---@author Bailey Bjornstad | ursa-major
+---@license MIT
+
+---@class uutils.cmp
+local M = {}
+
+M.cmp_actions = {}
+
+local function has_words_before()
+  unpack = unpack or table.unpack
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0
+    and vim.api
+        .nvim_buf_get_lines(0, line - 1, line, true)[1]
+        :sub(col, col)
+        :match("%s")
+      == nil
+end
+
+function M.cmp_actions.luasnip_supertab()
+  return function(fallback)
+    local cmp = require("cmp")
+    local luasnip = require("luasnip")
+    if cmp.visible() then
+      cmp.select_next_item()
+    -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
+    -- that way you will only jump inside the snippet region
+    elseif luasnip.expand_or_jumpable() then
+      luasnip.expand_or_jump()
+    elseif has_words_before() then
+      cmp.complete()
+    else
+      fallback()
+    end
+  end
+end
+
+function M.cmp_actions.luasnip_shift_supertab()
+  local cmp = require("cmp")
+  local luasnip = require("luasnip")
+  return function(fallback)
+    if cmp.visible() then
+      cmp.select_prev_item()
+    elseif luasnip.jumpable(-1) then
+      luasnip.jump(-1)
+    else
+      fallback()
+    end
+  end
+end
 
 local function source_parse(source, iopts)
   source = type(source) ~= "table" and { name = source } or source
-  iopts = type(iopts) ~= "table" and { group_index = iopts or 1 } or
-      (vim.tbl_islist(iopts) and vim.tbl_map(function(opt)
-        return type(opt) ~= "table" and { group_index = opt or 1 } or opt or
-            { group_index = 1 }
-      end, iopts)) or iopts
+  iopts = type(iopts) ~= "table" and { group_index = iopts or 1 }
+    or (vim.tbl_islist(iopts) and vim.tbl_map(function(opt)
+      return type(opt) ~= "table" and { group_index = opt or 1 }
+        or opt
+        or { group_index = 1 }
+    end, iopts))
+    or iopts
 end
 
 local function add_single_opts(source, iopts)
@@ -15,45 +68,44 @@ end
 
 local function filetype(ft, defaults)
   ft = type(ft) ~= "table" and { ft } or ft
-  local env = require('environment.cmp')
+  local env = require("environment.cmp")
   defaults = defaults or vim.deepcopy(env.default_sources)
   return function(sources, iopts)
-    sources = type(sources) ~= table and { add_single_opts(sources, iopts) } or
-        vim.tbl_map(function(sname)
-          return add_single_opts(sname, iopts)
-        end, sources) or sources
-    require('cmp').setup.filetype(ft, {
-      sources = defaults and vim.list_extend(defaults, sources) or sources
+    sources = type(sources) ~= table and { add_single_opts(sources, iopts) }
+      or vim.tbl_map(function(sname)
+        return add_single_opts(sname, iopts)
+      end, sources)
+      or sources
+    require("cmp").setup.filetype(ft, {
+      sources = defaults and vim.list_extend(defaults, sources) or sources,
     })
   end
 end
-
 
 local function attach_handler(map_p, map_o, attach_opts, behavior)
   for k, v in pairs(attach_opts) do
     local this_attach = attach_opts[k]
     local potential
     if type(this_attach) ~= "table" then
-      potential = (behavior == "force" and (map_o[k] or this_attach)) or
-          (behavior == "preserve" and this_attach)
+      potential = (behavior == "force" and (map_o[k] or this_attach))
+        or (behavior == "preserve" and this_attach)
       if not potential then
-        require('lazy.core.util').error(
+        require("lazy.core.util").error(
           string.format(
             "Conflicting unmergeable fields:\nOriginal: %s, Mapped: %s",
             map_o[k],
-            this_attach))
+            this_attach
+          )
+        )
       end
     else
-      potential = vim.tbl_deep_extend(
-        behavior,
-        this_attach,
-        map_o[k] or {})
+      potential = vim.tbl_deep_extend(behavior, this_attach, map_o[k] or {})
     end
     map_o[k] = potential
   end
 end
 
-function mod.ftwrap(ft, attach_to, wrap_opts)
+function M.ftwrap(ft, attach_to, wrap_opts)
   wrap_opts = wrap_opts or {}
   attach_to = attach_to or "hrsh7th/nvim-cmp"
   local behavior = wrap_opts.behavior or "force"
@@ -72,14 +124,18 @@ function mod.ftwrap(ft, attach_to, wrap_opts)
       -- function, the new wrapper calls the function with the appropriate signature, and
       -- if it was a table, then it ensures that those values are merged to the new
       -- wrapper function's arguments.
-      attach_to.opts = (vim.is_callable(attach_to.opts) and function(p, o)
-        local ret = attach_to.opts(p, o) or attach_to.opts()
-        source_fun(sources, iopts)
-        return ret
-      end) or function(p, o)
-        attach_handler(p, o, attach_to.opts, behavior)
-        source_fun(sources, iopts)
-      end
+      attach_to.opts = (
+        vim.is_callable(attach_to.opts)
+        and function(p, o)
+          local ret = attach_to.opts(p, o) or attach_to.opts()
+          source_fun(sources, iopts)
+          return ret
+        end
+      )
+        or function(p, o)
+          attach_handler(p, o, attach_to.opts, behavior)
+          source_fun(sources, iopts)
+        end
       return attach_to
     else
       -- in this case, the attach_to argument is epxected to be a string, which is the
@@ -91,24 +147,23 @@ function mod.ftwrap(ft, attach_to, wrap_opts)
         attach_to,
         opts = function(_, opts)
           source_fun(sources, iopts)
-        end
+        end,
       }
     end
   end
 end
 
-function mod.insert(sources, iopts)
-  sources = type(sources) ~= "table" and { add_single_opts(sources, iopts) } or
-      vim.tbl_map(function(sname)
-        return add_single_opts(sname, iopts)
-      end, sources)
+function M.insert(sources, iopts)
+  sources = type(sources) ~= "table" and { add_single_opts(sources, iopts) }
+    or vim.tbl_map(function(sname)
+      return add_single_opts(sname, iopts)
+    end, sources)
   return {
     "hrsh7th/nvim-cmp",
     opts = function(_, opts)
-      opts.sources = vim.list_extend(
-        opts.sources or {}, sources)
-    end
+      opts.sources = vim.list_extend(opts.sources or {}, sources)
+    end,
   }
 end
 
-return mod
+return M

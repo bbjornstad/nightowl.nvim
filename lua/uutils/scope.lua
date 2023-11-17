@@ -1,8 +1,52 @@
-local mod = {}
+local mopts = require("funsak.table").mopts
+
+local M = {}
 
 local scope_theme = "ivy"
 
-function mod.insert_source(configuration, extension)
+--- provides a handler for adding a new telescope component extension to the
+--- mix. This function is designed to return a table in LazyPlugin format which
+--- can be inserted into an appropriate lazy.nvim specification, or to return a
+--- function that does such when called with additional extension setup options
+---@param name string name/id of the target extension, e.g.
+---`"telescope-nvim/telescope-fzf-native.nvim"`
+---@param opts T_Opts
+---@param extension_setup (boolean | T_Opts)? specification for additional
+---parameters that should be passed directly to the extension's setup field if
+---it exists. These are not options that are supposed to be passed to the
+---telescope plugin directly, e.g. as part of its options. Instead, these are
+---sent to a `setup` method if desired. If not given, the setup function will be
+---returned. If a boolean, the value of the flag will indicate whether or not a
+---setup method should be called with empty parameters.
+---@return LazyPlugin | fun(o: T_Opts): LazyPlugin
+function M.extend(name, opts, extension_setup)
+  local setup_opts = extension_setup == true and {} or extension_setup
+  local new_item = {
+    name,
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+      opts = function(_, o)
+        o = mopts(opts or {}, o or {})
+      end,
+    },
+  }
+
+  --- calls the `setup` method of the extension itself, if it exists
+  ---@param extra_opts T_Opts the options that are passed to the extension's
+  ---individual `setup` method
+  ---@return LazyPlugin
+  local function setup(extra_opts)
+    return mopts(new_item, extra_opts)
+  end
+
+  if extension_setup == nil then
+    return setup
+  end
+
+  return extension_setup and setup(setup_opts)
+end
+
+function M.insert_source(configuration, extension)
   extension = extension or false
 
   local util = require("lazyvim.util")
@@ -16,7 +60,7 @@ function mod.insert_source(configuration, extension)
   table.insert(targeted, configuration)
 end
 
-function mod.setup_extension(extension, opts, theme, config)
+function M.setup_extension(extension, opts, theme, config)
   config[extension] = vim.tbl_deep_extend(
     "force",
     { theme = (theme or scope_theme) or "ivy" },
@@ -25,7 +69,7 @@ function mod.setup_extension(extension, opts, theme, config)
   -- require("telescope").load_extension(extension)
 end
 
-function mod.setup_picker(picker, opts, theme, config)
+function M.setup_picker(picker, opts, theme, config)
   config[picker] = vim.tbl_deep_extend(
     "force",
     { theme = (theme or scope_theme) or "ivy" },
@@ -33,7 +77,7 @@ function mod.setup_picker(picker, opts, theme, config)
   )
 end
 
-function mod.setup_targets(targets, opts, themes, fn)
+function M.setup_targets(targets, opts, themes, fn)
   fn = fn or function() end
   local configured = {}
   local new_themes = {}
@@ -64,15 +108,15 @@ function mod.setup_targets(targets, opts, themes, fn)
   return configured
 end
 
-function mod.setup_pickers(pickers, opts, themes)
-  return mod.setup_targets(pickers, opts, themes, mod.setup_picker)
+function M.setup_pickers(pickers, opts, themes)
+  return M.setup_targets(pickers, opts, themes, M.setup_picker)
 end
 
-function mod.setup_extensions(extensions, opts, themes)
-  return mod.setup_targets(extensions, opts, themes, mod.setup_extension)
+function M.setup_extensions(extensions, opts, themes)
+  return M.setup_targets(extensions, opts, themes, M.setup_extension)
 end
 
-function mod.extendoscope(extension_name, module_override, opts)
+function M.extendoscope(extension_name, module_override, opts)
   opts = opts or {}
   module_override = module_override or extension_name
   local scope = require("telescope")
@@ -81,11 +125,12 @@ function mod.extendoscope(extension_name, module_override, opts)
   end
 end
 
-function mod.builtinoscope(builtin_name, builtin_override, opts)
+function M.builtinoscope(builtin_name, builtin_override, opts)
   opts = opts or {}
   builtin_override = builtin_override or "telescope.builtin"
   return function()
     require(builtin_override)[builtin_name](opts)
   end
 end
-return mod
+
+return M
