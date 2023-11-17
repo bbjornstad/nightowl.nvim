@@ -1,4 +1,4 @@
-local deflang = require('funsak.lazy').language
+local deflang = require("funsak.lazy").lintformat
 
 return {
   unpack(deflang({ "zig" }, { "zigfmt" }, {})),

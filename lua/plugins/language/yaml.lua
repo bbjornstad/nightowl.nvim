@@ -1,15 +1,18 @@
+local kenv = require("environment.keys")
+local key_yaml = kenv.lang.yaml
+
 local toggle_fmtoption = require("uutils.text").toggle_fmtopt
-local deflang = require("funsak.lazy").language
-local masonry = require('funsak.lazy').masonry
+local deflang = require("funsak.lazy").lintformat
+local masonry = require("funsak.lazy").masonry
 
 return {
   unpack(deflang({ "yaml", "yml" }, { "yamlfmt" }, { "yamllint" })),
-  masonry({ name = "yamlls", lang = "yaml" }, {
+  masonry({ name = "yamlls", lang = "yaml" }, "server", {
     schemaStore = {
       enable = false,
       url = "",
     },
-    schemas = require('schemastore').yaml.schemas(),
+    schemas = require("schemastore").yaml.schemas(),
   }, { "b0o/SchemaStore.nvim" }),
   {
     "cuducos/yaml.nvim",
@@ -48,9 +51,9 @@ return {
     end,
     keys = {
       {
-        "<leader>M",
+        key_yaml.schema,
         function()
-          require('yaml-companion').open_ui_select()
+          require("yaml-companion").open_ui_select()
         end,
         mode = "n",
         desc = "schema=> yaml schema",

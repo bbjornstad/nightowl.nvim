@@ -1,11 +1,16 @@
 local env = require("environment.ui")
 local key_glow = require("environment.keys").tool.glow
 
-local deflang = require('funsak.lazy').language
+local deflang = require("funsak.lazy").lintformat
 
 return {
-  unpack(deflang({ "markdown", "md", "rmd" },
-    { "markdown-toc", "markdownlint", "mdformat" }, "markdownlint")),
+  unpack(
+    deflang(
+      { "markdown", "md", "rmd" },
+      { "markdown-toc", "markdownlint", "mdformat" },
+      "markdownlint"
+    )
+  ),
   {
     "preservim/vim-markdown",
     ft = { "markdown", "md", "rmd" },
@@ -19,18 +24,9 @@ return {
     end,
   },
   {
-    "SidOfc/mkdx",
-    ft = { "markdown", "md" },
-    config = function()
-      vim.cmd(
-        [[let g:mkdx#settings = { 'highlight': { 'frontmatter': { 'toml': 1, "json": 1 } }, 'map': { 'enable': 1, 'prefix': "M" } }]]
-      )
-    end,
-  },
-  {
     "jbyuki/nabla.nvim",
     config = false,
-    ft = { "markdown", "md" },
+    ft = { "markdown", "md", "qmd", "rmd", "quarto" },
   },
   {
     "ellisonleao/glow.nvim",
@@ -39,7 +35,7 @@ return {
       style = vim.env.NIGHTOWL_BACKGROUND_STYLE,
     },
     cmd = "Glow",
-    ft = { "markdown", "mkd", "md", "rmd", "qmd" },
+    ft = { "markdown", "mkd", "md", "rmd", "qmd", "quarto" },
     keys = {
       {
         key_glow,

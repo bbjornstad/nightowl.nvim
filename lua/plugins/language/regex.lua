@@ -46,7 +46,7 @@ return {
     },
     keys = {
       {
-        key_regex .. "r",
+        key_regex.explainer,
         "<CMD>RegexplainerToggle<CR>",
         mode = "n",
         desc = "regex=> explain",
@@ -60,19 +60,30 @@ return {
   {
     "tomiis4/hypersonic.nvim",
     config = true,
-    event = "CmdlineEnter",
+    ft = {
+      "html",
+      "js",
+      "cjs",
+      "mjs",
+      "ts",
+      "jsx",
+      "tsx",
+      "cjsx",
+      "mjsx",
+    },
+    -- event = "CmdlineEnter",
     cmd = "Hypersonic",
     opts = {
       border = env.borders.main,
       winblend = 15,
       add_padding = true,
       hl_group = "Keyword",
-      wrapping = '"',
+      wrapping = "\"",
       enable_cmdline = true,
     },
     keys = {
       {
-        key_regex .. "h",
+        key_regex.hypersonic,
         "<CMD>Hypersonic<CR>",
         mode = { "n", "v" },
         desc = "regex=> hypersonic",

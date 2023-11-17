@@ -1,12 +1,11 @@
 local add_cmp_source = require("uutils.cmp").add_source
-local deflang = require('funsak.lazy').language
+local deflang = require("funsak.lazy").lintformat
 
 return {
   unpack(deflang("clojure", "cljstyle", "clj-kondo")),
   {
     "clojure-vim/acid.nvim",
-    config = function()
-    end,
+    config = function() end,
     build = ":UpdateRemotePlugins",
     ft = { "clojure" },
   },
@@ -14,9 +13,14 @@ return {
     "clojure-vim/jazz.nvim",
     dependencies = {
       "clojure-vim/acid.nvim",
-      "Vigemus/impromptu.nvim",
+      "hkupty/impromptu.nvim",
     },
     ft = { "clojure" },
+  },
+  {
+    "hkupty/impromptu.nvim",
+    config = false,
+    event = "VeryLazy",
   },
   {
     "Shopify/shadowenv.vim",
@@ -37,6 +41,7 @@ return {
             },
           })
         end,
+        ft = { "clojure", "fennel", "python" },
       },
     },
     config = function(_, opts)

@@ -17,4 +17,13 @@ return {
     "MrPicklePinosaur/typst-conceal.vim",
     ft = { "typst" },
   },
+  {
+    "niuiic/typst-preview.nvim",
+    dependencies = { "niuiic/core.nvim" },
+    ft = { "typst" },
+    config = function(_, opts)
+      require("typst-preview").setup(opts)
+    end,
+    opts = {},
+  },
 }

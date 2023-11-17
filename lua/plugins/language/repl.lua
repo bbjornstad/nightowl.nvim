@@ -1,10 +1,11 @@
 local env = require("environment.ui")
-local stems = require("environment.keys")
-local mapn = require("funsak.keys").kmap("n")
-local key_repl = stems.repl:leader()
-local key_iron = stems.repl.iron
-local key_sniprun = stems.repl.sniprun
-local key_molten = stems.repl.molten
+local kenv = require("environment.keys")
+local key_repl = kenv.repl
+local mopts = require("funsak.table").mopts
+
+local mapn = function(lhs, rhs, opts)
+  vim.api.nvim_buf_set_keymap("n", lhs, rhs, opts)
+end
 
 return {
   {
@@ -15,7 +16,7 @@ return {
     end,
     keys = {
       {
-        key_repl .. "v",
+        key_repl.vlime,
         "<CMD>!sbcl --load <CR>",
         mode = "n",
         desc = "lisp=> start vlime",
@@ -30,41 +31,41 @@ return {
     -- event = "VeryLazy",
     keys = {
       {
-        key_sniprun .. "O",
+        key_repl.sniprun.line,
         "<Plug>SnipRun",
         mode = { "n" },
         silent = true,
         desc = "repl.snip=> line sniprun",
       },
       {
-        key_sniprun .. "o",
+        key_repl.sniprun.operator,
         "<Plug>SnipRunOperator",
         mode = { "n" },
         silent = true,
         desc = "repl.snip=> operator sniprun",
       },
       {
-        key_sniprun .. "s",
+        key_repl.sniprun.run,
         "<Plug>SnipRun",
         mode = { "v" },
         silent = true,
         desc = "repl.snip=> sniprun",
       },
       {
-        key_sniprun .. "i",
+        key_repl.sniprun.info,
         "<Plug>SnipInfo",
         mode = { "n" },
         silent = true,
         desc = "repl.snip=> sniprun info",
       },
       {
-        key_sniprun .. "q",
+        key_repl.sniprun.close,
         "<Plug>SnipClose",
         mode = { "n" },
         desc = "repl.snip=> close sniprun",
       },
       {
-        key_sniprun .. "l",
+        key_repl.sniprun.live,
         "<Plug>SnipLive",
         mode = { "n" },
         silent = true,
@@ -86,7 +87,7 @@ return {
     },
     keys = {
       {
-        key_iron .. "s",
+        key_repl.iron.filetype,
         function()
           local core = require("iron.core")
           local ft = vim.bo.filetype
@@ -96,7 +97,7 @@ return {
         desc = "repl.iron=> open ft repl",
       },
       {
-        key_iron .. "r",
+        key_repl.iron.restart,
         function()
           local core = require("iron.core")
           core.repl_restart()
@@ -105,7 +106,7 @@ return {
         desc = "repl.iron=> restart repl",
       },
       {
-        key_iron .. "f",
+        key_repl.iron.focus,
         function()
           local core = require("iron.core")
           local ft = vim.bo.filetype
@@ -115,7 +116,7 @@ return {
         desc = "repl.iron=> focus on repl",
       },
       {
-        key_iron .. "q",
+        key_repl.iron.hide,
         function()
           local core = require("iron.core")
           local ft = vim.bo.filetype
@@ -128,14 +129,45 @@ return {
   },
   {
     "quarto-dev/quarto-nvim",
+    opts = {
+      debug = true,
+      lspFeatures = {
+        enabled = true,
+        languages = { "r", "python", "julia", "bash", "rust", "haskell", "lua" },
+        chunks = "curly",
+        diagnostics = {
+          enabled = true,
+          triggers = { "BufWritePost" },
+          completion = {
+            enabled = true,
+          },
+        },
+        keymap = {
+          hover = "K",
+          definition = "gd",
+          rename = "<leader>cr",
+          references = "gr",
+        },
+      },
+    },
     dependencies = {
       {
         "jmbuhr/otter.nvim",
         dependencies = {
-          "hrsh7th/nvim-cmp",
           "neovim/nvim-lspconfig",
-          "nvim-treesitter/nvim-treesitter",
         },
+        event = { "LspAttach" },
+        ft = { "quarto", "qmd", "markdown", "rmd", "norg", "org" },
+        opts = {
+          lsp = {
+            hover = {
+              border = env.borders.main,
+            },
+          },
+        },
+        config = function(_, opts)
+          require("otter").setup(opts)
+        end,
       },
       "hrsh7th/nvim-cmp",
       "neovim/nvim-lspconfig",
@@ -147,12 +179,12 @@ return {
       mapn(
         "gd",
         otter.ask_definition,
-        { desc = "otter=> ask for item definition", silent = true }
+        { desc = "repl.otter=> ask for item definition", silent = true }
       )
       mapn(
         "gK",
         otter.ask_hover,
-        { desc = "otter=> ask for item hover", silent = true }
+        { desc = "repl.otter=> ask for item hover", silent = true }
       )
       otter.activate({
         "r",
@@ -160,6 +192,14 @@ return {
         "lua",
         "julia",
         "rust",
+        "haskell",
+        "zig",
+        "typst",
+        "json",
+        "lisp",
+        "scala",
+        "lean",
+        "clojure",
       }, true)
     end,
   },
@@ -195,34 +235,159 @@ return {
     end,
     keys = {
       {
-        key_molten .. "l",
+        key_repl.molten.evaluate.line,
         "<CMD>MoltenEvaluateLine<CR>",
         mode = "n",
-        desc = "molten=> evaluate line",
+        desc = "repl.molten=> evaluate line",
       },
       {
-        key_molten .. "e",
+        key_repl.molten.evaluate.visual,
         "<CMD>MoltenEvaluateVisual<CR>",
         mode = "x",
-        desc = "molten=> evaluate",
+        desc = "repl.molten=> evaluate",
       },
       {
-        key_molten .. "r",
+        key_repl.molten.evaluate.cell,
         "<CMD>MoltenReevaluateCell<CR>",
         mode = "n",
-        desc = "molten=> evaluate cell",
+        desc = "repl.molten=> evaluate cell",
       },
       {
-        key_molten .. "d",
+        key_repl.molten.delete,
         "<CMD>MoltenDelete<CR>",
         mode = "n",
-        desc = "molten=> delete",
+        desc = "repl.molten=> delete",
       },
       {
-        key_molten .. "s",
+        key_repl.molten.show,
         "<CMD>MoltenShowOutput<CR>",
         mode = "n",
-        desc = "molten=> show output",
+        desc = "repl.molten=> show output",
+      },
+    },
+  },
+  {
+    "milanglacier/yarepl.nvim",
+    config = function(_, opts)
+      require("yarepl").setup(opts)
+    end,
+    opts = function(_, opts)
+      opts.buflisted = opts.buflisted or true
+      opts.scratch = opts.scratch or true
+      opts.ft = opts.ft or "yarepl"
+      opts.metas = mopts({
+        aichat = {
+          cmd = "aichat",
+          formatter = require("yarepl").formatter.bracketed_pasting,
+        },
+        radian = {
+          cmd = "radian",
+          formatter = require("yarepl").formatter.bracketed_pasting,
+        },
+        ipython = {
+          cmd = "ipython",
+          formatter = require("yarepl").formatter.bracketed_pasting,
+        },
+        python = {
+          cmd = "python",
+          formatter = require("yarepl").formatter.trim_empty_lines,
+        },
+        R = {
+          cmd = "R",
+          formatter = require("yarepl").formatter.trim_empty_lines,
+        },
+        bash = {
+          cmd = "bash",
+          formatter = require("yarepl").formatter.trim_empty_lines,
+        },
+        zsh = {
+          cmd = "zsh",
+          formatter = require("yarepl").formatter.bracketed_pasting,
+        },
+      }, opts.metas or {})
+    end,
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+      "stevearc/dressing.nvim",
+    },
+    keys = {
+      {
+        key_repl.yarepl.start,
+        "<CMD>REPLStart<CR>",
+        mode = "n",
+        desc = "repl.ya=> start [menu]",
+      },
+      {
+        key_repl.yarepl.attach_buffer,
+        "<CMD>REPLAttachBufferToREPL<CR>",
+        mode = "n",
+        desc = "repl.ya=> attach current",
+      },
+      {
+        key_repl.yarepl.detach_buffer,
+        "<CMD>REPLDetachBufferToREPL<CR>",
+        mode = "n",
+        desc = "repl.ya=> detach current",
+      },
+      {
+        key_repl.yarepl.cleanup,
+        "<CMD>REPLCleanup<CR>",
+        mode = "n",
+        desc = "repl.ya=> cleanup",
+      },
+      {
+        key_repl.yarepl.focus,
+        "<CMD>REPLFocus<CR>",
+        mode = "n",
+        desc = "repl.ya=> focus",
+      },
+      {
+        key_repl.yarepl.hide,
+        "<CMD>REPLHide<CR>",
+        mode = "n",
+        desc = "repl.ya=> hide",
+      },
+      {
+        key_repl.yarepl.hide_or_focus,
+        "<CMD>REPLHideOrFocus<CR>",
+        mode = "n",
+        desc = "repl.ya=> hide or focus",
+      },
+      {
+        key_repl.yarepl.close,
+        "<CMD>REPLClose<CR>",
+        mode = "n",
+        desc = "repl.ya=> close",
+      },
+      {
+        key_repl.yarepl.swap,
+        "<CMD>REPLSwap<CR>",
+        mode = "n",
+        desc = "repl.ya=> swap",
+      },
+      {
+        key_repl.yarepl.send_visual,
+        "<CMD>REPLSendVisual<CR>",
+        mode = "n",
+        desc = "repl.ya=> send visual",
+      },
+      {
+        key_repl.yarepl.send_line,
+        "<CMD>REPLSendLine<CR>",
+        mode = "n",
+        desc = "repl.ya=> send line",
+      },
+      {
+        key_repl.yarepl.send_operator,
+        "<CMD>REPLSendOperator<CR>",
+        mode = "n",
+        desc = "repl.ya=> send operator",
+      },
+      {
+        key_repl.yarepl.exec,
+        "<CMD>REPLExec<CR>",
+        mode = "n",
+        desc = "repl.ya=> exec",
       },
     },
   },

@@ -1,5 +1,5 @@
 local env = require("environment.ui")
-local deflang = require('funsak.lazy').language
+local deflang = require("funsak.lazy").lintformat
 
 return {
   unpack(deflang({ "rust", "rs" }, { "rustfmt" }, {})),
@@ -22,7 +22,7 @@ return {
           },
         },
       }
-    end
+    end,
   },
   {
     "hrsh7th/nvim-cmp",
@@ -30,6 +30,19 @@ return {
       opts.sources = vim.list_extend(opts.sources or {}, {
         { name = "crates", group_index = 1 },
       })
-    end
+    end,
+  },
+  {
+    "vxpm/ferris.nvim",
+    opts = {
+      create_commands = true,
+      url_handler = "xdg-open",
+    },
+    ft = { "rust", "rs" },
+  },
+  {
+    "mrcjkb/rustaceanvim",
+    version = "^3",
+    ft = { "rust", "rs" },
   },
 }

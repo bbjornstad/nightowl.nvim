@@ -1,6 +1,7 @@
 local key_jupyter = require("environment.keys").repl.jupyter
-local key_fstring_toggle = require("environment.keys").code:leader() .. "f"
-local deflang = require("funsak.lazy").language
+local key_fstring_toggle =
+  require("environment.keys").lang.python.fstring_toggle
+local deflang = require("funsak.lazy").lintformat
 
 return {
   unpack(
@@ -29,25 +30,25 @@ return {
     build = [[:UpdateRemotePlugins]],
     keys = {
       {
-        key_jupyter .. "a",
+        key_jupyter.attach,
         "<CMD>JupyterAttach<CR>",
         mode = { "n" },
         desc = "repl.py=> attach jupyter kernel",
       },
       {
-        key_jupyter .. "d",
+        key_jupyter.detach,
         "<CMD>JupyterDetach<CR>",
         mode = { "n" },
         desc = "repl.py=> detach jupyter kernel",
       },
       {
-        key_jupyter .. "x",
+        key_jupyter.execute,
         "<CMD>JupyterExecute<CR>",
         mode = { "n", "v" },
         desc = "repl.py=> jupyter execute",
       },
       {
-        key_jupyter .. "k",
+        key_jupyter.inspect,
         "<CMD>JupyterInspect<CR>",
         mode = "n",
         desc = "repl.py=> jupyter inspect",

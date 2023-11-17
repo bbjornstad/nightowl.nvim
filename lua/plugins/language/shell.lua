@@ -1,5 +1,4 @@
-local stems = require("environment.keys").stems
-local deflang = require('funsak.lazy').language
+local lopts = require("funsak.table").lopts
 
 return {
   {
@@ -17,29 +16,33 @@ return {
     config = true,
   },
   {
-    "zioroboco/nu-ls.nvim",
-    ft = { "nu" },
-    init = function()
-      vim.filetype.add({
-        extension = {
-          nu = "nu",
-        },
-      })
-    end,
-
-    config = function(_, opts)
-      require("nu-ls").setup(opts)
+    "nvimtools/none-ls.nvim",
+    opts = function(_, opts)
+      opts.sources = lopts({
+        require("nu-ls"),
+      }, opts.sources or {})
     end,
     dependencies = {
-      "nvim-lua/plenary.nvim",
       {
-        "nvimtools/none-ls.nvim",
-        opts = function(_, opts)
-          opts.sources = vim.tbl_deep_extend("force", {
-            require('nu-ls')
-          }, opts.sources or {})
-        end
+        "zioroboco/nu-ls.nvim",
+        ft = { "nu" },
+        config = function(_, opts)
+          vim.filetype.add({
+            extension = {
+              nu = "nu",
+            },
+          })
+          require("nu-ls").setup(opts)
+        end,
+        opts = {},
+        dependencies = {
+          "nvim-lua/plenary.nvim",
+          "nvimtools/none-ls.nvim",
+        },
       },
     },
+  },
+  {
+    "zioroboco/nu-ls.nvim",
   },
 }

@@ -66,25 +66,22 @@ return {
     cmd = { "RestNvim", "RestNvimPreview", "RestNvimLast" },
     keys = {
       {
-        key_rest .. "r",
+        key_rest.open,
         "<Plug>RestNvim",
         mode = "n",
         desc = "rest=> open rest client",
-        remap = true,
       },
       {
-        key_rest .. "p",
+        key_rest.preview,
         "<Plug>RestNvimPreview",
         mode = "n",
         desc = "rest=> open rest preview",
-        remap = true,
       },
       {
-        key_rest .. "l",
+        key_rest.last,
         "<Plug>RestNvimLast",
         mode = "n",
         desc = "rest=> open last used rest client",
-        remap = true,
       },
     },
   },
@@ -99,25 +96,25 @@ return {
     cmd = { "LicenseInsert", "LicenseFetch", "LicenseUpdate", "LicenseWrite" },
     keys = {
       {
-        key_licenses .. "i",
+        key_licenses.insert,
         "<CMD>LicenseInsert<CR>",
         mode = "n",
         desc = "license=> insert",
       },
       {
-        key_licenses .. "f",
+        key_licenses.fetch,
         "<CMD>LicenseFetch<CR>",
         mode = "n",
         desc = "license=> fetch",
       },
       {
-        key_licenses .. "u",
+        key_licenses.update,
         "<CMD>LicenseUpdate<CR>",
         mode = "n",
         desc = "license=> update",
       },
       {
-        key_licenses .. "w",
+        key_licenses.write,
         "<CMD>LicenseWrite<CR>",
         mode = "n",
         desc = "license=> write",

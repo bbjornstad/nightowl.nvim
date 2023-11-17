@@ -1,8 +1,9 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local colors = require("kanagawa.colors").setup({ theme = "wave" }).palette
 local inp = require("uutils.input")
-local key_time = require('environment.keys').time:leader()
-local key_journal = require("environment.keys").time.neorg .. "j"
+local kenv = require("environment.keys")
+local key_time = kenv.time
+local key_org = key_time.org
 
 local function colorize(bg, fg, opts)
   opts = opts or {}
@@ -14,19 +15,54 @@ local function colorize(bg, fg, opts)
   return retstr
 end
 
+local function norgbind(norgbind, keybundle, opts)
+  opts = opts or {}
+  local leader = norgbind.leader
+  local res = opts.string_formatter or "${ leader }${ bind }"
+
+  local function binder(bound, action, opts)
+    opts = opts or {}
+    norgbind.map(
+      "norg",
+      opts.mode or "n",
+      res.gsub("${ leader }", leader).gsub("${ bind }", bound),
+      action,
+      {
+        buffer = true,
+        desc = opts.desc or nil,
+      }
+    )
+  end
+
+  for k, act in pairs(keybundle) do
+    binder(k, act, opts)
+  end
+end
+
 local organization_tools = {
+  {
+    "joaomsa/telescope-orgmode.nvim",
+    config = function(_, opts)
+      require("telescope").load_extension("orgmode")
+    end,
+    opts = {},
+    dependencies = { "nvim-telescope/telescope.nvim" },
+  },
+  {
+    "lukas-reineke/headlines.nvim",
+    ft = { "markdown", "rmd", "org", "norg" },
+    config = function(_, opts)
+      require("headlines").setup(opts)
+    end,
+    opts = {},
+  },
   {
     "nvim-orgmode/orgmode",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
-      "akinsho/org-bullets.nvim",
-      {
-        "joaomsa/telescope-orgmode.nvim",
-        config = function()
-          require("telescope").load_extension("orgmode")
-        end,
-      },
-      "danilshvalov/org-modern.nvim",
+      { "akinsho/org-bullets.nvim", ft = { "org" } },
+      { "joaomsa/telescope-orgmode.nvim", ft = { "org" } },
+      { "danilshvalov/org-modern.nvim", ft = { "org" } },
       "lukas-reineke/headlines.nvim",
     },
     ft = { "org" },
@@ -112,34 +148,35 @@ local organization_tools = {
         ),
       },
       org_capture_templates = {
-        t = "Task",
-        ts = {
+        [key_org.task:leader()] = "Task",
+        [key_org.task.standard] = {
           description = "Standard",
           template = "* TODO %? | [%]\n  SCHEDULED: %t DEADLINE: %t",
         },
-        tu = { description = "Undated", template = "* TODO %? | [%]" },
-        td = {
+        [key_org.task.undated] = {
+          description = "Undated",
+          template = "* TODO %? | [%]",
+        },
+        [key_org.task.discrete] = {
           description = "Discrete",
           template = "* TODO %? | [/]\n  SCHEDULED: %t DEADLINE: %t",
         },
-        tf = {
+        [key_org.task.full] = {
           description = "Full",
-          template =
-          "* TODO %? | [%]\n  SCHEDULED: <%^{Start: |%<%Y-%m-%d %a>}> DEADLINE: <%^{End: |%<%Y-%m-%d %a>}>",
+          template = "* TODO %? | [%]\n  SCHEDULED: <%^{Start: |%<%Y-%m-%d %a>}> DEADLINE: <%^{End: |%<%Y-%m-%d %a>}>",
         },
-        e = "Event",
-        eu = {
+        [key_org.event:leader()] = "Event",
+        [key_org.event._until] = {
           description = "Until",
           template = "* TODO %? | [%]\n  %t--<%^{End: |%<%Y-%m-%d %a>}>",
         },
-        es = {
+        [key_org.event.single] = {
           description = "Single",
           template = "* TODO %? | [%]\n  <%^{Date: |%<%Y-%m-%d %a>}>",
         },
-        er = {
+        [key_org.event.range] = {
           description = "Range",
-          template =
-          "* TODO %? | [%]\n  <%^{Start: |%<%Y-%m-%d %a>}>--<%^{End: |%<%Y-%m-%d %a>}>",
+          template = "* TODO %? | [%]\n  <%^{Start: |%<%Y-%m-%d %a>}>--<%^{End: |%<%Y-%m-%d %a>}>",
         },
       },
       mappings = {
@@ -193,9 +230,9 @@ local organization_tools = {
       },
       "lukas-reineke/headlines.nvim",
       { "madskjeldgaard/neorg-figlet-module", ft = "norg" },
-      { "pysan3/neorg-templates",             ft = "norg" },
-      { "tamton-aquib/neorg-jupyter",         ft = "norg" },
-      { "laher/neorg-exec",                   ft = "norg" },
+      { "pysan3/neorg-templates", ft = "norg" },
+      { "tamton-aquib/neorg-jupyter", ft = "norg" },
+      { "laher/neorg-exec", ft = "norg" },
     },
     build = ":Neorg sync-parsers",
     cmd = "Neorg",
@@ -263,22 +300,47 @@ local organization_tools = {
         ["external.templates"] = {
           config = {
             templates_dir = vim.fn.stdpath("config")
-                .. "/templates/neorg-templates",
+              .. "/templates/neorg-templates",
           },
         },
-        ["external.jupyter"] = {},
+        -- ["external.jupyter"] = {},
         ["external.exec"] = {},
-        ["external.integrations.figlet"] = {
-          config = {
-            font = "impossible",
-            wrapInCodeTags = true,
-          },
-        },
+        -- ["external.integrations.figlet"] = {
+        --   config = {
+        --     font = "impossible",
+        --     wrapInCodeTags = true,
+        --   },
+        -- },
         ["core.keybinds"] = {
           config = {
             default_keybinds = true,
             hook = function(binds)
+              norgbinder(binds, {
+                journal = {
+                  today = "d",
+                  tomorrow = "w",
+                  yesterday = "y",
+                },
+                note = {
+                  new = "n",
+                },
+                linkable = {
+                  find = "f",
+                  insert = "i",
+                  file = "e",
+                },
+                metagen = {
+                  inject = "i",
+                  update = "u",
+                },
+                workspace = {
+                  default = "d",
+                  switch = "w",
+                },
+              }, {})
+              vim.notify(vim.inspect(binds))
               local leader = binds.leader
+              vim.notify(vim.inspect(leader))
               binds.remap_key(
                 "norg",
                 "n",
@@ -398,11 +460,11 @@ local organization_tools = {
                 }
               )
             end,
-            neorg_leader = key_time,
+            neorg_leader = key_time:leader(),
           },
           keys = {
             {
-              key_journal .. "d",
+              key_time:leader() .. "jd",
               function()
                 vim.cmd([[Neorg journal daily]])
               end,
