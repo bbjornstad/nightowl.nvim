@@ -43,9 +43,13 @@ env.preview = {
     cursorlineopt = "both",
     cursorcolumn = false,
     signcolumn = "yes",
-    list = true,
+    list = false,
     foldenable = false,
     foldmethod = "manual",
   },
 }
+
+env.directory_switcher = {}
+env.directory_switcher.enable_commands = true
+
 return env

@@ -48,6 +48,7 @@ env.enabled = env.enablements({
   gptnvim = { env = true, fallback = false },
   llama = { env = true, fallback = false },
   ollero = { env = true, fallback = false },
+  gen = { env = true, fallback = false },
 })
 env.status_notify_on_startup = false
 

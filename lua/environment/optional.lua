@@ -79,4 +79,15 @@ env.games = {
   },
 }
 
+env.windowing = {
+  focus_v_windows = {
+    focus = { prefer = true },
+    windows = { prefer = false },
+  },
+}
+
+env.prefer = {
+  focus_windows = "focus",
+}
+
 return env

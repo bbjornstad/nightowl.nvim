@@ -1,6 +1,6 @@
-local env = {}
+local M = {}
 
-function env.animation_line_replace(line, replace, replace_with, frequency)
+function M.animation_line_replace(line, replace, replace_with, frequency)
   return string.gsub(line, replace, function(c)
     local prob = math.random()
     if prob <= frequency then
@@ -24,28 +24,28 @@ end
 ---characters to be replaced.
 ---3. frequency float(0,1) a proportion representing the frequency of which the
 ---replace_char is replaced with one of the options from replace_with.
-function env.generate_animation_frame(base_frame, opts)
+function M.generate_animation_frame(base_frame, opts)
   opts = opts or {}
   local replace = opts.replace_char or { [[.]] }
   local replace_with = opts.replace_with or { [[*]] }
   local frequency = opts.frequency or { 0.05 } --5% replacement
   local res = {}
   for no, line in pairs(base_frame) do
-    res[no] = env.animation_line_replace(line, replace, replace_with, frequency)
+    res[no] = M.animation_line_replace(line, replace, replace_with, frequency)
   end
   return res
 end
 
-function env.generate_animation(base_frame, opts)
+function M.generate_animation(base_frame, opts)
   local n_repeat = opts.n_frame
   local res = {}
   for i = 1, n_repeat, 1 do
-    res[i] = env.generate_animation_frame(base_frame, opts)
+    res[i] = M.generate_animation_frame(base_frame, opts)
   end
   return res
 end
 
-env.nightowl_splash_compact = {
+M.nightowl_splash_compact = {
   [[..................................................................................]],
   [[..................................................................................]],
   [[...███╗...██╗██╗.██████╗.██╗..██╗████████╗.██████╗.██╗....██╗██╗..................]],
@@ -67,7 +67,7 @@ env.nightowl_splash_compact = {
   [[============"="========="="====="="==="="=============="="===="="=================]],
   [[..................................................................................]],
 }
-env.nightowl_splash = {
+M.nightowl_splash = {
   [[..............................................................................................................]],
   [[..............................................................................................................]],
   [[.....███╗...██╗██╗.██████╗.██╗..██╗████████╗.██████╗.██╗....██╗██╗............................................]],
@@ -89,22 +89,22 @@ env.nightowl_splash = {
   [[=============="="========="="====="="==="="=============================="="===="="===========================]],
   [[..............................................................................................................]],
 }
-env.nightowl_splash_frames = env.generate_animation(env.nightowl_splash, {
+M.nightowl_splash_frames = M.generate_animation(M.nightowl_splash, {
   n_frame = 10,
   replace_char = "%.",
   replace_with = "*",
   frequency = 0.05,
 })
 
-env.nightowl_splash_compact_frames =
-  env.generate_animation(env.nightowl_splash_compact, {
+M.nightowl_splash_compact_frames =
+  M.generate_animation(M.nightowl_splash_compact, {
     n_frame = 10,
     replace_char = "%.",
     replace_with = "*",
     frequency = 0.05,
   })
 
-env.week_headers = {
+M.week_headers = {
   monday = {
 
     [[        _   _         _            _             _            _    _        _  ]],
@@ -199,4 +199,18 @@ env.week_headers = {
   },
 }
 
-return env
+M.fn_menu = {}
+
+function M.fn_menu.files() end
+function M.fn_menu.projects() end
+function M.fn_menu.recent_files() end
+function M.fn_menu.grep() end
+function M.fn_menu.git() end
+
+function M.fn_menu.tip() end
+
+function M.fn_menu.apc() end
+
+function M.fn_menu.edit(path) end
+
+return M
