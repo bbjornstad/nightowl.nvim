@@ -1,9 +1,9 @@
 -- vim: set ft=lua sts=2 sw=2 ts=2 et:
-local key_lsp = require("environment.keys").lsp:leader()
+local key_lsp = require("environment.keys").lsp
 return {
   {
     "mfussenegger/nvim-lint",
-    enabled = false,
+    enabled = true,
     opts = {
       linters_by_ft = {
         text = { "vale" },
@@ -11,16 +11,17 @@ return {
     },
     config = function(_, opts)
       require("lint").linters_by_ft = opts.linters_by_ft or {}
-
       vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-        callback = require("lint").try_lint,
+        callback = function()
+          require("lint").try_lint()
+        end,
         desc = "linting after writing buffer",
       })
     end,
     event = "VeryLazy",
     keys = {
       {
-        key_lsp .. "l",
+        key_lsp.auxillary.lint,
         function()
           require("lint").try_lint()
         end,
@@ -34,7 +35,7 @@ return {
     event = "VeryLazy",
     keys = {
       {
-        key_lsp .. "f",
+        key_lsp.auxillary.format,
         vim.lsp.buf.format,
         mode = "n",
         desc = "lsp=> format buffer",
@@ -46,7 +47,7 @@ return {
     event = "VeryLazy",
     keys = {
       {
-        key_lsp .. "I",
+        key_lsp.auxillary.rules.ignore,
         function()
           require("rulebook").ignoreRule()
         end,
@@ -54,7 +55,7 @@ return {
         desc = "lsp=> ignore lint rule",
       },
       {
-        key_lsp .. "L",
+        key_lsp.auxillary.rules.lookup,
         function()
           require("rulebook").lookupRule()
         end,
