@@ -66,6 +66,11 @@ kenv.shortcut = keygroup({
       next = "]d",
       previous = "[d",
     },
+    breakpoint = {
+      next = "]k",
+      previous = "[k",
+      stopped = "]K"
+    }
   },
   history = {
     command = "q:",
@@ -83,8 +88,20 @@ kenv.shortcut = keygroup({
     explore = {
       [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "e" },
       explore = "e",
-      split = "E",
+      split = "s",
       directories = "d",
+      home = {
+        [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "~" },
+        directories = "d",
+        explore = "e",
+        split = "s",
+      },
+      prompt = {
+        [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "/" },
+        directories = "d",
+        explore = "e",
+        split = "s",
+      },
     },
     nnn = {
       [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "nn" },
@@ -113,6 +130,15 @@ kenv.shortcut = keygroup({
     fuzz = "b",
     scope = "z",
   },
+  treesitter = {
+    [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "gt" },
+    textsubjects = {
+      smart = "t",
+      outer = "o",
+      inner = "i",
+      previous = "p"
+    },
+  }
 }, leader_shortcut, {})
 
 local leader_buffer = "<leader>b"
@@ -148,6 +174,7 @@ kenv.window = keygroup({
     down = "<Down>",
   },
   focus = {
+    maximize = "z",
     split = {
       cycle = "c",
       direction = "s",
@@ -500,7 +527,7 @@ kenv.build = keygroup({
 local leader_time = "<localleader>"
 kenv.time = keygroup({
   stand = {
-    [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = "s",
+    [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "s" },
     now = "n",
     when = "s",
     every = "e",
@@ -534,6 +561,22 @@ kenv.time = keygroup({
     notes = {
       [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "n" },
       new = "n",
+    },
+    linkable = {
+      [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "l" },
+      find = "f",
+      insert = "i",
+      file = "e",
+    },
+    metagen = {
+      [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "m" },
+      inject = "i",
+      update = "u",
+    },
+    workspace = {
+      [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "w" },
+      default = "d",
+      switch = "w",
     },
   },
   org = {
@@ -753,6 +796,7 @@ kenv.fuzz = keygroup({
     [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "f" },
     files = "f",
     recent = "r",
+    directories = "d",
   },
   buffers = {
     [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "b" },
@@ -842,7 +886,7 @@ kenv.fuzz = keygroup({
     man = "m",
   },
   colors = {
-    [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "c" },
+    [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "C" },
     schemes = "s",
     highlights = "h",
   },
@@ -1169,6 +1213,10 @@ kenv.scope = keygroup({
 -- <<<<<<<<<<<<
 local leader_editor = "\\"
 kenv.editor = keygroup({
+  notes = {
+    [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "n" },
+    eureka = "n",
+  },
   venn = "v",
   figlet = {
     [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "f" },
@@ -1249,6 +1297,39 @@ kenv.editor = keygroup({
     nerdfonts = "n",
     nerdy = "y",
     nerdicons = "i",
+    picker = {
+      [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "p" },
+      normal = {
+        everything = "p",
+        icons = "i",
+        emoji = "j",
+        nerd = "n",
+        nerdv3 = "3",
+        symbols = "y",
+        altfont = "f",
+        altfontsymbols = "F",
+      },
+      yank = {
+        everything = "p",
+        icons = "i",
+        emoji = "j",
+        nerd = "n",
+        nerdv3 = "3",
+        symbols = "y",
+        altfont = "f",
+        altfontsymbols = "F",
+      },
+      insert = {
+        everything = "p",
+        icons = "i",
+        emoji = "j",
+        nerd = "n",
+        nerdv3 = "3",
+        symbols = "y",
+        altfont = "f",
+        altfontsymbols = "F",
+      },
+    },
   },
   comment_frame = {
     [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "c" },
@@ -1313,6 +1394,20 @@ kenv.macro = keygroup({
   addBreakPoint = "##.",
 }, leader_macro, {})
 
+local leader_games = "`<leader><bar>"
+kenv.games = keygroup({
+  solitaire = {
+    [KEYSAK_AUTM_LEADER_DEFAULT_FDNAME] = { append = "s" },
+    new = "n",
+    next = "N",
+  },
+  tetris = "t",
+  sudoku = "u",
+  blackjack = "j",
+  nvimesweeper = "w",
+  killersheep = "k",
+  speedtyper = "y",
+}, leader_games, {})
 function kenv:leader()
   return NVIM_DYN_LEADER
 end
