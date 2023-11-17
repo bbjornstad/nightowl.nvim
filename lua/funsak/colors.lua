@@ -1,104 +1,84 @@
-local mopts = require("funsak.table").mopts
+---@module "funsak.colors" color manipulation utilities for functional swiss army
+---knives and lazy nvim configurations.
+---@author Bailey Bjornstad | ursa-major
+---@license MIT
 
-local mod = {}
+---@alias hexadecimal string a string consisting of two characters and whose
+---digits represent numbers in base 16. This is obviously constructed such that
+---0-255 are the possible numerical values represented with the characters
+---between "00" and "FF"
 
----@alias MatchColorscheme string represents a valid name for an installed
+---@alias RGBColor { red: integer, green: integer, blue: integer, alpha: integer? }
+---@alias HSLColor { hue: integer, sat: integer, light: integer, alpha: integer? }
+---@alias HexColor { red: hexadecimal, green: hexadecimal, blue: hexadecimal, alpha: hexadecimal? }
+---@alias T_Color RGBColor | HSLColor | HexColor
+
+---@class funsak.colors
+local M = {}
+
+---@alias owhl.ColorScheme string represents a valid name for an installed
 ---colorscheme
----@alias HLGroupName string represents a valid highlight group name
----@alias HLGroupComponent string represents a valid highlight group component,
----such as `guifg`
----@alias HLComponentValue string represents the matching value of a highlight
+---@alias owhl.HighlightGroup string represents a valid highlight group name
+---@alias owhl.ix_HlComponent string represents a valid highlight group
+---component, such as `guifg`
+---@alias owhl.HlComponent table represents the matching values of a highlight
 ---group component, such as the color represented as a string or the status of
 ---other text styling like `underline`
 
----@class HLMatcher a submodule whose purpose is to identify the "matched"
----highlight options and ensure consistency in group definitions when switching
----colorschemes. The hope is to create a submodule which can (more or less)
----agnostically create highlight groups, while maintaining the same level of
----readability or UI styling even when the colorscheme is switched.
-local HLMatcher = {}
-HLMatcher.matches = {}
-HLMatcher.derivatives = {}
+---@alias owhl.NvimHighlightComponents { [owhl.ix_HlComponent]: owhl.HlComponent? }
+---@alias owhl.NvimHighlight owhl.NvimHighlightComponents
 
----@class NvimHighlight represents an internal highlight definition from neovim
----directly. This is not used directly, it simply exists as a method of allowing
----for the inheritence of `HLMatch` items as being directly created from the
----internal highlight.
-local NvimHighlight = {
-  ["fg"] = false,
-  ["bg"] = false,
-  ["sp"] = false,
-  ["blend"] = false,
-  ["bold"] = false,
-  ["standout"] = false,
-  ["underline"] = false,
-  ["undercurl"] = false,
-  ["underdouble"] = false,
-  ["underdotted"] = false,
-  ["underdashed"] = false,
-  ["strikethrough"] = false,
-  ["italic"] = false,
-  ["reverse"] = false,
-  ["nocombine"] = false,
-  ["link"] = false,
-  ["default"] = false,
-  ["ctermfg"] = false,
-  ["ctermbg"] = false,
-  ["cterm"] = false,
+function M.rgb_to_hcl(color) end
 
-  -- these only have effect in graphical (non-terminal) nvim versions = false.
-  ["guifg"] = false,
-  ["guibg"] = false,
-}
-
----@class HLMatch: NvimHighlight a spruced up highlight with the ability to
----resolve itself into a dynamic definition determined by the active or target
----colorscheme.
-local HLMatch = {}
-
---- registers a new highlight group to be tracked by the Matcher, thereby
---- allowing for granular configuration between schemes if necessary.
----@param scheme MatchColorscheme|MatchColorscheme[] a colorscheme or list of
----colorscheme to which the new group definition is registered under
----@param group HLGroupName|HLGroupName[] a highlight group name or list of
----such names to which the new options should be registered.
----@param derivative_opts table<HLGroupComponent, HLComponentValue> the
----definitions of highlight components that are specific to this registration.
-function HLMatcher:register_derivatives(scheme, group, derivative_opts) end
-
-local function __register_scheme(registry, scheme, opts)
-  registry[scheme] = mopts(registry[scheme] or {}, opts)
-  return registry
+function M.euclidean(this, that)
+  local items = require("funsak.wrap").rezip({ this, that })
+  local squares = vim.tbl_map(function(i)
+    local _this, _that = unpack(i)
+    return (_this - _that) ^ 2
+  end, items)
+  local summed = require("funsak.wrap").reduce(function(agg, new)
+    return agg + new
+  end, squares, {})
+  return math.sqrt(summed)
 end
 
-function HLMatcher:register_schemes(schemes, opts)
-  local schemer = require("funsak.wrap").recurser(function(s, o)
-    return __register_scheme(self.matches, s, o)
-  end)
-  return schemer(self.matches, schemes, opts)
+--- computes the distance between two colors in RGB space. This is essentially
+--- just the calculation of a notion of distance which makes sense according to
+--- analytical principles of metric spaces
+--- (https://en.wikipedia.org/wiki/Metric_space). Note that since hex values are
+--- simply a different textual representation of RGB space, it suffices to
+--- calculate this for general rgb values and use a separater conversion
+--- function to achieve the hex metrics.
+---@param color RGBColor
+---@param other RGBColor
+function M.metric_rgb(color, other)
+  local red = (color.red - other.red) ^ 2
+  local green = (color.green - other.green) ^ 2
+  local blue = (color.blue - other.blue) ^ 2
+  return math.sqrt(red + green + blue)
 end
 
-function HLMatcher:get(schemes)
-  if schemes == nil then
-    return self.matches
-  end
-
-  local schemer = require("funsak.wrap").recurser(function(s)
-    return self.matches[s]
-  end)
-
-  return schemer(schemes)
-end
-
-function HLMatcher:hl(schemes, opts) end
+--- computes the distance between two colors in HSL space. This is essentially
+--- the calculation of a notion of distance which makes sense according to
+--- analytical principles of metric spaces
+--- (https://en.wikipedia.org/wiki/Metric_space). This is a slightly different
+--- representation of the color-space than RGB and so we also provide the metric
+--- implementation in this context so that conversion into RGB values is not
+--- strictly necessary (though very likely). I believe that the
+--- conversion/transformation is basically a projection onto a radial, e.g.
+--- circular curve. Supposedly this provides a more accurate representation of
+--- how colors blend physically to create new colors.
+---@param color HSLColor
+---@param other HSLColor
+function M.metric_hsl(color, other) end
 
 --- sets the given highlight groups to have the definitions specified as
 --- options.
----@param hls HLGroupName[] list of highlight group names that are to receive
+---@param hls owhl.HighlightGroup[] list of highlight group names that are to receive
 ---the `opts` as their definitions.
----@param opts table<HLGroupComponent, table> table whose index keys refer to
----highlight components
-function mod.initialize_custom_highlights(hls, opts)
+---@param opts T_Opts options that are passed to the underlying call to
+---nvim_set_hl
+function M.initialize_custom_highlights(hls, opts)
   hls = type(hls) ~= "table" and { hls } or hls
   vim.tbl_map(function(n)
     vim.api.nvim_set_hl(0, n, opts)
@@ -106,29 +86,91 @@ function mod.initialize_custom_highlights(hls, opts)
 end
 
 --- retrieves the foreground color of the specified highlight group.
----@param hlgroup string highlight group name
----@param link string if the highlight group is accessible by link, this
----argument can accept the name. Defaults to `true`.
+---@param hlgroup owhl.HighlightGroup
+---@param link boolean? shows the linked highlight group name instead of the
+---"effective definition". Needs a good example of behavior. Defaults to `true`.
 ---@return string color the color of the foreground of the specified highlight
 ---group
-function mod.identify_highlight(hlgroup, link)
+function M.identify_highlight(hlgroup, link)
   link = link or true
   local labeled_hl = vim.api.nvim_get_hl(0, { name = hlgroup, link = link })
   return labeled_hl.fg or labeled_hl.guifg
 end
 
---- formats the necessary field access and method calls to bring in well-defined
---- colors from the colorscheme Kanagawa. This will need to be remimplemented
---- in the future to accept other themes as well.This gets around an apparent function call
---- timing issue where the kanagawa.colors item is not yet accessible when the
---- definition is made. By using this function, you are effectively deferring the
---- evaluation of the color definition until it is directly accessed.
----
----@param opts table: Maps the item that is to be colored to a string of the
+M.hl = vim.api.nvim_get_hl
+    and function(name)
+      return vim.api.nvim_get_hl(0, { name = name })
+    end
+  or function(name)
+    return vim.api.nvim_get_hl_by_name(name, true)
+  end
+
+local function hl_component(component, name, hlmap)
+  hlmap = hlmap or {}
+  component = component or "fg"
+  local hl = M.hl(name)
+  local comp = hl and hl[component] or nil
+  local compid = hlmap and hlmap[component] or component
+  return comp and { [compid] = string.format("#%06x", comp) } or nil
+end
+
+--- retrieves the values of the given highlight group component properties from
+--- the highlight group with the specified names.
+---@param name owhl.HighlightGroup
+---@param component string | string[] highlight group property names
+---@return owhl.NvimHighlight
+function M.component(name, component, hlmap)
+  local f = require("funsak.wrap").recurser(hl_component)
+  local fres = f(component, name, hlmap)
+  local should_reduce = type(fres) == "table"
+    and vim.iter(fres):all(function(item)
+      return type(item) ~= "table"
+    end)
+  return should_reduce
+      and require("funsak.wrap").reduce(function(agg, new)
+        vim.notify(vim.inspect(agg))
+        vim.notify(vim.inspect(new))
+        return vim.tbl_deep_extend("force", agg, new)
+      end, fres, {})
+    or fres
+end
+
+local function hl_adjust(augment, name, opts)
+  opts = opts or {}
+  local hl = M.hl(name)
+  local new_def = vim.tbl_deep_extend("force", hl, augment)
+  local has_link = vim.tbl_contains(vim.tbl_keys(new_def), "link")
+  return has_link and (opts.follow_links and { link = new_def.link }) or new_def
+end
+
+--- modifies or creates a neovim highlight definition with the specified
+--- augmentations, returning either the new highlight or the modified highlight
+--- if the definition already existed; serves to allow for new coloration to be
+--- added to the existing highlight behavior.
+---@param name owhl.HighlightGroup name of neovim highlight group
+---@param augments owhl.NvimHighlightComponents highlight group
+---component mapping
+---@param opts T_Opts
+---@return owhl.NvimHighlight
+function M.sethl(name, augments, opts)
+  local f = require("funsak.wrap").recurser(hl_adjust)
+  local fres = f(augments, name, opts)
+  local should_reduce = type(fres) == "table"
+    and vim.iter(fres):all(function(item)
+      return type(item) ~= "table"
+    end)
+  return should_reduce
+      and require("funsak.wrap").reduce(function(agg, new)
+        vim.tbl_deep_extend("force", agg, new)
+      end, fres, {})
+    or fres
+end
+
+---@param opts table Maps the item that is to be colored to a string of the
 --- color that it should receive.
----@param scheme_target string: Identifies an item that is to be required in the
+---@param scheme_target string Identifies an item that is to be required in the
 ---sense of calling lua's require to bring the main definitions into focus.
-function mod.colors(opts, scheme_target, scheme_cfg)
+function M.colors(opts, scheme_target, scheme_cfg)
   scheme_target = scheme_target or "kanagawa.colors"
   scheme_cfg = scheme_cfg or {}
   local function itemized_color(colorname)
@@ -140,8 +182,8 @@ function mod.colors(opts, scheme_target, scheme_cfg)
   return retval
 end
 
-function mod.kanacolors(opts)
-  return mod.colors(opts, "kanagawa.colors", { theme = "wave" })
+function M.kanacolors(opts)
+  return M.colors(opts, "kanagawa.colors", { theme = "wave" })
 end
 
-return mod
+return M

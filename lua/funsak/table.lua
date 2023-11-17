@@ -1,15 +1,79 @@
-local mod = {}
+---@module "funsak.table" utilities for operating and manipulating with lua
+---table items, and conversion to/from for use in function definitions, etc.
+---@author Bailey Bjornstad | ursa-major
+---@license MIT
 
-function mod.strip(item, strip, suppress_return)
+---@class funsak.table
+local M = {}
+
+---@alias T_Iter
+---| table
+---| any[]
+
+local function _contains(items, tbl)
+  return tbl[items] ~= nil
+end
+
+function M.contains(tbl, items)
+  local f = require("funsak.wrap").recurser(_contains)
+  local res = vim.iter(f(items, tbl))
+  return res:all(function(i)
+    return i
+  end)
+end
+
+--- collects the items in an iterator into a table with arbitrary keys, in
+--- contrast to the standard builtin iterable method `totable` which only really
+--- works with list-like maps and nothing containing actual information in the
+--- keys.
+---@param iter T_Iter iterable collection of things that must be gathered
+---together into a single dataset.
+---@return table t the collected table.
+function M.miter(iter)
+  return iter:fold({}, function(t, k, v)
+    t[k] = v
+    return t
+  end)
+end
+
+---@generic Ix: any
+--- strips off the specified elements from the table. This function will access
+--- the items in the table to get their values, store them appropriately, then
+--- remove their indices from the original table. Used normally to prepare
+--- arguments to functions at the beginning of the implementation, though this
+--- is not enforced.
+---@param item table<Ix, any> any table for which certain elements should be
+---popped
+---@param strip Ix[]
+---@param defaults table<Ix, any> a table containing optional defaults if the
+---items are
+---missing from `item`
+---@return table<Ix, any> subset the returned table will be a subset of the
+---input table, and the input table will not have the corresponding elements.
+function M.strip(item, strip, defaults, deepcopy)
   local res = {}
-  for k, v in pairs(strip) do
-    res[v] = item[v]
+  deepcopy = deepcopy or false
+  for _, v in ipairs(strip) do
+    res[v] = deepcopy and vim.deepcopy(item[v] or defaults[v])
+      or (item[v] or defaults[v])
     item[v] = nil
   end
   return res
 end
 
-function mod.tabler(item, enforce_list_input, allow_empty_return)
+--- forces that the specified input item is of a table form, which is to say
+--- that if it is a table, the item is returned unchanged, but if not, the item
+--- is placed into a new table by itself. Used typically to prepare function
+--- arguments that are to be operated on iterably but whose type may not
+--- necessarily be iterable.
+---@param item any any item that should be squished into a table if it is not
+---already one.
+---@param enforce_list_input boolean? if the function should fail with an error
+---if the input item is not list-like. Defaults to `false`.
+---@param allow_empty_return boolean? if the function should return an empty
+---table if the computed value does not represent any elements or otherwise
+---fails. Defaults to `true`.
+function M.tabler(item, enforce_list_input, allow_empty_return)
   enforce_list_input = enforce_list_input or false
   allow_empty_return = allow_empty_return or true
   local tbl = type(item) == "table"
@@ -20,7 +84,8 @@ function mod.tabler(item, enforce_list_input, allow_empty_return)
 end
 
 ---@alias OptifyHandlersPhase Ix_OptsField
----@alias OptsFunction fun(plugin: LazyPluginSpec, opts: T_Opts)|fun(plugin: LazyPluginSpec, opts: T_OptsField)
+---@alias OptsFunction fun(plugin: LazyPlugin, opts: T_Opts)|fun(plugin: LazyPluginSpec, opts: T_OptsField)
+
 --- turns a table that is specified in an opts field of a LazyPluginSpec into a
 --- function which deeply merges each indexed field of the spec with the _opts
 --- argument of the returned function, along with the specified callbacks
@@ -38,7 +103,7 @@ end
 ---for which the behavioral modifications allowed with this tool make sense,
 ---e.g. `opts`. Rarely `keys` could be used. It is unlikely that other fields
 ---will find all that much utility from this function otherwise.
----@param handlers OptsFunction|OptsFunction[]|table<OptifyHandlersPhase, OptsFunction>
+---@param handlers OptsFunction|OptsFunction[]|{[OptifyHandlersPhase]: OptsFunction}
 ---a collection of optional handlers that should be applied. The behavior is as
 ---follows: if this argument is a single function, it is applied after the
 ---merging is complete. If the argument is a list of functions, they are each
@@ -49,7 +114,7 @@ end
 ---field.
 ---@param behavior {merge_before: boolean, tbl_merge: MergeBehavior}
 ---@return OptsFunction optified
-function mod.fopts(opts, handlers, behavior)
+function M.fopts(opts, handlers, behavior)
   opts = opts or {}
   local inset_merge = type(opts) == "table" and not vim.tbl_islist(opts)
   behavior = behavior or {}
@@ -91,18 +156,14 @@ function mod.fopts(opts, handlers, behavior)
   end
 end
 
----@alias MOptsError
----| '"suppress"' # error on merging of input tables is not propogated
----| '"error"' # error on merging of input tables is propogated
----
---- recursively merges two sets of options, given as table items with optional named keys;
---- this is a deep merge, so fully recursive down each table for the merge. This
---- is most frequently used to add user-defined parameters to plugins which have
---- defaults, but it doesn't make any assumptions about where the data first
---- comes from.
----@param defaults table the default options that should be present if there are
----no user overrides for the matching key.
----@param overrides table the options which should override the defaults by
+--- recursively merges two sets of options, given as table items with optional
+--- named keys; this is a deep merge, so fully recursive down each table for
+--- the merge. This is most frequently used to add user-defined parameters to
+--- plugins which have defaults, but it doesn't make any assumptions about
+--- where the data first comes from.
+---@param defaults table? the default options that should be present if there
+---are no user overrides for the matching key.
+---@param overrides table? the options which should override the defaults by
 ---passing values explicitly in this table.
 ---@param error MOptsError? one of "suppress" or "raise", indicating what should
 ---happen if there is no passed overrides to this function. This is helpful in
@@ -110,24 +171,42 @@ end
 ---Defaults to `"suppress"`.
 ---@return table results the table that results from merging the options deeply
 ---and recursively.
-function mod.mopts(defaults, overrides, error)
+function M.mopts(defaults, overrides, error)
   error = error or "suppress"
   if error == "suppress" then
     overrides = overrides or {}
     defaults = defaults or {}
   end
 
-  local overridden
-  if vim.tbl_islist(overrides) and vim.tbl_islist(defaults) then
-    if overridden == nil then
-      -- no overrides here
-      overridden = defaults
-    end
-  else
-    overridden = vim.tbl_deep_extend("force", defaults, overrides)
-  end
-
-  return overridden or {}
+  local overridden = vim.tbl_deep_extend("force", defaults, overrides)
+  return overridden
 end
 
-return mod
+--- merges recursively and deeply the input arguments. This is basically the
+--- same as the `mopts` function which is used commonly but can work on multiple
+--- tables, not only a single pair, but the signature is switched.
+---@param error MOptsError?
+---@param defaults table the default selections which will be used when no toher
+---matching key is present to override the value.
+---@vararg table[] other tables that should be considered during recursive
+---merging.
+---@return table the merged table
+function M.rmopts(error, defaults, ...)
+  error = error or "suppress"
+  defaults = defaults or {}
+
+  return vim.tbl_deep_extend("force", defaults, unpack({ ... }))
+end
+
+function M.lopts(defaults, overrides, error)
+  error = error or "suppress"
+  if error == "suppress" then
+    overrides = overrides or {}
+    defaults = defaults or {}
+  end
+
+  defaults = vim.list_extend(defaults, overrides)
+  return defaults
+end
+
+return M

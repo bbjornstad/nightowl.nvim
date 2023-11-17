@@ -132,15 +132,18 @@ local FDNAME_LEADER_AUTOMORPHISM = "${[ leader ]}"
 ---@field family_fmtstr string?
 ---@field separator string?
 
+---@class RepetitiousAutomorphism
+---@field multiplicity integer
+
 ---@alias LeaderSpec
 ---| string # a simple keybind
----| LeaderAutomorphism # a more complicated specification on augmentation of
+---| `LeaderAutomorphism` # a more complicated specification on augmentation of
 ---existing leader in hierarchy.
 
----@class AutomorphismSpec
+---@enum Automorphism
 ---@field leader LeaderAutomorphism?
 ---@field bang CapitalizeAutomorphism?
----@field multiplicity MultiplicityAutomorphism?
+---@field repeats RepetitiousAutomorphism?
 ---@field description DescriptionAutomorphism?
 
 --- setup handler for the keygroup module. This really only does a few things:
@@ -410,7 +413,8 @@ end
 
 local strip = require("funsak.table").strip
 
----@alias MapPath string a string item which represents either a standard unix
+---@alias MapPath
+---| string # a string item which represents either a standard unix
 ---relative or absolute path, or a string item which will be interpreted
 ---directly by a call to require the specified item.
 

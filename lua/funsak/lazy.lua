@@ -100,7 +100,7 @@ end
 ---wrappers.
 ---@return LazySpec[] tables representing the appropriate Lazy Specification
 ---stem portions that can be added alongside other language options.
-function M.language(ft, formatter, linter, opts)
+function M.lintformat(ft, formatter, linter, opts)
   opts = opts or {}
   linter = M.linter(linter, ft, opts.linter or {})
   formatter = M.conform(formatter, ft, opts.formatter or {})
@@ -114,7 +114,7 @@ end
 ---language server names a that are targeted
 ---@param target "setup" | "server"? name of the field to inject into in the
 ---original lspconfig spec. Defaults to "setup".
----@param opts table? language server configuration options.
+---@param opts table | fun(): table? language server configuration options.
 ---@param dependencies LazySpec[]? list of additional dependency
 ---specifications that are required for this configuration.
 ---@return LazyPlugin spec the lspconfig item that is added to a lazy
@@ -122,7 +122,11 @@ end
 function M.masonry(server, target, opts, dependencies)
   target = target or "setup"
   opts = opts or {}
+  server = server or {}
   dependencies = dependencies or {}
+
+  server = type(server) ~= "table" and { name = server, lang = server }
+    or server
   dependencies = type(dependencies) ~= "table" and { dependencies }
     or dependencies
   local plugin_target = "neovim/nvim-lspconfig"
@@ -133,7 +137,7 @@ function M.masonry(server, target, opts, dependencies)
       local prev = _opts[target] or {}
       _opts[target] = mopts(prev, {
         [server.name] = function(serv, o)
-          o = vim.is_callable(o) and o(serv)
+          o = vim.is_callable(o) and o()
             or {
               settings = {
                 [server.lang] = o,

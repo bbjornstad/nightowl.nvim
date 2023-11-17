@@ -1,7 +1,9 @@
---- funsak_OrderedSet implementation
---  ============================================================================
---- defines a set-like construct with some typical set operations, but makes
---- sure to preserve the ordering of item insertion if needed.
+---@module "funsak.orderedset" implementation of a set-like data structure that is
+---capable of tracking order of insertion of elements.
+---@author Bailey Bjornstad | ursa-major
+---@license MIT
+
+---@class funsak.orderedset
 local OrderedSet = {}
 OrderedSet.__index = OrderedSet
 

@@ -1,4 +1,10 @@
-local mod = {}
+---@module "funsak.wrap" utilities for wrapping and manipulating function valued
+---items.
+---@author Bailey Bjornstad | ursa-major
+---@license MIT
+
+---@class funsak.wrap
+local M = {}
 
 --- makes a function evaluation and returns the results only when the given
 --- condition evaluates to true. If the condition is not given, nil is used and
@@ -7,19 +13,19 @@ local mod = {}
 --- then nothing is returned from this function (rather, nil is explicitly
 --- returned). If the condition is true, the function is evaluated and the
 --- results returned.
----@param func function a callable item that is to be conditionalized in the
+---@param fn function a callable item that is to be conditionalized in the
 ---manner described.
 ---@param condition any anything that can be a condition in lua, e.g.
 ---if conditions.
 ---@return function fn the function wrapper, accepting any set of arguments
 ---which are passed directly to the call to func when the condition is true.
-function mod.conditionalize(func, condition)
-  local function condition_wrapper(...)
+function M.conditionalize(fn, condition)
+  local function condition_wrap(...)
     if condition ~= nil then
       -- the condition ends up being given explicitly and is true, so we simply
       -- evaluate the function and return
       if condition(...) or condition then
-        return func(...)
+        return fn(...)
       end
       -- a condition was supplied explicitly, but it ended up being false. in
       -- this case, we don't want anything to return here, as this function is
@@ -30,12 +36,12 @@ function mod.conditionalize(func, condition)
 
       return nil
     end
-    return func(...)
+    return fn(...)
   end
-  return condition_wrapper
+  return condition_wrap
 end
 
-function mod.recurser(fn)
+function M.recurser(fn)
   local function recurse_wrap(targ, ...)
     local args = { ... }
     if type(targ) == "table" then
@@ -56,7 +62,7 @@ local OSet = require("funsak.orderedset")
 ---@param arguments table[] arguments any set of arbitrarily sized tables, whose
 ---elements should be unpacked slice-wise.
 ---@return table list containing a slice of each table at the top-level
-local function rezip(arguments)
+function M.rezip(arguments)
   local res = {}
   local indices = vim.iter(vim.tbl_map(function(val)
     return vim.tbl_keys(val)
@@ -78,9 +84,9 @@ end
 --- arguments.
 ---@vararg any set of arbitrarily sized tables, whose elements should be
 ---unpacked slice-wise
-function mod.unpacker(pretreat, posttreat, arguments)
-  pretreat = pretreat or mod.F
-  posttreat = posttreat or mod.F
+function M.unpacker(pretreat, posttreat, arguments)
+  pretreat = pretreat or M.F
+  posttreat = posttreat or M.F
   arguments = arguments or {}
   local arg_pre = pretreat(arguments)
   -- we need to redo this below so that we can do a different method. In
@@ -89,7 +95,7 @@ function mod.unpacker(pretreat, posttreat, arguments)
   -- inidices of what we want out of each table, hence we make the intersection
   -- of the keys for each table and that provides the maximal amount of complete
   -- pairs we can make.
-  local rezipped = rezip(arg_pre)
+  local rezipped = M.rezip(arg_pre)
   posttreat(rezipped)
   return rezipped
 end
@@ -107,57 +113,60 @@ end
 ---given.
 ---@return function wrapper a function which operates on arbitrarily sized
 ---collections of element slices.
-function mod.batch(func, pretreat, override_opts)
+function M.batch(func, pretreat, override_opts)
   -- func operates on the single elements, we want to map this here across a
   -- collection of k,v pairs.
   -- hence, we are going to do a thing where we create a function wrapper which
   -- performs the map across arbitrary collections passed in.
-  local function funcwrap(...)
+  local function wrap(...)
     local res = {}
-    local unpacked = mod.unpacker(pretreat, ...) or {}
+    local unpacked = M.unpacker(pretreat, ...) or {}
     for k, val in pairs(unpacked) do
       res[k] = func(unpack(val))
     end
     return res
   end
-  return funcwrap
+  return wrap
 end
 
----@generic t_Agg any represents the result of folded-style aggregation, can be
+---@alias t_Agg
+---| any # represents the result of folded-style aggregation, can be
 ---any type that makes sense given the context in which the aggregation is being
 ---performed.
----@generic t_Reduceable any represents a single item in the collection which is
+---@alias Reduceable
+---| any # represents a single item in the collection which is
 ---the target for a reduction procedure.
----@generic idx_Reduceable any represents the type of the index item, relevant
----only in the rare case where the `tbl `
----@alias Reducer fun(agg: t_Agg, new: t_Reduceable): t_Agg | fun(agg: t_Agg, idx: idx_Reduceable, val: t_Reduceable)
----represents the aggregation callback function in the two forms which are acceptable
----by nvim. The signature without an `idx` argument is the more common option, and is
----applied for list-like tables. The signature including `idx` is used only for
----map-like tables. When presented with the opportunity to use this form, only
----do so if the index value itself is relevant for the computation of the new
----aggregation, otherwise the form lacking an `idx` argument is preferred for
----user clarity.
---
+---@alias idx_Reduceable
+---| Ix<Reduceable>
+
+---@alias Reducer
+---| fun(agg: t_Agg, new: Reduceable, init_val: Reduceable?): t_Agg # represents
+---the aggregation callback function in the two forms which are acceptable by
+---nvim. The signature without an `idx` argument is the more common option, and
+---is applied for list-like tables. The signature including `idx` is used only
+---for map-like tables. When presented with the opportunity to use this form,
+---only do so if the index value itself is relevant for the computation of the
+---new aggregation, otherwise the form lacking an `idx` argument is preferred
+---for user clarity.
+
 --- a standard reduce implementation, aggregating/"condensing" the tables values
 --- sequentially using a specified aggregation function. A foundational
 --- component of functional programming tooling, and can serve many seemingly
 --- disparate use-cases.
----@param fn Reducer an aggregation function with the
----inner computation logic for the processing of an iterable to
----produce a single value from its items through repeated function application.
----@param tbl table<idx_Reduceable, t_Reduceable> a series of items for which the aggregation
----function will be applied.
----@param initial t_Reduceable? an optional parameter which allows adjustment of
+---@param fn Reducer an aggregation function with the inner computation logic
+---for the processing of an iterable to produce a single value from its items
+---through repeated function application.
+---@param tbl table<idx_Reduceable, Reduceable> a series of items for which
+---the aggregation function will be applied.
+---@param initial Reduceable? an optional parameter which allows adjustment of
 ---the desired initial value used by the reduce operation. If no parameter is
 ---given, the initial value is taken to be the first item of `tbl` instead.
-function mod.reduce(fn, tbl, initial)
+function M.reduce(fn, tbl, initial)
   local it = vim.iter(tbl)
   local function folder(agg, key, val)
     return fn(agg, key, val) or fn(agg, val)
   end
-  local res = (it:enumerate():fold(initial, folder))
-  vim.notify(vim.inspect(res))
+  local res = (it:fold(initial, folder))
   return res
 end
 
@@ -167,7 +176,7 @@ end
 --- semantic meaning, or as the "null" result for parameters that expect
 --- function values.
 ---@vararg any[] these exist purely for compatibility with other functions
-function mod.eff(...) end
+function M.eff(...) end
 
 --- the simplest possible function accepting arbitrary arguments with full
 --- information flow through the wrapper, e.g. the function returns the raw set
@@ -178,8 +187,67 @@ function mod.eff(...) end
 --- values expected corresponding to the number of input values.
 ---@vararg any[] these exist purely for compatibility with other functions, and
 ---are returned from `F` unaltered.
-function mod.F(...)
+function M.F(...)
   return ...
 end
 
-return mod
+--- turns the given function into a callback function. A callback function is in
+--- this context simply a bare wrapper around the function.
+---@param fn fun(...): any? a function to wrap in a callback
+---@return fun(fun...): any? fn the callback
+function M.cb(fn)
+  return function(...)
+    return fn(...)
+  end
+end
+
+--- turns the given function into a callback function, essentially a bare
+--- wrapper around the original function. This is distinct from the behavior in
+--- the standard `cb` function, as this allows for additional options to be
+--- passed from the top level "factory" invocation.
+---@param fn fun(...): any? a function to wrap
+---@vararg any[] additional arguments that are given to the call to fn after
+---merging with the options passed in the level below.
+---@return fun(...): any? the callback
+function M.cbmerge(fn, ...)
+  local those = { ... }
+  return function(...)
+    local these = { ... }
+    local args = vim.list_extend(those, these)
+    return fn(unpack(args))
+  end
+end
+
+--- wraps the given function such that when called, additional options passed
+--- through a standard `opts` argument are treated using the `handler` function
+--- before being reinserted into the original function arguments during
+--- evaluation of the wrapping.
+---@param fn fun(...): any? a function, whose last argument is the `opts` field.
+---@param handler fun(opts: T_Opts): any? function to "handle" the extra opts
+---that are passed through the `opts` argument of the original function
+---@param consume_optarg boolean? whether or not the opts field that is held in
+---the last argument position should be removed for processing, or simply read
+---for processing.
+---@return fun(...): any? wrapping wrapped function
+function M.inject(fn, handler, consume_optarg)
+  consume_optarg = consume_optarg or false
+
+  local getopts = function(iter)
+    if consume_optarg then
+      return iter:nextback()
+    end
+    return iter:peekback()
+  end
+
+  local function wrap(...)
+    local args = vim.iter({ ... })
+    local opts = getopts(args)
+    local handler_results = handler(opts)
+
+    return fn(unpack(args), handler_results)
+  end
+
+  return wrap
+end
+
+return M
