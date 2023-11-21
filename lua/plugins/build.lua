@@ -1,9 +1,9 @@
-local stems = require("environment.keys").build
-local key_overseer = stems.overseer
-local key_runner = stems.runner
-local key_executor = stems.executor
-local key_rapid = stems.rapid
-local key_launch = stems.launch
+local kenv = require("environment.keys").build
+local key_overseer = kenv.overseer
+local key_runner = kenv.runner
+local key_executor = kenv.executor
+local key_rapid = kenv.rapid
+local key_launch = kenv.launch
 local env = require("environment.ui")
 
 return {
@@ -108,7 +108,7 @@ return {
     },
     keys = {
       {
-        key_overseer .. "o",
+        key_overseer.open,
         function()
           require("overseer").open()
         end,
@@ -116,7 +116,7 @@ return {
         desc = "task.seer=> open overseer",
       },
       {
-        key_overseer .. "q",
+        key_overseer.close,
         function()
           require("overseer").close()
         end,
@@ -124,7 +124,7 @@ return {
         desc = "task.seer=> close overseer",
       },
       {
-        key_overseer .. "v",
+        key_overseer.toggle,
         function()
           require("overseer").toggle()
         end,
@@ -132,7 +132,7 @@ return {
         desc = "task.seer=> toggle overseer",
       },
       {
-        key_overseer .. "n",
+        key_overseer.task.new,
         function()
           require("overseer").new_task()
         end,
@@ -140,7 +140,7 @@ return {
         desc = "task.seer=> new overseer task",
       },
       {
-        key_overseer .. "b",
+        key_overseer.bundle.list,
         function()
           require("overseer").list_task_bundles()
         end,
@@ -148,7 +148,7 @@ return {
         desc = "task.seer=> list overseer task bundles",
       },
       {
-        key_overseer .. "l",
+        key_overseer.task.list,
         function()
           require("overseer").list_tasks()
         end,
@@ -156,7 +156,7 @@ return {
         desc = "task.seer=> load overseer task bundle",
       },
       {
-        key_overseer .. "L",
+        key_overseer.bundle.load,
         function()
           require("overseer").load_task_bundle()
         end,
@@ -164,15 +164,15 @@ return {
         desc = "task.seer=> load overseer task bundle",
       },
       {
-        key_overseer .. "d",
+        key_overseer.bundle.delete,
         function()
-          require("overseer").load_task_bundle()
+          require("overseer").delete_task_bundle()
         end,
         mode = "n",
         desc = "task.seer=> load overseer task bundle",
       },
       {
-        key_overseer .. "rr",
+        key_overseer.run.template,
         function()
           require("overseer").run_template()
         end,
@@ -180,7 +180,7 @@ return {
         desc = "task.seer=> run overseer template",
       },
       {
-        key_overseer .. "ra",
+        key_overseer.run.action,
         function()
           require("overseer").run_action()
         end,
@@ -202,7 +202,7 @@ return {
     end,
     keys = {
       {
-        key_runner .. "r",
+        key_runner.run,
         function()
           require("runner").run()
         end,
@@ -210,7 +210,7 @@ return {
         desc = "build.run=> run",
       },
       {
-        key_runner .. "R",
+        key_runner.autorun.enable,
         function()
           require("runner").autorun()
         end,
@@ -218,9 +218,9 @@ return {
         desc = "build.run=> enable autorun",
       },
       {
-        key_runner .. "q",
+        key_runner.autorun.disable,
         function()
-          require("runner").run()
+          require("runner").autorun_stop()
         end,
         mode = "n",
         desc = "build.run=> disable autorun",

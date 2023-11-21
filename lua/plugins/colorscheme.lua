@@ -42,7 +42,7 @@ return {
           PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
           PmenuSbar = { bg = theme.ui.bg_m1 },
           PmenuThumb = { bg = theme.ui.bg_p2 },
-          InclineNormal = { bg = colors.palette.sumiInk4 },
+          InclineNormal = { bg = colors.palette.waveBlue1 },
           InclineNormalNC = { bg = colors.palette.sumiInk1 },
           WinBar = { bg = colors.palette.sumiInk4 },
           WinBarNC = { bg = colors.palette.sumiInk4 },
@@ -54,23 +54,23 @@ return {
           TreesitterContextBottom = { underline = true },
           NightowlContextHints = {
             italic = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,
+            fg = colors.palette.springViolet2,
           },
           NightowlContextHintsBright = {
             italic = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.dragonBlue,
+            fg = colors.palette.dragonBlue,
           },
           NightowlStartupEntry = {
             bold = false,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,
+            fg = colors.palette.springViolet2,
           },
           NightowlStartupHeader = {
             bold = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.waveRed,
+            fg = colors.palette.waveRed,
           },
           NightowlStartupConvenience = {
             bold = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.waveBlue2,
+            fg = colors.palette.waveBlue2,
           },
           IndentBlanklineWhitespace = { link = "@comment" },
           IndentBlanklineScope = { link = "@comment" },
@@ -99,6 +99,43 @@ return {
     },
     lazy = true,
     priority = 997,
+  },
+  {
+    "cryptomilk/nightcity.nvim",
+    version = false,
+    opts = {
+      style = "afterlife",
+      terminal_colors = true,
+      invert_colors = {
+        cursor = true,
+        diff = true,
+        error = true,
+        search = true,
+        selection = true,
+        signs = false,
+        statusline = true,
+        tabline = false,
+      },
+      font_style = {
+        comments = {
+          italic = true,
+        },
+        keywords = {
+          italic = true,
+        },
+        functions = {
+          bold = true,
+        },
+        search = {
+          bold = true,
+        },
+      },
+      plugins = { default = true },
+      on_highlights = function(groups, colors) end,
+    },
+    config = function(_, opts)
+      require("nightcity").setup(opts)
+    end,
   },
   {
     "rose-pine/neovim",
@@ -161,11 +198,10 @@ return {
     lazy = true,
     priority = 890,
     config = function(_, opts)
-      defhl({ "TreesitterContextBottom" }, { underline = true })
-      defhl(
-        { "NightowlContextHints" },
-        { italic = true, fg = default_colorizer("@punctuation") }
-      )
+      local dw_accent = "#E5E5E5"
+      defhl({ "TreesitterContextBottom" }, { fg = dw_accent, underline = true })
+      defhl({ "NightowlContextHints" }, { italic = true, fg = dw_accent })
+      defhl({ "WinSeparator" }, { fg = dw_accent })
       require("deepwhite").setup(opts)
     end,
     opts = {
@@ -184,6 +220,8 @@ return {
           ["kanagawa-wave"] = {},
           ["kanagawa-lotus"] = {},
           ["deepwhite"] = {},
+          ["nano"] = {},
+          ["hagoromo"] = {},
         },
       },
       caching = true,
@@ -194,14 +232,28 @@ return {
     event = "VeryLazy",
   },
   {
+    "ronisbr/nano-theme.nvim",
+    config = function(_, opts)
+      vim.o.background = opts.background.override and opts.background.style
+        or (vim.o.background or "light")
+    end,
+    opts = {
+      background = {
+        override = false,
+        style = "light",
+      },
+    },
+  },
+  {
     "LazyVim/LazyVim",
     opts = {
       colorscheme = function()
-        local bg = vim.g.background or "dark"
-        if bg == "dark" then
-          require("kanagawa").load()
+        local bg = bg_style or "dark"
+        if bg == "light" then
+          require(env.colorscheme.light).load()
+        else
+          require(env.colorscheme.dark).load()
         end
-        require("deepwhite").load()
       end,
     },
   },

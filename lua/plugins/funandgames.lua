@@ -1,6 +1,8 @@
 local env = require("environment.ui")
 local opt = require("environment.optional")
 
+local key_games = require("environment.keys").games
+
 return {
   {
     "eandrju/cellular-automaton.nvim",
@@ -22,12 +24,12 @@ return {
   },
   {
     "alec-gibson/nvim-tetris",
-    enabled = opt.games.tetris.enable,
+    enabled = opt.games.tetris,
     cmd = "Tetris",
     config = function() end,
     keys = {
       {
-        "<localleader><bar>",
+        key_games.tetris,
         "<CMD>Tetris<CR>",
         mode = "n",
         { desc = "tetris=> play tetris" },
@@ -36,39 +38,71 @@ return {
   },
   {
     "jim-fx/sudoku.nvim",
-    enabled = opt.games.sudoku.enable,
+    enabled = opt.games.sudoku,
     cmd = "Sudoku",
     config = function()
       require("sudoku").setup({
         -- configuration ...
       })
     end,
+    keys = {
+      {
+        key_games.sudoku,
+        "<CMD>Sudoku<CR>",
+        mode = "n",
+        desc = "sudoku=> play",
+      },
+    },
   },
   {
     "alanfortlink/blackjack.nvim",
-    enabled = opt.games.blackjack.enable,
+    enabled = opt.games.blackjack,
     dependencies = { "nvim-lua/plenary.nvim" },
     cmd = "BlackJackNewGame",
     opts = {
       card_style = "large",
     },
+    keys = {
+      {
+        key_games.blackjack,
+        "<CMD>BlackJackNewGame<CR>",
+        mode = "n",
+        desc = "blackjack=> new game",
+      },
+    },
   },
   {
     "seandewar/killersheep.nvim",
-    enabled = opt.games.killersheep.enable,
+    enabled = opt.games.killersheep,
     cmd = "KillKillKill",
     opts = {
       gore = true,
     },
+    keys = {
+      {
+        key_games.killersheep,
+        "<CMD>KillKillKill<CR>",
+        mode = "n",
+        desc = "sheep=> killgame",
+      },
+    },
   },
   {
     "seandewar/nvimesweeper",
-    enabled = opt.games.nvimesweeper.enable,
+    enabled = opt.games.nvimesweeper,
     cmd = "Nvimesweeper",
+    keys = {
+      {
+        key_games.nvimesweeper,
+        "<CMD>Nvimesweeper<CR>",
+        mode = "n",
+        desc = "minesweep=> new",
+      },
+    },
   },
   {
     "tamton-aquib/zone.nvim",
-    enabled = opt.screensaver.enable,
+    enabled = opt.screensaver,
     cmd = {
       "Treadmill",
       "DVD",
@@ -84,23 +118,20 @@ return {
       treadmill = {
         direction = "left",
         headache = true,
-        tick_time = 500, -- Lower, the faster
+        tick_time = 500,
       },
       epilepsy = {
-        stage = "aura", -- "aura" or "ictal"
+        stage = "aura",
         tick_time = 100,
       },
       dvd = {
         tick_time = 100,
       },
-      -- Opts for Dvd style
     },
-    -- event = "VeryLazy",
   },
   {
     "tamton-aquib/duck.nvim",
     config = function() end,
-    -- event = "VeryLazy",
     keys = {
       {
         "<F7>",
@@ -125,6 +156,41 @@ return {
         end,
         mode = "n",
         desc = "duck=> cook a duck",
+      },
+    },
+  },
+  {
+    "rktjmp/shenzhen-solitaire.nvim",
+    config = true,
+    opts = {},
+    keys = {
+      {
+        key_games.solitaire.new,
+        "<CMD>ShenzhenSolitaireNewGame<CR>",
+        mode = "n",
+        desc = "solitaire=> new game",
+      },
+      {
+        key_games.solitaire.next,
+        "<CMD>ShenzhenSolitaireNextGame<CR>",
+        mode = "n",
+        desc = "solitaire=> new game",
+      },
+    },
+  },
+  {
+    "NStefan002/speedtyper.nvim",
+    cmd = "Speedtyper",
+    opts = {},
+    config = function(_, opts)
+      require("speedtyper").setup(opts)
+    end,
+    keys = {
+      {
+        key_games.speedtyper,
+        "<CMD>Speedtyper<CR>",
+        mode = "n",
+        desc = "speedtyper=> new game",
       },
     },
   },

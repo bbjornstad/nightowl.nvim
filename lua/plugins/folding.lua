@@ -3,7 +3,7 @@ local mopts = require("funsak.table").mopts
 
 local handler = function(virtText, lnum, endLnum, width, truncate)
   local newVirtText = {}
-  local suffix = (" 󰁂 %d "):format(endLnum - lnum)
+  local suffix = ("  %d "):format(endLnum - lnum)
   local sufWidth = vim.fn.strdisplaywidth(suffix)
   local targetWidth = width - sufWidth
   local curWidth = 0
@@ -33,14 +33,15 @@ return { -- add folding range to capabilities
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
-      opts.capabilities = vim.tbl_deep_extend("force", opts.capabilities or {}, {
-        textDocument = {
-          foldingRange = {
-            dynamicRegistration = false,
-            lineFoldingOnly = true,
-          }
-        }
-      })
+      opts.capabilities =
+        vim.tbl_deep_extend("force", opts.capabilities or {}, {
+          textDocument = {
+            foldingRange = {
+              dynamicRegistration = false,
+              lineFoldingOnly = true,
+            },
+          },
+        })
     end,
   },
   {
@@ -55,7 +56,24 @@ return { -- add folding range to capabilities
     dependencies = {
       "kevinhwang91/promise-async",
       "anuvyklack/pretty-fold.nvim",
+      { "VonHeikemen/lsp-zero.nvim", optional = true },
     },
+    config = function(_, opts)
+      require("ufo").setup(opts)
+      local ok, zero = pcall(require, "lsp-zero")
+      if ok then
+        zero.set_server_config({
+          capabilities = {
+            textDocument = {
+              foldingRange = {
+                dynamicRegistration = false,
+                lineFoldingOnly = true,
+              },
+            },
+          },
+        })
+      end
+    end,
     event = "BufEnter",
     opts = {
       fold_virt_text_handler = handler,
@@ -167,10 +185,9 @@ return { -- add folding range to capabilities
       add_close_pattern = true, -- true, 'last_line' or false
 
       matchup_patterns = {
-        { "{",  "}" },
+        { "{", "}" },
         { "%(", ")" }, -- % to escape lua pattern char
         { "%[", "]" }, -- % to escape lua pattern char
-        { "<",  ">" },
       },
 
       ft_ignore = mopts({ "neorg" }, env.ft_ignore_list, "suppress"),

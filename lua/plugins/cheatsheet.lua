@@ -8,14 +8,15 @@ return {
       "nvim-lua/popup.nvim",
       "nvim-lua/plenary.nvim",
     },
-    opts = function(_, opts)
+    config = function(_, opts)
+      require("cheatsheet").setup(opts)
       require("telescope").load_extension("cheatsheet")
-      opts = vim.tbl_extend("force", {
-        bundled_cheatsheets = true,
-        bundled_plugin_cheatsheets = true,
-        include_only_installed_plugins = true,
-      }, opts or {})
     end,
+    opts = {
+      bundled_cheatsheets = true,
+      bundled_plugin_cheatsheets = true,
+      include_only_installed_plugins = true,
+    },
     keys = {
       {
         "<F3>",

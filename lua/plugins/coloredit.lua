@@ -1,6 +1,6 @@
 local env = require("environment.ui")
 local default_colorizer = require("funsak.colors").identify_highlight
-local key_ccc = require("environment.keys").ui.color
+local key_color = require("environment.keys").color
 
 return {
   {
@@ -31,34 +31,34 @@ return {
     },
     keys = {
       {
-        key_ccc .. "c",
+        key_color.pick.ccc,
         "<CMD>CccPick<CR>",
         mode = "n",
-        desc = "ccc=> pick color interface",
+        desc = "col.ccc=> pick color interface",
       },
       {
-        key_ccc .. "h",
+        key_color.inline_hl.toggle,
         "<CMD>CccHighlighterToggle<CR>",
         mode = "n",
-        desc = "ccc=> toggle inline highlighting",
+        desc = "col.ccc=> toggle inline highlighting",
       },
       {
-        key_ccc .. "v",
+        key_color.convert,
         "<CMD>CccConvert<CR>",
         mode = "n",
-        desc = "ccc=> convert color",
+        desc = "col.ccc=> convert color",
       },
       {
-        key_ccc .. "f",
+        key_color.inline_hl.disable,
         "<CMD>CccHighlighterDisable<CR>",
         mode = "n",
-        desc = "ccc=> disable inline highlighting",
+        desc = "col.ccc=> disable inline highlighting",
       },
       {
-        key_ccc .. "o",
+        key_color.inline_hl.enable,
         "<CMD>CccHighlighterEnable<CR>",
         mode = "n",
-        desc = "ccc=> enable inline highlighting",
+        desc = "col.ccc=> enable inline highlighting",
       },
     },
   },
@@ -78,34 +78,34 @@ return {
     cmd = "Colortils",
     keys = {
       {
-        key_ccc .. "t",
+        key_color.pick.tils,
         "<CMD>Colortils picker<CR>",
         mode = "n",
-        desc = "'tils=> pick color",
+        desc = "col.tils=> pick color",
       },
       {
-        key_ccc .. "l",
+        key_color.lighten,
         "<CMD>Colortils lighten<CR>",
         mode = "n",
-        desc = "'tils=> lighten",
+        desc = "col.tils=> lighten",
       },
       {
-        key_ccc .. "d",
+        key_color.darken,
         "<CMD>Colortils darken<CR>",
         mode = "n",
-        desc = "'tils=> darken",
+        desc = "col.tils=> darken",
       },
       {
-        key_ccc .. "g",
+        key_color.greyscale,
         "<CMD>Colortils greyscale<CR>",
         mode = "n",
-        desc = "'tils=> greyscale",
+        desc = "col.tils=> greyscale",
       },
       {
-        key_ccc .. "L",
-        "<CMD>Colortils greyscale<CR>",
+        key_color.list,
+        "<CMD>Colortils css list<CR>",
         mode = "n",
-        desc = "'tils=> css list",
+        desc = "col.tils=> css list",
       },
     },
   },

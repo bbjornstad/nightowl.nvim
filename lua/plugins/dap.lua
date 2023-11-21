@@ -1,4 +1,5 @@
-local kenv = require("environment.keys").debug
+local kenv = require("environment.keys")
+local key_debug = kenv.debug
 
 return {
   {
@@ -7,35 +8,31 @@ return {
       --- fancy UI for the debugger
       {
         "rcarriga/nvim-dap-ui",
-        dependencies = { "mfussenegger/nvim-dap" },
-      },
-      {
-        "niuiic/dap-utils.nvim",
-        dependencies = { "mfussenegger/nvim-dap" },
+        dependencies = {
+          "mfussenegger/nvim-dap",
+          {
+            "folke/neodev.nvim",
+            opts = function(_, opts)
+              opts.library = require("funsak.table").mopts({
+                plugins = {
+                  { "nvim-dap-ui" },
+                  types = true,
+                },
+              }, opts.library or {})
+            end,
+          },
+        },
       },
       -- virtual text for the debugger
-      {
-        "theHamsta/nvim-dap-virtual-text",
-        dependencies = { "mfussenegger/nvim-dap" },
-      },
-      {
-        "daic0r/dap-helper.nvim",
-        dependencies = {
-          "rcarriga/nvim-dap-ui",
-          "mfussenegger/nvim-dap",
-        },
-        config = function(_, opts)
-          require("dap-helper").setup()
-        end,
-      },
+      { "theHamsta/nvim-dap-virtual-text" },
 
       -- which key integration
       {
         "folke/which-key.nvim",
         opts = {
           defaults = {
-            [kenv:leader()] = { name = "+debug" },
-            [kenv.adapters] = { name = "dap=> +adapters" },
+            [key_debug:leader()] = { name = "::debug::" },
+            [key_debug.adapters] = { name = "::debug.dap=> adapters::" },
           },
         },
       }, -- mason.nvim integration
@@ -53,6 +50,9 @@ return {
           ensure_installed = {
             -- Update this to ensure that you have the debuggers for the langs you want
           },
+        },
+        dependencies = {
+          "williamboman/mason.nvim",
         },
       },
       {
@@ -96,12 +96,70 @@ return {
   },
   {
     "rareitems/printer.nvim",
+    event = "VeryLazy",
     config = function(_, opts)
       require("printer").setup(opts)
     end,
     opts = {
-      keymap = kenv.printer .. "p",
+      keymap = key_debug.printer,
       behavior = "insert_below",
+    },
+  },
+  {
+    "daic0r/dap-helper.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+      "mfussenegger/nvim-dap",
+    },
+    config = function(_, opts)
+      require("dap-helper").setup()
+    end,
+  },
+  {
+    "theHamsta/nvim-dap-virtual-text",
+    dependencies = { "mfussenegger/nvim-dap" },
+    config = function(_, opts)
+      require("nvim-dap-virtual-text").setup(opts)
+    end,
+    opts = {
+      enabled = true,
+      enabled_commands = true,
+      highlight_new_as_changed = true,
+      commented = false,
+      all_references = false,
+    },
+  },
+  {
+    "ofirgall/goto-breakpoints.nvim",
+    dependencies = { "mfussenegger/nvim-dap" },
+    config = function(_, opts) end,
+    opts = {},
+    keys = {
+      {
+        kenv.shortcut.diagnostics.breakpoint.next,
+        function()
+          require("goto-breakpoints").next()
+        end,
+        mode = "n",
+        desc = "dap=> next breakpoint",
+      },
+      {
+        kenv.shortcut.diagnostics.breakpoint.previous,
+        function()
+          require("goto-breakpoints").prev()
+        end,
+        mode = "n",
+        desc = "dap=> next breakpoint",
+      },
+      {
+        kenv.shortcut.diagnostics.breakpoint.stopped,
+        function()
+          require("goto-breakpoints").stopped()
+        end,
+        mode = "n",
+        desc = "dap=> next breakpoint",
+      },
     },
   },
 }
