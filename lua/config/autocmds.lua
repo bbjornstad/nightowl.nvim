@@ -3,5 +3,7 @@
 -- Add any additional autocmds here
 
 vim.api.nvim_create_autocmd({ "LspAttach" }, {
-  callback = function() vim.lsp.set_log_level("warn") end,
+  callback = function()
+    vim.lsp.set_log_level("error")
+  end,
 })

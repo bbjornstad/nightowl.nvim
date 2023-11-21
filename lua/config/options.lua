@@ -7,8 +7,8 @@ local NIGHTOWL_BACKGROUND = vim.env.NIGHTOWL_BACKGROUND_STYLE
 -- leader configuration. These are mapped to <leader> and <localleader>
 -- respectively. If using a `funsak` KeyModule, these have somewhat more
 -- specific meanings depending on configuration.
-vim.g.mapleader = " "
-vim.g.maplocalleader = "'"
+vim.g.mapleader = [[ ]]
+vim.g.maplocalleader = [[']]
 
 -- Basic interface options that are not handled with specific plugin
 -- configurations set in interface.lua
@@ -46,12 +46,11 @@ vim.opt.ruler = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true
-vim.opt.synmaxcol = 200
+vim.opt.synmaxcol = 50
 
 vim.opt.swapfile = false
 vim.opt.spelllang = "en_us"
 vim.opt_global.formatoptions:append("t")
-vim.opt_global.formatoptions:append("a")
 vim.opt.laststatus = 3
 vim.opt.fillchars:append({
   horiz = "━",

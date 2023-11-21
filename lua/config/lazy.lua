@@ -21,7 +21,7 @@ local lazyconf = {
     {
       "abeldekat/lazyflex.nvim",
       version = "*",
-      import = "lazyflex.entry.lazyvim",
+      import = "lazyflex.hook",
       lazy = false,
       cond = true,
       opts = {
@@ -46,10 +46,11 @@ local lazyconf = {
         kw = {
           "tokyonight",
           "catppuccin",
-          "alpha",
+          -- "alpha",
           "bufferline",
           "neo-tree",
           "illuminate",
+          "dashboard",
         },
       },
     },
@@ -57,9 +58,6 @@ local lazyconf = {
       "LazyVim/LazyVim",
       import = "lazyvim.plugins",
       opts = {
-        defaults = {
-          keymaps = "parliament.config.keymaps",
-        },
         icons = {
           diagnostics = uienv.icons.diagnostic,
         },
@@ -76,17 +74,10 @@ local lazyconf = {
     -- ~~ lsp tooling ~~
     { import = "lazyvim.plugins.extras.lsp.none-ls" },
 
-    -- ~~ language specification ~~
-    { import = "lazyvim.plugins.extras.lang.typescript" },
-    { import = "lazyvim.plugins.extras.lang.json" },
-    { import = "lazyvim.plugins.extras.lang.rust" },
-    { import = "lazyvim.plugins.extras.lang.clangd" },
-    { import = "lazyvim.plugins.extras.lang.tailwind" },
-    { import = "lazyvim.plugins.extras.lang.python" },
-    { import = "lazyvim.plugins.extras.lang.python-semshi" },
-    { import = "lazyvim.plugins.extras.lang.tex" },
-    { import = "lazyvim.plugins.extras.lang.markdown" },
-    { import = "lazyvim.plugins.extras.lang.yaml" },
+    -- language specification
+    -- >>> update 11/13/2023 removed the language options from this list, now to
+    -- be managed with the lazyextras builtin. But the rest of this we want to
+    -- keep here in config.
 
     -- - ~~ ui tooling ~~
     { import = "lazyvim.plugins.extras.ui.mini-animate" },
@@ -106,7 +97,7 @@ local lazyconf = {
     -- - ~~ utility tooling ~~
     { import = "lazyvim.plugins.extras.util.project" },
     { import = "lazyvim.plugins.extras.util.dot" },
-    { import = "lazyvim.plugins.extras.editor.aerial" },
+    -- { import = "lazyvim.plugins.extras.editor.aerial" },
     { import = "lazyvim.plugins.extras.editor.symbols-outline" },
 
     -- ~~ ai tooling ~~
@@ -115,7 +106,7 @@ local lazyconf = {
     { import = "lazyvim.plugins.extras.coding.tabnine" },
 
     -- user-level plugin configuration
-    -- - exists namely to allow for modularziation of the specification
+    -- * exists namely to allow for modularziation of the specification
     --   configuration. Ideally, we will offload most of the spec to lazyflex
     --   loaded presets. When that has been achieved, the following will be
     --   uncommented.
@@ -129,13 +120,15 @@ local lazyconf = {
   defaults = {
     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
     -- If you know what you're doing, you can set this to `true` to have all your custom plugins lazy-loaded by default.
-    lazy = true,
+    lazy = false,
     version = false,
   },
   install = {
     colorscheme = {
       "kanagawa",
       "deepwhite",
+      "nano",
+      "nightcity",
       "newpaper",
       "rose-pine",
       "sherbet",
@@ -162,14 +155,43 @@ local lazyconf = {
     },
   },
   ui = {
-    border = uienv.borders.main_accent,
+    border = uienv.borders.alt,
+    title = " ::lazy: package manager",
     title_pos = "left",
+    icons = vim.tbl_deep_extend("force", {
+      cmd = " ",
+      config = " ",
+      event = " ",
+      ft = " ",
+      new = "󱍕 ",
+      import = "󱀯 ",
+      keys = " ",
+      lazy = "󰒲 ",
+      loaded = "● ",
+      not_loaded = "○ ",
+      plugin = " ",
+      runtime = " ",
+      require = "󰢱 ",
+      source = " ",
+      start = " ",
+      task = "✔ ",
+      list = {
+        "⋄",
+        "⇀",
+        "⟐",
+        "‒",
+      },
+    }, uienv.icons.kinds),
   },
   diff = "diffview.nvim",
   dev = {
     path = vim.fn.expand("~/prj/nvim-dev"),
     patterns = {},
     fallback = true,
+  },
+  profiling = {
+    loader = true,
+    require = true,
   },
 }
 
