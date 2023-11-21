@@ -1,82 +1,49 @@
 local env = {}
 local bfe = require("funsak.convert").bool_from_env
 
-env.accelerated_jk = {
-  enable = false,
-}
-env.tabout = {
-  enable = true,
-}
+env.accelerated_jk = false
+env.tabout = true
 env.screensaver = {
   enable = bfe("NIGHTOWL_ENABLE_SCREENSAVER") or false,
   selections = { "treadmill", "epilepsy", "dvd" },
 }
-env.hardtime = {
-  enable = false,
-}
+env.hardtime = false
 env.file_managers = {
-  fm_nvim = {
-    enable = false,
-  },
-  bolt = {
-    enable = true,
-  },
-  attempt = {
-    enable = true,
-  },
-  broot = {
-    enable = true,
-  },
+  oil = true,
+  nnn = true,
+  fm_nvim = false,
+  bolt = true,
+  attempt = true,
+  broot = true,
 }
-env.specs = {
-  enable = false,
-}
-env.tabtree = {
-  enable = true,
-}
-env.troublesum = {
-  enable = true,
-}
-env.undotree = {
-  enable = false,
-}
-env.reverb = {
-  enable = false,
-}
-env.gh_actions = {
-  enable = false,
-}
+env.specs = false
+env.tabtree = true
+env.troublesum = true
+env.undotree = true
+env.reverb = false
+env.gh_actions = false
 env.lsp = {
   diagnostics = {
-    lsp_lines = {
-      enable = true,
-    },
+    lsp_lines = true,
   },
 }
 env.symbol = {
-  aerial = {
-    enable = true,
-  },
-  outline = {
-    enable = true,
-  },
+  aerial = false,
+  outline = true,
 }
 env.games = {
-  blackjack = {
-    enable = false,
-  },
-  killersheep = {
-    enable = false,
-  },
-  nvimesweeper = {
-    enable = false,
-  },
-  sudoku = {
-    enable = false,
-  },
-  tetris = {
-    enable = false,
-  },
+  blackjack = false,
+  killersheep = false,
+  nvimesweeper = false,
+  sudoku = false,
+  tetris = false,
+}
+
+env.git = {
+  neogit = true,
+  git_conflict = false,
+  gitblame = true,
+  blamer = true,
 }
 
 env.windowing = {
@@ -86,8 +53,16 @@ env.windowing = {
   },
 }
 
+--- contains preferential behavior specifications for nvim plugins which step on
+--- each others toes, generally accomplishing similar tasks. This is a
+--- performance consideration.
 env.prefer = {
   focus_windows = "focus",
+  gitblame = "f-person",
+  symbol_outline = "outline",
+  timers = {
+    pomodoro = "pulse",
+  },
 }
 
 return env
