@@ -1,53 +1,126 @@
 ---@diagnostic disable: missing-fields
 local ncmp = "hrsh7th/nvim-cmp"
-local default_sources = require("environment.cmp").default_sources
-local kenv = require("environment.keys").completion
+local default_sources = {
+  {
+    name = "nvim_lsp",
+    entry_filter = function(entry, ctx)
+      local kind = require("cmp.types").lsp.CompletionItemKind[entry:get_kind()]
 
-local function toggle_cmp_enabled()
-  local status = vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
-  status = not status
-  vim.notify(("nvim-cmp: %s"):format(status and "enabled" or "disabled"))
-  vim.b.enable_cmp_completion = status
-end
-
-local function toggle_cmp_autocompletion()
-  local status = vim.b.enable_cmp_autocompletion
-    or vim.g.enable_cmp_autocompletion
-  status = not status
-  if status then
-    require("cmp").setup.buffer({
-      completion = {
-        autocomplete = {
-          require("cmp.types").cmp.TriggerEvent.InsertEnter,
-          require("cmp.types").cmp.TriggerEvent.TextChanged,
-        },
-      },
-    })
-  else
-    require("cmp").setup.buffer({
-      autocomplete = false,
-    })
-  end
-  vim.b.enable_cmp_autocompletion = status
-  vim.notify(("Autocompletion: %s"):format(vim.b.enable_cmp_autocompletion))
-end
-
-local function initialize_autocompletion()
-  if vim.g.enable_cmp_autocompletion then
-    return {
-      require("cmp.types").cmp.TriggerEvent.InsertEnter,
-      require("cmp.types").cmp.TriggerEvent.TextChanged,
-    }
-  end
-  return false
-end
+      if kind == "Text" then
+        return false
+      end
+      return true
+    end,
+    group_index = 1,
+  },
+  {
+    name = "nvim_lsp_signature_help",
+    group_index = 1,
+  },
+  {
+    name = "nvim_lsp_document_symbol",
+    group_index = 1,
+  },
+  {
+    name = "treesitter",
+    keyword_length = 4,
+    group_index = 1,
+  },
+  {
+    name = "luasnip",
+    group_index = 1,
+  },
+  {
+    name = "dap",
+    group_index = 1,
+  },
+  -- {
+  --   name = "dynamic",
+  --   group_index = 1,
+  -- },
+  {
+    name = "look",
+    group_index = 1,
+  },
+  {
+    name = "omni",
+    group_index = 2,
+  },
+  {
+    name = "rg",
+    keyword_length = 4,
+    group_index = 2,
+  },
+  {
+    name = "env",
+    trigger_characters = { "$" },
+    group_index = 3,
+  },
+  {
+    name = "buffer",
+    keyword_length = 5,
+    group_index = 3,
+  },
+  {
+    name = "spell",
+    group_index = 2,
+  },
+  {
+    name = "fuzzy_path",
+    keyword_length = 3,
+    trigger_characters = { "/" },
+    group_index = 2,
+  },
+  {
+    name = "gitlog",
+    max_item_count = 5,
+    group_index = 2,
+  },
+  {
+    name = "calc",
+    group_index = 1,
+  },
+  {
+    name = "emoji",
+    trigger_characters = { ":" },
+    group_index = 1,
+  },
+  {
+    name = "nerdfont",
+    trigger_characters = { ":" },
+    group_index = 1,
+  },
+  {
+    name = "nerdfonts",
+    trigger_characters = { "nf" },
+    group_index = 1,
+  },
+  {
+    name = "color_names",
+    group_index = 2,
+  },
+  {
+    name = "fonts",
+    group_index = 2,
+    keyword_length = 3,
+    option = { space_filter = "-" },
+  },
+  {
+    name = "diag-codes",
+    option = { in_comment = false },
+    group_index = 1,
+  },
+  {
+    name = "natdat",
+    group_index = 1,
+  },
+}
 
 return {
   {
     ncmp,
     version = false,
     dependencies = {
-      "L3MON4D3/LuaSnip",
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
@@ -81,42 +154,11 @@ return {
       "uga-rosa/cmp-latex-symbol",
       "Gelio/cmp-natdat",
     },
-    init = function()
-      vim.g.enable_cmp_completion = true
-      vim.g.enable_cmp_autocompletion = false
-    end,
     opts = function(_, opts)
-      opts = opts or {}
-      opts.enabled = opts.enabled
-        or function()
-          return vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
-        end
       local cmp = require("cmp")
-      opts.snippet = vim.tbl_deep_extend("force", {
-        expand = function(args)
-          require("luasnip").lsp_expand(args)
-        end,
-      }, opts.snippet or {})
-      opts.performance = vim.tbl_deep_extend("force", {
-        debounce = 100,
-        max_view_entries = 500,
-      }, opts.performance or {})
-
+      opts = opts or {}
       -- configure nvim-cmp sources.
-      -- TODO: integrate a completion menu system that can filter these by first
-      -- items on the initialization of the menu.
-
       opts.sources = vim.list_extend(opts.sources or {}, default_sources)
-
-      -- =======================================================================
-      -- The following changes the behavior of the menu. Noteably, we are
-      -- turning off autocompletion on insert, in other words we need to hit one
-      -- of the configured keys to be able to use the completion menu.
-      opts.completion = vim.tbl_deep_extend("force", {
-        -- autocomplete = false,
-        autocomplete = initialize_autocompletion(),
-        scrolloff = true,
-      }, opts.completion or {})
 
       cmp.setup.cmdline({ "/", "?" }, {
         mapping = cmp.mapping.preset.cmdline(),
@@ -202,20 +244,6 @@ return {
         }),
       })
     end,
-    keys = {
-      {
-        kenv.toggle.enabled,
-        toggle_cmp_enabled,
-        mode = "n",
-        desc = "cmp=> toggle nvim-cmp enabled",
-      },
-      {
-        kenv.toggle.autocompletion,
-        toggle_cmp_autocompletion,
-        mode = "n",
-        desc = "cmp=> toggle autocompletion on insert",
-      },
-    },
   },
   -- explicitly list out the sources that we are installing for nvim-cmp. These
   -- match the list that is represented above, but with the added caveat that

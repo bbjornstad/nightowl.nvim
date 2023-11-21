@@ -37,55 +37,23 @@ return {
           },
         },
       },
+      { "VonHeikemen/lsp-zero.nvim", optional = true },
     },
     opts = function(_, opts)
       local cmp = require("cmp")
+      local has = require("lazyvim.util").has
+      local cmp_action
+      if has("lsp-zero.nvim") then
+        cmp_action = require("lsp-zero").cmp_action()
+      else
+        cmp_action = require("uutils.cmp").cmp_actions
+      end
       opts.mapping = cmp.mapping.preset.insert(vim.tbl_deep_extend("force", {
-        [kenv_cmp.confirm] = cmp.mapping({
-          i = function(fallback)
-            if cmp.visible() and cmp.get_active_entry() then
-              cmp.mapping.confirm({
-                behavior = cmp.ConfirmBehavior.Replace,
-                select = cmp.SelectBehavior.Select,
-              })
-            else
-              fallback()
-            end
-          end,
-          s = cmp.mapping.confirm({
-            select = cmp.SelectBehavior.Insert,
-          }),
-          c = cmp.mapping.confirm({
-            behavior = cmp.ConfirmBehavior.Replace,
-            select = cmp.SelectBehavior.Insert,
-          }),
-        }),
-        [kenv_cmp.jump.forward] = cmp.mapping(function(fallback)
-          local luasnip = require("luasnip")
-          if cmp.visible() then
-            cmp.select_next_item()
-          -- note the use of the `expand_or_locally_jumpable` function:
-          -- this restricts possible targets to only those in the local snippet
-          -- region and no more external choices
-          elseif luasnip.expand_or_locally_jumpable() then
-            luasnip.expand_or_jump()
-          elseif has_words_before() then
-            cmp.complete()
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        [kenv_cmp.jump.backward] = cmp.mapping(function(fallback)
-          local luasnip = require("luasnip")
-
-          if cmp.visible() then
-            cmp.select_prev_item()
-          elseif luasnip.jumpable(-1) then
-            luasnip.jump(-1)
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
+        ["<CR>"] = false,
+        ["<S-CR>"] = false,
+        ["<C-CR>"] = false,
+        [kenv_cmp.jump.forward] = cmp_action.luasnip_supertab(),
+        [kenv_cmp.jump.backward] = cmp_action.luasnip_shift_supertab(),
         [kenv_cmp.docs.backward] = cmp.mapping.scroll_docs(-4),
         [kenv_cmp.docs.forward] = cmp.mapping.scroll_docs(4),
         [kenv_cmp.external.complete_common_string] = cmp.mapping.complete_common_string(),
