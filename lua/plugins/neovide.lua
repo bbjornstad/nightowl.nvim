@@ -5,7 +5,8 @@ local mod = {}
 -- issues the terminal official binary will work corrctly (`nvim` on cli)
 if vim.g.neovide then
   -- font setup.
-  vim.o.guifont = "Monaspace\\ Argon,Lilex,IntelOne\\ Mono,Symbola,Codicon:h12"
+  vim.o.guifont =
+    "Monaspace\\ Argon,Lilex,IntelOne\\ Mono,Martian\\ Mono,Lekton,Fira\\ Mono,JuliaMono,Maple\\ Mono,Broot\\ Icons\\ Visual\\ Studio\\ Code,Symbola,codicon:h12"
 
   -- padding
   vim.g.neovide_padding_top = 1
