@@ -1,5 +1,8 @@
-local sound_dir = vim.fn.expand("config") .. "/interface_sounds"
-local opt = require("environment.optional")
+local env = require("environment.ui")
+local signs = env.icons.cursorsigns
+
+local cb = require("funsak.wrap").cb
+local hlcomp = require("funsak.colors").component
 
 return {
   {
@@ -31,31 +34,67 @@ return {
         callback = function()
           local current_mode = vim.fn.mode()
           if current_mode == "n" then
-            vim.api.nvim_set_hl(0, "SmoothCursor", { fg = "#8aa872" })
-            vim.fn.sign_define("smoothcursor", { text = "" })
+            vim.api.nvim_set_hl(
+              0,
+              "SmoothCursor",
+              hlcomp("lualine_b_normal", "fg")
+            )
           elseif current_mode == "v" then
-            vim.api.nvim_set_hl(0, "SmoothCursor", { fg = "#bf616a" })
-            vim.fn.sign_define("smoothcursor", { text = "" })
+            vim.api.nvim_set_hl(
+              0,
+              "SmoothCursor",
+              hlcomp("lualine_b_visual", "fg")
+              -- hlcomp("ModesVisual", "bg", { bg = "fg" })
+            )
           elseif current_mode == "V" then
-            vim.api.nvim_set_hl(0, "SmoothCursor", { fg = "#bf616a" })
-            vim.fn.sign_define("smoothcursor", { text = "" })
+            vim.api.nvim_set_hl(
+              0,
+              "SmoothCursor",
+              hlcomp("lualine_b_visual", "fg")
+              -- hlcomp("ModesVisual", "bg", { bg = "fg" })
+            )
           elseif current_mode == "�" then
-            vim.api.nvim_set_hl(0, "SmoothCursor", { fg = "#bf616a" })
-            vim.fn.sign_define("smoothcursor", { text = "" })
+            vim.api.nvim_set_hl(
+              0,
+              "SmoothCursor",
+              hlcomp("lualine_b_visual", "fg")
+              -- hlcomp("ModesVisual", "bg", { bg = "fg" })
+            )
           elseif current_mode == "i" then
-            vim.api.nvim_set_hl(0, "SmoothCursor", { fg = "#668aab" })
-            vim.fn.sign_define("smoothcursor", { text = "" })
+            vim.api.nvim_set_hl(
+              0,
+              "SmoothCursor",
+              hlcomp("lualine_b_insert", "fg")
+              -- hlcomp("ModesInsert", "bg", { bg = "fg" })
+            )
           end
         end,
       })
     end,
     opts = {
+      type = "matrix",
       autostart = true,
+      text_hl = "SmoothCursor",
       line_hl = "CursorLine",
-      speed = 36,
+      speed = 64,
       threshold = 3,
+      matrix = {
+        head = {
+          cursor = vim.is_callable(signs.head) and cb(signs.head) or signs.head,
+          text_hl = "SmoothCursor",
+        },
+        body = {
+          cursor = vim.is_callable(signs.body) and cb(signs.body) or signs.body,
+          length = 6,
+          text_hl = "SmoothCursor",
+        },
+        tail = {
+          cursor = vim.is_callable(signs.tail) and cb(signs.tail) or signs.tail,
+          text_hl = "SmoothCursor",
+        },
+      },
       fancy = {
-        enable = true,
+        enable = false,
         head = { cursor = "󰵵" },
         body = {},
       },
