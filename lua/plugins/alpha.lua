@@ -18,7 +18,7 @@ end
 return {
   {
     "jovanlanik/fsplash.nvim",
-    event = "VimEnter",
+    lazy = false,
     config = true,
     opts = {
       lines = nightowl_splash,
@@ -34,7 +34,7 @@ return {
     },
     keys = {
       {
-        "<S-Home>",
+        "<Home>",
         function()
           require("fsplash").open_window()
         end,
@@ -45,12 +45,11 @@ return {
   },
   {
     "willothy/veil.nvim",
-    lazy = false,
-    enabled = true,
+    enabled = false,
+    event = "VimEnter",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "ibhagwan/fzf-lua",
-      "jovanlanik/fsplash.nvim",
     },
     opts = function()
       return {
@@ -60,7 +59,7 @@ return {
           }),
           require("veil.builtin").sections.buttons({
             {
-              icon = "",
+              icon = "󰙅",
               text = "fzf::files",
               shortcut = "f",
               callback = function()
