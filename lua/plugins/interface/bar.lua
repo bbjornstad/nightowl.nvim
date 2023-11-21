@@ -1,7 +1,33 @@
 local env = require("environment.ui")
 local sts = require("environment.status")
 local util = require("lazyvim.util")
-local kcolors = require("funsak.colors").kanacolors
+
+local function lubar()
+  local res = vim
+    .iter(vim.list_extend({ "neogitcommitmessage" }, env.ft_ignore_list))
+    :filter(function(t)
+      return not string.find(t, "oil")
+    end)
+    :totable()
+  return res
+end
+
+local function inclinate(results, opts)
+  opts = opts or {}
+  local ret = vim.tbl_deep_extend("force", { results }, opts)
+  return ret
+end
+
+local function incliner(fn)
+  local function wrap(props, opts)
+    local res = fn(props, opts)
+    return inclinate(res, function(t)
+      return { t, cond = opts.cond or true }
+    end)
+  end
+
+  return wrap
+end
 
 return {
   {
@@ -13,28 +39,64 @@ return {
     },
     opts = {
       render = function(props)
-        return {
-          { sts.recording_status() },
-          { " ~ " },
-          { " " .. require("local-highlight").match_count(props.buf) },
-          { " ~ " },
-          { sts.memory_use() },
-        }
+        return vim.tbl_map(function(it)
+          local ret = (vim.is_callable(it.cond) and it.cond() or it.cond)
+              and it[1]
+            or nil
+          return ret
+        end, {
+          { { "⟓:║ " }, cond = true },
+          sts.count.search(props, { icon = "󱊄", separator = "⦙" }),
+          sts.count.selection(props, { icon = "󱈅", separator = "⦙" }),
+          sts.progress(props, {
+            icon = { glyph = "󱋫", location = "prefix" },
+            separator = "⦙",
+          }),
+          sts.grapple(props, { icon = "⨳", separator = "⦙" }),
+          sts.match_local_hl(props, { icon = "󰾹", separator = "⦙" }),
+          sts.fileinfo(props, { formatter = "╘╡ %s %s ╞╛" }),
+        })
       end,
+      hide = {
+        cursorline = false,
+        focused_win = false,
+        only_win = false,
+      },
+      highlight = {
+        groups = {
+          InclineNormal = {
+            default = true,
+            group = "NormalFloat",
+          },
+          InclineNormalNC = {
+            default = true,
+            group = "NormalFloat",
+          },
+        },
+      },
       window = {
         margin = { vertical = 0, horizontal = 1 },
-        padding = { left = 1, right = 1 },
+        padding = 1,
+        padding_char = " ",
         placement = { horizontal = "right", vertical = "top" },
         width = "fit",
         options = {
-          winblend = 40,
           signcolumn = "no",
           wrap = false,
         },
         winhighlight = {
-          InclineNormal = kcolors({ guibg = "sumiInk2" }),
-          InclineNormalNC = kcolors({ guibg = "sumiInk1" }),
+          active = {
+            EndOfBuffer = "None",
+            Normal = "InclineNormal",
+            Search = "None",
+          },
+          inactive = {
+            EndOfBuffer = "None",
+            Normal = "InclineNormalNC",
+            Search = "None",
+          },
         },
+        zindex = 20,
       },
     },
   },
@@ -42,33 +104,35 @@ return {
     "lewis6991/satellite.nvim",
     opts = {
       current_only = true,
-      winblend = 50,
-      zindex = 40,
+      winblend = 20,
+      zindex = 10,
       excluded_filetypes = env.ft_ignore_list,
       width = 4,
-      search = {
-        enable = true,
-      },
-      diagnostic = {
-        enable = true,
-        signs = { "-", "=", "≡" },
-        min_severity = vim.diagnostic.severity.HINT,
-      },
-      gitsigns = {
-        enable = true,
-        signs = {
-          add = "┊",
-          change = "│",
-          delete = "⌁",
+      handlers = {
+        search = {
+          enable = true,
         },
-      },
-      marks = {
-        enable = true,
-        show_builtins = false,
-        key = "m",
-      },
-      quickfix = {
-        signs = { "⫞", "⫤", "⟚" },
+        diagnostic = {
+          enable = true,
+          signs = { "-", "=", "≡" },
+          min_severity = vim.diagnostic.severity.hint,
+        },
+        gitsigns = {
+          enable = true,
+          signs = {
+            add = "│",
+            change = "┆",
+            delete = "⦚",
+          },
+        },
+        marks = {
+          enable = true,
+          show_builtins = false,
+          key = "m",
+        },
+        quickfix = {
+          signs = { "↼", "⥚", "⦧" },
+        },
       },
     },
     config = true,
@@ -79,20 +143,11 @@ return {
     dependencies = {
       "folke/noice.nvim",
       "nvim-tree/nvim-web-devicons",
-      "meuter/lualine-so-fancy.nvim",
       "rebelot/kanagawa.nvim",
-      "Bekaboo/dropbar.nvim",
       "cbochs/grapple.nvim",
       "wthollingsworth/pomodoro.nvim",
-      {
-        "jcdickinson/wpm.nvim",
-        opts = {
-          sample_count = 10,
-          sample_interval = 2000,
-          percentile = 0.8,
-        },
-        config = true,
-      },
+      "jcdickinson/wpm.nvim",
+      "Lamby777/timewasted.nvim",
     },
     event = "VeryLazy",
     opts = {
@@ -103,16 +158,13 @@ return {
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
         refresh = {
-          statusline = 10,
+          statusline = 1000,
           tabline = 1000,
           winbar = 1000,
         },
         disabled_filetypes = {
-          lualine = env.ft_ignore_list,
-          winbar = vim.list_extend(
-            { "NeogitCommitMessage" },
-            env.ft_ignore_list
-          ),
+          statusline = env.ft_ignore_list,
+          winbar = lubar(),
         },
       },
       sections = {
@@ -127,40 +179,51 @@ return {
                   break
                 end
               end
-              return string.format("󰩀 %s %s 󰨿", res or "", mode)
+              return string.format("󰩀 %s%s 󰨿", res or "", mode)
             end,
           },
         },
-        lualine_b = { { "b:gitsigns_head", icon = "" } },
+        lualine_b = {
+          {
+            "b:gitsigns_head",
+            icon = " ",
+            separator = "┊",
+          },
+          {
+            "diff",
+            colored = true,
+            symbols = env.icons.gitdiff,
+            source = sts.diff_source,
+          },
+        },
         lualine_c = {
           {
-            "fancy_cwd",
-            substitute_home = true,
+            function()
+              local res = require("timewasted").get_fmt()
+              return res
+            end,
+            icon = "󱪑",
+            separator = "┊",
+          },
+          {
+            function()
+              return sts.wpm()
+            end,
+            cond = function()
+              local status, wpm = pcall(require, "wpm")
+              return wpm.wpm() >= 10 and status
+            end,
+            separator = "┊",
           },
         },
         lualine_x = {
           {
             function()
-              local key = require("grapple").key()
-              return "󰓼 ⋊ " .. key .. " ⋉"
-            end,
-            cond = function()
-              return require("grapple").exists()
-            end,
-          },
-          {
-            function()
-              local wpm = require("wpm")
-              return wpm.historic_graph() .. " 󱤘 " .. wpm.wpm() .. "  "
-            end,
-          },
-          {
-            function()
               return require("noice").api.status.command.get()
             end,
+            icon = " ",
+            separator = "┊",
           },
-          { "fancy_location" },
-          { "fancy_searchcount" },
         },
         lualine_y = {
           {
@@ -169,13 +232,30 @@ return {
             padding = { left = 1, right = 1 },
           },
           {
-            "fancy_lsp_servers",
+            function()
+              local clients = vim.lsp.get_clients({ bufnr = 0 })
+              clients = vim.tbl_map(function(t)
+                return t.name
+              end, clients)
+              return table.concat(
+                vim.tbl_filter(function(t)
+                  return not vim.tbl_contains({
+                    "null-ls",
+                    "diagnosticls",
+                    "efm",
+                  }, t)
+                end, clients),
+                ":"
+              )
+            end,
+            icon = "󰇗 ",
           },
         },
         lualine_z = {
           {
             "datetime",
-            style = "%Y-%m-%d %H:%M",
+            style = "%H:%M ~ %y-%m-%d",
+            icon = "󱇼 ",
           },
         },
       },
@@ -186,6 +266,7 @@ return {
             show_filename_only = false,
             mode = 4,
             use_mode_colors = true,
+            icon = "󱏒 ",
           },
         },
         lualine_x = {
@@ -196,32 +277,34 @@ return {
             cond = function()
               return require("noice").api.status.mode.has()
             end,
-            color = kcolors({ fg = "dragonRed" }),
+            color = util.ui.fg("DiagnosticError"),
+            icon = "󰻃 ",
           },
           {
             function()
               return sts.cust_fname()
             end,
             path = 0,
-            symbols = {
-              modified = "",
-              readonly = "󱪜",
-              unnamed = "",
-              newfile = "󰜄",
-            },
+            symbols = env.icons.modifications,
           },
         },
         lualine_y = {
           {
             function()
-              return require("pomodoro").statusline()
+              return sts.pulse_status()
             end,
             cond = function()
-              if not util.has("pomodoro.nvim") then
+              if not util.has("pulse.nvim") or not sts.pulse_status() then
                 return false
               end
-              return require("pomodoro").status
+              return true
             end,
+          },
+          {
+            function()
+              return sts.memory_use()
+            end,
+            separator = "┊",
           },
         },
         lualine_z = {
@@ -230,16 +313,34 @@ return {
             mode = 2,
             use_mode_colors = true,
             max_length = vim.o.columns / 6,
+            symbols = {
+              modified = " 󰰾",
+            },
             fmt = function(name, context)
-              -- Show + if buffer is modified in tab
               local buflist = vim.fn.tabpagebuflist(context.tabnr)
               local winnr = vim.fn.tabpagewinnr(context.tabnr)
               local bufnr = buflist[winnr]
               local mod = vim.fn.getbufvar(bufnr, "&mod")
               local thisdir = vim.fn.getcwd(winnr, context.tabnr)
               local dirtail = vim.fn.fnamemodify(thisdir, ":t")
+              local lzroot = util.lualine.root_dir({
+                cwd = true,
+                subdirectory = true,
+                icon = "󱞋 ",
+              })
+              local cond = lzroot.cond
+              local final
+              if cond ~= nil and (vim.is_callable(cond) and cond()) or cond then
+                final = lzroot[1]()
+              else
+                final = dirtail
+              end
 
-              return (dirtail or name) .. (mod == 1 and " +" or "")
+              final = (mod == 1 and "⦗ " or "⦋ ")
+                .. final
+                .. (mod == 1 and " ⦘" or " ⦌")
+
+              return final
             end,
           },
         },
@@ -247,14 +348,16 @@ return {
       winbar = {
         lualine_a = {},
         lualine_b = {},
-        lualine_c = {
-          {
-            "%{%v:lua.dropbar.get_dropbar_str()%}",
-          },
-        },
+        lualine_c = { "%{%v:lua.dropbar.get_dropbar_str()%}" },
         lualine_x = {
           {
             "diagnostics",
+            sources = {
+              "nvim_lsp",
+              "nvim_diagnostic",
+              "nvim_workspace_diagnostic",
+            },
+            sections = { "error", "warn", "info", "hint" },
             symbols = {
               error = env.icons.diagnostic.Error,
               warn = env.icons.diagnostic.Warn,
@@ -263,28 +366,13 @@ return {
             },
           },
         },
-        lualine_y = {
-          {
-            "diff",
-            colored = true,
-            symbols = {
-              added = " ",
-              modified = " ",
-              removed = " ",
-            },
-            source = sts.diff_source,
-          },
-        },
+        lualine_y = {},
         lualine_z = {},
       },
       inactive_winbar = {
         lualine_a = {},
         lualine_b = {},
-        lualine_c = {
-          {
-            "%{%v:lua.dropbar.get_dropbar_str()%}",
-          },
-        },
+        lualine_c = { "%{%v:lua.dropbar.get_dropbar_str()%}" },
         lualine_x = {},
         lualine_y = {},
         lualine_z = {},
@@ -308,8 +396,8 @@ return {
   },
   {
     "Bekaboo/dropbar.nvim",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    version = "*",
+    event = "VimEnter",
+    dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
     opts = {
       general = {
         enable = false,
@@ -327,22 +415,6 @@ return {
           },
         },
         keymaps = {
-          ["]"] = function()
-            local dutil = require("dropbar.utils")
-            local thismenu = dutil.menu.get_current()
-            if not thismenu then
-              return
-            end
-            require("dropbar.api").select_next_context()
-          end,
-          ["["] = function()
-            local dutil = require("dropbar.utils")
-            local thismenu = dutil.menu.get_current()
-            if not thismenu then
-              return
-            end
-            return thismenu.prev_menu
-          end,
           ["q"] = function()
             local api = require("dropbar.utils")
             local thismenu = api.menu.get_current()
@@ -360,15 +432,21 @@ return {
       bar = {
         padding = { left = 2, right = 2 },
       },
+      win_configs = {
+        border = env.borders.main,
+        style = "minimal",
+      },
       icons = {
         enable = true,
-        bar = {
-          separator = "  ",
-          extends = "...",
-        },
-        menu = {
-          separator = " ",
-          indicator = "⨽ ",
+        ui = {
+          bar = {
+            separator = " 󰧛 ",
+            extends = "",
+          },
+          menu = {
+            separator = " 󰘠 ",
+            indicator = "󱟮 ",
+          },
         },
         kinds = {
           use_devicons = true,
@@ -376,7 +454,7 @@ return {
             Array = "󰅪 ",
             Boolean = " ",
             BreakStatement = "󰙧 ",
-            Call = "󰃷 ",
+            Call = "󱅥 ",
             CaseStatement = "󱃙 ",
             Class = " ",
             Color = "󰏘 ",
@@ -394,22 +472,22 @@ return {
             File = "󰈔 ",
             Folder = "󰉋 ",
             ForStatement = "󰑖 ",
-            Function = "󰊕 ",
-            H1Marker = "󰉫 ", -- Used by markdown treesitter parser
+            Function = "󰡱 ",
+            H1Marker = "󰉫 ", -- used by markdown treesitter parser
             H2Marker = "󰉬 ",
             H3Marker = "󰉭 ",
             H4Marker = "󰉮 ",
             H5Marker = "󰉯 ",
             H6Marker = "󰉰 ",
-            Identifier = "󰀫 ",
+            Identifier = "󰓽 ",
             IfStatement = "󰇉 ",
             Interface = " ",
             Keyword = "󰌋 ",
             List = "󰅪 ",
             Log = "󰦪 ",
-            Lsp = " ",
-            Macro = "󰁌 ",
-            MarkdownH1 = "󰉫 ", -- Used by builtin markdown source
+            Lsp = " ",
+            Macro = "󰷵 ",
+            MarkdownH1 = "󰉫 ", -- used by builtin markdown source
             MarkdownH2 = "󰉬 ",
             MarkdownH3 = "󰉭 ",
             MarkdownH4 = "󰉮 ",
@@ -435,13 +513,12 @@ return {
             String = "󰉾 ",
             Struct = " ",
             SwitchStatement = "󰺟 ",
-            Terminal = " ",
             Text = " ",
             Type = " ",
             TypeParameter = "󰆩 ",
             Unit = " ",
             Value = "󰎠 ",
-            Variable = "󰀫 ",
+            Variable = "󱃼 ",
             WhileStatement = "󰑖 ",
           }, env.icons.kinds),
         },
@@ -454,27 +531,17 @@ return {
           require("dropbar.api").pick()
         end,
         mode = "n",
-        desc = "lsp=> pick grains from breadcrumbs",
-      },
-      {
-        "g_",
-        function()
-          require("dropbar.api").pick()
-        end,
-        mode = "n",
-        desc = "lsp=> pick grains from breadcrumbs",
+        desc = "::win=> breadcrumbs",
       },
     },
   },
   {
-    "lukas-reineke/virt-column.nvim",
-    event = "VeryLazy",
-    config = function(_, opts)
-      require("virt-column").setup(opts)
-    end,
+    "jcdickinson/wpm.nvim",
     opts = {
-      enabled = true,
-      char = "║",
+      sample_count = 10,
+      sample_interval = 2000,
+      percentile = 0.8,
     },
+    config = true,
   },
 }

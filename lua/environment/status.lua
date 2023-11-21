@@ -1,5 +1,6 @@
 local env = {}
 local util = require("lazyvim.util")
+local conv = require("funsak.convert").booleanize
 
 local function arglax(fn, ranking_priority)
   ranking_priority = ranking_priority or { "both", "none", "only" }
@@ -216,10 +217,12 @@ local function fileinfo(props, opts)
   }
 
   local fstr = opts.formatter or "%s %s"
-  return string.format(fstr, unpack(ret))
+  return fstr:format(unpack(ret))
 end
 
----@alias IconOpts ({ location: string, glyph: string } | boolean)
+---@alias IconOpts
+---| { location: string, glyph: string }
+---| boolean
 
 function env.preopts(fn, handler)
   handler = handler or require("funsak.wrap").F
@@ -300,8 +303,12 @@ local function incline_handler(props, opts)
 
   return function(fn, ...)
     local ok, fnres = pcall(fn, unpack({ ... }))
-    local ret = fmtstr:gsub("${ fn }", ok and fnres or tostring(ok))
-    return ret
+    local ret = ok and fmtstr:gsub("${ fn }", fnres)
+    if not ok then
+      vim.notify(vim.inspect({ ... }))
+      vim.notify(vim.inspect(fnres))
+    end
+    return { { ret }, cond = conv(ret and ok) }
   end
 end
 
@@ -317,6 +324,8 @@ env.count = {
 env.progress = env.incline_join(progress)
 env.grapple = env.incline_join(grapple)
 env.match_local_hl = env.incline_join(match_local_hl)
-env.fileinfo = fileinfo
+env.fileinfo = function(props, opts)
+  return { { fileinfo(props, opts) }, cond = true }
+end
 
 return env
