@@ -18,13 +18,15 @@ return {
       excluded_filetypes = env.ft_ignore_list,
       extras = { named_parameters = true },
     },
-    config = true,
+    config = function(_, opts)
+      require("hlargs").setup(opts)
+    end,
     event = "VeryLazy",
   },
   {
     "tzachar/highlight-undo.nvim",
     config = true,
-    enabled = false,
+    enabled = true,
     opts = {
       keymaps = {
         { "n", "u", "undo", {} },

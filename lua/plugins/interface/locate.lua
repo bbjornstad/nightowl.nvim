@@ -1,6 +1,4 @@
 local env = require("environment.ui")
-local opt = require("environment.optional")
-local kenv = require("environment.keys")
 local kcolors = require("funsak.colors").kanacolors
 
 return {
@@ -15,8 +13,24 @@ return {
         insert = "springBlue",
         visual = "springViolet1",
       }),
+      line_opacity = 0.10,
     },
     event = "VeryLazy",
+  },
+  {
+    "mawkler/modicator.nvim",
+    event = "VeryLazy",
+    config = function(_, opts)
+      require("modicator").setup(opts)
+    end,
+    opts = {
+      show_warnings = true,
+      highlights = {
+        defaults = {
+          bold = true,
+        },
+      },
+    },
   },
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -53,7 +67,7 @@ return {
         show_end = true,
         show_start = true,
         injected_languages = true,
-        priority = 1024,
+        priority = 100,
         highlight = "IndentBlanklineScope",
       },
       exclude = {
@@ -75,7 +89,7 @@ return {
   },
   {
     "edluffy/specs.nvim",
-    enabled = opt.specs.enable,
+    enabled = false,
     config = true,
     opts = function()
       local opts = {
@@ -138,7 +152,7 @@ return {
   },
   {
     "gorbit99/codewindow.nvim",
-    event = "LspAttach",
+    event = "VeryLazy",
     config = function(_, opts)
       local cw = require("codewindow")
       cw.setup(opts)
@@ -150,8 +164,36 @@ return {
         env.ft_ignore_list,
         { "mail", "himalaya-email-listing" }
       ),
-      minimap_width = 12,
+      minimap_width = 8,
       window_border = env.borders.alt,
+    },
+  },
+  {
+    "utilyre/sentiment.nvim",
+    version = "*",
+    event = "VeryLazy",
+    opts = {
+      pairs = {
+        { "(", ")" },
+        { "{", "}" },
+        { "[", "]" },
+        { "<", ">" },
+      },
+    },
+    init = function()
+      -- `matchparen.vim` needs to be disabled manually in case of lazy loading
+      vim.g.loaded_matchparen = 1
+    end,
+  },
+  {
+    "lukas-reineke/virt-column.nvim",
+    event = "VeryLazy",
+    config = function(_, opts)
+      require("virt-column").setup(opts)
+    end,
+    opts = {
+      enabled = true,
+      char = "╵",
     },
   },
 }

@@ -1,9 +1,7 @@
 local env = require("environment.ui")
 local opt = require("environment.optional")
-local kenv = require("environment.keys")
-
-local key_portal = kenv.motion.portal
-local key_grapple_tag = kenv.motion.grapple.tag
+local kenv = require("environment.keys").motion
+local key_harpoon = kenv.harpoon
 
 return {
   {
@@ -13,7 +11,7 @@ return {
   },
   {
     "rainbowhxch/accelerated-jk.nvim",
-    enabled = opt.accelerated_jk.enable,
+    enabled = opt.accelerated_jk,
     event = "VeryLazy",
     opts = {
       mode = "time_driven",
@@ -28,7 +26,7 @@ return {
   },
   {
     "abecodes/tabout.nvim",
-    enabled = opt.tabout.enable,
+    enabled = opt.tabout,
     event = "VeryLazy",
     opts = {
       tabkey = "<Tab>",
@@ -64,7 +62,7 @@ return {
       "nvim-lua/plenary.nvim",
     },
     opts = {
-      log_level = "warn",
+      eog_level = "warn",
       scope = "git",
       save_path = tostring(vim.fn.stdpath("data") .. "/grapple"),
       ---Window options used for the popup menu
@@ -83,7 +81,7 @@ return {
     },
     keys = {
       {
-        key_grapple_tag .. "g",
+        kenv.grapple.toggle,
         function()
           require("grapple").toggle()
         end,
@@ -91,7 +89,7 @@ return {
         desc = "grapple.tag=> toggle",
       },
       {
-        key_grapple_tag .. "p",
+        kenv.grapple.popup,
         function()
           require("grapple").popup_tags()
         end,
@@ -99,7 +97,7 @@ return {
         desc = "grapple.pop=> tags view",
       },
       {
-        key_grapple_tag .. "t",
+        kenv.grapple.tag,
         function()
           require("grapple").tag()
         end,
@@ -107,7 +105,7 @@ return {
         desc = "grapple.tag=> tag (named)",
       },
       {
-        key_grapple_tag .. "u",
+        kenv.grapple.untag,
         function()
           require("grapple").untag()
         end,
@@ -115,7 +113,7 @@ return {
         desc = "grapple.tag=> untag (named)",
       },
       {
-        key_grapple_tag .. "s",
+        kenv.grapple.select,
         function()
           require("grapple").select()
         end,
@@ -123,7 +121,7 @@ return {
         desc = "grapple.tag=> select",
       },
       {
-        key_grapple_tag .. "q",
+        kenv.grapple.quickfix,
         function()
           require("grapple").quickfix()
         end,
@@ -131,7 +129,7 @@ return {
         desc = "grapple.tag=> to quickfix",
       },
       {
-        key_grapple_tag .. "dd",
+        kenv.grapple.reset,
         function()
           require("grapple").reset()
         end,
@@ -139,7 +137,7 @@ return {
         desc = "grapple.tag=> ~reset~",
       },
       {
-        key_grapple_tag .. "C",
+        kenv.grapple.cycle.backward,
         function()
           require("grapple").cycle_backward()
         end,
@@ -147,7 +145,7 @@ return {
         desc = "grapple.tag=> cycle backward",
       },
       {
-        key_grapple_tag .. "c",
+        kenv.grapple.cycle.forward,
         function()
           require("grapple").cycle_forward()
         end,
@@ -155,15 +153,7 @@ return {
         desc = "grapple.tag=> cycle forward",
       },
       {
-        key_grapple_tag .. "u",
-        function()
-          require("grapple").untag()
-        end,
-        mode = "n",
-        desc = "grapple.tag=> untag (named)",
-      },
-      {
-        key_grapple_tag .. "T",
+        kenv.grapple.list_tags,
         function()
           require("grapple").tags()
         end,
@@ -176,7 +166,7 @@ return {
     "cbochs/portal.nvim",
     keys = {
       {
-        key_portal .. "c",
+        kenv.portal.changelist.forward,
         function()
           require("portal.builtin").changelist.tunnel()
         end,
@@ -184,7 +174,7 @@ return {
         desc = "portal=> forward changelist",
       },
       {
-        key_portal .. "C",
+        kenv.portal.changelist.backward,
         function()
           require("portal.builtin").changelist.tunnel_backward()
         end,
@@ -192,7 +182,7 @@ return {
         desc = "portal=> backward changelist",
       },
       {
-        key_portal .. "g",
+        kenv.portal.grapple.forward,
         function()
           require("portal.builtin").grapple.tunnel()
         end,
@@ -200,7 +190,7 @@ return {
         desc = "portal=> forward grapple",
       },
       {
-        key_portal .. "G",
+        kenv.portal.grapple.backward,
         function()
           require("portal.builtin").grapple.tunnel_backward()
         end,
@@ -208,7 +198,7 @@ return {
         desc = "portal=> backward grapple",
       },
       {
-        key_portal .. "q",
+        kenv.portal.quickfix.forward,
         function()
           require("portal.builtin").quickfix.tunnel()
         end,
@@ -216,7 +206,7 @@ return {
         desc = "portal=> forward quickfix",
       },
       {
-        key_portal .. "Q",
+        kenv.portal.quickfix.backward,
         function()
           require("portal.builtin").quickfix.tunnel_backward()
         end,
@@ -224,7 +214,7 @@ return {
         desc = "portal=> backward quickfix",
       },
       {
-        key_portal .. "j",
+        kenv.portal.jumplist.forward,
         function()
           require("portal.builtin").jumplist.tunnel()
         end,
@@ -232,28 +222,12 @@ return {
         desc = "portal=> backward jumplist",
       },
       {
-        key_portal .. "J",
+        kenv.portal.jumplist.backward,
         function()
           require("portal.builtin").jumplist.tunnel_backward()
         end,
         mode = "n",
         desc = "portal=> forward jumplist",
-      },
-      {
-        key_portal .. "f",
-        function()
-          require("portal.builtin").jumplist.tunnel()
-        end,
-        mode = "n",
-        desc = "portal=> forward jumplist",
-      },
-      {
-        key_portal .. "b",
-        function()
-          require("portal.builtin").jumplist.tunnel_backward()
-        end,
-        mode = "n",
-        desc = "portal=> backward jumplist",
       },
     },
     opts = {
@@ -308,12 +282,91 @@ return {
     },
   },
   {
+    "ThePrimeagen/harpoon",
+    opts = {
+      save_on_toggle = false,
+      save_on_change = true,
+      enter_on_sendcmd = false,
+      tabline = false,
+    },
+    config = function(_, opts)
+      require("harpoon").setup(opts)
+      require("telescope").load_extension("harpoon")
+    end,
+    keys = {
+      {
+        key_harpoon.add_file,
+        function()
+          require("harpoon.mark").add_file()
+        end,
+        mode = "n",
+        desc = "harpoon=> add file",
+      },
+      {
+        key_harpoon.quick_menu,
+        function()
+          require("harpoon.ui").toggle_quick_menu()
+        end,
+        mode = "n",
+        desc = "harpoon=> quick menu",
+      },
+      {
+        key_harpoon.nav.next,
+        function()
+          require("harpoon.ui").nav_next()
+        end,
+        mode = "n",
+        desc = "harpoon=> next mark",
+      },
+      {
+        key_harpoon.nav.previous,
+        function()
+          require("harpoon.ui").nav_prev()
+        end,
+        mode = "n",
+        desc = "harpoon=> previous mark",
+      },
+      {
+        key_harpoon.nav.file,
+        function()
+          require("harpoon.ui").nav_file()
+        end,
+        mode = "n",
+        desc = "harpoon=> to file",
+      },
+      {
+        key_harpoon.term.to,
+        function()
+          require("harpoon.term").gotoTerminal()
+        end,
+        mode = "n",
+        desc = "harpoon=> to terminal",
+      },
+      {
+        key_harpoon.term.send,
+        function()
+          require("harpoon.ui").sendCommand()
+        end,
+        mode = "n",
+        desc = "harpoon=> send command",
+      },
+      {
+        key_harpoon.term.menu,
+        function()
+          require("harpoon.cmd-ui").toggle_quick_menu()
+        end,
+        mode = "n",
+        desc = "harpoon=> command quick menu",
+      },
+    },
+  },
+  {
     "roobert/tabtree.nvim",
     config = function(_, opts)
       require("tabtree").setup(opts)
     end,
     event = "VeryLazy",
-    enabled = opt.tabtree.enable,
+    enabled = opt.tabtree,
     opts = {
       -- print the capture group name when executing next/previous
       debug = true,
@@ -357,6 +410,7 @@ return {
       label = {
         rainbow = {
           enabled = true,
+          shade = 8,
         },
         style = "overlay",
       },
@@ -364,6 +418,37 @@ return {
         char = {
           keys = { "f", "F", "t", "T", "," },
         },
+      },
+      jump = {
+        autojump = true,
+      },
+    },
+    keys = {
+      {
+        "s",
+        false,
+        mode = { "n", "x", "o" },
+      },
+      {
+        "S",
+        false,
+        mode = { "n", "x", "o" },
+      },
+      {
+        "<CR>",
+        function()
+          require("flash").jump()
+        end,
+        mode = { "n", "x", "o" },
+        desc = "::flash=> jump to",
+      },
+      {
+        "<BS>",
+        function()
+          require("flash").treesitter()
+        end,
+        mode = { "n", "x", "o" },
+        desc = "::flash=> jump treesitter",
       },
     },
   },

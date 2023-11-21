@@ -37,31 +37,31 @@ return {
     },
     keys = {
       {
-        key_remote .. "sc",
+        key_remote.sshfs.connect,
         "<CMD>RemoteSSHFSConnect<CR>",
         mode = "n",
         desc = "remote=> connect to sshfs",
       },
       {
-        key_remote .. "se",
+        key_remote.sshfs.edit,
         "<CMD>RemoteSSHFSEdit<CR>",
         mode = "n",
         desc = "remote=> edit files in sshfs",
       },
       {
-        key_remote .. "sd",
+        key_remote.sshfs.disconnect,
         "<CMD>RemoteSSHFSDisconnect<CR>",
         mode = "n",
         desc = "remote=> disconnect from sshfs",
       },
       {
-        key_remote .. "sf",
+        key_remote.sshfs.find_files,
         "<CMD>RemoteSSHFSFindFiles<CR>",
         mode = "n",
         desc = "remote=> find files in sshfs",
       },
       {
-        key_remote .. "sg",
+        key_remote.sshfs.live_grep,
         "<CMD>RemoteSSHFSLiveGrep<CR>",
         mode = "n",
         desc = "remote=> live grep in sshfs",
