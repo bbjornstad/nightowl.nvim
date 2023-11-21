@@ -5,6 +5,7 @@
 
 local M = {}
 
+M.class = require("funsak.class")
 M.requisition = require("funsak.masquerade").requisition
 M.mopts = require("funsak.table").mopts
 

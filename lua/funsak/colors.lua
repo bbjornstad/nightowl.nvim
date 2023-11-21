@@ -9,9 +9,9 @@
 ---between "00" and "FF"
 
 ---@alias RGBColor { red: integer, green: integer, blue: integer, alpha: integer? }
----@alias HSLColor { hue: integer, sat: integer, light: integer, alpha: integer? }
+---@alias HSVColor { hue: integer, sat: integer, light: integer, alpha: integer? }
 ---@alias HexColor { red: hexadecimal, green: hexadecimal, blue: hexadecimal, alpha: hexadecimal? }
----@alias T_Color RGBColor | HSLColor | HexColor
+---@alias T_Color RGBColor | HSVColor | HexColor
 
 ---@class funsak.colors
 local M = {}
@@ -52,13 +52,15 @@ end
 ---@param color RGBColor
 ---@param other RGBColor
 function M.metric_rgb(color, other)
+  color = M.normalize_rgb(color)
+  other = M.normalize_rgb(other)
   local red = (color.red - other.red) ^ 2
   local green = (color.green - other.green) ^ 2
   local blue = (color.blue - other.blue) ^ 2
   return math.sqrt(red + green + blue)
 end
 
---- computes the distance between two colors in HSL space. This is essentially
+--- computes the distance between two colors in HSV space. This is essentially
 --- the calculation of a notion of distance which makes sense according to
 --- analytical principles of metric spaces
 --- (https://en.wikipedia.org/wiki/Metric_space). This is a slightly different
@@ -68,9 +70,23 @@ end
 --- conversion/transformation is basically a projection onto a radial, e.g.
 --- circular curve. Supposedly this provides a more accurate representation of
 --- how colors blend physically to create new colors.
----@param color HSLColor
----@param other HSLColor
-function M.metric_hsl(color, other) end
+---@param color HSVColor
+---@param other HSVColor
+function M.metric_hsv(color, other)
+  color = M.normalize_hsv(color)
+  other = M.normalize_hsv(other)
+  local first = (
+    math.sin(color.hue) * color.saturation * color.value
+    - math.sin(other.hue) * other.saturation * other.value
+  ) ^ 2
+  local second = (
+    math.cos(color.hue) * color.saturation * color.value
+    - math.cos(other.hue) * other.saturation * other.value
+  ) ^ 2
+  local third = (color.value - other.value) ^ 2
+
+  return math.sqrt(first + second + third)
+end
 
 --- sets the given highlight groups to have the definitions specified as
 --- options.
@@ -97,7 +113,7 @@ function M.identify_highlight(hlgroup, link)
   return labeled_hl.fg or labeled_hl.guifg
 end
 
-M.hl = vim.api.nvim_get_hl
+M.get_hl = vim.api.nvim_get_hl
     and function(name)
       return vim.api.nvim_get_hl(0, { name = name })
     end
@@ -108,39 +124,34 @@ M.hl = vim.api.nvim_get_hl
 local function hl_component(component, name, hlmap)
   hlmap = hlmap or {}
   component = component or "fg"
-  local hl = M.hl(name)
+  local hl = M.get_hl(name)
   local comp = hl and hl[component] or nil
   local compid = hlmap and hlmap[component] or component
-  return comp and { [compid] = string.format("#%06x", comp) } or nil
+  return comp and { [compid] = string.format("#%06x", comp) or false } or nil
 end
 
 --- retrieves the values of the given highlight group component properties from
 --- the highlight group with the specified names.
 ---@param name owhl.HighlightGroup
 ---@param component string | string[] highlight group property names
+---@param hlmap { [string]: string }? if desired, a remapping of old highlight
+---group properties to new highlight group properties can be given. The values
+---for each of the constituent highlight components for components indexed by
+---the `hlmap` parameter will instead be mapped to the corresponding remapped
+---component portions.
 ---@return owhl.NvimHighlight
 function M.component(name, component, hlmap)
   local f = require("funsak.wrap").recurser(hl_component)
   local fres = f(component, name, hlmap)
-  local should_reduce = type(fres) == "table"
-    and vim.iter(fres):all(function(item)
-      return type(item) ~= "table"
-    end)
-  return should_reduce
-      and require("funsak.wrap").reduce(function(agg, new)
-        vim.notify(vim.inspect(agg))
-        vim.notify(vim.inspect(new))
-        return vim.tbl_deep_extend("force", agg, new)
-      end, fres, {})
-    or fres
+  return fres
 end
 
 local function hl_adjust(augment, name, opts)
   opts = opts or {}
-  local hl = M.hl(name)
+  local hl = M.get_hl(name)
   local new_def = vim.tbl_deep_extend("force", hl, augment)
   local has_link = vim.tbl_contains(vim.tbl_keys(new_def), "link")
-  return has_link and (opts.follow_links and { link = new_def.link }) or new_def
+  return opts.follow_links and (has_link and { link = new_def.link }) or new_def
 end
 
 --- modifies or creates a neovim highlight definition with the specified

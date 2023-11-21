@@ -1,5 +1,5 @@
----@module "funsak.convert" utilities for value conversion and environment variable
----parsing.
+---@module "funsak.convert" utilities for value conversion and environment
+---variable parsing.
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 
@@ -53,6 +53,18 @@ function M.toboolean(v)
     return true
   end
   return nil
+end
+
+--- converts any lua value into a proper boolean based on its resolution for a
+--- standard if statement. Because of this, by corollary, evaluation of this
+--- function with no argument returns false
+---@param v any?
+---@return boolean result
+function M.booleanize(v)
+  if v then
+    return true
+  end
+  return false
 end
 
 return M
