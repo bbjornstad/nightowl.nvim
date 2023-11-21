@@ -1,15 +1,16 @@
 local env = require("environment.ui")
+local opt = require("environment.optional")
 local inp = require("uutils.input")
-local stems = require("environment.keys")
-local key_pomodoro = stems.time.pomodoro
-local key_taskorg = stems.time:leader()
-local key_memento = stems.fm.memento
-local key_pulse = stems.time.pulse
-local key_mountaineer = stems.mail.mountaineer
+local kenv = require("environment.keys")
+local key_time = kenv.time
+local key_pomodoro = key_time.pomodoro
+local key_pulse = key_time.pulse
+local key_mail = kenv.mail
 
 return {
   {
     "wthollingsworth/pomodoro.nvim",
+    enabled = opt.prefer.timers.pomodoro == "pomodoro",
     dependencies = { "MunifTanjim/nui.nvim" },
     opts = {
       time_work = 50,
@@ -21,21 +22,21 @@ return {
     cmd = { "PomodoroStart", "PomodoroStop", "PomodoroStatus" },
     keys = {
       {
-        key_pomodoro .. "s",
+        key_pomodoro.start,
         "<CMD>PomodoroStart<CR>",
-        desc = "pomorg=> start pomodoro timer",
+        desc = "::pom=> start pomodoro timer",
         mode = { "n" },
       },
       {
-        key_pomodoro .. "q",
+        key_pomodoro.stop,
         "<CMD>PomodoroStop<CR>",
-        desc = "pomorg=> stop pomodoro timer",
+        desc = "::pom=> stop pomodoro timer",
         mode = { "n" },
       },
       {
-        key_pomodoro .. "u",
+        key_pomodoro.status,
         "<CMD>PomodoroStatus<CR>",
-        desc = "pomorg=> pomodoro timer status",
+        desc = "::pom=> pomodoro timer status",
         mode = { "n" },
       },
     },
@@ -79,63 +80,29 @@ return {
     cmd = "Himalaya",
     keys = {
       {
-        "<F11>",
+        key_mail.himalaya,
         "<CMD>Himalaya<CR>",
         mode = "n",
-        desc = "mail=> update servers and view mail",
+        desc = "::mail=> update servers and view mail",
       },
     },
   },
   {
     "elmarsto/mountaineer.nvim",
+    dependencies = { "https://git.sr.ht/~soywod/himalaya-vim" },
     cmd = "Himalaya",
     keys = {
       {
-        key_mountaineer,
+        key_mail.mountaineer,
         "<CMD>Telescope mountaineer<CR>",
         mode = "n",
-        desc = "mail=> telescope view mail",
-      },
-      {
-        "<F12>",
-        "<CMD>Telescope mountaineer<CR>",
-        mode = "n",
-        desc = "mail=> telescope view mail",
-      },
-    },
-  },
-  {
-    "gaborvecsei/memento.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    opts = {},
-    config = false,
-    init = function()
-      vim.g.memento_history = 50
-      vim.g.memento_shorten_path = true
-      vim.g.memento_window_width = 80
-      vim.g.memento_window_height = 16
-    end,
-    keys = {
-      {
-        key_memento .. "m",
-        function()
-          require("memento").toggle()
-        end,
-        mode = "n",
-        desc = "mem=> recently closed files",
-      },
-      {
-        key_memento .. "c",
-        function()
-          require("memento").clear_history()
-        end,
-        mode = "n",
-        desc = "mem=> clear closed file history",
+        desc = "::mail=> telescope view mail",
       },
     },
   },
   {
     "linguini1/pulse.nvim",
+    enabled = opt.prefer.timers.pomodoro == "pulse",
     version = "*",
     cmd = {
       "PulseEnable",
@@ -151,62 +118,126 @@ return {
       require("pulse").setup(opts)
     end,
     init = function()
-      require("pulse").add("standard pom", { interval = 53 })
-      require("pulse").add("standard break", { interval = 17 })
+      require("pulse").add("standard", { interval = 53 })
+      require("pulse").add("break:standard", { interval = 17 })
     end,
     keys = {
       {
-        key_pulse .. "n",
+        key_pulse.new_custom,
         function()
           inp.callback_input("timer:", function(input)
             require("pulse").add("custom_timer" .. input, { interval = input })
           end)
         end,
         mode = "n",
-        desc = "pulse=> new custom timer",
+        desc = "::pulse=> new custom timer",
       },
       {
-        key_pulse .. "N",
+        key_pulse.new_disabled_custom,
         function()
           inp.callback_input("timer:", function(input)
             require("pulse").add("custom_timer" .. input, { interval = input })
           end)
         end,
         mode = "n",
-        desc = "pulse=> new custom timer (no enable)",
+        desc = "::pulse=> new custom timer (no enable)",
       },
       {
-        key_pulse .. "t",
+        key_pulse.enable_standard,
         function()
-          require("pulse").enable("standard pom")
+          require("pulse").enable("standard")
         end,
         mode = "n",
-        desc = "pulse=> standard timer",
+        desc = "::pulse=> enable standard",
       },
       {
-        key_pulse .. "T",
+        key_pulse.disable_standard,
         function()
-          require("pulse").disable("standard pom")
+          require("pulse").disable("standard")
         end,
         mode = "n",
-        desc = "pulse=> standard timer",
+        desc = "::pulse=> disable standard",
       },
       {
-        key_pulse .. "p",
+        key_pulse.pick,
         function()
           require("pulse").pick_timers()
         end,
         mode = "n",
-        desc = "pulse=> standard timer",
+        desc = "::pulse=> pick timer",
       },
     },
   },
   {
-    "folke/which-key.nvim",
+    "Lamby777/timewasted.nvim",
+    event = "VeryLazy",
+    config = function(_, opts)
+      require("timewasted").setup(opts)
+    end,
+    opts = function()
+      return {
+        autosave_delay = 30,
+        time_formatter = function(total_sec)
+          local d, h, m = unpack(require("timewasted").dhms(total_sec))
+          local time_str = string.format("%2dd %02dh %02dm", d, h, m)
+
+          return string.format("TWC: %s", time_str)
+        end,
+      }
+    end,
+  },
+  {
+    "mvllow/stand.nvim",
     opts = {
-      defaults = {
-        [key_taskorg] = { name = "task/time management" },
+      minute_interval = 100,
+    },
+    config = function(_, opts)
+      require("stand").setup(opts)
+    end,
+    event = "VeryLazy",
+    keys = {
+      {
+        key_time.stand.now,
+        "<CMD>StandNow<CR>",
+        mode = "n",
+        desc = "time.stand=> now",
+      },
+      {
+        key_time.stand.every,
+        "<CMD>StandEvery<CR>",
+        mode = "n",
+        desc = "time.stand=> set interval",
+      },
+      {
+        key_time.stand.disable,
+        "<CMD>StandDisable<CR>",
+        mode = "n",
+        desc = "time.stand=> disable",
+      },
+      {
+        key_time.stand.enable,
+        "<CMD>StandEnable<CR>",
+        mode = "n",
+        desc = "time.stand=> enable",
+      },
+      {
+        key_time.stand.when,
+        "<CMD>StandWhen<CR>",
+        mode = "n",
+        desc = "time.stand=> when",
       },
     },
+  },
+  {
+    "stefanlogue/hydrate.nvim",
+    event = "VeryLazy",
+    opts = {
+      minute_interval = 60,
+      render_style = "default",
+      persist_timer = false,
+    },
+    config = function(_, opts)
+      require("hydrate").setup(opts)
+    end,
   },
 }

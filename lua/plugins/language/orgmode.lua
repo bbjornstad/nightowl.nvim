@@ -4,6 +4,7 @@ local inp = require("uutils.input")
 local kenv = require("environment.keys")
 local key_time = kenv.time
 local key_org = key_time.org
+local key_norg = key_time.neorg
 
 local function colorize(bg, fg, opts)
   opts = opts or {}
@@ -15,28 +16,42 @@ local function colorize(bg, fg, opts)
   return retstr
 end
 
-local function norgbind(norgbind, keybundle, opts)
-  opts = opts or {}
+local function norgbind(norgbind, op)
+  op = op or {}
   local leader = norgbind.leader
-  local res = opts.string_formatter or "${ leader }${ bind }"
 
-  local function binder(bound, action, opts)
+  local binder = {}
+  binder.__index = binder
+  function binder.map(bound, action, opts)
     opts = opts or {}
-    norgbind.map(
-      "norg",
-      opts.mode or "n",
-      res.gsub("${ leader }", leader).gsub("${ bind }", bound),
-      action,
-      {
-        buffer = true,
-        desc = opts.desc or nil,
-      }
-    )
+    opts.leader = opts.leader or {}
+
+    local sub = opts.leader.substitute_existing == nil and true
+      or opts.leader.substitute_existing
+    if sub then
+      bound = bound:gsub(key_norg:leader() or "<localleader>", leader)
+    end
+
+    norgbind.map("norg", opts.mode or "n", bound, action, {
+      buffer = true,
+      desc = opts.desc or nil,
+    })
+  end
+  function binder.remap_key(bound, seq_remap, opts)
+    opts = opts or {}
+    opts.leader = opts.leader or {}
+    local sub = opts.leader.substitute_existing == nil and true
+      or opts.leader.substitute_existing
+    if sub then
+      bound = bound:gsub(key_norg:leader() or "<localleader>", leader)
+    end
+    norgbind.remap_key("norg", opts.mode or "n", bound, seq_remap, {
+      buffer = true,
+      desc = opts.desc or nil,
+    })
   end
 
-  for k, act in pairs(keybundle) do
-    binder(k, act, opts)
-  end
+  return setmetatable(binder, binder)
 end
 
 local organization_tools = {
@@ -263,8 +278,10 @@ local organization_tools = {
             engine = "nvim-cmp",
           },
         },
+        ["core.integrations.treesitter"] = {
+          config = {},
+        },
         ["core.integrations.nvim-cmp"] = {},
-        ["core.integrations.telescope"] = {},
         ["core.summary"] = {
           config = {
             strategy = "default",
@@ -299,172 +316,129 @@ local organization_tools = {
         },
         ["external.templates"] = {
           config = {
-            templates_dir = vim.fn.stdpath("config")
-              .. "/templates/neorg-templates",
+            templates_dir = vim.fs.joinpath(
+              vim.fn.stdpath("config"),
+              "templates/neorg-templates"
+            ),
           },
         },
-        -- ["external.jupyter"] = {},
+        ["external.jupyter"] = {},
         ["external.exec"] = {},
-        -- ["external.integrations.figlet"] = {
-        --   config = {
-        --     font = "impossible",
-        --     wrapInCodeTags = true,
-        --   },
-        -- },
+        ["external.integrations.figlet"] = {
+          config = {
+            font = "impossible",
+            wrapInCodeTags = true,
+          },
+        },
         ["core.keybinds"] = {
           config = {
             default_keybinds = true,
             hook = function(binds)
-              norgbinder(binds, {
-                journal = {
-                  today = "d",
-                  tomorrow = "w",
-                  yesterday = "y",
-                },
-                note = {
-                  new = "n",
-                },
-                linkable = {
-                  find = "f",
-                  insert = "i",
-                  file = "e",
-                },
-                metagen = {
-                  inject = "i",
-                  update = "u",
-                },
-                workspace = {
-                  default = "d",
-                  switch = "w",
-                },
-              }, {})
-              vim.notify(vim.inspect(binds))
-              local leader = binds.leader
-              vim.notify(vim.inspect(leader))
+              local binder = norgbind(binds, {})
               binds.remap_key(
                 "norg",
                 "n",
                 "<C-Space>",
                 "cc",
-                { desc = "neorg=> cycle task status", buffer = true }
+                { buffer = true, desc = "neorg=> cycle task status" }
               )
-              binds.remap_key(
-                "norg",
-                "n",
-                leader .. "nn",
+              binder.remap_key(
+                key_norg.notes.new,
                 "gnn",
-                { buffer = true, desc = "neorg=> new note" }
+                { desc = "neorg=> new note" }
               )
-              binds.map(
-                "norg",
-                "n",
-                leader .. "fl",
+              binder.map(
+                key_norg.linkable.find,
                 "core.integrations.telescope.find_linkable",
-                { buffer = true, desc = "neorg=> find linkables" }
+                { desc = "neorg=> find linkables" }
               )
-              binds.map(
-                "norg",
-                "n",
-                leader .. "il",
+              binder.map(
+                key_norg.linkable.insert,
                 "core.integrations.telescope.insert_link",
-                { buffer = true, desc = "neorg=> insert linkable" }
+                { desc = "neorg=> insert linkable" }
               )
-              binds.map(
-                "norg",
-                "n",
-                leader .. "if",
+              binder.map(
+                key_norg.linkable.file,
                 "core.integrations.telescope.insert_file_link",
-                { buffer = true, desc = "neorg=> insert file linkable" }
+                { desc = "neorg=> insert file linkable" }
               )
-              binds.map(
-                "norg",
-                "i",
-                ("<C-%s><C-f>"):format(leader),
+              binder.map(
+                "<C-${ leader }><C-f>",
                 "core.integrations.telescope.insert_file_link",
-                { buffer = true, desc = "neorg=> insert file linkable" }
+                {
+                  leader = {
+                    substitute_existing = false,
+                  },
+                  desc = "neorg=> insert file linkable",
+                }
               )
-              binds.map(
-                "norg",
-                "i",
-                ("<C-%s><C-l>"):format(leader),
+              binder.map(
+                "<C-${ leader }><C-l>)",
                 "core.integrations.telescope.insert_link",
-                { buffer = true, desc = "neorg=> insert linkable" }
+                {
+                  leader = {
+                    substitute_existing = false,
+                  },
+                  desc = "neorg=> insert linkable",
+                }
               )
-              binds.map(
-                "norg",
-                "n",
-                leader .. "mi",
+              binder.map(
+                key_norg.metagen.inject,
                 "core.esupports.metagen.inject_metadata",
-                { buffer = true, desc = "neorg=> insert metadata" }
+                { desc = "neorg=> insert metadata" }
               )
-              binds.map(
-                "norg",
-                "n",
-                leader .. "mu",
+              binder.map(
+                key_norg.metagen.update,
                 "core.esupports.metagen.update_metadata",
-                { buffer = true, desc = "neorg=> update metadata" }
+                { desc = "neorg=> update metadata" }
               )
-              binds.map("norg", "n", leader .. "wd", function()
+              binder.map(key_norg.workspace.default, function()
                 vim.cmd([[Neorg workspace default]])
               end, {
-                buffer = true,
                 desc = "neorg=> default workspace",
               })
-              binds.map("norg", "n", leader .. "ws", function()
+              binder.map(key_norg.workspace.switch, function()
                 inp.workspace([[Neorg workspace %s]])
               end, {
-                buffer = true,
                 desc = "neorg=> switch to workspace",
               })
-              binds.map("norg", "n", leader .. "jd", function()
+              binder.map(key_norg.journal.daily, function()
                 vim.cmd([[Neorg journal today]])
               end, {
-                buffer = true,
                 desc = "neorg=> daily journal (today)",
               })
-              binds.map(
-                "norg",
-                "n",
-                leader .. "jy",
-                function()
-                  vim.cmd([[Neorg journal yesterday]])
-                end,
-                { buffer = true, desc = "neorg=> daily journal (yesterday)" }
-              )
-              binds.map("norg", "n", leader .. "jo", function()
+              binder.map(key_norg.journal.yesterday, function()
+                vim.cmd([[Neorg journal yesterday]])
+              end, { desc = "neorg=> daily journal (yesterday)" })
+              binder.map(key_norg.journal.tomorrow, function()
                 vim.cmd([[Neorg journal tomorrow]])
               end, {
-                buffer = true,
+
                 desc = "neorg=> daily journal (tomorrow)",
               })
-              binds.map("norg", "n", leader .. "jt", function()
+              binder.map(key_norg.journal.templates, function()
                 vim.cmd([[Neorg journal template]])
               end, {
-                buffer = true,
                 desc = "neorg=> journal template",
               })
-              binds.map("norg", "n", leader .. "jc", function()
+              binder.map(key_norg.journal.toc, function()
                 vim.cmd([[Neorg journal toc]])
               end, {
-                buffer = true,
                 desc = "neorg=> journal contents",
               })
-              binds.map(
-                "norg",
-                "n",
-                leader .. "sh",
+              binder.map(
+                key_norg.search_headings,
                 "core.integrations.telescope.search_headings",
                 {
-                  buffer = true,
                   desc = "neorg=> search headings",
                 }
               )
             end,
-            neorg_leader = key_time:leader(),
+            neorg_leader = key_norg:leader(),
           },
           keys = {
             {
-              key_time:leader() .. "jd",
+              key_norg.journal.daily,
               function()
                 vim.cmd([[Neorg journal daily]])
               end,
