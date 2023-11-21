@@ -14,14 +14,9 @@ local mopts = require("funsak.table").mopts
 
 return {
   {
-    "junegunn/fzf",
-  },
-  {
-    "junegunn/fzf.vim",
-  },
-  {
     "ojroques/nvim-lspfuzzy",
     event = "LspAttach",
+    enabled = opt.lsp.diagnostics.lspfuzzy,
     dependencies = {
       "junegunn/fzf",
       "junegunn/fzf.vim",
@@ -42,7 +37,6 @@ return {
     config = function(_, opts)
       vim.diagnostic.config(opts)
     end,
-    enabled = opt.lsp.diagnostics.lsp_lines.enable,
     event = "LspAttach",
     opts = {
       virtual_lines = {
@@ -63,7 +57,7 @@ return {
   },
   {
     "stevearc/aerial.nvim",
-    enabled = opt.symbol.aerial.enable,
+    enabled = opt.symbol.aerial,
     opts = {
       layout = {
         max_width = { 36, 0.2 },
@@ -190,11 +184,11 @@ return {
   },
   {
     "hedyhli/outline.nvim",
-    enabled = opt.symbol.outline.enable,
+    enabled = opt.symbol.outline and opt.prefer.symbol_outline == "outline",
     cmd = { "Outline", "OutlineOpen", "OutlineClose" },
     opts = {
       outline_window = {
-        position = "right",
+        position = "left",
         split_command = nil,
         width = 20,
         relative_width = true,
@@ -203,7 +197,7 @@ return {
         show_cursorline = true,
         show_relative_numbers = false,
         show_numbers = true,
-        wrap = false,
+        wrap = true,
         winhl = "OutlineDetails:Comment,OutlineLineno:LineNr",
       },
       outline_items = {
@@ -214,9 +208,9 @@ return {
       guides = {
         enabled = true,
         markers = {
-          bottom = "",
-          middle = "",
-          vertical = "",
+          bottom = "╌",
+          middle = "╵",
+          vertical = "┆",
         },
       },
       symbol_folding = {
@@ -237,7 +231,7 @@ return {
       keymaps = {
         code_actions = { "a", "ga", "<leader>a" },
         close = { key_view:close() },
-        toggle_preview = "<C-p>",
+        toggle_preview = "P",
         hover_symbol = "K",
         rename_symbol = "r",
         focus_location = "o",
@@ -338,25 +332,6 @@ return {
       },
     },
   },
-  -- {
-  --   "ivanjermakov/troublesum.nvim",
-  --   event = "VeryLazy",
-  --   opts = {
-  --     enabled = true,
-  --     autocmd = true,
-  --     severity_format = {
-  --       env.icons.diagnostic.Error,
-  --       env.icons.diagnostic.Warn,
-  --       env.icons.diagnostic.Info,
-  --       env.icons.diagnostic.Hint,
-  --     },
-  --     format = function(counts) end,
-  --     display_summary = function(bufnr, ns, text) end,
-  --   },
-  --   config = function(_, opts)
-  --     require("troublesum").setup(opts)
-  --   end,
-  -- },
   {
     "aznhe21/actions-preview.nvim",
     opts = {
@@ -425,26 +400,13 @@ return {
     },
   },
   {
-    "hinell/lsp-timeout.nvim",
-    event = "LspAttach",
-    dependencies = {
-      "neovim/nvim-lspconfig",
-    },
-    init = function()
-      vim.g.lspTimeoutConfig = {
-        stopTimeout = 1000 * 60 * 5,
-        startTimeout = 1000 * 60 * 1,
-        silent = false,
-      }
-    end,
-  },
-  {
     "luckasRanarison/clear-action.nvim",
+    event = "LspAttach",
     opts = {
       silent = false,
       signs = {
         enable = true,
-        position = "overlay",
+        position = "eol",
         separator = " ",
         show_count = true,
         show_label = true,
@@ -655,25 +617,6 @@ return {
         mode = "n",
         desc = "glance=> implementations",
       },
-    },
-  },
-  {
-    "Wansmer/symbol-usage.nvim",
-    enabled = false,
-    event = "BufReadPre",
-    config = function(_, opts)
-      require("symbol-usage").setup(opts)
-    end,
-    opts = {
-      hl = { link = "Comment" },
-      kinds = {
-        vim.lsp.protocol.SymbolKind.Function,
-        vim.lsp.protocol.SymbolKind.Method,
-      },
-      vt_position = "textwidth",
-      references = { enabled = true, include_declaration = true },
-      definition = { enabled = true },
-      implementation = { enabled = true },
     },
   },
 }
