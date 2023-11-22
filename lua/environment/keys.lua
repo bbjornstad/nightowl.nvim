@@ -2,8 +2,6 @@
 ---file which is to be used during plugin specification
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
--- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
--- vim: set ft=lua sts=2 ts=2 sw=2 et: --
 
 --- the user's keymap customization in an easily accessible and semantically
 --- meaningful form.
@@ -41,17 +39,7 @@ local kenv = {}
 
 local NVIM_DYN_LEADER = "<leader>"
 local LEADER_ID = "${[ leader ]}"
-
 local keygroup = require("funsak.keys.group").keygroup
-
--- TODO: keygroup needs a transpose method. this method should convert tables in
--- the representation below, which is more semantically meaningful by taking
--- better use of the key values to describe purpose at the cost of a more
--- verbose description of the leader and other behavior.
---
--- TODO: Really attempt to finish the damn keygroup object implementation, as
--- the current version struggles somewhat and is a bit preventative of splitting
--- into separate files appropriately.
 
 local leader_shortcut = false
 kenv.shortcut = keygroup({
@@ -388,6 +376,11 @@ kenv.ui = keygroup({
     [LEADER_ID] = { append = "d" },
     toggle = "t",
     toggle_lines = "l",
+  },
+  matchparen = {
+    [LEADER_ID] = { append = "m" },
+    enable = "m",
+    disable = "d",
   },
 }, leader_ui, {})
 
@@ -735,11 +728,6 @@ kenv.repl = keygroup({
     show = "s",
   },
   yarepl = {
-    -- TODO: the following would make a very good candidate for the bang
-    -- automorphism style, in that each of these needs additional targeting
-    -- information in the form of an id as a count prefix or by name. The most
-    -- recently used repl could be bound to each of these with a capitalization
-    -- modification.
     [LEADER_ID] = { append = "y" },
     start = "s",
     attach_buffer = "a",
@@ -1158,6 +1146,7 @@ kenv.scope = keygroup({
   },
   media_files = "X",
   heading = "#",
+  neorg = "n",
 }, leader_scope, {})
 
 local leader_editor = "\\"

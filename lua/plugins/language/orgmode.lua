@@ -5,6 +5,7 @@ local kenv = require("environment.keys")
 local key_time = kenv.time
 local key_org = key_time.org
 local key_norg = key_time.neorg
+local key_scope = kenv.scope
 
 local function colorize(bg, fg, opts)
   opts = opts or {}
@@ -74,11 +75,11 @@ local organization_tools = {
   {
     "nvim-orgmode/orgmode",
     dependencies = {
-      "nvim-treesitter/nvim-treesitter",
+      { "nvim-treesitter/nvim-treesitter" },
       { "akinsho/org-bullets.nvim", ft = { "org" } },
       { "joaomsa/telescope-orgmode.nvim", ft = { "org" } },
       { "danilshvalov/org-modern.nvim", ft = { "org" } },
-      "lukas-reineke/headlines.nvim",
+      { "lukas-reineke/headlines.nvim" },
     },
     ft = { "org" },
     config = function(_, opts)
@@ -242,18 +243,44 @@ local organization_tools = {
         config = function(_, opts)
           require("telescope").load_extension("neorg")
         end,
+        keys = {
+          {
+            key_scope.neorg,
+            function()
+              require("telescope").extensions.neorg.neorg()
+            end,
+            mode = "n",
+            desc = "scope.norg=> find",
+          },
+        },
       },
       "lukas-reineke/headlines.nvim",
-      { "madskjeldgaard/neorg-figlet-module", ft = "norg" },
-      { "pysan3/neorg-templates", ft = "norg" },
-      { "tamton-aquib/neorg-jupyter", ft = "norg" },
-      { "laher/neorg-exec", ft = "norg" },
+      { "madskjeldgaard/neorg-figlet-module", optional = true, ft = "norg" },
+      { "pysan3/neorg-templates", optional = true, ft = "norg" },
+      { "tamton-aquib/neorg-jupyter", optional = true, ft = "norg" },
+      { "laher/neorg-exec", optional = true, ft = "norg" },
     },
     build = ":Neorg sync-parsers",
     cmd = "Neorg",
     ft = { "norg" },
     opts = {
       load = {
+        ["external.templates"] = {
+          config = {
+            templates_dir = vim.fs.joinpath(
+              vim.fn.stdpath("config"),
+              "templates/neorg-templates"
+            ),
+          },
+        },
+        -- ["external.jupyter"] = {},
+        ["external.exec"] = {},
+        -- ["external.integrations.figlet"] = {
+        --   config = {
+        --     font = "impossible",
+        --     wrapInCodeTags = true,
+        --   },
+        -- },
         ["core.defaults"] = {},
         ["core.concealer"] = {
           config = {
@@ -268,6 +295,7 @@ local organization_tools = {
               tasks = "~/.notes/tasks",
               prj = "~/prj",
               life = "~/.notes",
+              prosaic = "~/prsc",
             },
             index = "note-index.norg",
             default_workspace = "life",
@@ -314,22 +342,7 @@ local organization_tools = {
             update_date = true,
           },
         },
-        ["external.templates"] = {
-          config = {
-            templates_dir = vim.fs.joinpath(
-              vim.fn.stdpath("config"),
-              "templates/neorg-templates"
-            ),
-          },
-        },
-        ["external.jupyter"] = {},
-        ["external.exec"] = {},
-        ["external.integrations.figlet"] = {
-          config = {
-            font = "impossible",
-            wrapInCodeTags = true,
-          },
-        },
+
         ["core.keybinds"] = {
           config = {
             default_keybinds = true,
@@ -458,6 +471,10 @@ local organization_tools = {
     },
     config = true,
   },
+  { "madskjeldgaard/neorg-figlet-module", enabled = false, ft = "norg" },
+  { "pysan3/neorg-templates", ft = "norg" },
+  { "tamton-aquib/neorg-jupyter", enabled = false, ft = "norg" },
+  { "laher/neorg-exec", ft = "norg" },
 }
 
 return organization_tools
