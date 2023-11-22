@@ -1,169 +1,59 @@
-@document.meta
-title: blockers
-description: things that are still causing hangups towards our better goal of progress.
-authors: Bailey Bjornstad | ursa-major
-categories: nightowl.nvim
-created: 2023-08-07
-updated: 2023-08-18
-version: 1.1.1
-@end
 
 * Nightowl.nvim
-  the following document outlines the major pieces of code, implementation, or
-  other work that is needed to get life back on the track that it was supposed
-  to be on. Neovim is a unique program in my arsenal, and unfortunately any
-  difficulties I presently have with the configuration itself is going to cause
-  issues with other things that I am also trying to do that involve neovim
-  somehow. This is the motivation to create this document.
+  A project roadmap for [nightowl.nvim]{https://github.com/bbjornstad/nightowl.nvim}
 
 ** Critical Blockers
-   The folliwng items are critical to the mission. They need to be fixed as soon
-   as possible, otherwise standard essential editing functions are missing.
+   The following subsections indicate tracked issues and their possible steps
+   towards resolution. There is not a particular order to them, outside of the
+   order induced by needing certain functionality at certain times for other
+   reasons.
+*** neorg
+    - Neorg is complaining all the time, specifically about not being able to
+      find the right neorg modules component to load.
+    -- This seems to be a problem that can strike if the external modules
+       haven't been appropriately updated to match with neorg version 6.0
+    -- The easiest solution, and currently implemented solution, is to simply
+       not include the offending external modules.
+*** edgy.nvim
+    - Edgy is causing problems, once again related to the supposed-to-be-disabled
+      neo-tree...
+    -- this is intensely frustrating as I am doing everything I can to keep the
+       tree plugin out of my configuration. But it just keeps finding its way
+       into the problems.
 
-*** (-) Neorg and Treesitter do not seem to be cooperating.
-    I am not sure what the issue is here, it seems like whenever I backspace in
-    a certain pattern while in insert mode, then treesitter flips out and throws
-    some gnarly errors.
-
-    Update 2023-08-09: this is mostly fixed. debugging left to do, but no errors
-    on startup and everything looks like it is working correctly.
-    Update 2023-08-16: I'm not sure if this is entirely fixed, on startup
-    occasionally neorg treesitter seems to have a minor problem wherein the
-    syntax highlight definitions do not seem to be applied completely to the
-    document. The biggest thing is that headers and metadata are missing body
-    highlighting.
-
-*** (-) Completion Menu Icons
-    This has been a thorny issue for too long at this point, and the lspkind
-    wiki is not helpful to fixing this problem. Basically we have a timing
-    mismatch because lspkind is not found when needed, despite the fact that the
-    package is loaded within a separate opts function.
-
-    update 2023-08-09: this is also mostly fixed, and generally cmp is working
-    better after disabling the automenu and forcing explicit user activation
-    with the tab or c-space keys.
-
-*** (x) Neorg keybindings
-    Neorg is missing important keybindings to any of the convenience functions
-    that are provided.
-*** (x) edgy.nvim fixes
-    unfortunately, edgy was not working correctly before today. luckily, it is
-    working now more correctly although there's still a few problematic spots of
-    behavior that should be fixed in the long run.
-
-*** ai components
-    This has become more problematic as time has gone on. Unfortunately, I don't
-    much like the way that I have started to set up the configuration of each
-    component, and whether or not it can be enabled. Perhaps we should do some
-    additional brainstorming about what might make the most sense in terms of
-    implementation. Perhaps we should take a few looks around to see what people
-    have done for their uses.
-    - ( ) check out folke's repos
-    - (x) we are working successfully now
-    ------
-
-** Problematic Blockers
-   These items are not as critical as the above, but they still are important
-   to improving the overall experience to the point of usability.
-
-*** escaping is sometimes weird
-    basically sometimes depending on the mode, pressing escape will just...not
-    do anything. I normally will have to spam other keys to get the keys to
-    "unlock" themselves even though they aren't locked by the system at all,
-    just vim input. Houdini is ok, but...
-
-**** Houdini: Alright so Far
-     the canonical way to deal with the fact that the escape key is in a weird
-     place is to use 'jj' or 'jk' in a keymapping from insert mode. Houdini
-     seems like the best version of these kinds of tools so far, but I am
-     struggling with one issue: in visual block mode, I don't seem to be able to
-     use the j key to move down...which is a problem as that is something I do
-     relatively commonly.
-
-**** Houdini: <2023-08-15> Houdini got the axe. Probably for good?
-     while I did really want to like the plugin, unfortunately it seemed like it
-     was almost too good at its job. Visual block mode had some trouble, and it
-     also was I think messing up other plugins.
-     ------
-    -----
+*** nvim-cmp
+    The mappings are not quite right...in particular I want to stop accepting
+    on <CR> and instead keep the return-key behavior the same as it was
+    previously. This is probably just an apparent mismatch between one of the
+    various sources that is probably trying to capture the animals for
+    sequestration and eventually fostering or other reasonable method of
+    handling.
+    ---
 
 ** Unimplemented Features
-   These items are not necessarily critical to being able to edit files in an
-   appropriate manner, but are important because they have features and details
-   that I would like to have in nightowl.nvim but are not yet implemented due to
-   hangups with other pieces that are holding this mission together.
+*** neorg
+*** general
+*** lazyflex.nvim
+    One of the more promising looking plugins that I have found recently,
+    lazyflex allows the definition of groups of plugins to be managed more
+    cleanly and conveniently by providing an extra method of enabling/disabling
+    plugins from a separate collection (e.g. LazyVim components and extras).
+    - ( ) Fully map the remaining plugins to consitutent "components", or
+          high-level groupings of plugins that are desinged to facilitate
+          particular behavior
+    - ( ) correctly format the two files that are needed for this; consult with
+          lazyflex.nvim documentation for more info
 
-*** ( ) dropbar.nvim navigation in breadcrumbs menus
-    the basic idea behind this part is that when we are in a dropbar menu,
-    normally activated with `g_` as a normal mode mapping, we would like a few
-    additional ways to move between dropbar windows. In particular, tab and
-    shift-tab should move to next and previous windows.
+*** dashboard (alpha.nvim, dashboard.nvim, mini.starter, etc).
+    This, for some reason, is just not working the correct way that it is
+    supposed to. We really want veil.nvim to be complete as a plugin, and not
+    in a halfway state with the animation API and surrounding functions.
 
-*** ( ) keymapping module
-    keymapping is sort of difficult to work with between having two opposed sets
-    of places where keymappings are reasonably defined under lazy.nvim
-    constraints. the init method uses the init key of the lazy spec item and
-    creates a function that creates the keymaps whenever the plugin is loaded.
-    The alternative and seemingly preferred way is to use the keys item of the
-    lazy spec instead, with individual table elements describing the keys, as
-    opposed to function calls.
-**** Enter lubrikey.nvim
-     the idea behind lubrikey is that it can dynamically adapt between both of
-     these forms of keybinding, or others. Hopefully makes heavy use of
-     functional ideas...and can mesh the use of either method because they are
-     needed in slightly different contexts.
-
-*** ( ) Input Prompter
-    this is supposed to be a simple module which can unify the text-formatting
-    and intake of user input via the vim.ui subset of functionality that is
-    exposed and configurable.
+*** AI Assistants and Code Editing Improvements
+    This is the section devoted specifically to the part of my nvim
+    configuration which handles all interaction with external LLM or
+    chatgpt-like interfaces.
     -----
-
-** Debugging Features
-   This is the list of things that are implemented but that need some extra
-   debugging in order to make work exactly right.
-
-*** (-) CCC Maybe
-    it may be having some trouble but it also could just not work in the wrong
-    document types, e.g. ones without any color codes in them.
-
-*** (-) fuzz
-    the fuzz module that I have put together could probably use a bit of work
-    and debugging. Plus some keymapping assignments to different, more effective
-    and less conflicting places. I do like using the Z key though...if only I
-    could swap Z and z
-
-    this is in fact, technically possible. Maybe we will give it a shot to see?
-
-**** UPDATE: 2023-08-15 this did not go well, and we've reverted to the standard
-     z-mapping plus the capital Z-mapping for all FZF stuff. We do need to do one
-     additional bit here though, which is to clean out telescope materials and
-     plugins that are superceded by the fzf-lua mappings instead.
-     -----
-
-*** folke/edgy.nvim fixes
-    I really want to like edgy because it nicely organizes the windows into
-    something slightly more manageable than they would otherwise be. But we are
-    still having a small amount of trouble with system stability while using
-    these tools.
-    - ( ) edgy sometimes doesn't open the symbol outline
-    - ( ) occasionally using symbol outline causes full crash of neovim
-
-*** The Balancing Act: Autocommands
-    Autocommands are proving to be a little bit of a finnicky beast here to
-    manage especially with the knowledge that we are trying to lazy load
-    everything if possible. In an ideal scenario, we would have the following:
-    all plugins would be left to their own devices. As long as each plugin makes
-    sure to accurately specify which other plugins it needs in the dependencies
-    field of each lazy.nvim specification item, there should be no issue with
-    conflicting, as long as there is actually a way to resolve the dependency
-    graph come time to put the program together.
-
-    Alas, things are proving more difficult than that it would seem on this
-    front. It does seem like there is a substantial effect of moving things
-    around in the lazy load runtime-specification by adjusting the event, keys,
-    filetype, or other relevant property items that are defined under lazy.nvim.
-    (e.g. those which affect the load order of plugins).
 
 **** A Definitive Specification, Perhaps?
      Let the following items determine the precise "ideal" definition of how
@@ -183,39 +73,66 @@ version: 1.1.1
      }
      @end
      ~ A plugin that is loaded lazily cannot be used directly in the
-     specification of another plugin without an additional function guard across
-     the property, even if the dependent plugin is specified as a dependency.
-     This is most commonly encountered with the `keys` field and using a bare
-     `require('plugin').function` as the action item.
-     ~ A plugin's internal operations do not have to rely on another plugin for
-     the latter to be a dependency of the first. This is to say that there are
-     two main scenarios when a plugin should be marked as a dependency: when
-     that plugin is specified by the author of the dependent plugin as being a
-     dependency, and when the user uses the functionality of the dependency
-     plugin in the lazy specification of the dependent plugin.
-     ~ asdf
-     ===
+       specification of another plugin without an additional function guard
+       across the targeted property, even if the dependent plugin is specified
+       as a dependency. This is most commonly encountered with the `keys` field
+       and using a bare `require('plugin').function` as the action item.
+     ~ A plugin's internal operations do not have to rely on another plugin
+       for the latter to be a dependency of the first. This is to say that
+       there are two main scenarios when a plugin should be marked as a
+       dependency: when that plugin is specified by the author of the dependent
+       plugin as being a dependency, and when the user uses the functionality
+       of the dependency plugin in the lazy specification of the dependent
+       plugin regardless of whether or not the plugin author specifies the
+       dependent plugin as being so.
+     ~ The `keys` and `opts` fields are the two main fields for which a
+       "functionalization" is necessary. These fields are set up prior to the
+       corresponding setup call for the plugin, and so all dependent calls
+       within either the `keys` or the `opts` field must resolve at the time
+       that the  `config` fields are required, hence the noted behavior here.
+     ~ Occasionally, there is need to set up a certain parameter or separate
+       behavior within the configuration of a particular plugin. Examples of
+       this include things like setting up an autocommand, defining a user
+       command, etc. In these cases, there are generally two possibilities:
+       either using the `init` field, or using the `config` field. There are
+       some subtle distinctions between the two.
+     ~~ The `init` field is called first, and all of the init fields
+        represented in the plugin specification are executed together before
+        other setup. If this timing is required for the particular loading
+        configuration of the target plugin, then the `init` field is your best
+        option. However, this is not frequently the case.
+     ~~ The `config` field is called at the time when an action or
+        functionality provided by the plugin is required, or if the importation
+        is otherwise signaled because of lazy.nvim plugin specification fields
+        (e.g. `event`, `ft`, `cmd`, `dependencies`, each of which specifies a
+        different reason for loading a plugin). If this timing seems more
+        optimal for behavioral augmentations at the time of loading, then you
+        should probably use the `config` field unless doing so would overwrite
+        another more necessary `config` present in another spec loation.
+     ~~ Lastly, when lazy loading using lazy.nvim, note that the `init` field
+        is called regardless of the lazy-loading-status of the plugin, while
+        the `config` field is not. This implies that if you wish to include
+        certain setup behavior regardless of whether other plugin functionality
+        is loaded lazily, then you will need to use the `init` field, and
+        further understand that the available operations and manipulations may
+        be somewhat limited. This is, from what I can tell, a major reason why
+        it seems most vim variable definitions or assignments occur in the
+        `init` field instead of a different more deferred option
+     ~~ Note that `init` as a LazyPluginSpec field can be defined only as a
+        function accepting at most the LazyPlugin item that corresponds to the
+        `init` target. This is in contrast to the `keys`, `opts`, and
+        especially `config` fields, which all accept an additional `opts` field
+        representing the "current state" of the cobbling process that creates
+        the final internal representation for the LazyPluginSpec. Hence, it is
+        not possible to modify the `opts` field or other corresponding items
+        using the `init` field, that must be done in a field which can accept
+        the target property as an argument to the property's defining function.
+        Like how `opts` can be given as `fun(LazyPlugin, opts)`
+
+        ===
 
 * Random Notes: Nightowl.nvim
   This is a section of the document that can hold some random notes related to
   the implementation of all of the stuff that is listed in the preceding
   section.
-
-** Project Management
-   the selection of task management plugins is maybe a bit too expansive at the
-   moment. We have, at least, the following plugins:
-   - `telescope-project.nvim`
-   - `project.nvim`
-   - `conduct.nvim`
-   - `nvim-possession`
-   - `mini.sessions`
-   - `persistence.nvim`
-   this does not include any plugins that are related to todo-management, which
-   is almost a separate thing since the former deal mostly with handling
-     directories while the latter are about time. Still, included below
-   - `pomodoro`,
-   - `wakatime`
-   - all todo management plugins, like `unfog.nvim`
-   - `do.nvim`
-     we probably should trim this down substantially.
-
+  ---
