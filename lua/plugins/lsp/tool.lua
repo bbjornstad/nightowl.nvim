@@ -338,11 +338,18 @@ return {
       diff = {
         ctxlen = 3,
       },
+      telescope = vim.tbl_extend(
+        "force",
+        require("telescope.themes").get_dropdown(),
+        { make_value = nil, make_make_display = nil }
+      ),
       nui = {
         preview = {
+          size = "64%",
           border = { style = env.borders.main, padding = { 1, 2 } },
         },
         select = {
+          size = "36%",
           border = { style = env.borders.main, padding = { 1, 2 } },
         },
       },

@@ -1,5 +1,6 @@
 local env = require("environment.ui")
 local kcolors = require("funsak.colors").kanacolors
+local key_ui = require("environment.keys").ui
 
 return {
   {
@@ -194,6 +195,37 @@ return {
     opts = {
       enabled = true,
       char = "╵",
+    },
+  },
+  {
+    "monkoose/matchparen.nvim",
+    cmd = "MatchParenEnable",
+    opts = {
+      on_startup = true,
+      hl_group = "MatchParen",
+      augroup_name = "matchparen",
+      debounce_time = 100,
+    },
+    config = function(_, opts)
+      require("matchparen").setup(opts)
+    end,
+    event = "VeryLazy",
+    init = function()
+      vim.g.loaded_matchparen = 1
+    end,
+    keys = {
+      {
+        key_ui.matchparen.enable,
+        "<CMD>MatchParenEnable<CR>",
+        mode = "n",
+        desc = "matchparen=> enable",
+      },
+      {
+        key_ui.matchparen.disable,
+        "<CMD>MatchParenDisable<CR>",
+        mode = "n",
+        desc = "matchparen=> disable",
+      },
     },
   },
 }
