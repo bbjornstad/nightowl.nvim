@@ -1,21 +1,14 @@
 -- Options are automatically loaded before lazy.nvim startup
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
------ The basic settings from init.vim
-local NIGHTOWL_BACKGROUND = os.getenv("NIGHTOWL_BACKGROUND_STYLE")
+-- The basic settings from init.vim
+local NIGHTOWL_BACKGROUND = vim.env.NIGHTOWL_BACKGROUND_STYLE
 
--- leader key specification
--- <leader> = <Space> for easy access
--- Also, <localleader> = <Backslash> for easy access, though somewhat less so.
---
--- The <localleader> is used for buffer-specific text-generation and editing
--- commands, namely line breaks and boxes drawn with specific ASCII
--- configurations.
--- The <leader> key is the backbone of interaction and provides shortcut access
--- to most of what could be needed at a moment's notice when editing, and then
--- some.
-vim.g.mapleader = " "
-vim.g.maplocalleader = "'"
+-- leader configuration. These are mapped to <leader> and <localleader>
+-- respectively. If using a `funsak` KeyModule, these have somewhat more
+-- specific meanings depending on configuration.
+vim.g.mapleader = [[ ]]
+vim.g.maplocalleader = [[']]
 
 -- Basic interface options that are not handled with specific plugin
 -- configurations set in interface.lua
@@ -29,7 +22,7 @@ vim.opt.mousemoveevent = true
 
 -- timeout configuration for neovim mappings, affects WhichKey predominantly
 vim.opt.ttimeout = true
-vim.opt.ttimeoutlen = 50
+vim.opt.ttimeoutlen = 75
 vim.opt.timeoutlen = 300
 
 -- turn on default hard word-wrapping and further extend the keys which can wrap
@@ -49,19 +42,15 @@ vim.opt.smartcase = true
 vim.opt.wrapscan = true
 vim.opt.scrolloff = 10
 
--- >>> these are overwritten by our .editorconfig file in this directory.
---vim.opt.tabstop = 4
---vim.opt.shiftwidth = 4
---vim.opt.textwidth = 80
--- >>>
-
 vim.opt.ruler = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true
+vim.opt.synmaxcol = 50
 
+vim.opt.swapfile = false
 vim.opt.spelllang = "en_us"
-vim.opt.formatoptions = "tcroqb"
+vim.opt_global.formatoptions:append("t")
 vim.opt.laststatus = 3
 vim.opt.fillchars:append({
   horiz = "━",

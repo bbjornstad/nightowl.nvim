@@ -1,7 +1,11 @@
 local env = require("environment.ui")
-local key_bufmenu = require("environment.keys").stems.base.buffers
-local key_files = require("environment.keys").stems.base.files
-local mopts = require("uutils.functional").mopts
+local opt = require("environment.optional")
+local kenv = require("environment.keys")
+local key_win = kenv.window
+local key_view = kenv.view
+local key_buffer = kenv.buffer
+local mopts = require("funsak.table").mopts
+local has = require("lazyvim.util").has
 
 local function pdel(mode, keys, opts)
   local ok, res = pcall(vim.keymap.del, mode, keys, opts)
@@ -11,239 +15,46 @@ local function pdel(mode, keys, opts)
   return res
 end
 
+local function winsep_disable_ft()
+  local colorful_winsep = require("colorful-winsep")
+  local win_n = require("colorful-winsep.utils").calculate_number_windows()
+  if win_n == 2 then
+    local win_id = vim.fn.win_getid(vim.fn.winnr("h"))
+    local filetype =
+      vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(win_id), "filetype")
+    if vim.tbl_contains({ "NvimTree", "nnn", "broot", "netrw" }, filetype) then
+      colorful_winsep.NvimSeparatorDel()
+    end
+  end
+end
+
 return {
-  {
-    "williamboman/mason.nvim",
-    opts = { ui = { border = env.borders.main } },
-  },
-  {
-    "folke/lazy.nvim",
-    init = function()
-      pdel({ "n", "<leader>l" })
-    end,
-    keys = {
-      {
-        "<leader>l",
-        vim.NIL,
-      },
-      {
-        "<leader>L",
-        "<CMD>Lazy<CR>",
-        mode = "n",
-        desc = "lazy=> home",
-      },
-    },
-  },
-  {
-    "folke/noice.nvim",
-    opts = {
-      debug = false,
-      lsp = {
-        -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-        override = {
-          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-          ["vim.lsp.util.stylize_markdown"] = true,
-          ["cmp.entry.get_documentation"] = true,
-        },
-        signature = {
-          enabled = true,
-        },
-      },
-      presets = {
-        bottom_search = false, -- use a classic bottom cmdline for search
-        command_palette = false, -- position the cmdline and popupmenu together
-        long_message_to_split = true, -- long messages will be sent to a split
-        inc_rename = true,
-      },
-      views = {
-        popup = {
-          border = {
-            style = env.borders.main,
-            padding = { 1, 2 },
-          },
-        },
-        cmdline_popup = {
-          position = { row = 16, col = "50%" },
-          size = {
-            width = math.max(80, vim.opt.textwidth:get()),
-          },
-          -- put it on top of everything else that could exist below (we picked
-          -- 1200 because it was larger than the largest present zindex
-          -- definition for any other component)
-          zindex = 100,
-          border = { style = env.borders.main, padding = { 1, 2 } },
-          win_options = {
-            winhighlight = {
-              -- Normal = "Normal",
-              Normal = "NormalFloat",
-              FloatBorder = "FloatBorder",
-            },
-          },
-        },
-        popupmenu = {
-          relative = "editor",
-          position = { row = 16, col = "50%" },
-          size = { width = 80, height = "auto" },
-          -- once again, put it on top of everything else that could exist below.
-          -- 1200 rationale still holds here too.
-          zindex = 100,
-          border = { style = env.borders.main, padding = { 1, 2 } },
-          win_options = {
-            winhighlight = {
-              -- Normal = "Normal",
-              Normal = "NormalFloat",
-              FloatBorder = "FloatBorder",
-            },
-          },
-        },
-        hover = {
-          view = "popup",
-          size = {
-            max_height = 30,
-            max_width = 120,
-          },
-          border = {
-            style = env.borders.main,
-            padding = { 1, 2 },
-          },
-        },
-        confirm = {
-          border = {
-            style = env.borders.main,
-            padding = { 1, 2 },
-            text = { "test" },
-          },
-          win_options = {
-            winhighlight = {
-              Normal = "NormalFloat",
-              FloatBorder = "FloatBorder",
-            },
-          },
-        },
-        notify = {
-          border = { style = env.borders.main, padding = { 1, 2 } },
-          relative = "editor",
-        },
-      },
-      routes = {
-        {
-          filter = { event = "msg_show", kind = "", find = "written" },
-          opts = { skip = true },
-        },
-        {
-          view = "mini",
-          filter = {
-            event = "lsp",
-            kind = "progress",
-            find = "Processing file symbols...",
-          },
-          opts = {
-            skip = true,
-          },
-        },
-        {
-          view = "mini",
-          filter = {
-            event = "msg_show",
-            kind = "progress",
-            find = "checking document",
-          },
-          opts = { skip = true },
-        },
-        {
-          view = "mini",
-          filter = {
-            event = "lsp",
-            kind = "progress",
-            find = "Diagnosing",
-          },
-          opts = {
-            skip = true,
-          },
-        },
-        {
-          view = "mini",
-          filter = {
-            event = "lsp",
-            kind = "progress",
-            find = "Processing full semantic tokens",
-          },
-          opts = {
-            skip = true,
-          },
-        },
-        {
-          view = "mini",
-          filter = {
-            event = "lsp",
-            kind = "progress",
-            find = "Searching in files...",
-          },
-          opts = {
-            skip = true,
-          },
-        },
-        {
-          view = "mini",
-          filter = {
-            event = "lsp",
-            kind = "progress",
-            find = "Processing reference...",
-          },
-          opts = {
-            skip = true,
-          },
-        },
-      },
-    },
-  },
   {
     "echasnovski/mini.bufremove",
     opts = function(_, opts) end,
     config = true,
     keys = {
       {
-        "<leader>bd",
-        false,
-      },
-      {
-        "<leader>bD",
-        false,
-      },
-      {
-        "qd",
+        key_buffer.delete,
         function()
           require("mini.bufremove").delete(0, false)
         end,
         mode = "n",
-        desc = "buf=> delete buffer",
+        desc = "::buf=> delete",
       },
       {
-        "qD",
+        key_buffer.force_delete,
         function()
           require("mini.bufremove").delete(0, true)
         end,
         mode = "n",
-        desc = "buf=> delete[!] buffer",
+        desc = "::buf=> [!] delete",
       },
     },
   },
   {
-    "rcarriga/nvim-notify",
-    opts = function(_, opts)
-      opts.top_down = opts.top_down or true
-      opts.render = opts.render or "compact"
-      opts.on_open = opts.on_open
-        or function(win)
-          vim.api.nvim_win_set_config(win, {
-            border = env.borders.main,
-          })
-        end
-    end,
-  },
-  {
     "stevearc/dressing.nvim",
-    event = "BufReadPre",
+    event = "VeryLazy",
     config = true,
     opts = {
       input = {
@@ -289,7 +100,7 @@ return {
             filetype = "DressingSelect",
           },
           win_options = {
-            winblend = 10,
+            winblend = 30,
           },
           max_width = 80,
           max_height = 40,
@@ -307,7 +118,7 @@ return {
           buf_options = {},
           win_options = {
             -- Window transparency (0-100)
-            winblend = 10,
+            winblend = 30,
             cursorline = true,
             cursorlineopt = "both",
           },
@@ -338,7 +149,7 @@ return {
       },
       border = env.borders.main,
       win_options = {
-        win_blend = 10,
+        win_blend = 30,
         wrap = true,
         list = true,
       },
@@ -349,27 +160,21 @@ return {
     cmd = "JABSOpen",
     keys = {
       {
-        "qbj",
+        key_buffer.jabs,
         "<CMD>JABSOpen<CR>",
         mode = "n",
-        desc = "buf=> open JABS",
-      },
-      {
-        "qj",
-        "<CMD>JABSOpen<CR>",
-        mode = "n",
-        desc = "buf=> open JABS",
+        desc = "buf.jabs=> win:float",
       },
     },
     opts = {
-      position = { "right", "top" },
-      width = 40,
-      height = 20,
+      position = { "left", "top" },
+      width = 72,
+      height = 24,
       border = env.borders.main,
-      preview_position = "left",
+      preview_position = "right",
       preview = {
-        width = 80,
-        height = 36,
+        width = 60,
+        height = 40,
         border = env.borders.main,
       },
       clip_popup_size = true,
@@ -379,7 +184,7 @@ return {
         right = 1,
         bottom = 1,
       },
-      relative = "cursor",
+      relative = "win",
       keymap = {
         close = "d",
         h_split = "h",
@@ -387,11 +192,13 @@ return {
         preview = "p",
       },
       use_devicons = true,
+      sort_mru = true,
     },
     config = true,
   },
   {
     "folke/persistence.nvim",
+    enabled = false,
     opts = function(_, opts)
       pdel({ "n" }, "q")
       pdel({ "n" }, "<leader>qs")
@@ -447,23 +254,49 @@ return {
   },
   {
     "anuvyklack/help-vsplit.nvim",
+    event = "VeryLazy",
     config = function(_, opts)
       require("help-vsplit").setup(opts)
     end,
-    event = { "VeryLazy" },
     opts = {
-      always = false,
+      always = true,
       side = "right",
       buftype = { "help" },
       filetype = { "man" },
     },
-    -- ft = { "man", "vimdoc", "help" },
+    ft = { "man", "vimdoc", "help" },
   },
   {
     "folke/edgy.nvim",
     init = function()
       vim.opt.splitkeep = "screen"
     end,
+    keys = {
+      {
+        "<leader>ue",
+        false,
+      },
+      {
+        "<leader>uE",
+        false,
+      },
+      {
+        key_view.edgy.toggle,
+        function()
+          require("edgy").toggle()
+        end,
+        mode = "n",
+        desc = "::win.edgy=> toggle",
+      },
+      {
+        key_view.edgy.select,
+        function()
+          require("edgy").select()
+        end,
+        mode = "n",
+        desc = "::win.edgy=> select",
+      },
+    },
     opts = function()
       local opts = {
         options = {
@@ -475,6 +308,7 @@ return {
         bottom = {
           {
             ft = "toggleterm",
+            title = "term.toggle::",
             size = { height = 0.4 },
             filter = function(buf, win)
               return vim.api.nvim_win_get_config(win).relative == ""
@@ -489,7 +323,7 @@ return {
           },
           {
             ft = "lazyterm",
-            title = "term::",
+            title = "term.lazy::",
             size = { height = 0.4 },
             filter = function(buf)
               return not vim.b[buf].lazyterm_cmd
@@ -515,175 +349,168 @@ return {
         exit_when_last = true,
       }
 
-      local Util = require("lazyvim.util")
-      local function condition(condition_to, edgy_loc, copts)
+      if has("outline.nvim") then
+        opts.left = vim.list_extend(opts.left, {
+          title = "symb::outline",
+          ft = "Outline",
+          size = {
+            height = 0.5,
+          },
+        })
+      end
+
+      --- inserts the contents of the `copts` argument into the target edgy
+      --- window if it satisfies the given condition evaluation.
+      ---@param condition_to any expression to evaluate as a boolean condition.
+      ---@param edgy_loc "bottom" | "left" | "right" window edge location to
+      ---insert into.
+      ---@param values table the values that are to be inserted as a new
+      ---component.
+      local function condition(condition_to, edgy_loc, values)
         local function opts_mapper(cond, cprime)
-          if Util.has(cond) then
+          if has(cond) or has(cond .. ".nvim") then
             return mopts({}, cprime)
           end
         end
         table.insert(
           opts[edgy_loc],
           #opts[edgy_loc],
-          opts_mapper(condition_to, copts)
+          opts_mapper(condition_to, values)
         )
       end
+      local function set_term_options(term, opts)
+        local buf = vim.bo[term.bufnr]
+        buf = vim.tbl_extend("force", buf, opts)
+      end
 
-      condition("nnn.nvim", "left", {
-        title = "fm::nnn",
-        ft = "nnn",
+      condition("toggleterm.nvim", "left", {
+        title = "fm::broot",
+        ft = "broot",
         size = {
           height = 0.6,
         },
         pinned = true,
-        open = "NnnExplorer",
+        open = require("environment.utiliterm").broot({
+          direction = "horizontal",
+          on_open = function(term)
+            set_term_options(term, { filetype = "broot" })
+          end,
+        }),
       })
-      condition("symbols-outline.nvim", "right", {
-        title = "symb::outline",
-        ft = "Outline",
-        pinned = true,
-        size = {
-          height = 0.5,
-        },
-        open = "SymbolsOutline",
-      })
-      condition("aerial.nvim", "right", {
-        title = "symb::aerial",
-        ft = "aerial",
-        pinned = true,
-        size = {
-          height = 0.5,
-        },
-        open = "AerialOpen",
-      })
+      -- condition("aerial.nvim", "left", {
+      --   title = "symb::aerial",
+      --   ft = "aerial",
+      --   size = {
+      --     height = 0.5,
+      --   },
+      -- })
 
-      return opts
+      return res
     end,
-  },
-  {
-    "folke/which-key.nvim",
-    opts = {
-      defaults = {
-        [key_bufmenu] = { name = "+buffers/quito" },
-      },
-    },
-  },
-  {
-    "dnlhc/glance.nvim",
-    cmd = { "Glance" },
-    opts = function(_, opts)
-      local actions = require("glance").actions
-      opts.height = opts.height or 16 -- Height of the window
-      opts.zindex = opts.zindex or 45
-      -- Or use a function to enable `detached` only when the active window is too small
-      -- (default behavior)
-      opts.detached = opts.detached
-        or function(winid)
-          return vim.api.nvim_win_get_width(winid) < 100
-        end
-
-      opts.preview_win_opts = mopts({
-        -- Configure preview window
-        cursorline = true,
-        number = true,
-        wrap = true,
-      }, opts.preview_win_opts)
-      opts.border = mopts({
-        enable = true, -- Show window borders. Only horizontal borders allowed
-        top_char = "🮩",
-        bottom_char = "🮨",
-      }, opts.border)
-      opts.list = mopts({
-        position = "right", -- Position of the list window 'left'|'right'
-        width = 0.33, -- 33% width relative to the active window, min 0.1, max 0.5
-      }, opts.list)
-      opts.theme = mopts({ -- This feature might not work properly in nvim-0.7.2
-        enable = true, -- Will generate colors for the plugin based on your current colorscheme
-        mode = "auto", -- 'brighten'|'darken'|'auto', 'auto' will set mode based on the brightness of your colorscheme
-      }, opts.theme)
-      opts.mappings = mopts({
-        list = {
-          ["j"] = actions.next, -- Bring the cursor to the next item in the list
-          ["k"] = actions.previous, -- Bring the cursor to the previous item in the list
-          ["<Down>"] = actions.next,
-          ["<Up>"] = actions.previous,
-          ["<Tab>"] = actions.next_location, -- Bring the cursor to the next location skipping groups in the list
-          ["<S-Tab>"] = actions.previous_location, -- Bring the cursor to the previous location skipping groups in the list
-          ["<C-u>"] = actions.preview_scroll_win(5),
-          ["<C-d>"] = actions.preview_scroll_win(-5),
-          ["v"] = actions.jump_vsplit,
-          ["s"] = actions.jump_split,
-          ["t"] = actions.jump_tab,
-          ["<CR>"] = actions.jump,
-          ["o"] = actions.jump,
-          ["l"] = actions.open_fold,
-          ["h"] = actions.close_fold,
-          ["<leader>l"] = actions.enter_win("preview"), -- Focus preview window
-          ["q"] = actions.close,
-          ["Q"] = actions.close,
-          ["<Esc>"] = actions.close,
-          ["<C-q>"] = actions.quickfix,
-          -- ['<Esc>'] = false -- disable a mapping
-        },
-        preview = {
-          ["q"] = actions.close,
-          ["Q"] = actions.close,
-          ["<Esc>"] = actions.close,
-          ["<Tab>"] = actions.next_location,
-          ["<S-Tab>"] = actions.previous_location,
-          ["<leader>l"] = actions.enter_win("list"), -- Focus list window
-        },
-      }, opts.mapping)
-      opts.hooks = mopts({}, opts.hooks)
-      opts.folds = mopts({
-        fold_closed = "",
-        fold_open = "",
-        folded = true, -- Automatically fold list on startup
-      }, opts.folds)
-      opts.indent_lines = mopts({
-        enable = true,
-        icon = "│",
-      }, opts.indent_lines)
-      opts.winbar = mopts({
-        enable = true, -- Available strating from nvim-0.8+
-      }, opts.winbar)
-    end,
-    keys = {
-      {
-        "glr",
-        "<CMD>Glance references<CR>",
-        mode = "n",
-        desc = "glance=> references",
-      },
-      {
-        "gld",
-        "<CMD>Glance definitions<CR>",
-        mode = "n",
-        desc = "glance=> definitions",
-      },
-      {
-        "glt",
-        "<CMD>Glance type_definitions<CR>",
-        mode = "n",
-        desc = "glance=> type definitions",
-      },
-      {
-        "gli",
-        "<CMD>Glance implementations<CR>",
-        mode = "n",
-        desc = "glance=> implementations",
-      },
-    },
   },
   {
     "stevearc/stickybuf.nvim",
-    config = true,
     event = "BufWinEnter",
     cmd = { "PinBuffer", "PinBuftype", "PinFiletype", "Unpin" },
+    opts = {
+      get_auto_pin = function(bufnr)
+        -- do any required filtration prior to using default settings.
+        local bufft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+        if
+          vim.list_contains({
+            "Outline",
+            "oil",
+            "nnn",
+          }, bufft)
+        then
+          return "filetype"
+        end
+        return require("stickybuf").should_auto_pin(bufnr)
+      end,
+    },
+  },
+  {
+    "nvim-focus/focus.nvim",
+    version = false,
+    event = "BufWinEnter",
+    enabled = opt.prefer.focus_windows == "focus",
+    config = function(_, opts)
+      local ignore_buftypes = { "nofile", "prompt", "popup" }
+      local ignore_filetypes = env.ft_ignore_list
+      require("focus").setup(opts)
+      local grp =
+        vim.api.nvim_create_augroup("FtDisableFocus", { clear = true })
+      vim.api.nvim_create_autocmd({ "WinEnter" }, {
+        group = grp,
+        callback = function(ev)
+          if vim.tbl_contains(ignore_buftypes, vim.bo[ev.buf].buftype) then
+            vim.w.focus_disable = true
+          else
+            vim.w.focus_disable = false
+          end
+        end,
+        desc = "Disable focus autoresizer for special buffer types",
+      })
+      vim.api.nvim_create_autocmd({ "FileType" }, {
+        group = grp,
+        callback = function(ev)
+          if vim.tbl_contains(ignore_filetypes, vim.bo[ev.buf].filetype) then
+            vim.b.focus_disable = true
+          else
+            vim.b.focus_disable = false
+          end
+        end,
+        desc = "Disable focus autoresizer for special filetypes",
+      })
+    end,
+    opts = {
+      autoresize = {
+        minwidth = 12,
+        minheight = 18,
+        height_quickfix = 12,
+      },
+      split = {
+        bufnew = true,
+      },
+      ui = {
+        hybridnumber = true,
+        absolutenumber_unfocussed = true,
+        cursorline = true,
+        winhighlight = false,
+        cursorcolumn = false,
+        colorcolumn = {
+          enable = true,
+          list = "+1",
+        },
+      },
+    },
+    keys = {
+      {
+        key_win.focus.maximize,
+        "<CMD>FocusMaxOrEqual<CR>",
+        mode = "n",
+        desc = "win.focus=> toggle max",
+      },
+      {
+        key_win.focus.split.cycle,
+        "<CMD>FocusSplitCycle<CR>",
+        mode = "n",
+        desc = "win.focus=> split cycle",
+      },
+      {
+        key_win.focus.split.direction,
+        require("uutils.window").focus_split_helper,
+        expr = true,
+        remap = true,
+        mode = "n",
+        desc = "win.focus=> split towards",
+      },
+    },
   },
   {
     "anuvyklack/windows.nvim",
     event = "BufWinEnter",
+    enabled = opt.prefer.focus_windows == "windows",
     dependencies = {
       "anuvyklack/middleclass",
       "anuvyklack/animation.nvim",
@@ -741,11 +568,185 @@ return {
     opts = {},
     keys = {
       {
-        key_files .. "B",
+        kenv.buffer.telescope.scope,
         "<CMD>Telescope scope buffers<CR>",
         mode = "n",
         desc = "scope.buf=> view buffers",
       },
     },
+  },
+  {
+    "jyscao/ventana.nvim",
+    enabled = false,
+    cmd = {
+      "VentanaTranspose",
+      "VentanaShift",
+      "VentanaShiftMaintainLinear",
+    },
+    keys = {
+      {
+        key_win.ventana.transpose,
+        "<CMD>VentanaTranspose<CR>",
+        mode = "n",
+        desc = "win.vent=> transpose",
+      },
+      {
+        key_win.ventana.shift,
+        "<CMD>VentanaShift<CR>",
+        mode = "n",
+        desc = "win.vent=> shift",
+      },
+      {
+        key_win.ventana.linear_shift,
+        "<CMD>VentanaShiftMaintainLinear<CR>",
+        mode = "n",
+        desc = "win.vent=> linear shift",
+      },
+    },
+  },
+  {
+    "ghillb/cybu.nvim",
+    event = "VeryLazy",
+    branch = "main",
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+      "nvim-lua/plenary.nvim",
+    },
+    config = function(_, opts)
+      local mapx = vim.keymap.set
+      require("cybu").setup(opts)
+      mapx("n", "<C-S-h>", "<Plug>(CybuPrev)", { desc = "win.cybu=> previous" })
+      mapx("n", "<C-S-l>", "<Plug>(CybuNext)", { desc = "win.cybu=> next" })
+      mapx(
+        "i",
+        "<C-S-h>",
+        "<C-o><Plug>(CybuPrev)",
+        { desc = "win.cybu=> previous" }
+      )
+      mapx(
+        "i",
+        "<C-S-l>",
+        "<C-o><Plug>(CybuNext)",
+        { desc = "win.cybu=> next" }
+      )
+      mapx("n", "[b", "<Plug>(CybuPrev)", { desc = "win.cybu=> previous" })
+      mapx("n", "]b", "<Plug>(CybuNext)", { desc = "win.cybu=> next" })
+      mapx(
+        { "n", "v" },
+        "<c-s-tab>",
+        "<plug>(CybuLastusedPrev)",
+        { desc = "win.cybu=> [mru] previous" }
+      )
+      mapx(
+        { "n", "v" },
+        "<c-tab>",
+        "<plug>(CybuLastusedNext)",
+        { desc = "win.cybu=> [mru] next" }
+      )
+    end,
+    opts = {
+      position = {
+        relative_to = "win",
+        anchor = "topleft",
+        vertical_offset = 12,
+        horizontal_offset = 16,
+        max_win_height = 8,
+        max_win_width = 0.4,
+      },
+      style = {
+        path = "relative",
+        path_abbreviation = "shortened",
+        border = env.borders.alt,
+        separator = " :: ",
+        prefix = "󱃺",
+        padding = 6,
+        hide_buffer_id = false,
+        devicons = {
+          enabled = true,
+          colored = true,
+          truncate = true,
+        },
+      },
+      behavior = {
+        mode = {
+          default = {
+            switch = "immediate",
+            view = "rolling",
+          },
+          last_used = {
+            switch = "on_close",
+            view = "paging",
+          },
+          auto = {
+            view = "rolling",
+          },
+        },
+      },
+      display_time = 1600,
+      filter = {
+        unlisted = true,
+      },
+    },
+  },
+  {
+    "nvim-zh/colorful-winsep.nvim",
+    event = "BufWinEnter",
+    config = function(_, opts)
+      require("colorful-winsep").setup(opts)
+      winsep_disable_ft()
+    end,
+    opts = {
+      interval = 30,
+      no_exec_files = env.ft_ignore_list,
+      symbols = { "╍", "┋", "┏", "┓", "┗", "┛" },
+    },
+  },
+  {
+    "chrisgrieser/nvim-early-retirement",
+    config = function(_, opts)
+      require("early-retirement").setup(opts)
+    end,
+    opts = {
+      -- if a buffer has been inactive for this many minutes, close it
+      retirementAgeMins = 30,
+
+      -- filetypes to ignore
+      ignoredFiletypes = {},
+
+      -- ignore files matching this lua pattern; empty string disables this setting
+      ignoreFilenamePattern = "",
+
+      -- will not close the alternate file
+      ignoreAltFile = true,
+
+      -- minimum number of open buffers for auto-closing to become active. E.g.,
+      -- by setting this to 4, no auto-closing will take place when you have 3
+      -- or fewer open buffers. Note that this plugin never closes the currently
+      -- active buffer, so a number < 2 will effectively disable this setting.
+      minimumBufferNum = 4,
+
+      -- will ignore buffers with unsaved changes. If false, the buffers will
+      -- automatically be written and then closed.
+      ignoreUnsavedChangesBufs = true,
+
+      -- ignore non-empty buftypes, for example terminal buffers
+      ignoreSpecialBuftypes = true,
+
+      -- ignore visible buffers ("a" in `:buffers`). Buffers that are open in
+      -- a window or in a tab are considered visible by vim.
+      ignoreVisibleBufs = true,
+
+      -- ignore unloaded buffers. Session-management plugin often add buffers
+      -- to the buffer list without loading them.
+      ignoreUnloadedBufs = false,
+
+      -- Show notification on closing. Works with nvim-notify or noice.nvim
+      notificationOnAutoClose = true,
+
+      -- when a file is deleted, for example via an external program, delete the
+      -- associated buffer as well
+      deleteBufferWhenFileDeleted = true,
+    },
+    event = "VeryLazy",
   },
 }

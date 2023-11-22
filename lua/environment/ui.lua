@@ -1,73 +1,23 @@
-local toboolean = require("uutils.conversion").toboolean
 local env = {}
 
-function env.identify_highlight(hlgroup, link)
-  link = link or true
-  local labeled_hl = vim.api.nvim_get_hl(0, { name = hlgroup, link = link })
-  return labeled_hl.fg or labeled_hl.guifg
-end
-
---- formats the necessary field access and method calls to bring in well-defined
---- colors from the colorscheme Kanagawa. This will need to be remimplemented
---- in the future to accept other themes as well.This gets around an apparent function call
---- timing issue where the kanagawa.colors item is not yet accessible when the
---- definition is made. By using this function, you are effectively deferring the
---- evaluation of the color definition until it is directly accessed.
----
----@param opts table: Maps the item that is to be colored to a string of the
---- color that it should receive.
----@param scheme_target string: Identifies an item that is to be required in the
----sense of calling lua's require to bring the main definitions into focus.
-function env.colors(opts, scheme_target, scheme_cfg)
-  scheme_target = scheme_target or "kanagawa.colors"
-  scheme_cfg = scheme_cfg or {}
-  local function itemized_color(colorname)
-    local retval = require(scheme_target).setup(scheme_cfg).palette[colorname]
-    return retval
-  end
-
-  local retval = vim.tbl_map(itemized_color, opts)
-  return retval
-end
-
-function env.kanacolors(opts)
-  return env.colors(opts, "kanagawa.colors", { theme = "wave" })
-end
-
-env.accelerated_jk = {}
-env.accelerated_jk.enable = false
-env.tabout = {}
-env.tabout.enable = true
-env.numbertoggle = {}
-env.numbertoggle.enable = false
-env.houdini = {}
-env.houdini.enable = false
-
---------------------------------------------------------------------------------
+-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 -- UI: Borders
--- ===========
+-- >>>>>>>>>>>
 -- Spec is that the main border should be shadow. We want this to apply to all
 -- borders that are not made by mason or lazy, the package management tools.
--- Those receive the alt border, which is the double.
-env.borders = {}
-env.borders.main = "shadow"
-env.borders.alt = "solid"
--- env.borders.main_accent = "single"
-env.borders.main_accent =
-  { "🭽", "▔", "🭾", "▕", "🭿", "▁", "🭼", "▏" }
+-- Those receive the alt border. An accent border is also reserved for cases
+-- when the main border is not appropriately readable, typically because the
+-- window size is small.
+env.borders = {
+  main = "shadow",
+  alt = "solid",
+  main_accent = "single",
+  telescope = { "═", "┆", "═", "┆", "╒", "╕", "╛", "╘" },
+}
 
-env.telescope = {}
-env.telescope.theme = "ivy"
-
-env.bufferline = {}
-env.bufferline.tab_format = "slant"
-
-env.enable_vim_strict = false
-
-env.screensaver = {}
-env.screensaver.enabled = toboolean(os.getenv("NIGHTOWL_ENABLE_SCREENSAVER"))
-  or false
-env.screensaver.selections = { "treadmill", "epilepsy", "dvd" }
+env.telescope = {
+  theme = "ivy",
+}
 
 env.ft_ignore_list = {
   "oil",
@@ -94,12 +44,318 @@ env.ft_ignore_list = {
   "prompt",
 }
 
---------------------------------------------------------------------------------
--- UI: Colorscheme Options
--- ===========
-env.default_colorscheme = "kanagawa"
-env.colorscheme = {}
+-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+-- Lualine: icons and other themes
+-- <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-env.lualine_theme = "auto" -- env.default_colorscheme
+env.icons = {
+  actions = {
+    quickfix = "󱍔",
+    refactor = "󱐌",
+    source = "󰿨",
+    combined = "󰴖", -- used when combine is set to true or as a fallback when there is no action kind
+  },
+  lualine = {
+    mode = {
+      ["NORMAL"] = "󰩷 ",
+      ["INSERT"] = "󰟵 ",
+      ["VISUAL"] = "󰠡 ",
+      ["REPLACE"] = " ",
+      ["O-PENDING"] = "󱖲 ",
+      ["BLOCK"] = "󰙟 ",
+      ["LINE"] = "󰘤 ",
+      ["EX"] = "󱐌 ",
+      ["TERMINAL"] = " ",
+      ["COMMAND"] = " ",
+      ["SHELL"] = " ",
+      ["CONFIRM"] = "󱔳 ",
+    },
+  },
+  kinds = {
+    Array = "󰅪 ",
+    Boolean = " ",
+    CaseStatement = "󰚔 ",
+    Class = " ",
+    Codeium = "󰆨 ",
+    Color = "󱠓 ",
+    Control = " ",
+    Collapsed = "󰘤 ",
+    Constant = "󰳄 ",
+    Constructor = " ",
+    Copilot = " ",
+    Enum = " ",
+    EnumMember = " ",
+    Event = " ",
+    Field = "󰓼 ",
+    File = "󰈤 ",
+    Folder = "󰉖 ",
+    Function = "󰡱 ",
+    Interface = "󰸻 ",
+    Key = "󰷖 ",
+    Keyword = " ",
+    Method = "󰡱 ",
+    Module = " ",
+    Namespace = " ",
+    Null = "󰒅 ",
+    Number = "󰎠 ",
+    Object = "󰮄 ",
+    Operator = " ",
+    Package = " ",
+    Property = "󰓽 ",
+    Reference = "󰮳 ",
+    Snippet = "󱂕 ",
+    String = " ",
+    Struct = " ",
+    TabNine = "󱤬 ",
+    Text = "󰪸 ",
+    TypeParameter = " ",
+    Unit = " ",
+    Value = " ",
+    Variable = " ",
+  },
+  diagnostic = {
+    Error = "󰳦 ",
+    Warn = "󱇏 ",
+    Hint = "󰳧 ",
+    Info = "󰳤 ",
+  },
+  modifications = {
+    modified = "󰷉 ",
+    readonly = "󱀰 ",
+    unnamed = "󱔘 ",
+    newfile = "󱪞 ",
+  },
+  gitdiff = {
+    added = "󰜄 ",
+    removed = "󰛲 ",
+    modified = "󰏭 ",
+  },
+  misc = {
+    Ok = "󰄵 ",
+  },
+  cursorsigns = {
+    head = {
+      "🂠",
+      "🂡",
+      "🂢",
+      "🂣",
+      "🂤",
+      "🂥",
+      "🂦",
+      "🂧",
+      "🂨",
+      "🂩",
+      "🂪",
+      "🂫",
+      "🂬",
+      "🂭",
+      "🂮",
+      "🂱",
+      "🂲",
+      "🂳",
+      "🂴",
+      "🂵",
+      "🂶",
+      "🂷",
+      "🂸",
+      "🂹",
+      "🂺",
+      "🂻",
+      "🂼",
+      "🂽",
+      "🂾",
+      "🂿",
+      "🃁",
+      "🃂",
+      "🃃",
+      "🃄",
+      "🃅",
+      "🃆",
+      "🃇",
+      "🃈",
+      "🃉",
+      "🃊",
+      "🃋",
+      "🃌",
+      "🃍",
+      "🃎",
+      "🃏",
+      "🃑",
+      "🃒",
+      "🃓",
+      "🃔",
+      "🃕",
+      "🃖",
+      "🃗",
+      "🃘",
+      "🃙",
+      "🃚",
+      "🃛",
+      "🃜",
+      "🃝",
+      "🃞",
+      "🃟",
+    },
+    body = {
+      "🂠",
+      "🂡",
+      "🂢",
+      "🂣",
+      "🂤",
+      "🂥",
+      "🂦",
+      "🂧",
+      "🂨",
+      "🂩",
+      "🂪",
+      "🂫",
+      "🂬",
+      "🂭",
+      "🂮",
+      "🂱",
+      "🂲",
+      "🂳",
+      "🂴",
+      "🂵",
+      "🂶",
+      "🂷",
+      "🂸",
+      "🂹",
+      "🂺",
+      "🂻",
+      "🂼",
+      "🂽",
+      "🂾",
+      "🂿",
+      "🃁",
+      "🃂",
+      "🃃",
+      "🃄",
+      "🃅",
+      "🃆",
+      "🃇",
+      "🃈",
+      "🃉",
+      "🃊",
+      "🃋",
+      "🃌",
+      "🃍",
+      "🃎",
+      "🃏",
+      "🃑",
+      "🃒",
+      "🃓",
+      "🃔",
+      "🃕",
+      "🃖",
+      "🃗",
+      "🃘",
+      "🃙",
+      "🃚",
+      "🃛",
+      "🃜",
+      "🃝",
+      "🃞",
+      "🃟",
+    },
+    tail = {
+      "🂠",
+      "🂡",
+      "🂢",
+      "🂣",
+      "🂤",
+      "🂥",
+      "🂦",
+      "🂧",
+      "🂨",
+      "🂩",
+      "🂪",
+      "🂫",
+      "🂬",
+      "🂭",
+      "🂮",
+      "🂱",
+      "🂲",
+      "🂳",
+      "🂴",
+      "🂵",
+      "🂶",
+      "🂷",
+      "🂸",
+      "🂹",
+      "🂺",
+      "🂻",
+      "🂼",
+      "🂽",
+      "🂾",
+      "🂿",
+      "🃁",
+      "🃂",
+      "🃃",
+      "🃄",
+      "🃅",
+      "🃆",
+      "🃇",
+      "🃈",
+      "🃉",
+      "🃊",
+      "🃋",
+      "🃌",
+      "🃍",
+      "🃎",
+      "🃏",
+      "🃑",
+      "🃒",
+      "🃓",
+      "🃔",
+      "🃕",
+      "🃖",
+      "🃗",
+      "🃘",
+      "🃙",
+      "🃚",
+      "🃛",
+      "🃜",
+      "🃝",
+      "🃞",
+      "🃟",
+    },
+  },
+}
+
+-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+-- UI: Colorscheme Options
+-- <<<<<<<<<<<
+env.colorscheme = {
+  dark = "kanagawa",
+  light = "deepwhite",
+}
+
+env.padding = {
+  noice = { 2, 4 },
+}
+
+-- should probably go into a different file
+env.oil = {
+  init_columns = "succinct",
+  columns = {
+    extended = {
+      "icon",
+      "type",
+      "permissions",
+      "birthtime",
+      "atime",
+      "mtime",
+      "ctime",
+      "size",
+    },
+    succinct = {
+      "icon",
+      "type",
+      "ctime",
+      "size",
+    },
+  },
+}
 
 return env

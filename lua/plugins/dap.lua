@@ -1,3 +1,6 @@
+local kenv = require("environment.keys")
+local key_debug = kenv.debug
+
 return {
   {
     "mfussenegger/nvim-dap",
@@ -5,27 +8,31 @@ return {
       --- fancy UI for the debugger
       {
         "rcarriga/nvim-dap-ui",
-        dependencies = { "mfussenegger/nvim-dap" },
-      },
-      {
-        "niuiic/dap-utils.nvim",
-        dependencies = { "mfussenegger/nvim-dap" },
+        dependencies = {
+          "mfussenegger/nvim-dap",
+          {
+            "folke/neodev.nvim",
+            opts = function(_, opts)
+              opts.library = require("funsak.table").mopts({
+                plugins = {
+                  { "nvim-dap-ui" },
+                  types = true,
+                },
+              }, opts.library or {})
+            end,
+          },
+        },
       },
       -- virtual text for the debugger
-      {
-        "theHamsta/nvim-dap-virtual-text",
-        dependencies = { "mfussenegger/nvim-dap" },
-      },
+      { "theHamsta/nvim-dap-virtual-text" },
 
       -- which key integration
       {
         "folke/which-key.nvim",
         opts = {
           defaults = {
-            ["<leader>d"] = { name = "+debug" },
-            ["<leader>da"] = { name = "dap=> +adapters" },
-            -- TODO Add a few more of these baseline name mappings
-            -- directly onto the which-key configuration here.
+            [key_debug:leader()] = { name = "::debug::" },
+            [key_debug.adapters] = { name = "::debug.dap=> adapters::" },
           },
         },
       }, -- mason.nvim integration
@@ -43,6 +50,9 @@ return {
           ensure_installed = {
             -- Update this to ensure that you have the debuggers for the langs you want
           },
+        },
+        dependencies = {
+          "williamboman/mason.nvim",
         },
       },
       {
@@ -67,19 +77,89 @@ return {
       "mfussenegger/nvim-dap",
       "nvim-treesitter/nvim-treesitter",
     },
+    build = ":TSInstall dap_repl",
   },
   {
     "andrewferrier/debugprint.nvim",
-    event = "LspAttach",
+    event = "VeryLazy",
     opts = {
-      create_keymaps = false,
+      create_keymaps = true,
+      move_to_debugline = true,
     },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   {
     "andythigpen/nvim-coverage",
+    event = "VeryLazy",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = true,
-    event = "LspAttach",
+  },
+  {
+    "rareitems/printer.nvim",
+    event = "VeryLazy",
+    config = function(_, opts)
+      require("printer").setup(opts)
+    end,
+    opts = {
+      keymap = key_debug.printer,
+      behavior = "insert_below",
+    },
+  },
+  {
+    "daic0r/dap-helper.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+      "mfussenegger/nvim-dap",
+    },
+    config = function(_, opts)
+      require("dap-helper").setup()
+    end,
+  },
+  {
+    "theHamsta/nvim-dap-virtual-text",
+    dependencies = { "mfussenegger/nvim-dap" },
+    config = function(_, opts)
+      require("nvim-dap-virtual-text").setup(opts)
+    end,
+    opts = {
+      enabled = true,
+      enabled_commands = true,
+      highlight_new_as_changed = true,
+      commented = false,
+      all_references = false,
+    },
+  },
+  {
+    "ofirgall/goto-breakpoints.nvim",
+    dependencies = { "mfussenegger/nvim-dap" },
+    config = function(_, opts) end,
+    opts = {},
+    keys = {
+      {
+        kenv.shortcut.diagnostics.breakpoint.next,
+        function()
+          require("goto-breakpoints").next()
+        end,
+        mode = "n",
+        desc = "dap=> next breakpoint",
+      },
+      {
+        kenv.shortcut.diagnostics.breakpoint.previous,
+        function()
+          require("goto-breakpoints").prev()
+        end,
+        mode = "n",
+        desc = "dap=> next breakpoint",
+      },
+      {
+        kenv.shortcut.diagnostics.breakpoint.stopped,
+        function()
+          require("goto-breakpoints").stopped()
+        end,
+        mode = "n",
+        desc = "dap=> next breakpoint",
+      },
+    },
   },
 }

@@ -1,33 +1,14 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local env = require("environment.ui")
 local aienv = require("environment.ai")
-local enb = aienv.enablements(aienv.enabled)
-local notify_on_startup = require("environment.ai").status_notify_on_startup
+local enb = aienv.enabled
+local notify_on_startup = aienv.status_notify_on_startup
 
-local stems = require("environment.keys").stems
-local key_ai = stems.base.ai
-local key_copilot = stems.copilot
-local key_hfllm = stems.hfllm
-local key_neural = stems.neural
-local key_chatgpt = stems.chatgpt
-local key_neoai = stems.neoai
-local key_codegpt = stems.codegpt
-local key_navi = stems.navi
-local key_rgpt = stems.rgpt
-local key_cmpai = stems.cmp_ai
-local key_explain_it = stems.explain_it
-local key_tabnine = stems.tabnine
-local key_doctor = stems.doctor
-local key_llm = stems.llm
-local key_backseat = stems.backseat
-local key_wtf = stems.wtf
-local key_prompter = stems.prompter
-local key_gptnvim = stems.gptnvim
-local key_ollero = stems.ollero
+local kenv = require("environment.keys").ai
 
 -- show a menu, but only if the user has selected the appropriate option.
--- This menu is supposed to inform the user which plugins might send -- their code off to an external service for analysis.
-
+-- This menu is supposed to inform the user which plugins might send
+-- their code off to an external service for analysis.
 local function notify_agents()
   vim.notify(
     string.format(
@@ -35,7 +16,7 @@ local function notify_agents()
 AI Plugin Status:
 -----------------
 
-  -> *huggingface*: %s
+  -> *llm[llm-ls]*: %s
   -> *codeium*: %s
   -> *tabnine*: %s (cmp-source: %s)
   -> *cmp_ai*: %s
@@ -47,7 +28,7 @@ AI Plugin Status:
   -> **ReviewGPT**: %s
   -> **naVi** %s
   -> **explain-it** %s
-  -> **llm**: %s
+  -> **gllm**: %s
   -> **backseat**: %s
   -> **wtf**: %s
   -> **prompter**: %s
@@ -62,7 +43,7 @@ AI Plugin Status:
 **plugin uses proprietary, non-free, non-open, or non-libre backend (namely ChatGPT)**
 ***plugin has both of the above listed attributes***
 ]],
-      enb.hfllm.enable,
+      enb.llm.enable,
       enb.codeium.enable,
       enb.tabnine.enable,
       enb.cmp_tabnine.enable,
@@ -75,8 +56,7 @@ AI Plugin Status:
       enb.rgpt.enable,
       enb.navi.enable,
       enb.explain_it.enable,
-      enb.llm.enable,
-      enb.doctor.enable,
+      enb.gllm.enable,
       enb.backseat.enable,
       enb.wtf.enable,
       enb.prompter.enable,
@@ -102,7 +82,7 @@ vim.api.nvim_create_autocmd({ "VimEnter" }, {
   callback = function()
     vim.keymap.set(
       { "n" },
-      key_ai .. "N",
+      kenv:leader() .. "N",
       notify_agents,
       { desc = "ai.status=> notify agent statuses", remap = false }
     )
@@ -114,50 +94,98 @@ return {
     "folke/which-key.nvim",
     opts = {
       defaults = {
-        [key_ai] = { name = "+ai" },
-        [key_neoai] = { name = "ai=> +neoai" },
-        [key_chatgpt] = { name = "ai=> +chatgpt (openai original)" },
-        [key_copilot] = { name = "ai=> +copilot" },
-        [key_hfllm] = { name = "ai=> +huggingface" },
-        [key_codegpt] = { name = "ai=> +codegpt" },
-        [key_neural] = { name = "ai=> +neural" },
-        [key_rgpt] = { name = "ai=> +rgpt" },
-        [key_navi] = { name = "ai=> +navi" },
-        [key_cmpai] = { name = "ai=> +cmp-ai" },
-        [key_tabnine] = { name = "ai=> +tabnine" },
-        [key_llm] = { name = "ai=> +llms" },
-        [key_explain_it] = { name = "ai=> +explain it" },
-        [key_doctor] = { name = "ai=> the doc is in" },
-        -- TODO Add a few more of these baseline name mappings
+        [kenv:leader()] = { name = "::ai & ml::" },
+        [kenv.neoai:leader()] = { name = "::ai=> +neoai" },
+        [kenv.chatgpt:leader()] = { name = "::ai=> +chatgpt (openai original)" },
+        [kenv.copilot:leader()] = { name = "::ai=> +copilot" },
+        [kenv.llm] = { name = "::ai=> +huggingface" },
+        [kenv.codegpt] = { name = "::ai=> +codegpt" },
+        [kenv.neural] = { name = "::ai=> +neural" },
+        [kenv.rgpt] = { name = "::ai=> +rgpt" },
+        [kenv.navi:leader()] = { name = "::ai=> +navi" },
+        [kenv.cmp_ai] = { name = "::ai=> +cmp-ai" },
+        [kenv.tabnine:leader()] = { name = "::ai=> +tabnine" },
+        [kenv.codeium:leader()] = { name = "::ai=> +codeium" },
+        [kenv.gllm:leader()] = { name = "::ai=> +llms" },
+        [kenv.explain_it:leader()] = { name = "::ai=> +explain it" },
+        -- TODO: Add a few more of these baseline name mappings
         -- directly onto the which-key configuration here.
       },
     },
   },
   {
-    "jcdickinson/codeium.nvim",
+    "jcdickinson/http.nvim",
+    enabled = enb.codeium.enable or enb.navi.enable,
+    build = "cargo build --workspace --release",
+  },
+  {
+    "Exafunction/codeium.nvim",
+    enabled = enb.codeium.enable,
     dependencies = {
+      { "nvim-lua/plenary.nvim" },
+      {
+        "hrsh7th/nvim-cmp",
+        opts = function(_, opts)
+          opts.sources = vim.tbl_extend("force", {
+            { name = "codeium", group_index = 1 },
+          }, opts.sources or {})
+        end,
+      },
       {
         "jcdickinson/http.nvim",
         build = "cargo build --workspace --release",
       },
-      "nvim-lua/plenary.nvim",
     },
-    cmd = "Codeium",
-    enabled = enb.codeium.enable,
+    event = "BufEnter",
+    config = function(_, opts)
+      require("codeium").setup(opts)
+    end,
+    init = function()
+      vim.keymap.set(
+        "i",
+        kenv.codeium:accept() or "<C-;>",
+        function()
+          return vim.fn["codeium#Accept"]()
+        end,
+        { expr = true, desc = "ai.codeium=> accept suggestion", buffer = true }
+      )
+    end,
+    opts = {},
+    keys = {
+      {
+        kenv.codeium.disable,
+        "<CMD>CodeiumDisable<CR>",
+        mode = "n",
+        desc = "ai.codeium=> disable",
+      },
+      {
+        kenv.codeium.enable,
+        "<CMD>CodeiumEnable<CR>",
+        mode = "n",
+        desc = "ai.codeium=> enable",
+      },
+      {
+        kenv.codeium.authenticate,
+        "<CMD>Codeium Auth<CR>",
+        mode = "n",
+        desc = "ai.codeium=> authenticate",
+      },
+    },
   },
   {
     "huggingface/llm.nvim",
-    name = aienv.hf.llm.name or "llms",
+    name = aienv.hf.llm.name or "llm",
     opts = {
       model = aienv.hf.llm.model or "bigcode/starcoder",
+      model_eos = "<|endoftext|>",
       query_params = aienv.hf.llm.params or {
         max_new_tokens = 60,
-        temperature = 0.2,
+        temperature = 0.3,
         top_p = 0.95,
-        stop_token = "<|endoftext|>",
+        stop_tokens = nil,
       },
-      accept_keymap = "<C-=>",
-      dismiss_keymap = "<C-->",
+      accept_keymap = kenv:accept(),
+      dismiss_keymap = kenv:cancel(),
       fim = aienv.hf.llm.fim or {
         enabled = true,
         prefix = "<fim_prefix>",
@@ -166,28 +194,17 @@ return {
       },
       lsp = aienv.hf.llm.lsp
         or {
-          enabled = true,
           bin_path = vim.fs.normalize(
             vim.fs.joinpath(vim.fn.stdpath("data") .. "/llm_nvim/bin")
           ),
         },
+      context_window = 8192,
     },
-    enabled = enb.hfllm.enable,
-    cmd = { "HugMyFace", "LLMToggleAutoSuggest" },
-    init = function()
-      vim.api.nvim_create_user_command("HugMyFace", function()
-        require("lmm.completion").complete()
-      end, {})
-    end,
+    enabled = enb.llm.enable,
+    cmd = { "LLMToggleAutoSuggest" },
     keys = {
       {
-        key_hfllm .. "F",
-        "<CMD>LLMToggleAutoSuggest<CR>",
-        mode = "n",
-        desc = "ai.llm=> toggle insert mode autosuggest",
-      },
-      {
-        key_hfllm .. "a",
+        kenv.llm,
         "<CMD>LLMToggleAutoSuggest<CR>",
         mode = "n",
         desc = "ai.llm=> toggle insert mode autosuggest",
@@ -197,31 +214,57 @@ return {
   {
     "zbirenbaum/copilot.lua",
     enabled = enb.copilot.enable,
-    module = enb.copilot.enable,
     cmd = "Copilot",
-    -- event = { "InsertEnter" },
-    opts = { suggestion = { enabled = true }, panel = { enabled = true } },
+    opts = {
+      suggestion = {
+        enabled = false,
+        auto_trigger = true,
+        debounce = 150,
+        keymap = {
+          accept = kenv.copilot:accept(),
+          dismiss = kenv.copilot:cancel(),
+          accept_word = false,
+          accept_line = false,
+          next = "<M-]>",
+          prev = "<M-[>",
+        },
+      },
+      panel = {
+        enabled = false,
+        auto_trigger = true,
+        debounce = 150,
+        keymap = {
+          accept = "<C-:>",
+          open = "<C-M-CR>",
+          refresh = "gr",
+        },
+        layout = {
+          position = "top",
+          ratio = 0.36,
+        },
+      },
+    },
     keys = {
       {
-        key_copilot .. "a",
+        kenv.copilot.authenticate,
         "<CMD>Copilot auth<CR>",
         mode = "n",
         desc = "ai.copilot=> authenticate",
       },
       {
-        key_copilot .. "t",
+        kenv.copilot.toggle,
         "<CMD>Copilot toggle<CR>",
         mode = "n",
         desc = "ai.copilot=> toggle",
       },
       {
-        key_copilot .. "s",
+        kenv.copilot.status,
         "<CMD>Copilot status<CR>",
         mode = "n",
         desc = "ai.copilot=> status",
       },
       {
-        key_copilot .. "d",
+        kenv.copilot.detach,
         "<CMD>Copilot detach<CR>",
         mode = "n",
         desc = "ai.copilot=> detach",
@@ -230,27 +273,42 @@ return {
   },
   {
     "zbirenbaum/copilot-cmp",
-    enabled = enb.copilot.enable,
+    enabled = require("lazyvim.util").has("copilot.lua"),
     dependencies = {
-      "zbirenbaum/copilot.lua",
+      {
+        "hrsh7th/nvim-cmp",
+        opts = function(_, opts)
+          opts.sources = vim.tbl_extend("force", {
+            { name = "copilot", group_index = 1 },
+          }, opts.sources or {})
+        end,
+      },
+      { "zbirenbaum/copilot.lua" },
     },
   },
   {
     "tzachar/cmp-ai",
+    event = "VeryLazy",
     enabled = enb.cmp_ai.enable,
     dependencies = {
+      {
+        "hrsh7th/nvim-cmp",
+        opts = function(_, opts)
+          opts.sources = vim.tbl_extend("force", {
+            { name = "cmp_ai", group_index = 1 },
+          }, opts.sources or {})
+        end,
+      },
       "nvim-lua/plenary.nvim",
-      -- "hrsh7th/nvim-cmp",
     },
-    event = "VeryLazy",
+    opts = {
+      max_lines = 1000,
+      provider = "HF",
+      run_on_every_keystroke = true,
+      ignored_file_types = env.ft_ignore_list,
+    },
     config = function(_, opts)
-      require("cmp_ai.config"):setup(vim.tbl_deep_extend("force", {
-        max_lines = 1000,
-        provider = "HF",
-        -- notify = true,
-        run_on_every_keystroke = true,
-        ignored_file_types = {},
-      }, opts or {}))
+      require("cmp_ai.config"):setup(opts)
     end,
   },
   {
@@ -267,7 +325,7 @@ return {
     },
     keys = {
       {
-        key_rgpt .. "r",
+        kenv.rgpt,
         "<CMD>ReviewGPT review<CR>",
         mode = "n",
         desc = "ai.rgpt=> enable ai code review",
@@ -280,40 +338,40 @@ return {
     build = "./dl_binaries.sh",
     keys = {
       {
-        key_tabnine .. "s",
+        kenv.tabnine.status,
         "<CMD>TabnineStatus<CR>",
         mode = "n",
-        desc = "ai.nine=> tabnine status",
+        desc = "ai.nine=> status",
       },
       {
-        key_tabnine .. "e",
+        kenv.tabnine.enable,
         "<CMD>TabnineEnable<CR>",
         mode = "n",
-        desc = "ai.nine=> enable tabnine",
+        desc = "ai.nine=> enable",
       },
       {
-        key_tabnine .. "q",
+        kenv.tabnine.disable,
         "<CMD>TabnineDisable<CR>",
         mode = "n",
-        desc = "ai.nine=> disable tabnine",
+        desc = "ai.nine=> disable",
       },
       {
-        key_tabnine .. "9",
+        kenv.tabnine.toggle,
         "<CMD>TabnineToggle<CR>",
         mode = "n",
-        desc = "ai.nine=> tabnine status",
+        desc = "ai.nine=> toggle",
       },
       {
-        key_tabnine .. "c",
+        kenv.tabnine.chat,
         "<CMD>TabnineChat<CR>",
         mode = "n",
-        desc = "ai.nine=> tabnine status",
+        desc = "ai.nine=> chat",
       },
     },
     opts = {
       disable_auto_comment = true,
-      accept_keymap = "<A-=>",
-      dismiss_keymap = "<A-->",
+      accept_keymap = kenv.tabnine:accept(),
+      dismiss_keymap = kenv.tabnine:cancel(),
       debounce_ms = 800,
       suggestion_color = { link = "@punctuation" },
       exclude_filetypes = {
@@ -335,11 +393,18 @@ return {
     dependencies = {
       {
         "tzachar/cmp-tabnine",
-        enabled = enb.cmp_tabnine.enable,
+        enabled = require("lazyvim.util").has("tabnine-nvim"),
         build = "./install.sh",
         dependencies = {
           "codota/tabnine-nvim",
-          -- "hrsh7th/nvim-cmp",
+          {
+            "hrsh7th/nvim-cmp",
+            opts = function(_, opts)
+              opts.sources = vim.tbl_extend("force", {
+                { name = "tabnine", group_index = 1 },
+              }, opts.sources or {})
+            end,
+          },
         },
       },
     },
@@ -354,7 +419,7 @@ return {
     cmd = { "CodeGPT" },
     keys = {
       {
-        key_codegpt,
+        kenv.codegpt,
         "<CMD>CodeGPT<CR>",
         mode = { "n" },
         desc = "ai.codegpt=> open interface",
@@ -368,7 +433,7 @@ return {
     cmd = "Neural",
     keys = {
       {
-        key_neural,
+        kenv.neural,
         "<CMD>Neural<CR>",
         mode = { "n", "v" },
         desc = "ai.neural=> chatgpt neural interface",
@@ -393,34 +458,28 @@ return {
     },
     keys = {
       {
-        key_chatgpt .. "g",
+        kenv.chatgpt.open_interface,
         "<CMD>ChatGPT<CR>",
         mode = "n",
         desc = "ai.chatgpt=> open interface",
       },
       {
-        key_chatgpt .. "r",
+        kenv.chatgpt.roles,
         "<CMD>ChatGPTActAs<CR>",
         mode = "n",
         desc = "ai.chatgpt=> role prompts",
       },
       {
-        key_chatgpt .. "e",
+        kenv.chatgpt.edit,
         "<CMD>ChatGPTEditWithInstructions<CR>",
         mode = "n",
         desc = "ai.chatgpt=> edit with instructions",
       },
       {
-        key_chatgpt .. "a",
+        kenv.chatgpt.code_actions,
         "<CMD>ChatGPTCustomCodeAction<CR>",
         mode = "n",
         desc = "ai.chatgpt=> code actions",
-      },
-      {
-        key_ai .. "G",
-        "<CMD>ChatGPT<CR>",
-        mode = "n",
-        desc = "ai.chatgpt=> open interface",
       },
     },
   },
@@ -471,11 +530,13 @@ return {
         end,
       },
       mappings = { ["select_up"] = "<C-k>", ["select_down"] = "<C-j>" },
-      open_api_key_env = "OPENAI_API_KEY",
+      open_ai = {
+        api_key = { env = "OPENAI_API_KEY" },
+      },
       shortcuts = {
         {
           name = "textify",
-          key = key_neoai .. "t",
+          key = kenv.neoai.textify,
           desc = "ai.neoai=> fix text (textify)",
           use_context = true,
           prompt = function()
@@ -490,7 +551,7 @@ return {
         },
         {
           name = "gitcommit",
-          key = key_neoai .. "g",
+          key = kenv.neoai.gitcommit,
           desc = "ai.neoai=> generate git commit message",
           use_context = false,
           prompt = function()
@@ -505,7 +566,7 @@ return {
         },
         {
           name = "professional email (affirm)",
-          key = key_neoai .. "ma",
+          key = kenv.neoai.email.affirm,
           desc = "ai.neoai=> generate professional email (affirm)",
           use_context = true,
           prompt = function()
@@ -524,7 +585,7 @@ return {
         },
         {
           name = "professional email (decline)",
-          key = key_neoai .. "md",
+          key = kenv.neoai.email.decline,
           desc = "ai.neoai=> generate professional email (decline)",
           use_context = true,
           prompt = function()
@@ -545,7 +606,7 @@ return {
         },
         {
           name = "professional email (cold-contact)",
-          key = key_neoai .. "mc",
+          key = kenv.neoai.email.cold,
           desc = "ai.neoai=> generate professional email (cold-contact)",
           use_context = true,
           prompt = function()
@@ -567,7 +628,7 @@ return {
         },
         {
           name = "The Spacebar (from Outline)",
-          key = key_neoai .. "so",
+          key = kenv.neoai.blog.new,
           desc = "ai.neoai=> blog post for 'The Spacebar'",
           use_context = true,
           prompt = function()
@@ -588,7 +649,7 @@ return {
         },
         {
           name = "The Spacebar (from Existing)",
-          key = key_neoai .. "st",
+          key = kenv.neoai.blog.existing,
           desc = "ai.neoai=> polish blog post rough draft for 'The Spacebar'",
           use_context = true,
           prompt = function()
@@ -659,37 +720,31 @@ return {
     },
     keys = {
       {
-        key_navi .. "a",
+        kenv.navi.append,
         "<cmd>lua require('navi').Append()<cr>",
         mode = "n",
         desc = "ai.navi=> append",
       },
       {
-        key_navi .. "e",
+        kenv.navi.edit,
         "<cmd>lua require('navi').Edit()<cr>",
         mode = "v",
         desc = "ai.navi=> edit",
       },
       {
-        key_navi .. "b",
+        kenv.navi.bufedit,
         "<cmd>lua require('navi').EditBuffer()<cr>",
         mode = "n",
         desc = "ai.navi=> edit buffer",
       },
       {
-        key_navi .. "r",
+        kenv.navi.review,
         "<cmd>lua require('navi').Review()<cr>",
         mode = "v",
         desc = "ai.navi=> review",
       },
       {
-        key_navi .. "x",
-        "<cmd>lua require('navi').Explain()<cr>",
-        mode = "v",
-        desc = "ai.navi=> explain",
-      },
-      {
-        key_navi .. "c",
+        kenv.navi.chat,
         "<cmd>lua require('navi').Chat()<cr>",
         mode = "n",
         desc = "ai.navi=> chat",
@@ -725,7 +780,7 @@ return {
     end,
     keys = {
       {
-        key_explain_it .. "x",
+        kenv.explain_it.it,
         function()
           require("explain-it").call_gpt({})
         end,
@@ -733,7 +788,7 @@ return {
         desc = "ai.xplain=> explain it",
       },
       {
-        key_explain_it .. "X",
+        kenv.explain_it.buffer,
         function()
           vim.ui.input({ prompt = "prompt: " }, function(input)
             require("explain-it").call_gpt(
@@ -748,20 +803,13 @@ return {
     },
   },
   {
-    "iagoleal/doctor.nvim",
-    enabled = enb.doctor.enable,
-    cmd = "TalkToTheDoctor",
-    keys = {
-      {
-        key_doctor,
-        "<CMD>TalkToTheDoctor<CR>",
-        mode = "n",
-        desc = "ai.doc=> talk to a fake doctor",
-      },
-    },
-  },
-  {
+    -- we have a name conflict on this plugin, due to the fact that HF renamed
+    -- their llm plugin to just llm like this one. We are making a deliberate
+    -- choice to try and minimize the amount of naming separation we have
+    -- between the two, so that more commands/keys are accessible under the llm
+    -- semantic-level
     "gsuuon/llm.nvim",
+    name = "gllm",
     cmd = {
       "Llm",
       "LlmSelect",
@@ -772,18 +820,19 @@ return {
       "LlmShow",
     },
     opts = function(_, opts)
-      opts.prompts = require("llm.util").module.autoload("prompt_library")
+      opts.prompts = opts.prompts
+        or require("gllm.util").module.autoload("prompt_library")
     end,
-    enabled = enb.llm.enable,
+    enabled = enb.gllm.enable,
     keys = {
       {
-        key_llm .. "L",
+        kenv.gllm.default,
         "<CMD>Llm<CR>",
         mode = "n",
         desc = "ai.llm=> use default llm model",
       },
       {
-        key_llm .. "l",
+        kenv.gllm.prompt,
         function()
           vim.ui.input({ prompt = "select llm prompt: " }, function(input)
             vim.cmd(("llm %s"):format(input))
@@ -796,7 +845,6 @@ return {
   },
   {
     "james1236/backseat.nvim",
-    event = "VeryLazy",
     cmd = { "Backseat", "BackseatAsk", "BackseatClear", "BackseatClearLine" },
     enabled = enb.backseat.enable,
     opts = {
@@ -809,25 +857,25 @@ return {
     },
     keys = {
       {
-        key_backseat .. "b",
+        kenv.backseat.review,
         "<CMD>Backseat<CR>",
         mode = "n",
         desc = "ai.backseat=> review",
       },
       {
-        key_backseat .. "a",
+        kenv.backseat.ask,
         "<CMD>BackseatAsk<CR>",
         mode = "n",
         desc = "ai.backseat=> ask",
       },
       {
-        key_backseat .. "c",
+        kenv.backseat.clear,
         "<CMD>BackseatClear<CR>",
         mode = "n",
         desc = "ai.backseat=> clear ai notes",
       },
       {
-        key_backseat .. "l",
+        kenv.backseat.clearline,
         "<CMD>BackseatClearLine<CR>",
         mode = "n",
         desc = "ai.backseat=> clear line's ai notes",
@@ -840,7 +888,6 @@ return {
     dependencies = {
       "MunifTanjim/nui.nvim",
     },
-    event = "VeryLazy",
     cmd = { "Wtf", "WtfSearch" },
     opts = {
       openai_model_id = "gpt-4",
@@ -848,20 +895,20 @@ return {
     },
     keys = {
       {
-        key_wtf .. "a",
-        mode = { "n" },
+        kenv.wtf.debug,
         function()
           require("wtf").ai()
         end,
-        desc = "Debug diagnostic with AI",
+        mode = { "n" },
+        desc = "ai.wtf=> debug diagnostic",
       },
       {
-        mode = { "n" },
-        key_wtf .. "s",
+        kenv.wtf.search,
         function()
           require("wtf").search()
         end,
-        desc = "Search diagnostic with Google",
+        mode = { "n" },
+        desc = "ai.wtf=> google diagnostic",
       },
     },
   },
@@ -879,26 +926,26 @@ return {
     end,
     keys = {
       {
-        key_prompter .. "r",
+        kenv.prompter.replace,
         "<CMD>PrompterReplace<CR>",
         mode = "n",
         desc = "ai.prompt=> replace prompt",
       },
       {
-        key_prompter .. "e",
+        kenv.prompter.edit,
         "<CMD>PrompterEdit<CR>",
         mode = "n",
         desc = "ai.prompt=> edit prompt",
       },
       {
-        key_prompter .. "c",
+        kenv.prompter.continue,
         "<CMD>PrompterContinue<CR>",
         mode = "n",
         desc = "ai.prompt=> continue prompt",
       },
       {
-        key_prompter .. "b",
-        "<CMD>PrompterReplace<CR>",
+        kenv.prompter.browser,
+        "<CMD>PrompterBrowser<CR>",
         mode = "n",
         desc = "ai.prompt=> browser prompt",
       },
@@ -907,11 +954,35 @@ return {
   {
     "joshuavial/aider.nvim",
     enabled = enb.aider.enable,
-    cmd = { "OpenAider" },
-    opts = {},
+    cmd = { "AiderOpen", "AiderBackground" },
+    opts = {
+      default_bindings = false,
+      auto_manage_context = true,
+    },
     config = function(_, opts)
-      require("aider").setup(opts)
+      local aider = require("aider")
+      aider.setup(opts)
     end,
+    keys = {
+      {
+        kenv.aider.noauto,
+        "<CMD>lua AiderOpen(AIDER_NO_AUTO_COMMITS=1, 'editor')<CR>",
+        mode = "n",
+        desc = "ai.aider=> no auto commits",
+      },
+      {
+        kenv.aider.float,
+        "<CMD>lua AiderOpen()<CR>",
+        mode = "n",
+        desc = "ai.aider=> floating window",
+      },
+      {
+        kenv.aider.three,
+        "<CMD>lua AiderOpen(AIDER_NO_AUTO_COMMITS=1 aider -3, 'editor')<CR>",
+        mode = "n",
+        desc = "ai.aider=> model 3.5",
+      },
+    },
   },
   {
     "juliusolson/gpt.nvim",
@@ -924,59 +995,48 @@ return {
   {
     "thmsmlr/gpt.nvim",
     enabled = enb.gptnvim.enable,
-    config = function(_, opts) end,
-    opts = {},
-    keys = {
-      {
-        key_gptnvim .. "r",
-        function()
-          require("gpt").replace()
-        end,
-        mode = "v",
-        desc = "ai.gpt=> replace selected",
-        silent = true,
-        noremap = true,
-      },
-      {
-        key_gptnvim .. "v",
-        function()
-          require("gpt").visual_prompt()
-        end,
-        mode = "v",
-        desc = "ai.gpt=> visual prompt",
-        silent = false,
-        noremap = true,
-      },
-      {
-        key_gptnvim .. "p",
-        function()
-          require("gpt").prompt()
-        end,
-        mode = "i",
-        desc = "ai.gpt=> prompt",
-        silent = true,
-        noremap = true,
-      },
-      {
-        key_gptnvim .. "c",
-        function()
-          require("gpt").cancel()
-        end,
-        mode = "n",
-        desc = "ai.gpt=> cancel",
-        silent = true,
-        noremap = true,
-      },
-      {
-        key_gptnvim .. "p",
-        function()
-          require("gpt").prompt()
-        end,
-        mode = "n",
-        desc = "ai.gpt=> prompt",
-        silent = true,
-        noremap = true,
-      },
+    config = function(_, opts)
+      require("gpt").setup(opts)
+      local kopts = function(op)
+        return vim.tbl_deep_extend(
+          "force",
+          { silent = true, noremap = true },
+          op
+        )
+      end
+      vim.keymap.set(
+        "v",
+        kenv.gptnvim.replace,
+        require("gpt").replace,
+        kopts({ desc = "ai.gpt=> replace selected" })
+      )
+      vim.keymap.set(
+        "v",
+        kenv.gptnvim.visual_prompt,
+        require("gpt").visual_prompt,
+        kopts({ desc = "ai.gpt=> visual prompt" })
+      )
+      -- vim.keymap.set(
+      --   "i",
+      --   kenv.gptnvim.prompt,
+      --   require("gpt").prompt,
+      --   kopts({ desc = "ai.gpt=> prompt" })
+      -- )
+      vim.keymap.set(
+        "n",
+        kenv.gptnvim.cancel,
+        require("gpt").cancel,
+        kopts({ desc = "ai.gpt=> cancel" })
+      )
+      vim.keymap.set(
+        "n",
+        kenv.gptnvim.prompt,
+        require("gpt").prompt,
+        kopts({ desc = "ai.gpt=> prompt" })
+      )
+    end,
+    opts = {
+      api_key = vim.env.OPENAI_API_KEY,
     },
   },
   {
@@ -989,16 +1049,46 @@ return {
   {
     "marco-souza/ollero.nvim",
     enabled = enb.ollero.enable,
-    config = function(_, opts) end,
+    config = function(_, opts)
+      require("ollero").setup()
+    end,
     opts = {},
     keys = {
       {
-        key_ollero .. "o",
+        kenv.ollero,
         function()
           require("ollero.nvim").open()
         end,
         mode = "n",
         desc = "ai.ollero=> open",
+      },
+    },
+  },
+  {
+    "David-Kunz/gen.nvim",
+    enabled = enb.gen.enable,
+    config = function(_, opts) end,
+    opts = {},
+    keys = {
+      {
+        kenv.gen.gen,
+        "<CMD>Gen<CR>",
+        mode = { "n", "v" },
+        desc = "ai.gen=> text generation",
+      },
+      {
+        kenv.gen.prompts,
+        function()
+          vim.notify(vim.inspect(require("gen").prompts))
+        end,
+        mode = { "n", "v" },
+        desc = "ai.gen=> text generation",
+      },
+      {
+        kenv.gen.model,
+        function() end,
+        mode = { "n", "v" },
+        desc = "ai.gen=> text generation",
       },
     },
   },

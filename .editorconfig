@@ -1,5 +1,6 @@
 root = true
 
+#
 [*]
 end_of_line = lf
 insert_final_newline = true
@@ -7,7 +8,7 @@ trim_trailing_whitespace=true
 
 # -----------------------------------------------------------------------------
 # Org and Neorg: Organizational Tools
-# -----
+# -----------------------------------
 [*.{org,norg}]
 indent_style = space
 indent_size = 2
@@ -15,14 +16,15 @@ max_line_length = 80
 
 # -----------------------------------------------------------------------------
 # Markdown Derivative Filetypes
-# -----
+# -----------------------------
 [*.{md,qmd}]
 indent_style = space
 indent_size = 2
-max_line_length = 88
+max_line_length = 80
 
 # -----------------------------------------------------------------------------
 # Lua and Other Programming Languages
+# -----------------------------------
 [*.lua]
 indent_style = space
 indent_size = 2
@@ -30,10 +32,10 @@ max_line_length = 80
 
 # -----------------------------------------------------------------------------
 # Main Programming Languages
-# - rust
-# - c++
-# - python
-# -----
+# --------------------------
+# * rust
+# * c++
+# * python
 [*.rs]
 indent_style = unset
 indent_size = unset
@@ -52,8 +54,20 @@ indent_style = space
 indent_size = 4
 
 # -----------------------------------------------------------------------------
-# HTML, CSS, website tools
-# -----
+# html, css, website tools
+# ------------------------
 [*.{html,css}]
 indent_style = space
 indent_size = 2
+
+# -----------------------------------------------------------------------------
+# JSON
+# ----
+[*.json]
+indent_style = space
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+max_line_length = 80

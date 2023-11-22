@@ -16,9 +16,9 @@ env.fullscreen = false
 env.preview = {
   -- default     = 'bat',           -- override the default previewer?
   -- default uses the 'builtin' previewer
-  border = "border", -- border|noborder, applies only to
+  border = "noborder", -- border|noborder, applies only to
   -- native fzf previewers (bat/cat/git/etc)
-  wrap = "nowrap", -- wrap|nowrap
+  wrap = "wrap", -- wrap|nowrap
   hidden = "nohidden", -- hidden|nohidden
   vertical = "down:45%", -- up|down:size
   horizontal = "right:60%", -- right|left:size
@@ -27,7 +27,7 @@ env.preview = {
   -- Only used with the builtin previewer:
   title = true, -- preview border title (file/buf)?
   title_pos = "right", -- left|center|right, title alignment
-  scrollbar = "border", -- `false` or string:'float|border'
+  scrollbar = "float", -- `false` or string:'float|border'
   -- float:  in-window floating border
   -- border: in-border chars (see below)
   scrolloff = "-2", -- float scrollbar offset from right
@@ -48,4 +48,8 @@ env.preview = {
     foldmethod = "manual",
   },
 }
+
+env.directory_switcher = {}
+env.directory_switcher.enable_commands = true
+
 return env

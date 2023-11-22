@@ -1,9 +1,13 @@
-local stems = require("environment.keys").stems
-local key_cbox = stems.cbox
-local key_cline = stems.cline
-local key_figlet = stems.figlet
-local key_editor = stems.base.editor
-local mopts = require("uutils.functional").mopts
+local env = require("environment.ui").borders
+local key_editor = require("environment.keys").editor
+local key_cbox = key_editor.cbox
+local key_cline = key_editor.cline
+local key_figlet = key_editor.figlet
+local key_cframe = key_editor.comment_frame
+local key_venn = key_editor.venn
+local key_iconpick = key_editor.glyph.picker
+
+local mopts = require("funsak.table").mopts
 local inp = require("uutils.input")
 local compute_remaining_width = require("uutils.text").compute_remaining_width
 
@@ -21,7 +25,7 @@ return {
     },
     keys = {
       {
-        key_cbox .. "B",
+        key_cbox.catalog,
         function()
           require("comment-box").catalog()
         end,
@@ -29,7 +33,7 @@ return {
         desc = "box=> catalog",
       },
       {
-        key_cbox .. "ll",
+        key_cbox.pos_left.align_left,
         function()
           return require("comment-box").llbox(vim.v.count)
         end,
@@ -37,7 +41,7 @@ return {
         desc = "box=> 󰘷:󰉢 󱄽:󰉢",
       },
       {
-        key_cbox .. "lc",
+        key_cbox.pos_left.align_center,
         function()
           return require("comment-box").lcbox(vim.v.count)
         end,
@@ -45,7 +49,7 @@ return {
         desc = "box=> 󰘷:󰉢 󱄽:󰉠",
       },
       {
-        key_cbox .. "lr",
+        key_cbox.pos_left.align_right,
         function()
           return require("comment-box").lrbox(vim.v.count)
         end,
@@ -53,7 +57,7 @@ return {
         desc = "box=> 󰘷:󰉢 󱄽:󰉣",
       },
       {
-        key_cbox .. "cl",
+        key_cbox.pos_center.align_left,
         function()
           return require("comment-box").clbox(vim.v.count)
         end,
@@ -61,7 +65,7 @@ return {
         desc = "box=> 󰘷:󰉠 󱄽:󰉢",
       },
       {
-        key_cbox .. "cc",
+        key_cbox.pos_center.align_center,
         function()
           return require("comment-box").ccbox(vim.v.count)
         end,
@@ -69,7 +73,7 @@ return {
         desc = "box=> 󰘷:󰉠 󱄽:󰉠",
       },
       {
-        key_cbox .. "cr",
+        key_cbox.pos_center.align_right,
         function()
           return require("comment-box").crbox(vim.v.count)
         end,
@@ -77,7 +81,7 @@ return {
         desc = "box=> 󰘷:󰉠 󱄽:󰉣",
       },
       {
-        key_cbox .. "rl",
+        key_cbox.pos_right.align_left,
         function()
           return require("comment-box").rlbox(vim.v.count)
         end,
@@ -85,7 +89,7 @@ return {
         desc = "box=> 󰘷:󰉣 󱄽:󰉢",
       },
       {
-        key_cbox .. "rc",
+        key_cbox.pos_right.align_center,
         function()
           return require("comment-box").rcbox(vim.v.count)
         end,
@@ -93,7 +97,7 @@ return {
         desc = "box=> 󰘷:󰉣 󱄽:󰉠",
       },
       {
-        key_cbox .. "rr",
+        key_cbox.pos_right.align_right,
         function()
           return require("comment-box").rrbox(vim.v.count)
         end,
@@ -101,7 +105,7 @@ return {
         desc = "box=> 󰘷:󰉣 󱄽:󰉣",
       },
       {
-        key_cbox .. "al",
+        key_cbox.adaptive.align_left,
         function()
           return require("comment-box").albox(vim.v.count)
         end,
@@ -109,7 +113,7 @@ return {
         desc = "box=> 󰘷:󰡎 󱄽:󰉢",
       },
       {
-        key_cbox .. "ac",
+        key_cbox.adaptive.align_center,
         function()
           return require("comment-box").acbox(vim.v.count)
         end,
@@ -117,7 +121,7 @@ return {
         desc = "box=> 󰘷:󰡎 󱄽:󰉠",
       },
       {
-        key_cbox .. "ar",
+        key_cbox.adaptive.align_right,
         function()
           return require("comment-box").arbox(vim.v.count)
         end,
@@ -125,7 +129,7 @@ return {
         desc = "box=> 󰘷:󰡎 󱄽:󰉣",
       },
       {
-        key_cline .. "l",
+        key_cline.align_left,
         function()
           return require("comment-box").line(vim.v.count)
         end,
@@ -133,7 +137,7 @@ return {
         desc = "line=> 󰘷:󰡎 󱄽:󰉢",
       },
       {
-        key_cline .. "c",
+        key_cline.align_center,
         function()
           return require("comment-box").cline(vim.v.count)
         end,
@@ -141,7 +145,7 @@ return {
         desc = "line=> 󰘷:󰡎 󱄽:󰉠",
       },
       {
-        key_cline .. "r",
+        key_cline.align_right,
         function()
           return require("comment-box").rline(vim.v.count)
         end,
@@ -155,7 +159,7 @@ return {
     config = true,
     keys = {
       {
-        key_editor .. "cf",
+        key_cframe.single_line,
         function()
           require("nvim-comment-frame").add_comment()
         end,
@@ -163,7 +167,7 @@ return {
         desc = "frame=> add comment frame",
       },
       {
-        key_editor .. "cm",
+        key_cframe.multi_line,
         function()
           require("nvim-comment-frame").add_multiline_comment()
         end,
@@ -213,7 +217,7 @@ return {
         -- somehow we would ideally like this keymapping to have completion items
         -- which are the selection of figlet fonts that are available on theme
         -- system
-        key_figlet .. "F",
+        key_figlet.banner.change_font,
         inp.callback_input("figlet font:", function(input)
           vim.g.figban_fontstyle = input
           vim.notify(("Assigned Figlet Font: %s"):format(input))
@@ -222,20 +226,19 @@ return {
         desc = "figlet.ban=> select banner font",
       },
       {
-        key_figlet .. "b",
+        key_figlet.banner.generate,
         inp.cmdtext_input("banner text:", [[Figban %s]]),
         mode = "n",
         desc = "figlet.ban=> generate banner",
       },
       {
-        key_figlet .. "b",
-        ":Figban<CR>",
+        key_figlet.banner.generate,
+        "<CMD>Figban<CR>",
         mode = "v",
         desc = "figlet.ban=> selection generate banner",
       },
     },
   },
-
   {
     "pavanbhat1999/figlet.nvim",
     dependencies = { "numToStr/Comment.nvim" },
@@ -253,24 +256,23 @@ return {
     opts = { font = "Impossible" },
     keys = {
       {
-        key_figlet .. "F",
+        key_figlet.change_font,
         change_figlet_font,
         mode = "n",
         desc = "figlet=> change font",
       },
       {
-        key_figlet .. "f",
+        key_figlet.ascii_interface,
         function()
           vim.ui.input({ prompt = "text to figlet: " }, function(input)
             vim.cmd(([[Fig %s]]):format(input))
           end)
         end,
-        "<CMD>Fig<CR>",
         mode = { "n" },
         desc = "figlet=> ascii interface",
       },
       {
-        key_figlet .. "c",
+        key_figlet.ascii_comment_interface,
         function()
           vim.ui.input({ prompt = "text to figlet: " }, function(input)
             vim.cmd(([[FigComment %s]]):format(input))
@@ -280,34 +282,16 @@ return {
         desc = "figlet=> ascii comment interface",
       },
       {
-        key_figlet .. "ss",
+        key_figlet.ascii_interface,
         "<CMD>FigSelect<CR>",
         mode = { "v" },
         desc = "figlet=> ascii select interface",
       },
       {
-        key_figlet .. "sc",
+        key_figlet.ascii_comment_interface,
         "<CMD>FigSelectComment<CR>",
         mode = { "v" },
         desc = "figlet=> ascii select comment interface",
-      },
-    },
-  },
-  {
-    "samodostal/image.nvim",
-    event = "VeryLazy",
-    dependencies = { "nvim-lua/plenary.nvim", "m00qek/baleia.nvim" },
-    opts = {
-      render = {
-        min_padding = 5,
-        show_label = true,
-        show_image_dimensions = true,
-        use_dither = true,
-        foreground_color = true,
-        background_color = true,
-      },
-      events = {
-        update_on_nvim_resize = true,
       },
     },
   },
@@ -360,18 +344,239 @@ return {
             { noremap = true }
           )
         else
-          vim.cmd([[setlocal ve=]])
+          vim.cmd([[setlocal virtualedit]])
           vim.cmd([[mapclear <buffer>]])
           vim.b.venn_enabled = nil
         end
       end
+
       -- toggle keymappings for venn using <leader>v
       vim.api.nvim_set_keymap(
         "n",
-        "<leader>V",
+        key_venn,
         "<CMD>lua ToggleVenn()<CR>",
         { noremap = true }
       )
     end,
+  },
+  {
+    "2kabhishek/nerdy.nvim",
+    dependencies = {
+      "stevearc/dressing.nvim",
+      "nvim-telescope/telescope.nvim",
+    },
+    cmd = "Nerdy",
+    keys = {
+      {
+        key_editor.glyph.nerdy,
+        "<CMD>Nerdy<CR>",
+        mode = "n",
+        desc = "glyph.nerdfont=> symbols",
+      },
+    },
+  },
+  {
+    "nvimdev/nerdicons.nvim",
+    cmd = "NerdIcons",
+    opts = {
+      border = env.main,
+      prompt = "󱊒 ",
+      preview_prompt = "󱊓 ",
+      width = 0.5,
+      down = key_editor.glyph:next(),
+      up = key_editor.glyph:previous(),
+    },
+    config = function(_, opts)
+      require("nerdicons").setup(opts)
+    end,
+    keys = {
+      {
+        key_editor.glyph.nerdicons,
+        "<CMD>NerdIcons<CR>",
+        mode = "n",
+        desc = "glyph.nerdicons=> symbols",
+      },
+    },
+  },
+  {
+    "ziontee113/icon-picker.nvim",
+    cmd = {
+      "PickEverything",
+      "PickIcons",
+      "PickEmoji",
+      "PickNerd",
+      "PickNerdV3",
+      "PickSymbols",
+      "PickAltFont",
+      "PickAltFontAndSymbols",
+      "PickEverythingYank",
+      "PickIconsYank",
+      "PickEmojiYank",
+      "PickNerdYank",
+      "PickNerdV3Yank",
+      "PickSymbolsYank",
+      "PickAltFontYank",
+      "PickAltFontAndSymbolsYank",
+      "PickEverythingInsert",
+      "PickIconsInsert",
+      "PickEmojiInsert",
+      "PickNerdInsert",
+      "PickNerdV3Insert",
+      "PickSymbolsInsert",
+      "PickAltFontInsert",
+      "PickAltFontAndSymbolsInsert",
+    },
+    opts = {
+      disable_legacy_commands = true,
+    },
+    config = function(_, opts)
+      require("icon-picker").setup(opts)
+    end,
+    keys = {
+      {
+        key_iconpick.normal.everything,
+        "<CMD>PickEverything<CR>",
+        mode = "n",
+        desc = "glyph.pick=> everything",
+      },
+      {
+        key_iconpick.normal.icons,
+        "<CMD>PickIcons<CR>",
+        mode = "n",
+        desc = "glyph.pick=> icons",
+      },
+      {
+        key_iconpick.normal.emoji,
+        "<CMD>PickEmoji<CR>",
+        mode = "n",
+        desc = "glyph.pick=> emoji",
+      },
+      {
+        key_iconpick.normal.nerd,
+        "<CMD>PickNerd<CR>",
+        mode = "n",
+        desc = "glyph.icons=> nerdfont",
+      },
+      {
+        key_iconpick.normal.nerdv3,
+        "<CMD>PickNerdV3<CR>",
+        mode = "n",
+        desc = "glyph.icons=> v3 nerdfont",
+      },
+      {
+        key_iconpick.normal.symbols,
+        "<CMD>PickSymbols<CR>",
+        mode = "n",
+        desc = "glyph.icons=> symbols",
+      },
+      {
+        key_iconpick.normal.altfont,
+        "<CMD>PickAltFont<CR>",
+        mode = "n",
+        desc = "glyph.icons=> font (alt)",
+      },
+      {
+        key_iconpick.normal.altfontsymbols,
+        "<CMD>PickAltFontAndSymbols<CR>",
+        mode = "n",
+        desc = "glyph.icons=> font and symbols (alt)",
+      },
+      {
+        key_iconpick.yank.everything,
+        "<CMD>PickEverythingYank<CR>",
+        mode = "n",
+        desc = "glyph.pick=> everything",
+      },
+      {
+        key_iconpick.yank.icons,
+        "<CMD>PickIconsYank<CR>",
+        mode = "n",
+        desc = "glyph.pick=> icons",
+      },
+      {
+        key_iconpick.yank.emoji,
+        "<CMD>PickEmojiYank<CR>",
+        mode = "n",
+        desc = "glyph.pick=> emoji",
+      },
+      {
+        key_iconpick.yank.nerd,
+        "<CMD>PickNerdYank<CR>",
+        mode = "n",
+        desc = "glyph.icons=> nerdfont",
+      },
+      {
+        key_iconpick.yank.nerdv3,
+        "<CMD>PickNerdV3Yank<CR>",
+        mode = "n",
+        desc = "glyph.icons=> v3 nerdfont",
+      },
+      {
+        key_iconpick.yank.symbols,
+        "<CMD>PickSymbolsYank<CR>",
+        mode = "n",
+        desc = "glyph.icons=> symbols",
+      },
+      {
+        key_iconpick.yank.altfont,
+        "<CMD>PickAltFontYank<CR>",
+        mode = "n",
+        desc = "glyph.icons=> font (alt)",
+      },
+      {
+        key_iconpick.yank.altfontsymbols,
+        "<CMD>PickAltFontAndSymbolsYank<CR>",
+        mode = "n",
+        desc = "glyph.icons=> font and symbols (alt)",
+      },
+      {
+        key_iconpick.insert.everything,
+        "<CMD>PickEverythingInsert<CR>",
+        mode = "n",
+        desc = "glyph.pick=> everything",
+      },
+      {
+        key_iconpick.insert.icons,
+        "<CMD>PickIconsInsert<CR>",
+        mode = "n",
+        desc = "glyph.pick=> icons",
+      },
+      {
+        key_iconpick.insert.emoji,
+        "<CMD>PickEmojiInsert<CR>",
+        mode = "n",
+        desc = "glyph.pick=> emoji",
+      },
+      {
+        key_iconpick.insert.nerd,
+        "<CMD>PickNerdInsert<CR>",
+        mode = "n",
+        desc = "glyph.icons=> nerdfont",
+      },
+      {
+        key_iconpick.insert.nerdv3,
+        "<CMD>PickNerdV3Insert<CR>",
+        mode = "n",
+        desc = "glyph.icons=> v3 nerdfont",
+      },
+      {
+        key_iconpick.insert.symbols,
+        "<CMD>PickSymbolsInsert<CR>",
+        mode = "n",
+        desc = "glyph.icons=> symbols",
+      },
+      {
+        key_iconpick.insert.altfont,
+        "<CMD>PickAltFontInsert<CR>",
+        mode = "n",
+        desc = "glyph.icons=> font (alt)",
+      },
+      {
+        key_iconpick.insert.altfontsymbols,
+        "<CMD>PickAltFontAndSymbolsInsert<CR>",
+        mode = "n",
+        desc = "glyph.icons=> font and symbols (alt)",
+      },
+    },
   },
 }

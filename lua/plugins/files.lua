@@ -1,13 +1,10 @@
 -- vim: set ft=lua: --
 local env = require("environment.ui")
-local keystems = require("environment.keys").stems
+local opt = require("environment.optional")
 
-local key_files = keystems.files
-local key_nnn = keystems.nnn
-local key_bolt = keystems.bolt
-local key_broot = keystems.broot
-local key_attempt = keystems.attempt
-local key_traveller = keystems.traveller
+local kenv = require("environment.keys")
+local key_fm = kenv.fm
+local key_shortcut = kenv.shortcut
 
 return {
   {
@@ -16,8 +13,32 @@ return {
     module = false,
   },
   {
+    "lstwn/broot.vim",
+    enabled = opt.file_managers.broot,
+    init = function()
+      vim.g.broot_default_conf_path = (
+        vim.env.XDG_CONFIG_HOME .. "/broot/conf.hjson"
+      )
+      vim.g.broot_replace_netrw = 0
+    end,
+    keys = {
+      {
+        key_fm.broot.working_dir,
+        "<CMD>BrootWorkingDir<CR>",
+        mode = "n",
+        desc = "fm.broot=> working directory",
+      },
+      {
+        key_fm.broot.current_dir,
+        "<CMD>BrootCurrentDir<CR>",
+        mode = "n",
+        desc = "fm.broot=> current directory",
+      },
+    },
+  },
+  {
     "is0n/fm-nvim",
-    enabled = true,
+    enabled = opt.file_managers.fm_nvim,
     cmd = {
       -- "Lazygit",
       "Joshuto",
@@ -52,104 +73,38 @@ return {
           size = 32,
         },
       },
-      broot_conf = vim.fs.normalize(
-        vim.fn.expand("~/.config/broot/conf.hjson")
-      ),
       mappings = {
         vert_split = "<C-v>",
         horz_split = "<C-h>",
         tabedit = "<C-t>",
-        edit = "<C-e>",
+        edit = "<C-m>",
         ESC = "<ESC>",
       },
     },
     config = true,
   },
   {
-    "lstwn/broot.vim",
-    cmd = { "Broot", "BrootCurrentDir", "BrootWorkingDir", "BrootHomeDir" },
-    config = function(_, opts)
-      -- TODO: Determine if we need to do anything in config here.
-    end,
-    opts = {},
-    init = function()
-      vim.g.broot_default_conf_path =
-        vim.fs.normalize("~/.config/broot/conf.hjson")
-      -- vim.g.broot_replace_netrw = 1
-      -- vim.g.loaded_netrwPlugin = 1
-      -- vim.g.broot_command = "br"
-    end,
-    keys = {
-      {
-        key_broot .. "e",
-        "<CMD>Broot vsplit<CR>",
-        mode = "n",
-        desc = "br=> right here tree",
-        -- silent = true,
-      },
-      {
-        key_broot .. "c",
-        "<CMD>BrootCurrentDir vsplit<CR>",
-        mode = "n",
-        desc = "br=> current directory tree",
-        -- silent = true,
-      },
-      {
-        key_broot .. "w",
-        "<CMD>BrootWorkingDir vsplit<CR>",
-        mode = "n",
-        desc = "br=> working directory tree",
-        -- silent = true,
-      },
-      {
-        key_broot .. "~",
-        "<CMD>BrootHomeDir vsplit<CR>",
-        mode = "n",
-        desc = "br=> home directory tree",
-        -- silent = true,
-      },
-    },
-  },
-  -- {
-  --   "bbjornstad/broot.nvim",
-  --   dev = true,
-  --   config = false,
-  --   cmd = "Broot",
-  --   keys = {
-  --     {
-  --       key_broot .. "e",
-  --       "<CMD>Broot<CR>",
-  --       mode = "n",
-  --       desc = "br=> right here tree",
-  --       -- silent = true,
-  --     },
-  --   },
-  -- },
-  {
     "stevearc/oil.nvim",
     cmd = "Oil",
     event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
+    init = function()
+      -- can be either "succinct" or "extended".
+      vim.g.oil_extended_column_mode = env.oil.init_columns == "extended"
+    end,
     opts = {
-      default_file_explorer = false,
+      default_file_explorer = true,
       prompt_save_on_select_new_entry = true,
-      columns = {
-        "icon",
-        "type",
-        "permissions",
-        "birthtime",
-        "atime",
-        "mtime",
-        "size",
-      },
+      columns = env.oil.init_columns == "succinct" and env.oil.columns.succinct
+        or env.oil.columns.extended,
       delete_to_trash = true,
       float = {
         padding = 4,
         border = env.borders.main,
       },
       preview = {
-        max_width = 0.8,
-        min_width = { 40, 0.4 },
+        max_width = { 100, 0.8 },
+        min_width = { 32, 0.25 },
         border = env.borders.main,
         win_options = {
           winblend = 20,
@@ -165,59 +120,88 @@ return {
         },
       },
       keymaps = {
-        ["`"] = "actions.tcd",
+        ["<A-`>"] = "actions.tcd",
         ["<A-CR>"] = "actions.tcd",
         ["<BS>"] = "actions.toggle_hidden",
         ["."] = "actions.toggle_hidden",
-        ["<C-BS>"] = "actions.parent",
         ["-"] = "actions.parent",
         ["_"] = "actions.open_cwd",
         ["q"] = "actions.close",
+        [key_fm.oil:close()] = "actions.close",
         [".."] = "actions.parent",
-        ["go."] = "actions.cd",
-        ["<C-l>"] = "actions.refresh",
-        ["<C-p>"] = "actions.preview",
-        ["<C-c>"] = false,
-        ["<C-s>"] = "actions.select_vsplit",
-        ["<C-h>"] = "actions.select_split",
-        ["g?"] = "actions.show_help",
+        ["<C-r>"] = "actions.refresh",
+        ["<C-P>"] = "actions.preview",
+        ["<C-C>"] = {
+          callback = function()
+            local extended_is_target = vim.b.oil_extended_column_mode
+              or vim.g.oil_extended_column_mode
+
+            require("oil").set_columns(
+              extended_is_target and env.oil.columns.extended
+                or env.oil.columns.succinct
+            )
+            vim.b.oil_extended_column_mode = extended_is_target
+          end,
+          desc = "fm.oil=> toggle succinct columns",
+        },
+        ["<C-v>"] = "actions.select_vsplit",
+        ["<C-s>"] = "actions.select_split",
         ["?"] = "actions.show_help",
+        ["<S-CR>"] = "actions.select",
+        ["<CR>"] = false,
+      },
+      view_options = {
+        sort = {
+          { "type", "asc" },
+          { "name", "asc" },
+          { "ctime", "desc" },
+          { "size", "asc" },
+        },
       },
     },
     keys = {
       {
-        key_files .. "o",
+        key_fm.oil.open_float,
         function()
           return require("oil").open_float()
         end,
         mode = { "n" },
-        desc = "oil=> open oil (float)",
+        desc = "fm.oil=> open (float)",
       },
       {
-        key_files .. "O",
+        key_fm.oil.split,
+        function()
+          vim.cmd([[vsplit]])
+          require("oil").open()
+        end,
+        mode = "n",
+        desc = "fm.oil=> open (split)",
+      },
+      {
+        key_fm.oil.open,
         function()
           require("oil").open()
         end,
         mode = { "n" },
-        desc = "oil=> open oil (not float)",
+        desc = "fm.oil=> open",
       },
       {
-        "<leader>e",
+        key_shortcut.fm.explore.explore,
         function()
-          local cwd = vim.b.netrw_curdir
-          require("oil").open_float(cwd)
+          require("oil").open_float()
         end,
         mode = { "n" },
-        desc = "oil=> float oil",
+        desc = "fm.oil=> open",
       },
       {
-        "<leader>E",
+        key_shortcut.fm.explore.split,
         function()
-          local cwd = vim.b.netrw_curdir
-          require("oil").open(cwd)
+          -- local cwd = vim.loop.cwd() or "."
+          -- vim.cmd([[vsplit]])
+          require("oil").open()
         end,
         mode = { "n" },
-        desc = "oil=> open oil",
+        desc = "fm.oil=> open oil (split)",
       },
     },
   },
@@ -226,10 +210,10 @@ return {
     config = true,
     cmd = { "NnnExplorer", "NnnPicker" },
     opts = function(_, opts)
-      opts.replace_netrw = opts.replace_netrw or "explorer"
+      opts.replace_netrw = opts.replace_netrw or nil
       opts.quitcd = opts.quitcd or "tcd"
       opts.explorer = vim.tbl_deep_extend("force", {
-        width = 28,
+        width = 20,
         side = "topleft",
         session = "shared",
         tabs = true,
@@ -237,7 +221,7 @@ return {
       }, opts.explorer or {})
       opts.picker = vim.tbl_deep_extend("force", {
         style = {
-          width = 0.4,
+          width = 0.2,
           height = 0.6,
           border = env.borders.main,
         },
@@ -263,31 +247,31 @@ return {
     end,
     keys = {
       {
-        key_files .. "nE",
+        key_fm.nnn.explorer,
         "<CMD>NnnExplorer<CR>",
         mode = "n",
         desc = "fm.nnn=> explorer mode",
       },
       {
-        key_files .. "ne",
+        key_fm.nnn.explorer_here,
         "<CMD>NnnExplorer %:p<CR>",
         mode = "n",
         desc = "fm.nnn=> explorer mode",
       },
       {
-        key_files .. "np",
+        key_fm.nnn.picker,
         "<CMD>NnnPicker<CR>",
         mode = { "n" },
         desc = "fm.nnn=> picker mode",
       },
       {
-        key_nnn .. "N",
+        key_shortcut.fm.nnn.picker,
         "<CMD>NnnPicker<CR>",
         mode = { "n" },
         desc = "fm.nnn=> picker mode",
       },
       {
-        key_nnn .. "n",
+        key_shortcut.fm.nnn.explorer,
         "<CMD>NnnExplorer<CR>",
         mode = { "n" },
         desc = "fm.nnn=> explorer mode",
@@ -296,6 +280,7 @@ return {
   },
   {
     "m-demare/attempt.nvim",
+    enabled = opt.file_managers.attempt,
     opts = {
       dir = vim.fs.normalize(vim.fn.stdpath("data") .. "attempt.nvim"),
       autosave = false,
@@ -324,7 +309,7 @@ return {
     end,
     keys = {
       {
-        key_attempt .. "n",
+        key_fm.attempt.new_select,
         function()
           require("attempt").new_select()
         end,
@@ -332,7 +317,7 @@ return {
         desc = "scratch=> new buffer",
       },
       {
-        key_attempt .. "i",
+        key_fm.attempt.new_input_ext,
         function()
           require("attempt").new_input_ext()
         end,
@@ -340,7 +325,7 @@ return {
         desc = "scratch=> new buffer (custom extension)",
       },
       {
-        key_attempt .. "r",
+        key_fm.attempt.run,
         function()
           require("attempt").run()
         end,
@@ -348,7 +333,7 @@ return {
         desc = "scratch=> run",
       },
       {
-        key_attempt .. "d",
+        key_fm.attempt.delete,
         function()
           require("attempt").delete_buf()
         end,
@@ -356,7 +341,7 @@ return {
         desc = "scratch=> delete buffer",
       },
       {
-        key_attempt .. "c",
+        key_fm.attempt.rename,
         function()
           require("attempt").rename_buf()
         end,
@@ -364,7 +349,7 @@ return {
         desc = "scratch=> rename buffer",
       },
       {
-        key_attempt .. "l",
+        key_fm.attempt.open_select,
         function()
           require("attempt").open_select()
         end,
@@ -374,61 +359,99 @@ return {
     },
   },
   {
-    "Norlock/nvim-traveller",
-    event = "VeryLazy",
-    enabled = false,
-    config = function(_, opts)
-      require("nvim-traveller").setup(opts)
-    end,
-    opts = {
-      show_hidden = true,
-      mappings = {
-        directories_tab = "<Tab>",
-        directories_delete = "<C-d>",
-      },
-    },
-    keys = {
-      {
-        key_traveller .. "o",
-        function()
-          require("nvim-traveller").open_navigation()
-        end,
-        mode = "n",
-        desc = "fm.travel=> open",
-      },
-      {
-        key_traveller .. "d",
-        function()
-          require("nvim-traveller").last_directories_search()
-        end,
-        mode = "n",
-        desc = "fm.travel=> last directories",
-      },
-      {
-        key_traveller .. "t",
-        function()
-          require("nvim-traveller").open_terminal()
-        end,
-        mode = "n",
-        desc = "fm.travel=> terminal mode",
-      },
-    },
-  },
-  {
     "ripxorip/bolt.nvim",
+    enabled = opt.file_managers.bolt,
     build = ":UpdateRemotePlugins",
     keys = {
       {
-        key_bolt .. "o",
+        key_fm.bolt.open_root,
         "<CMD>Bolt<CR>",
         mode = "n",
         desc = "fm.bolt=> open project root",
       },
       {
-        key_bolt .. "O",
+        key_fm.bolt.open_cwd,
         "<CMD>BoltCwd<CR>",
         mode = "n",
         desc = "fm.bolt=> open cwd",
+      },
+    },
+  },
+  {
+    "gaborvecsei/memento.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {},
+    config = false,
+    init = function()
+      vim.g.memento_history = 50
+      vim.g.memento_shorten_path = true
+      vim.g.memento_window_width = 80
+      vim.g.memento_window_height = 16
+    end,
+    keys = {
+      {
+        key_fm.memento.toggle,
+        function()
+          require("memento").toggle()
+        end,
+        mode = "n",
+        desc = "mem=> recently closed files",
+      },
+      {
+        key_fm.memento.clear,
+        function()
+          require("memento").clear_history()
+        end,
+        mode = "n",
+        desc = "mem=> clear closed file history",
+      },
+    },
+  },
+  {
+    "dzfrias/arena.nvim",
+    opts = {
+      max_items = 12,
+      always_context = { "mod.rs", "init.lua" },
+      ignore_current = true,
+      per_project = true,
+      window = {
+        width = 32,
+        height = 12,
+        border = env.borders.main,
+      },
+      algorithm = {
+        recency_factor = 0.5,
+        frequency_factor = 1,
+      },
+    },
+    config = function(_, opts)
+      require("arena").setup(opts)
+    end,
+    event = "BufWinEnter",
+    keys = {
+      {
+        key_fm.arena.toggle,
+        function()
+          require("arena").toggle()
+        end,
+        mode = "n",
+        desc = "fm.arena=> toggle",
+      },
+      {
+        key_fm.arena.open,
+        function()
+          require("arena").open()
+        end,
+        mode = "n",
+        desc = "fm.arena=> open",
+      },
+      {
+        key_fm.arena.close,
+        function()
+          require("arena").close()
+        end,
+        mode = "n",
+        desc = "fm.arena=> close",
       },
     },
   },

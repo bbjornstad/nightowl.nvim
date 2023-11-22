@@ -1,8 +1,29 @@
 local env = require("environment.ui")
-local stems = require("environment.keys").stems
-local key_git = stems.git
-local key_undotree = stems.undotree
-local key_versioning = "gs"
+local opt = require("environment.optional")
+local kenv = require("environment.keys")
+local key_view = kenv.view
+local key_git = kenv.git
+local key_session = kenv.session
+
+local function session_files(file)
+  local lines = {}
+  local cwd, cwd_pat = "", "^cd%s*"
+  local buf_pat = "^badd%s*%+%d+%s*"
+  for line in io.lines(file) do
+    if string.find(line, cwd_pat) then
+      cwd = line:gsub("%p", "%%%1")
+    end
+    if string.find(line, buf_pat) then
+      lines[#lines + 1] = line
+    end
+  end
+  local buffers = {}
+  for k, v in pairs(lines) do
+    buffers[k] =
+      v:gsub(buf_pat, ""):gsub(cwd:gsub("cd%s*", ""), ""):gsub("^/?%.?/", "")
+  end
+  return buffers
+end
 
 return {
   {
@@ -22,39 +43,39 @@ return {
   },
   {
     "jiaoshijie/undotree",
-    -- event = "VeryLazy",
+    enabled = opt.undotree,
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
     config = true,
     keys = {
       {
-        key_undotree .. "t",
+        key_view.undotree.toggle,
         function()
           require("undotree").toggle()
         end,
         mode = "n",
-        desc = "undo=> toggle history tree",
+        desc = "::undo=> toggle tree",
         noremap = true,
         silent = true,
       },
       {
-        key_undotree .. "o",
+        key_view.undotree.open,
         function()
           require("undotree").open()
         end,
         mode = "n",
-        desc = "undo=> open history tree",
+        desc = "::undo=> open tree",
         noremap = true,
         silent = true,
       },
       {
-        key_undotree .. "q",
+        key_view.undotree.close,
         function()
           require("undotree").close()
         end,
         mode = "n",
-        desc = "undo=> close history tree",
+        desc = "::undo=> close tree",
         noremap = true,
         silent = true,
       },
@@ -83,31 +104,39 @@ return {
     cmd = { "DiffviewOpen", "DiffviewFileHistory" },
     keys = {
       {
-        key_git .. "d",
+        key_git.diffview,
         "<CMD>DiffviewOpen<CR>",
         mode = "n",
-        desc = "git=> compare in diffview",
+        desc = "::git.diff=> compare",
       },
     },
   },
   {
     "f-person/git-blame.nvim",
+    event = "VeryLazy",
+    enabled = opt.prefer.gitblame == "f-person",
     cmd = { "GitBlameToggle", "GitBlameEnable" },
-    init = function()
-      vim.g.gitblame_delay = 1000
+    opts = {
+      enabled = true,
+      delay = 1000,
+      message_template = "   :: <committer> 󱒊 <date> 󱛠 <summary>",
+      date_format = "%r (%c)",
+    },
+    config = function(_, opts)
+      require("gitblame").setup(opts)
     end,
     keys = {
       {
-        key_git .. "Bl",
+        key_git.blame.toggle,
         "<CMD>GitBlameToggle<CR>",
         mode = { "n" },
-        desc = "git=> toggle git blame on line",
+        desc = "::git.blame=> toggle on line",
       },
       {
-        key_git .. "Be",
+        key_git.blame.enable,
         "<CMD>GitBlameEnable<CR>",
         mode = { "n" },
-        desc = "git=> force enable git blame on line",
+        desc = "::git.blame=> force enable on line",
       },
     },
   },
@@ -119,23 +148,24 @@ return {
       disable_commit_confirmation = true,
       disable_insert_on_commit = "auto",
       signs = {
-        section = { "󰄾", "󰄼" },
-        item = { "󰅂", "󰅀" },
-        hunk = { "󰧛", "󰧗" },
+        section = { "󰧛", "󰧗" },
+        item = { "󰄾", "󰄼" },
+        hunk = { "󰅂", "󰅀" },
       },
       integrations = { telescope = true, diffview = true },
     },
     keys = {
       {
-        key_git .. "n",
+        key_git.neogit,
         "<CMD>Neogit<CR>",
         mode = { "n" },
-        desc = "git=> neogit",
+        desc = "::git.neo=> open",
       },
     },
   },
   {
     "akinsho/git-conflict.nvim",
+    enabled = opt.git.git_conflict,
     config = true,
     version = "*",
     cmd = {
@@ -149,106 +179,108 @@ return {
     },
     keys = {
       {
-        key_git .. "fq",
+        key_git.conflict.quickfix,
         "<CMD>GitConflictListQf<CR>",
         mode = "n",
-        desc = "git=> conflict quick fix",
+        desc = "::git.conflict=> quick fix",
       },
       {
-        key_git .. "fo",
+        key_git.conflict.choose_ours,
         "<CMD>GitConflictChooseOurs<CR>",
         mode = "n",
-        desc = "git=> conflict choose ours",
+        desc = "::git.conflict=> choose ours",
       },
       {
-        key_git .. "ft",
+        key_git.conflict.choose_theirs,
         "<CMD>GitConflictChooseTheirs<CR>",
         mode = "n",
-        desc = "git=> conflict choose theirs",
+        desc = "::git.conflict=> choose theirs",
       },
       {
-        key_git .. "fb",
+        key_git.conflict.choose_both,
         "<CMD>GitConflictChooseBoth<CR>",
         mode = "n",
-        desc = "git=> conflict choose both",
+        desc = "::git.conflict=> choose both",
       },
       {
-        key_git .. "fe",
+        key_git.conflict.choose_none,
         "<CMD>GitConflictChooseNone<CR>",
         mode = "n",
-        desc = "git=> conflict choose none",
+        desc = "::git.conflict=> choose none",
       },
       {
-        key_git .. "fn",
+        key_git.conflict.next,
         "<CMD>GitConflictNextConflict<CR>",
         mode = "n",
-        desc = "git=> next conflict",
+        desc = "::git.conflict=> next",
       },
       {
-        key_git .. "fp",
+        key_git.conflict.previous,
         "<CMD>GitConflictPrevConflict<CR>",
         mode = "n",
-        desc = "git=> previous conflict",
+        desc = "::git.conflict=> previous",
       },
     },
   },
   {
     "APZelos/blamer.nvim",
+    enabled = opt.prefer.gitblame == "APZelos",
     config = function(_, opts)
       vim.g.blamer_enabled = 1
       vim.g.blamer_delay = 1000
       vim.g.blamer_show_in_visual_modes = 0
       vim.g.blamer_prefix = "  "
-      vim.g.blamer_template = "<committer>@<committer-time>  <summary>"
+      vim.g.blamer_template = "<committer>@<committer-time>  󱛠 <summary>"
       vim.g.blamer_relative_time = 1
     end,
     keys = {
       {
-        key_git .. "bb",
+        key_git.blame.toggle_alt,
         "<CMD>BlamerToggle<CR>",
         mode = "n",
-        desc = "git=> toggle global blamer",
+        desc = "::git.blame=> toggle alt global",
       },
       {
-        key_git .. "bi",
-        "<leader>gbi",
+        key_git.blame.mode_insert,
         function()
           vim.g.blamer_show_in_insert_modes = 1
         end,
         mode = "n",
-        desc = "git=> show global blamer in insert mode",
+        desc = "::git.blame=> insert mode show",
       },
       {
-        key_git .. "bv",
+        key_git.blame.mode_visual,
         function()
           vim.g.blamer_show_in_visual_modes = 1
         end,
         mode = "n",
-        desc = "git=> show global blamer in visual mode",
+        desc = "::git.blame=> visual mode show",
       },
     },
   },
   {
     "mcchrish/info-window.nvim",
+    enabled = false,
     cmd = "InfoWindowToggle",
     keys = {
       {
-        key_versioning .. "i",
+        key_view.infowindow,
         "<CMD>InfoWindowToggle<CR>",
         mode = "n",
-        desc = "info=> buffer metadata/file info",
+        desc = "::info=> buffer metadata/file info",
       },
     },
   },
   {
     "topaxi/gh-actions.nvim",
+    enabled = opt.gh_actions,
     cmd = "GhActions",
     keys = {
       {
-        "<leader>ga",
+        key_git.gh_actions,
         "<cmd>GhActions<cr>",
         mode = "n",
-        desc = "git=> Github Actions",
+        desc = "::git=> Github Actions",
       },
     },
     -- optional, you can also install and use `yq` instead.
@@ -276,33 +308,95 @@ return {
     },
   },
   {
-    "gennaro-tedesco/nvim-possession",
-    dependencies = {
-      "ibhagwan/fzf-lua",
-    },
+    "echasnovski/mini.sessions",
+    version = false,
     opts = {
-      sessions = {
-        sessions_path = vim.fn.stdpath("data") .. "/sessions/",
+      autoread = false,
+      autowrite = true,
+      directory = vim.fs.joinpath(vim.fn.stdpath("data"), "mini.sessions/"),
+      file = "session-local.vim",
+      force = { read = false, write = true, delete = false },
+      verbose = { read = false, write = true, delete = true },
+    },
+    config = function(_, opts)
+      require("mini.sessions").setup(opts)
+    end,
+    event = "VeryLazy",
+  },
+  {
+    "niuiic/git-log.nvim",
+    opts = {
+      extra_args = {},
+      win = {
+        border = env.borders.main,
+        width_ratio = 0.6,
+        height_ratio = 0.6,
       },
-      autoload = true,
-      autosave = true,
+      keymap = {
+        close = "q",
+      },
+    },
+    config = function(_, opts)
+      require("git-log").setup(opts)
+    end,
+    keys = {
+      {
+        key_git.log,
+        function()
+          require("git-log").check_log()
+        end,
+        mode = { "n" },
+        -- mode = { "n", "v" },
+        desc = "::git.log=> check",
+      },
+    },
+  },
+  {
+    "FredeEB/tardis.nvim",
+    cmd = "Tardis",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+      keymap = {
+        next = key_git:next(),
+        prev = key_git:previous(),
+        quit = key_git:close(),
+        commit_message = "m",
+      },
+    },
+    config = function(_, opts)
+      require("tardis-nvim").setup(opts)
+    end,
+    keys = {
+      {
+        key_git.tardis,
+        "<CMD>Tardis<CR>",
+        mode = "n",
+        desc = "::git.tardis=> open",
+      },
+    },
+  },
+  {
+    "gennaro-tedesco/nvim-possession",
+    dependencies = { "ibhagwan/fzf-lua" },
+    opts = {
       autoswitch = {
         enable = true,
       },
-      fzf_winopts = {},
     },
-    config = true,
+    config = function(_, opts)
+      require("nvim-possession").setup(opts)
+    end,
     keys = {
       {
-        "<leader>Sl",
+        key_session.list,
         function()
           require("nvim-possession").list()
         end,
         mode = "n",
-        desc = "session=> fuzzylist",
+        desc = "session=> list",
       },
       {
-        "<leader>Sn",
+        key_session.new,
         function()
           require("nvim-possession").new()
         end,
@@ -310,7 +404,7 @@ return {
         desc = "session=> new",
       },
       {
-        "<leader>Su",
+        key_session.update,
         function()
           require("nvim-possession").update()
         end,
@@ -318,7 +412,7 @@ return {
         desc = "session=> update",
       },
       {
-        "<leader>Sl",
+        key_session.delete,
         function()
           require("nvim-possession").delete()
         end,

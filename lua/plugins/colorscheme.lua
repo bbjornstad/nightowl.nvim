@@ -1,37 +1,13 @@
 local env = require("environment.ui")
-local default_colorizer = env.identify_highlight
-local bg_style = os.getenv("NIGHTOWL_BACKGROUND_STYLE")
+local default_colorizer = require("funsak.colors").identify_highlight
+local bg_style = vim.env.NIGHTOWL_BACKGROUND_STYLE
 
 if vim.fn.has("termguicolors") then
   vim.cmd([[set termguicolors]])
 end
 
-local hl_overrides = {
-  TelescopeTitle = { fg = "ui.special", bold = true },
-  TelescopePromptNormal = { bg = "ui.bg_p1" },
-
-  TelescopePromptBorder = { fg = "ui.bg_p1", bg = "ui.bg_p1" },
-  TelescopeResultsNormal = { fg = "ui.fg_dim", bg = "ui.bg_m1" },
-  TelescopeResultsBorder = { fg = "ui.bg_m1", bg = "ui.bg_m1" },
-  TelescopePreviewNormal = { bg = "ui.bg_dim" },
-  TelescopePreviewBorder = {
-    bg = "ui.bg_dim",
-    fg = "ui.bg_dim",
-  },
-  Pmenu = { fg = "ui.shade0", bg = "ui.bg_p1" },
-  PmenuSel = { fg = "NONE", bg = "ui.bg_p2" },
-  PmenuSbar = { bg = "ui.bg_m1" },
-  PmenuThumb = { bg = "ui.bg_p2" },
-  InclineNormal = { bg = "ui.bg_p1" },
-  InclineNormalNC = { bg = "ui.bg_m2" },
-  WinBar = { bg = "ui.bg_p1" },
-  WinBarNC = { bg = "ui.bg_p1" },
-  DropBarCurrentContext = { bg = "NONE" },
-  DropBarMenuCurrentContext = { bg = "NONE" },
-  DropBarIconCurrentContext = { bg = "NONE" },
-  DropBarPreview = { bg = "NONE" },
-  TreeSitterContext = {},
-}
+local defhl = require("funsak.colors").initialize_custom_highlights
+-- defhl({ "Comment" }, { italic = true })
 
 return {
   {
@@ -66,7 +42,7 @@ return {
           PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
           PmenuSbar = { bg = theme.ui.bg_m1 },
           PmenuThumb = { bg = theme.ui.bg_p2 },
-          InclineNormal = { bg = colors.palette.sumiInk4 },
+          InclineNormal = { bg = colors.palette.waveBlue1 },
           InclineNormalNC = { bg = colors.palette.sumiInk1 },
           WinBar = { bg = colors.palette.sumiInk4 },
           WinBarNC = { bg = colors.palette.sumiInk4 },
@@ -78,31 +54,88 @@ return {
           TreesitterContextBottom = { underline = true },
           NightowlContextHints = {
             italic = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,
+            fg = colors.palette.springViolet2,
+          },
+          NightowlContextHintsBright = {
+            italic = true,
+            fg = colors.palette.dragonBlue,
           },
           NightowlStartupEntry = {
             bold = false,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,
+            fg = colors.palette.springViolet2,
           },
           NightowlStartupHeader = {
             bold = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.waveRed,
+            fg = colors.palette.waveRed,
           },
           NightowlStartupConvenience = {
             bold = true,
-            fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.waveBlue2,
+            fg = colors.palette.waveBlue2,
           },
+          IndentBlanklineWhitespace = { link = "@comment" },
+          IndentBlanklineScope = { link = "@comment" },
+          IndentBlanklineIndent = { link = "@comment" },
         }
       end,
     },
   },
   {
-    "projekt0n/github-nvim-theme",
+    "lewpoly/sherbet.nvim",
     config = function(_, opts)
-      require("github-theme").setup(opts)
+      vim.g.sherbet_italic_keywords = opts.italic.keywords or false
+      vim.g.sherbet_italic_functions = opts.italic.functions or true
+      vim.g.sherbet_italic_comments = opts.italic.comments or true
+      vim.g.sherbet_italic_loops = opts.italic.loops or true
+      vim.g.sherbet_italic_conditionals = opts.italic.conditionals or true
     end,
+    opts = {
+      italic = {
+        keywords = false,
+        functions = true,
+        comments = true,
+        loops = true,
+        conditionals = true,
+      },
+    },
     lazy = true,
-    priority = 901,
+    priority = 997,
+  },
+  {
+    "cryptomilk/nightcity.nvim",
+    version = false,
+    opts = {
+      style = "afterlife",
+      terminal_colors = true,
+      invert_colors = {
+        cursor = true,
+        diff = true,
+        error = true,
+        search = true,
+        selection = true,
+        signs = false,
+        statusline = true,
+        tabline = false,
+      },
+      font_style = {
+        comments = {
+          italic = true,
+        },
+        keywords = {
+          italic = true,
+        },
+        functions = {
+          bold = true,
+        },
+        search = {
+          bold = true,
+        },
+      },
+      plugins = { default = true },
+      on_highlights = function(groups, colors) end,
+    },
+    config = function(_, opts)
+      require("nightcity").setup(opts)
+    end,
   },
   {
     "rose-pine/neovim",
@@ -140,6 +173,9 @@ return {
           italic = true,
           fg = default_colorizer("@punctuation"),
         },
+        IndentBlanklineWhitespace = { link = "@comment" },
+        IndentBlanklineScope = { link = "@comment" },
+        IndentBlanklineIndent = { link = "@comment" },
       }, opts.highlight_groups or {})
     end,
     config = true,
@@ -149,22 +185,23 @@ return {
   {
     "yorik1984/newpaper.nvim",
     priority = 900,
-    config = true,
+    config = function(_, opts)
+      require("newpaper").setup(opts)
+    end,
     lazy = true,
     opts = {
       style = bg_style,
     },
   },
   {
-    "antonk52/lake.nvim",
-    priority = 995,
-    lazy = true,
-  },
-  {
     "Verf/deepwhite.nvim",
     lazy = true,
     priority = 890,
     config = function(_, opts)
+      local dw_accent = "#E5E5E5"
+      defhl({ "TreesitterContextBottom" }, { fg = dw_accent, underline = true })
+      defhl({ "NightowlContextHints" }, { italic = true, fg = dw_accent })
+      defhl({ "WinSeparator" }, { fg = dw_accent })
       require("deepwhite").setup(opts)
     end,
     opts = {
@@ -172,28 +209,52 @@ return {
     },
   },
   {
-    "wuelnerdotexe/vim-enfocado",
-    lazy = true,
-    priority = 997,
-    config = function()
-      vim.g.enfocado_style = "nature"
-    end,
-  },
-  {
-    "nyoom-engineering/oxocarbon.nvim",
-    lazy = true,
-    priority = 996,
-    config = function() end,
-  },
-  {
-    "olimorris/onedarkpro.nvim",
-    lazy = true,
-    priority = 992,
-    opts = {},
+    "roobert/palette.nvim",
     config = function(_, opts)
-      require("onedarkpro").setup(opts)
+      require("palette").setup(opts)
     end,
+    opts = {
+      palettes = {},
+      custom_palettes = {
+        main = {
+          ["kanagawa-wave"] = {},
+          ["kanagawa-lotus"] = {},
+          ["deepwhite"] = {},
+          ["nano"] = {},
+          ["hagoromo"] = {},
+        },
+      },
+      caching = true,
+      cache_dir = {
+        vim.fn.stdpath("cache") .. "/palette",
+      },
+    },
+    event = "VeryLazy",
   },
-
-  { "LazyVim/LazyVim", opts = { colorscheme = env.default_colorscheme } },
+  {
+    "ronisbr/nano-theme.nvim",
+    config = function(_, opts)
+      vim.o.background = opts.background.override and opts.background.style
+        or (vim.o.background or "light")
+    end,
+    opts = {
+      background = {
+        override = false,
+        style = "light",
+      },
+    },
+  },
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = function()
+        local bg = bg_style or "dark"
+        if bg == "light" then
+          require(env.colorscheme.light).load()
+        else
+          require(env.colorscheme.dark).load()
+        end
+      end,
+    },
+  },
 }

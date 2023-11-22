@@ -1,16 +1,47 @@
+-- vim: set ft=lua sts=2 ts=2 sw=2 et:
 local env = require("environment.ui")
 local kenv = require("environment.keys")
+local kenv_term = kenv.term
+local key_macro = kenv.macro
 local mapx = vim.keymap.set
-local key_tterm = kenv.stems.toggleterm
-local key_cterm = kenv.stems.customterm
-local key_treesj = kenv.stems.treesj
-local key_code_shot = kenv.stems.code_shot
+local key_treesj = kenv.tool.splitjoin
+local key_code_shot = kenv.editor.code_shot
+local key_replace = kenv.replace
+local key_notes = kenv.editor.notes
 
 local utiliterm = require("environment.utiliterm")
 
-local inp = require("uutils.input")
-
 return {
+  {
+    "smjonas/inc-rename.nvim",
+    cmd = { "IncRename" },
+    dependencies = {
+      {
+        "folke/noice.nvim",
+        optional = true,
+        opts = {
+          presets = {
+            inc_rename = true,
+          },
+        },
+      },
+    },
+    config = function(_, opts)
+      require("inc-rename").setup(opts)
+    end,
+    opts = {
+      preview_empty_name = false,
+      input_buffer_type = "dressing",
+    },
+    keys = {
+      {
+        key_replace.inc_rename,
+        "<CMD>IncRename<CR>",
+        mode = "n",
+        desc = "search=> incremental",
+      },
+    },
+  },
   {
     "akinsho/toggleterm.nvim",
     version = "*",
@@ -21,7 +52,7 @@ return {
         border = env.borders.main,
         winblend = 10,
       },
-      insert_mappings = false,
+      insert_mappings = true,
       terminal_mappings = true,
       autochdir = true,
       direction = "float",
@@ -34,14 +65,14 @@ return {
           return 85
         end
       end,
-      shading_factor = 2,
+      shading_factor = 4,
       winbar = {
         enabled = false,
       },
     },
     keys = {
       {
-        key_tterm .. "v",
+        kenv_term.layout.vertical,
         function()
           require("toggleterm").setup({ direction = "vertical" })
         end,
@@ -49,7 +80,7 @@ return {
         desc = "term=> toggle vertical layout",
       },
       {
-        key_tterm .. "h",
+        kenv_term.layout.horizontal,
         function()
           require("toggleterm").setup({ direction = "horizontal" })
         end,
@@ -57,7 +88,7 @@ return {
         desc = "term=> toggle horizontal layout",
       },
       {
-        key_tterm .. "f",
+        kenv_term.layout.float,
         function()
           require("toggleterm").setup({ direction = "float" })
         end,
@@ -65,7 +96,7 @@ return {
         desc = "term=> toggle float layout",
       },
       {
-        key_tterm .. "b",
+        kenv_term.layout.tabbed,
         function()
           require("toggleterm").setup({ direction = "tabbed" })
         end,
@@ -74,28 +105,28 @@ return {
       },
       -- custom terminal mappings go here.
       {
-        key_cterm .. "b",
-        utiliterm.btop,
+        kenv_term.utiliterm.btop,
+        utiliterm.btop(),
         mode = "n",
         desc = "term.mon=> btop",
       },
       {
-        key_cterm .. "t",
-        utiliterm.broot,
-        mode = "n",
-        desc = "term.mon=> broot",
-      },
-      {
-        key_cterm .. "s",
-        utiliterm.sysz,
+        kenv_term.utiliterm.sysz,
+        utiliterm.sysz(),
         mode = "n",
         desc = "term.mon=> sysz",
       },
       {
-        key_cterm .. "w",
-        utiliterm.weechat,
+        kenv_term.utiliterm.weechat,
+        utiliterm.weechat(),
         mode = "n",
         desc = "term.mon=> weechat",
+      },
+      {
+        kenv_term.utiliterm.broot,
+        utiliterm.broot(),
+        mode = "n",
+        desc = "term.fm=> broot",
       },
     },
     init = function()
@@ -104,7 +135,7 @@ return {
         local opts = { buffer = bufnr or 0 }
         mapx(
           "t",
-          "<esc>",
+          "<leader><esc>",
           [[<C-\><C-n>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
@@ -113,7 +144,7 @@ return {
         )
         mapx(
           "t",
-          "<C-h>",
+          "<C-S-h>",
           [[<Cmd>wincmd h<CR>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
@@ -122,7 +153,7 @@ return {
         )
         mapx(
           "t",
-          "<C-j>",
+          "<C-S-j>",
           [[<Cmd>wincmd j<CR>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
@@ -131,7 +162,7 @@ return {
         )
         mapx(
           "t",
-          "<C-k>",
+          "<C-S-k>",
           [[<Cmd>wincmd k<CR>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
@@ -140,7 +171,7 @@ return {
         )
         mapx(
           "t",
-          "<C-l>",
+          "<C-S-l>",
           [[<Cmd>wincmd l<CR>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
@@ -158,7 +189,7 @@ return {
         )
         mapx(
           "t",
-          "q",
+          [[<C-\><C-q>]],
           "<CMD>quit<CR>",
           vim.tbl_deep_extend("force", {
             remap = false,
@@ -179,23 +210,6 @@ return {
     end,
   },
   {
-    "folke/flash.nvim",
-    ---@type Flash.Config
-    opts = {
-      label = {
-        rainbow = {
-          enabled = true,
-        },
-        style = "overlay",
-      },
-      modes = {
-        char = {
-          keys = { "f", "F", "t", "T", "," },
-        },
-      },
-    },
-  },
-  {
     "kevinhwang91/nvim-bqf",
     ft = "qf",
     opts = {
@@ -205,7 +219,7 @@ return {
         win_height = 16,
         win_vheight = 2,
         delay_syntax = 80,
-        border = { "┏", "━", "┓", "┃", "┛", "━", "┗", "┃" },
+        border = env.borders.main,
         show_title = false,
         should_preview_cb = function(bufnr, winid)
           local ret = true
@@ -244,7 +258,7 @@ return {
     "Wansmer/treesj",
     keys = {
       {
-        key_treesj .. "j",
+        key_treesj.toggle,
         function()
           require("treesj").toggle()
         end,
@@ -252,7 +266,7 @@ return {
         desc = "treesj=> toggle fancy splitjoin",
       },
       {
-        key_treesj .. "J",
+        key_treesj.join,
         function()
           require("treesj").join()
         end,
@@ -260,7 +274,7 @@ return {
         desc = "treesj=> join with splitjoin",
       },
       {
-        key_treesj .. "p",
+        key_treesj.split,
         function()
           require("treesj").split()
         end,
@@ -269,7 +283,9 @@ return {
       },
     },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    config = true,
+    config = function(_, opts)
+      require("treesj").setup(opts)
+    end,
     opts = {
       -- Use default keymaps
       -- (<space>m - toggle, <space>j - join, <space>s - split)
@@ -352,24 +368,13 @@ return {
     end,
     keys = {
       {
-        "<leader>sp",
+        key_replace.structural,
         function()
           require("ssr").open()
         end,
         mode = "n",
-        desc = "search=> structural search replace",
+        desc = "rp.struct=> structural search replace",
       },
-    },
-  },
-  {
-    "rareitems/printer.nvim",
-    event = "VeryLazy",
-    config = function(_, opts)
-      require("printer").setup(opts)
-    end,
-    opts = {
-      keymap = "gpp",
-      behavior = "insert_below",
     },
   },
   {
@@ -386,6 +391,222 @@ return {
     },
     opts = {
       cwd = true,
+    },
+    keys = {
+      {
+        -- "go substitute/replace"
+        key_replace.muren.toggle,
+        "<CMD>MurenToggle<CR>",
+        mode = "n",
+        desc = "rp.muren=> toggle replacer",
+      },
+      {
+        key_replace.muren.open,
+        "<CMD>MurenOpen<CR>",
+        mode = "n",
+        desc = "rp.muren=> open [!] replacer",
+      },
+      {
+        key_replace.muren.close,
+        "<CMD>MurenClose<CR>",
+        mode = "n",
+        desc = "rp.muren=> close [!] replacer",
+      },
+      {
+        key_replace.muren.fresh,
+        "<CMD>MurenFresh<CR>",
+        mode = "n",
+        desc = "rp.muren=> fresh replacer",
+      },
+      {
+        key_replace.muren.unique,
+        "<CMD>MurenUnique<CR>",
+        mode = "n",
+        desc = "rp.muren=> unique replacer",
+      },
+    },
+  },
+  {
+    "echasnovski/mini.comment",
+    event = "VeryLazy",
+    opts = {
+      start_of_line = false,
+      pad_comment_parts = true,
+      ignore_blank_line = false,
+    },
+    version = false,
+  },
+  {
+    "echasnovski/mini.surround",
+    event = "VeryLazy",
+    version = false,
+    config = function(_, opts)
+      require("mini.surround").setup(opts)
+    end,
+    opts = {
+      respect_selection_type = true,
+      search_method = "cover",
+      mappings = {
+        add = "sa", -- Add surrounding in Normal and Visual modes
+        delete = "sd", -- Delete surrounding
+        find = "sf", -- Find surrounding (to the right)
+        find_left = "sF", -- Find surrounding (to the left)
+        highlight = "sh", -- Highlight surrounding
+        replace = "sr", -- Replace surrounding
+        update_n_lines = "sn", -- Update `n_lines`
+
+        suffix_last = "l", -- Suffix to search with "prev" method
+        suffix_next = "n", -- Suffix to search with "next" method
+      },
+    },
+  },
+  {
+    "echasnovski/mini.align",
+    event = "VeryLazy",
+    version = false,
+    opts = {
+      mappings = {
+        start = "ga",
+        start_with_preview = "gA",
+      },
+    },
+  },
+  {
+    "echasnovski/mini.extra",
+    version = false,
+    config = function(_, opts)
+      require("mini.extra").setup(opts)
+    end,
+    opts = {},
+  },
+  {
+    "chrisgrieser/nvim-recorder",
+    event = "VeryLazy",
+    dependencies = {
+      "rcarriga/nvim-notify",
+    },
+    config = function(_, opts)
+      require("recorder").setup(opts)
+    end,
+    opts = {
+      slots = { "a", "b" },
+      clear = true,
+      dapSharedKeymaps = true,
+      mapping = {
+        startStopRecording = key_macro.record,
+        playMacro = key_macro.play,
+        switchSlot = key_macro.switch,
+        editMacro = key_macro.edit,
+        yankMacro = key_macro.yank,
+        add_breakpoint = "##.",
+      },
+    },
+  },
+  {
+    "VidocqH/auto-indent.nvim",
+    event = "VeryLazy",
+    opts = {
+      lightmode = true,
+      indentexpr = nil,
+      ignore_filetype = env.ft_ignore_list,
+    },
+    config = function(_, opts)
+      require("auto-indent").setup(opts)
+    end,
+  },
+  {
+    "monaqa/dial.nvim",
+    config = function(_, opts)
+      -- do anything to register new dial targets here. this is somewhat
+      -- confusing setup.
+    end,
+    keys = {
+      {
+        "<C-a>",
+        function()
+          require("dial.map").manipulate("increment", "normal")
+        end,
+        mode = "n",
+        desc = "dial=> increment",
+      },
+      {
+        "<C-x>",
+        function()
+          require("dial.map").manipulate("decrement", "normal")
+        end,
+        mode = "n",
+        desc = "dial=> decrement",
+      },
+      {
+        "g<C-a>",
+        function()
+          require("dial.map").manipulate("increment", "gnormal")
+        end,
+        mode = "n",
+        desc = "dial=> gincrement",
+      },
+      {
+        "g<C-x>",
+        function()
+          require("dial.map").manipulate("decrement", "gnormal")
+        end,
+        mode = "n",
+        desc = "dial=> gdecrement",
+      },
+      {
+        "<C-a>",
+        function()
+          require("dial.map").manipulate("increment", "normal")
+        end,
+        mode = "v",
+        desc = "dial=> increment",
+      },
+      {
+        "<C-x>",
+        function()
+          require("dial.map").manipulate("decrement", "normal")
+        end,
+        mode = "v",
+        desc = "dial=> decrement",
+      },
+      {
+        "g<C-a>",
+        function()
+          require("dial.map").manipulate("increment", "gnormal")
+        end,
+        mode = "v",
+        desc = "dial=> gincrement",
+      },
+      {
+        "g<C-x>",
+        function()
+          require("dial.map").manipulate("decrement", "gnormal")
+        end,
+        mode = "v",
+        desc = "dial=> gdecrement",
+      },
+    },
+  },
+  {
+    "EdmondTabaku/eureka",
+    config = function(_, opts)
+      require("eureka").setup(opts)
+    end,
+    opts = {
+      default_notes = {
+        "${ project }: ${ project_desc }\n",
+      },
+      close_key = "qq",
+    },
+    keys = {
+      {
+        key_notes.eureka,
+        function()
+          require("eureka").show_notes()
+        end,
+        mode = "n",
+        desc = "note.eureka=> open",
+      },
     },
   },
 }

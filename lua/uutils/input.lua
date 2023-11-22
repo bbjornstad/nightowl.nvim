@@ -1,5 +1,3 @@
-local mopts = require("uutils.functional").mopts
-
 local mod = {}
 
 function mod.varfmt(argtable, input)
@@ -73,48 +71,45 @@ function mod.Prompter:callback(input_prompt, finput, ...)
   return wrapper
 end
 
-function mod.cmdtext_input(prompt, ...)
-  prompt = prompt or " :"
+function mod.cmdtext_input(opts, ...)
+  opts = opts or {}
+  local prompt = opts.prompt or " :"
   local argtable = { ... }
   local function extrawrap()
     vim.ui.input({ prompt = prompt }, function(input)
       local fargs = vim.tbl_map(function(val)
         return val:format(input)
       end, argtable)
-      vim.notify(vim.inspect(fargs))
       vim.cmd(unpack(fargs))
-      -- vim.notify(vim.inspect(res))
     end)
   end
   return extrawrap
 end
 
-function mod.callback_input(prompt, ...)
-  prompt = prompt or " :"
+function mod.callback_input(opts, ...)
+  opts = opts or {}
+  local prompt = opts.prompt or " :"
   local callbacks = { ... }
   local function extrawrap()
     vim.ui.input({ prompt = prompt }, function(input)
-      local res = {}
-      for i, cfunc in ipairs(callbacks) do
-        res[i] = cfunc(input)
-      end
-      return res
+      local fres = vim.tbl_map(function(cfunc)
+        return cfunc(input)
+      end, callbacks)
     end)
   end
-
   return extrawrap
 end
 
 function mod.name(...)
-  return mod.cmdtext_input("name 󰟵 ", ...)
+  return mod.cmdtext_input({ prompt = "name 󰟵 " }, ...)
 end
 
 function mod.filename(...)
-  return mod.cmdtext_input("filename 󰟵 ", ...)
+  return mod.cmdtext_input({ prompt = "filename 󰟵 " }, ...)
 end
 
 function mod.workspace(...)
-  return mod.cmdtext_input("workspace  ", ...)
+  return mod.cmdtext_input({ prompt = "workspace  " }, ...)
 end
 
 return mod

@@ -1,5 +1,5 @@
 local env = require("environment.ui")
-local kenv = require("environment.keys").stems
+local kenv = require("environment.keys").ui
 local key_easyread = kenv.easyread
 local key_block = kenv.block
 
@@ -18,13 +18,15 @@ return {
       excluded_filetypes = env.ft_ignore_list,
       extras = { named_parameters = true },
     },
-    config = true,
-    event = "LspAttach",
+    config = function(_, opts)
+      require("hlargs").setup(opts)
+    end,
+    event = "VeryLazy",
   },
   {
     "tzachar/highlight-undo.nvim",
     config = true,
-    enabled = false,
+    enabled = true,
     opts = {
       keymaps = {
         { "n", "u", "undo", {} },
