@@ -114,6 +114,11 @@ return {
     },
   },
   {
+    "jcdickinson/http.nvim",
+    enabled = enb.codeium.enable or enb.navi.enable,
+    build = "cargo build --workspace --release",
+  },
+  {
     "Exafunction/codeium.nvim",
     enabled = enb.codeium.enable,
     dependencies = {
@@ -128,7 +133,6 @@ return {
       },
       {
         "jcdickinson/http.nvim",
-        enabled = enb.codeium.enable,
         build = "cargo build --workspace --release",
       },
     },
@@ -284,6 +288,7 @@ return {
   },
   {
     "tzachar/cmp-ai",
+    event = "VeryLazy",
     enabled = enb.cmp_ai.enable,
     dependencies = {
       {
