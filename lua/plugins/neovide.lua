@@ -1,12 +1,23 @@
-local mod = {}
+local M = {}
 
 -- We can do anything that we need to in order to set up neovide behavior
 -- correctly in this block, but we need to keep the guard such that in case of
 -- issues the terminal official binary will work corrctly (`nvim` on cli)
 if vim.g.neovide then
   -- font setup.
-  vim.o.guifont =
-    "Monaspace\\ Argon,Lilex,IntelOne\\ Mono,Martian\\ Mono,Lekton,Fira\\ Mono,JuliaMono,Maple\\ Mono,Broot\\ Icons\\ Visual\\ Studio\\ Code,Symbola,codicon:h12"
+  vim.o.guifont = table.concat({
+    "Monaspace\\ Argon",
+    "Lilex",
+    "IntelOne\\ Mono",
+    "Martian\\ Mono",
+    "Lekton",
+    "Fira\\ Mono",
+    "JuliaMono",
+    "Maple\\ Mono",
+    "Broot\\ Icons\\ Visual\\ Studio\\ Code",
+    "Symbola",
+    "codicon",
+  }, ",") .. ":h12"
 
   -- padding
   vim.g.neovide_padding_top = 1
@@ -43,4 +54,4 @@ if vim.g.neovide then
   vim.g.neovide_cursor_unfocused_outline_width = 0.125
 end
 
-return mod
+return M
