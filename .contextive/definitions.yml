@@ -1,1 +1,5 @@
-
+contexts:
+  - name: Metacontext
+    domainVisionStatement: |
+      To describe core component types for my lazyvim configuration in a
+      descriptive and accessible way
