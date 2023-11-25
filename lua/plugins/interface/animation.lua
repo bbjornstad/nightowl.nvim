@@ -1,4 +1,5 @@
 local env = require("environment.ui")
+local key_mc = require("environment.keys").multicursor
 local signs = env.icons.cursorsigns
 
 local cb = require("funsak.wrap").cb
@@ -97,6 +98,27 @@ return {
         enable = false,
         head = { cursor = "󰵵" },
         body = {},
+      },
+    },
+  },
+  {
+    "smoka7/multicursors.nvim",
+    event = "VeryLazy",
+    dependencies = "anuvyklack/hydra.nvim",
+    cmd = {
+      "MCstart",
+      "MCvisual",
+      "MCclear",
+      "MCpattern",
+      "MCvisualPattern",
+      "MCunderCursor",
+    },
+    keys = {
+      {
+        key_mc.start,
+        "<cmd>MCstart<cr>",
+        mode = { "v", "n" },
+        desc = "Create a selection for selected text or word under the cursor",
       },
     },
   },
