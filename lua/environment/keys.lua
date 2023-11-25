@@ -674,7 +674,11 @@ kenv.ai = keygroup({
     prompt = "p",
     cancel = "c",
   },
-  ollero = "o",
+  ollero = {
+    [LEADER_ID] = { append = "o" },
+    open = "o",
+    list = "l",
+  },
   aider = {
     [LEADER_ID] = { append = "y" },
     noauto = "o",
@@ -1354,6 +1358,11 @@ kenv.session = keygroup({
   delete = "d",
   list = "p",
 }, leader_session, {})
+
+local leader_mc = "<leader>T"
+kenv.multicursor = keygroup({
+  start = "T",
+}, leader_mc, {})
 
 function kenv:leader()
   return NVIM_DYN_LEADER
