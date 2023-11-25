@@ -1055,9 +1055,17 @@ return {
     opts = {},
     keys = {
       {
-        kenv.ollero,
+        kenv.ollero.open,
         function()
-          require("ollero.nvim").open()
+          require("ollero").open()
+        end,
+        mode = "n",
+        desc = "ai.ollero=> open",
+      },
+      {
+        kenv.ollero.open,
+        function()
+          require("ollero").list_llms()
         end,
         mode = "n",
         desc = "ai.ollero=> open",
@@ -1068,7 +1076,14 @@ return {
     "David-Kunz/gen.nvim",
     enabled = enb.gen.enable,
     config = function(_, opts) end,
-    opts = {},
+    opts = {
+      debugCommand = true,
+      display_mode = "float",
+      show_prompt = true,
+      show_model = true,
+      no_auto_close = true,
+      no_serve = false,
+    },
     keys = {
       {
         kenv.gen.gen,
