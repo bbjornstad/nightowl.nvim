@@ -81,7 +81,7 @@ local lazyconf = {
 
     -- - ~~ ui tooling ~~
     { import = "lazyvim.plugins.extras.ui.mini-animate" },
-    { import = "lazyvim.plugins.extras.ui.edgy" },
+    -- { import = "lazyvim.plugins.extras.ui.edgy" },
     -- { import = "lazyvim.plugins.extras.ui.mini-starter" },
 
     -- ~~ formatting and linting ~~
