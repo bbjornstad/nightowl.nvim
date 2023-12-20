@@ -169,7 +169,7 @@ end
 ---happen if there is no passed overrides to this function. This is helpful in
 ---cases where it is not clear if the user has passed additional options.
 ---Defaults to `"suppress"`.
----@return table results the table that results from merging the options deeply
+---@return table? results the table that results from merging the options deeply
 ---and recursively.
 function M.mopts(defaults, overrides, error)
   error = error or "suppress"
@@ -198,6 +198,14 @@ function M.rmopts(error, defaults, ...)
   return vim.tbl_deep_extend("force", defaults, unpack({ ... }))
 end
 
+--- merges list-like tables using the vim.list_extend standard library function.
+--- This is different from any `mopts` derivative as this extends the list, e.g.
+--- there could be duplicated entries using this function.
+---@param defaults any[]
+---@param overrides any[]
+---@param error ("suppress" | "raise")? whether an error should be raised if
+---either of the operands are missing. Defaults to "suppress".
+---@return any[] list the final list-like extension.
 function M.lopts(defaults, overrides, error)
   error = error or "suppress"
   if error == "suppress" then
@@ -207,6 +215,75 @@ function M.lopts(defaults, overrides, error)
 
   defaults = vim.list_extend(defaults, overrides)
   return defaults
+end
+
+local strsplit = require("funsak.string").split
+function M.rget(tbl, field, sep)
+  sep = sep or "."
+  local fields = strsplit(field, sep)
+  local res
+
+  local operated_on = vim.deepcopy(tbl)
+  if fields ~= nil then
+    for _, fld in ipairs(fields) do
+      operated_on = operated_on[fld]
+    end
+  else
+    require("lazyvim.util").warn(
+      "No indexing field given, returning entire table..."
+    )
+  end
+  return operated_on
+end
+
+--- converts a list-like table into a table whose keys are the corresponding
+--- list items and the value is their ordering; essentially just a reversing of
+--- keys and values.
+---@param list any[] list like collection
+---@return table { [any]: integer }
+function M.idxlist(list)
+  local res = {}
+  for i, v in ipairs(list) do
+    res[v] = i
+  end
+  return res
+end
+
+function M.slice(tbl)
+  local mt = getmetatable(tbl)
+  mt.slice = function(t, first, last)
+    local keys = vim.tbl_keys(t)
+    keys = vim.tbl_filter(function(v)
+      if v < first or v > last then
+        return false
+      end
+      return true
+    end, keys)
+    return vim
+      .iter(M.idxlist(keys))
+      :map(function(k, v)
+        return tbl[k]
+      end)
+      :totable()
+  end
+end
+
+function M.firstn(n)
+  return function(tbl)
+    return vim
+      .iter(tbl)
+      :enumerate()
+      :filter(function(i, v)
+        if not i > n then
+          return v
+        end
+      end)
+      :map(function(ivpair)
+        local i, v = unpack(ivpair)
+        return v
+      end)
+      :totable()
+  end
 end
 
 return M

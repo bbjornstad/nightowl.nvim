@@ -13,11 +13,9 @@ local M = {}
 ---@param caster? fun(varval: any, ...): T
 ---@return T env the converted value of the environment variable.
 function M.from_env(varname, caster)
-  caster = caster or function(...)
-    return unpack({ ... })
-  end
+  caster = caster or require("funsak.wrap").F
 
-  local res = vim.env[varname]
+  local res = os.getenv(varname)
   return caster(res)
 end
 
@@ -47,7 +45,7 @@ function M.toboolean(v)
   if ok then
     return res > 0
   end
-  if v == "false" or not v then
+  if not v or v == "false" then
     return false
   elseif v == "true" then
     return true
