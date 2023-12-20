@@ -21,6 +21,7 @@ vim.opt.visualbell = true
 vim.opt.mousemoveevent = true
 
 -- timeout configuration for neovim mappings, affects WhichKey predominantly
+vim.opt.completeopt = "menuone,menu,noinsert"
 vim.opt.ttimeout = true
 vim.opt.ttimeoutlen = 75
 vim.opt.timeoutlen = 300
@@ -32,7 +33,7 @@ vim.opt.whichwrap:append("<,>,h,l")
 
 vim.opt.showcmd = true
 vim.opt.wildmenu = true
-vim.opt.cmdheight = 2
+vim.opt.cmdheight = 0
 
 vim.opt.ignorecase = true
 vim.opt.incsearch = true
@@ -73,7 +74,15 @@ end
 vim.opt.background = (NIGHTOWL_BACKGROUND or "dark")
 
 vim.cmd.hi("clear SignColumns")
+vim.opt.signcolumn = "auto"
 
 vim.opt.encoding = "utf-8"
 
 vim.g.loaded_perl_provider = 0
+
+-- set up the most important of the highlights for all schemes, generally these
+-- should be overwritten somewhere in the scheme definition itself but this
+-- provides a fallback such that certain plugins won't fail.
+vim.api.nvim_set_hl(0, "IndentBlanklineWhitespace", { link = "@comment" })
+vim.api.nvim_set_hl(0, "IndentBlanklineScope", { link = "@comment" })
+vim.api.nvim_set_hl(0, "IndentBlanklineIndent", { link = "@comment" })
