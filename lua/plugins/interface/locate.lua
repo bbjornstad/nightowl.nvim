@@ -2,6 +2,19 @@ local env = require("environment.ui")
 local kcolors = require("funsak.colors").kanacolors
 local key_ui = require("environment.keys").ui
 
+local default_class_separator_style = {
+  fgColor = "#7AA89F",
+  char = "⬩",
+  width = tonumber(vim.o.colorcolumn) or 80,
+  name = "ClassSeparator",
+}
+local default_func_separator_style = {
+  fgColor = "#7E9CD8",
+  char = "⌁",
+  width = tonumber(vim.o.colorcolumn) or 80,
+  name = "FuncSeparator",
+}
+
 return {
   {
     "mvllow/modes.nvim",
@@ -85,57 +98,6 @@ return {
         enable = true,
         min_length = 3,
         hl = { underline = true },
-      },
-    },
-  },
-  {
-    "edluffy/specs.nvim",
-    enabled = false,
-    config = true,
-    opts = function()
-      local opts = {
-        show_jumps = true,
-        min_jump = 30,
-        popup = {
-          delay_ms = 0,
-          inc_ms = 30,
-          blend = 10,
-          width = 30,
-          winhl = "CmpCompletionSel",
-          fader = require("specs").linear_fader,
-          resizer = require("specs").shrink_resizer,
-        },
-        ignore_filetypes = env.ft_ignore_list,
-        ignore_buftypes = {
-          nofile = true,
-        },
-      }
-      return opts
-    end,
-    keys = {
-      {
-        "gC",
-        function()
-          require("specs").show_specs()
-        end,
-        mode = "n",
-        desc = "specs=> show location flare",
-      },
-      {
-        "gCs",
-        function()
-          require("specs").show_specs()
-        end,
-        mode = "n",
-        desc = "specs=> show location flare",
-      },
-      {
-        "gCt",
-        function()
-          require("specs").toggle()
-        end,
-        mode = "n",
-        desc = "specs=> toggle location flare",
       },
     },
   },

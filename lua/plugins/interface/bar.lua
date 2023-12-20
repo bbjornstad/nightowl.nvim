@@ -12,6 +12,61 @@ local function lubar()
   return res
 end
 
+local M = {}
+
+M.incline_handler = {}
+
+local strip = require("funsak.table").strip
+
+function M.incline_handler.condition(fn)
+  return function(props, opts)
+    local condition = opts.cond or props.cond or true
+    props.cond = nil
+    if condition and condition() or condition then
+      return fn(props, opts)
+    end
+  end
+end
+function M.incline_handler.icon(fn)
+  return function(props, opts)
+    ---@type string | { glyph: string, location: ("prefix" | "suffix")?, formatter: string?, include_space: boolean? } | boolean
+    local icon_spec = opts.icon or props.icon or false
+    icon_spec = icon_spec ~= false
+        and type(icon_spec) ~= "table"
+        and { glyph = icon_spec }
+      or icon_spec
+    props.icon = nil
+    local include_space = icon_spec.include_space or true
+    local fmtstr = icon_spec.formatter or (include_space and "%s %s" or "%s%s")
+    local location = icon_spec.location or "prefix"
+    fmtstr = location == "prefix" and fmtstr:format("${ icon }", "${ content }")
+      or fmtstr:format("${ content }", "${ icon }")
+    local ok, fnres = pcall(fn, props, opts)
+    if not ok then
+      return
+    end
+    return fmtstr:gsub("${ icon }", icon_spec.glyph):gsub("${ content }", fnres)
+  end
+end
+
+function M.incline_handler.separator(fn)
+  return function(props, opts)
+    local sep_spec = opts.separator or props.separator or " "
+    props.separator = nil
+
+    local ok, fnres = pcall(fn, props, opts)
+    if not ok then
+      return
+    end
+
+    if sep_spec then
+      return ("${ content } ${ separator }")
+        :gsub("${ content }", fnres)
+        :gsub("${ separator }", sep_spec)
+    end
+  end
+end
+
 local function inclinate(results, opts)
   opts = opts or {}
   local ret = vim.tbl_deep_extend("force", { results }, opts)
@@ -39,23 +94,27 @@ return {
     },
     opts = {
       render = function(props)
-        return vim.tbl_map(function(it)
+        local retit = vim.tbl_map(function(it)
           local ret = (vim.is_callable(it.cond) and it.cond() or it.cond)
               and it[1]
             or nil
           return ret
         end, {
           { { "⟓:║ " }, cond = true },
-          sts.count.search(props, { icon = "󱊄", separator = "⦙" }),
-          sts.count.selection(props, { icon = "󱈅", separator = "⦙" }),
+          sts.count.search(props, { icon = "󱈅", separator = "⦙" }),
+          sts.count.selection(props, { icon = "󱊄", separator = "⦙" }),
           sts.progress(props, {
             icon = { glyph = "󱋫", location = "prefix" },
             separator = "⦙",
           }),
           sts.grapple(props, { icon = "⨳", separator = "⦙" }),
           sts.match_local_hl(props, { icon = "󰾹", separator = "⦙" }),
+          sts.wrap_mode(props, { icon = "󰖶", separator = "⦙" }),
           sts.fileinfo(props, { formatter = "╘╡ %s %s ╞╛" }),
         })
+
+        vim.notify(vim.inspect(retit))
+        return retit
       end,
       hide = {
         cursorline = false,
@@ -145,7 +204,6 @@ return {
       "nvim-tree/nvim-web-devicons",
       "rebelot/kanagawa.nvim",
       "cbochs/grapple.nvim",
-      "wthollingsworth/pomodoro.nvim",
       "jcdickinson/wpm.nvim",
       "Lamby777/timewasted.nvim",
     },
@@ -163,7 +221,13 @@ return {
           winbar = 1000,
         },
         disabled_filetypes = {
-          statusline = env.ft_ignore_list,
+          statusline = vim.tbl_filter(function(it)
+            if it == "outline" or it == "Outline" then
+              return false
+            else
+              return true
+            end
+          end, env.ft_ignore_list),
           winbar = lubar(),
         },
       },
@@ -355,6 +419,22 @@ return {
             sources = {
               "nvim_lsp",
               "nvim_diagnostic",
+              -- "nvim_workspace_diagnostic",
+            },
+            sections = { "error", "warn", "info", "hint" },
+            symbols = {
+              error = env.icons.diagnostic.Error,
+              warn = env.icons.diagnostic.Warn,
+              info = env.icons.diagnostic.Info,
+              hint = env.icons.diagnostic.Hint,
+            },
+            separator = "⦙",
+          },
+          {
+            "diagnostics",
+            sources = {
+              -- "nvim_lsp",
+              -- "nvim_diagnostic",
               "nvim_workspace_diagnostic",
             },
             sections = { "error", "warn", "info", "hint" },
@@ -543,5 +623,6 @@ return {
       percentile = 0.8,
     },
     config = true,
+    event = require("funsak.lazy").spec("lualine.nvim", "event"),
   },
 }

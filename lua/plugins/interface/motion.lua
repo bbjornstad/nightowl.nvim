@@ -1,28 +1,13 @@
 local env = require("environment.ui")
 local opt = require("environment.optional")
-local kenv = require("environment.keys").motion
-local key_harpoon = kenv.harpoon
+local kenv = require("environment.keys").motion.standard
+local qenv = require("environment.keys").motion.qortal
 
 return {
   {
     "echasnovski/mini.bracketed",
     event = "VeryLazy",
     version = false,
-  },
-  {
-    "rainbowhxch/accelerated-jk.nvim",
-    enabled = opt.accelerated_jk,
-    event = "VeryLazy",
-    opts = {
-      mode = "time_driven",
-      enable_deceleration = false,
-      acceleration_motions = { "j", "k", "e", "w", "b" },
-      acceleration_limit = 120,
-      acceleration_table = { 7, 12, 17, 21, 24, 26, 28, 30 },
-      -- when 'enable_deceleration = true', 'deceleration_table = { {200, 3}, {300, 7}, {450, 11}, {600, 15}, {750, 21}, {900, 9999} }'
-      deceleration_table = { { 150, 9999 } },
-    },
-    config = true,
   },
   {
     "abecodes/tabout.nvim",
@@ -166,7 +151,7 @@ return {
     "cbochs/portal.nvim",
     keys = {
       {
-        kenv.portal.changelist.forward,
+        qenv.changelist.forward,
         function()
           require("portal.builtin").changelist.tunnel()
         end,
@@ -174,7 +159,7 @@ return {
         desc = "portal=> forward changelist",
       },
       {
-        kenv.portal.changelist.backward,
+        qenv.changelist.backward,
         function()
           require("portal.builtin").changelist.tunnel_backward()
         end,
@@ -182,7 +167,7 @@ return {
         desc = "portal=> backward changelist",
       },
       {
-        kenv.portal.grapple.forward,
+        qenv.grapple.forward,
         function()
           require("portal.builtin").grapple.tunnel()
         end,
@@ -190,7 +175,7 @@ return {
         desc = "portal=> forward grapple",
       },
       {
-        kenv.portal.grapple.backward,
+        qenv.grapple.backward,
         function()
           require("portal.builtin").grapple.tunnel_backward()
         end,
@@ -198,7 +183,7 @@ return {
         desc = "portal=> backward grapple",
       },
       {
-        kenv.portal.quickfix.forward,
+        qenv.quickfix.forward,
         function()
           require("portal.builtin").quickfix.tunnel()
         end,
@@ -206,7 +191,7 @@ return {
         desc = "portal=> forward quickfix",
       },
       {
-        kenv.portal.quickfix.backward,
+        qenv.quickfix.backward,
         function()
           require("portal.builtin").quickfix.tunnel_backward()
         end,
@@ -214,7 +199,7 @@ return {
         desc = "portal=> backward quickfix",
       },
       {
-        kenv.portal.jumplist.forward,
+        qenv.jumplist.forward,
         function()
           require("portal.builtin").jumplist.tunnel()
         end,
@@ -222,7 +207,7 @@ return {
         desc = "portal=> backward jumplist",
       },
       {
-        kenv.portal.jumplist.backward,
+        qenv.jumplist.backward,
         function()
           require("portal.builtin").jumplist.tunnel_backward()
         end,
@@ -260,7 +245,6 @@ return {
       escape = {
         ["<esc>"] = true,
         ["q"] = true,
-        ["qq"] = true,
       },
 
       ---The raw window options used for the portal window
@@ -295,7 +279,7 @@ return {
     end,
     keys = {
       {
-        key_harpoon.add_file,
+        kenv.harpoon.add_file,
         function()
           require("harpoon.mark").add_file()
         end,
@@ -303,7 +287,7 @@ return {
         desc = "harpoon=> add file",
       },
       {
-        key_harpoon.quick_menu,
+        kenv.harpoon.quick_menu,
         function()
           require("harpoon.ui").toggle_quick_menu()
         end,
@@ -311,7 +295,7 @@ return {
         desc = "harpoon=> quick menu",
       },
       {
-        key_harpoon.nav.next,
+        kenv.harpoon.nav.next,
         function()
           require("harpoon.ui").nav_next()
         end,
@@ -319,7 +303,7 @@ return {
         desc = "harpoon=> next mark",
       },
       {
-        key_harpoon.nav.previous,
+        kenv.harpoon.nav.previous,
         function()
           require("harpoon.ui").nav_prev()
         end,
@@ -327,7 +311,7 @@ return {
         desc = "harpoon=> previous mark",
       },
       {
-        key_harpoon.nav.file,
+        kenv.harpoon.nav.file,
         function()
           require("harpoon.ui").nav_file()
         end,
@@ -335,7 +319,7 @@ return {
         desc = "harpoon=> to file",
       },
       {
-        key_harpoon.term.to,
+        kenv.harpoon.term.to,
         function()
           require("harpoon.term").gotoTerminal()
         end,
@@ -343,7 +327,7 @@ return {
         desc = "harpoon=> to terminal",
       },
       {
-        key_harpoon.term.send,
+        kenv.harpoon.term.send,
         function()
           require("harpoon.ui").sendCommand()
         end,
@@ -351,7 +335,7 @@ return {
         desc = "harpoon=> send command",
       },
       {
-        key_harpoon.term.menu,
+        kenv.harpoon.term.menu,
         function()
           require("harpoon.cmd-ui").toggle_quick_menu()
         end,

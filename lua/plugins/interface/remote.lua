@@ -6,6 +6,7 @@ return {
     config = function(_, opts)
       require("netman").setup(opts)
     end,
+    event = "VeryLazy",
   },
   {
     "chipsenkbeil/distant.nvim",
