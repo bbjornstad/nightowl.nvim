@@ -13,7 +13,14 @@ return {
       use_lsp_features = true,
       all_cmd_names = [[nu -c 'help commands | get name | str join "\n"']],
     },
-    config = true,
+    config = function(_, opts)
+      require("nu").setup(opts)
+      vim.filetype.add({
+        extension = {
+          nu = "nu",
+        },
+      })
+    end,
   },
   {
     "nvimtools/none-ls.nvim",
@@ -25,24 +32,23 @@ return {
     dependencies = {
       {
         "zioroboco/nu-ls.nvim",
-        ft = { "nu" },
-        config = function(_, opts)
-          vim.filetype.add({
-            extension = {
-              nu = "nu",
-            },
-          })
-          require("nu-ls").setup(opts)
-        end,
-        opts = {},
-        dependencies = {
-          "nvim-lua/plenary.nvim",
-          "nvimtools/none-ls.nvim",
-        },
       },
     },
+    ft = { "nu" },
   },
   {
     "zioroboco/nu-ls.nvim",
+    ft = { "nu" },
+    config = function(_, opts)
+      require("nu-ls").setup(opts)
+    end,
+    opts = {
+      debounce = 500,
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      { "nvimtools/none-ls.nvim" },
+    },
   },
+  { import = "lazyvim.plugins.extras.lsp.none-ls" },
 }

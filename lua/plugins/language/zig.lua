@@ -1,7 +1,16 @@
-local deflang = require("funsak.lazy").lintformat
+local lz = require("funsak.lazy")
 
 return {
-  unpack(deflang({ "zig" }, { "zigfmt" }, {})),
+  lz.lspfmt("zigfmt", { "zig" }),
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = { "VonHeikemen/lsp-zero.nvim" },
+    opts = function(_, opts)
+      opts.setup = vim.tbl_deep_extend("force", {
+        zls = require("lsp-zero").noop,
+      }, opts.setup or {})
+    end,
+  },
   {
     "NTBBloodbath/zig-tools.nvim",
     ft = "zig",

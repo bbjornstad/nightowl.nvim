@@ -2,18 +2,18 @@ local env = require("environment.ui")
 local key_glow = require("environment.keys").tool.glow
 
 local deflang = require("funsak.lazy").lintformat
+local lz = require("funsak.lazy")
 
 return {
-  unpack(
-    deflang(
-      { "markdown", "md", "rmd" },
-      { "markdown-toc", "markdownlint", "mdformat" },
-      "markdownlint"
-    )
+  lz.lspsrv("marksman", { server = {} }),
+  lz.lsplnt({ "markdownlint" }, { "markdown", "md", "rmd", "qmd", "quarto" }),
+  lz.lspfmt(
+    { "markdown-toc", "markdownlint", "mdformat" },
+    { "markdown", "md", "rmd", "qmd", "quarto" }
   ),
   {
     "preservim/vim-markdown",
-    ft = { "markdown", "md", "rmd" },
+    ft = { "markdown", "md", "rmd", "qmd", "quarto" },
     config = function() end,
     init = function()
       vim.g.vim_markdown_folding_disabled = 1
@@ -35,7 +35,7 @@ return {
       style = vim.env.NIGHTOWL_BACKGROUND_STYLE,
     },
     cmd = "Glow",
-    ft = { "markdown", "mkd", "md", "rmd", "qmd", "quarto" },
+    ft = { "markdown", "md", "rmd", "qmd", "quarto" },
     keys = {
       {
         key_glow,

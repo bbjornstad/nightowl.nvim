@@ -1,19 +1,40 @@
 local kenv = require("environment.keys")
 local key_yaml = kenv.lang.yaml
+local lz = require("funsak.lazy")
 
 local toggle_fmtoption = require("uutils.text").toggle_fmtopt
-local deflang = require("funsak.lazy").lintformat
-local masonry = require("funsak.lazy").masonry
 
 return {
-  unpack(deflang({ "yaml", "yml" }, { "yamlfmt" }, { "yamllint" })),
-  masonry({ name = "yamlls", lang = "yaml" }, "server", {
-    schemaStore = {
-      enable = false,
-      url = "",
+  lz.lspsrv("yamlls", {
+    server = {
+      capabilities = {
+        textDocument = {
+          foldingRange = {
+            dynamicRegistration = false,
+            lineFoldingOnly = true,
+          },
+        },
+      },
+      settings = {
+        redhat = { telemetry = { enabled = false } },
+        yaml = {
+          validate = true,
+          format = true,
+          schemaStore = {
+            enable = false,
+            url = "",
+          },
+          schemas = require("schemastore").yaml.schemas(),
+          schemaDownload = { enable = true },
+        },
+      },
     },
-    schemas = require("schemastore").yaml.schemas(),
-  }, { "b0o/SchemaStore.nvim" }),
+    dependencies = {
+      { "b0o/SchemaStore.nvim" },
+    },
+  }),
+  lz.lsplnt("yamllint", { "yaml", "yml" }),
+  lz.lspfmt("yamlfmt", { "yaml", "yml" }),
   {
     "cuducos/yaml.nvim",
     ft = { "yaml" },
@@ -30,8 +51,9 @@ return {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",
     },
-    opts = {
-      lspconfig = {
+    opts = function(_, opts)
+      opts = opts or {}
+      opts.lspconfig = vim.tbl_deep_extend("force", {
         settings = {
           yaml = {
             format = {
@@ -39,8 +61,8 @@ return {
             },
           },
         },
-      },
-    },
+      }, opts.lspconfig or {})
+    end,
     config = function(_, opts)
       require("yaml-companion").setup(opts)
       require("telescope").load_extension("yaml_schema")

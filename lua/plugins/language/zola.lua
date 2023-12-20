@@ -1,22 +1,15 @@
 local deflang = require("funsak.lazy").lintformat
 
 return {
-  unpack(
-    deflang(
-      { "html", "jinja", "jinja2", "liquid" },
-      { "djlint" },
-      { "djlint", "curlylint" }
-    )
-  ),
   {
     "yorik1984/zola.nvim",
     config = false,
     dependencies = {
       "Glench/Vim-Jinja2-Syntax",
-      { "cespare/vim-toml", ft = { "toml", "markdown", "html", "jinja" } },
+      -- "HiPhish/jinja.vim",
+      { "cespare/vim-toml", ft = { "toml", "markdown" } },
     },
-    ft = { "markdown", "html", "jinja" },
-    enabled = true,
+    ft = { "markdown", "html", "jinja", "jinja2" },
   },
   {
     "ray-x/web-tools.nvim",

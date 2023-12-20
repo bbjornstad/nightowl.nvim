@@ -1,8 +1,9 @@
-local add_cmp_source = require("uutils.cmp").add_source
-local deflang = require("funsak.lazy").lintformat
+local lz = require("funsak.lazy")
 
 return {
-  unpack(deflang("clojure", "cljstyle", "clj-kondo")),
+  lz.lspsrv("clojure_lsp", { server = {} }),
+  lz.lsplnt("clj-kondo", "clojure"),
+  lz.lspfmt("cljstyle", "clojure"),
   {
     "clojure-vim/acid.nvim",
     config = function() end,
@@ -33,14 +34,7 @@ return {
     dependencies = {
       {
         "PaterJason/cmp-conjure",
-        config = function(_, opts)
-          add_cmp_source("conjure", opts or {})
-          add_cmp_source("buffer", opts or {}, {
-            sources = {
-              { name = "conjure" },
-            },
-          })
-        end,
+        dependencies = { "hrsh7th/nvim-cmp" },
         ft = { "clojure", "fennel", "python" },
       },
     },
