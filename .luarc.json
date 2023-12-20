@@ -1,0 +1,20 @@
+{
+  "workspace.checkThirdParty": false,
+  "diagnostics.workspaceDelay": 500,
+  "diagnostics.disable": ["different-requires", "unused-local"],
+  "diagnostics.globals": ["vim"],
+  "completion": {
+    "callSnippet": "Both"
+  },
+  "hint": {
+    "enabled": true,
+    "setType": true,
+    "arrayIndex": "Enable",
+    "paramType": true,
+    "await": true,
+    "paramName": "All",
+    "semicolon": "SameLine"
+  },
+  "codeLens.enable": true,
+  "runtime.version": "LuaJIT"
+}
