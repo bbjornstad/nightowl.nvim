@@ -3,10 +3,13 @@ local key_lsp = require("environment.keys").lsp
 return {
   {
     "mfussenegger/nvim-lint",
+    dependencies = {
+      { "rshkarin/mason-nvim-lint", optional = true },
+    },
     enabled = true,
     opts = {
       linters_by_ft = {
-        text = { "vale" },
+        text = {},
       },
     },
     config = function(_, opts)
@@ -29,6 +32,22 @@ return {
         desc = "lsp=> try lint",
       },
     },
+  },
+  {
+    "rshkarin/mason-nvim-lint",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+      "mfussenegger/nvim-lint",
+    },
+    config = function(_, opts)
+      require("mason-nvim-lint").setup(opts)
+    end,
+    opts = {
+      ensure_installed = {},
+      automatic_installation = true,
+    },
+    event = { "LspAttach" },
   },
   {
     "stevearc/conform.nvim",
@@ -72,7 +91,6 @@ return {
       "nvim-telescope/telescope.nvim", -- Optional, better picker
     },
     main = "plf",
-    lazy = true,
     opts = {
       data_dir = vim.fn.expand(vim.fn.stdpath("state") .. "/picklspformat/"),
       when_unset = "pick",
