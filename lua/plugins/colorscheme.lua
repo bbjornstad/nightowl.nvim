@@ -1,5 +1,6 @@
 local env = require("environment.ui")
 local default_colorizer = require("funsak.colors").identify_highlight
+local comp = require("funsak.colors").component
 local bg_style = vim.env.NIGHTOWL_BACKGROUND_STYLE
 
 if vim.fn.has("termguicolors") then
@@ -7,7 +8,54 @@ if vim.fn.has("termguicolors") then
 end
 
 local defhl = require("funsak.colors").initialize_custom_highlights
--- defhl({ "Comment" }, { italic = true })
+
+local REQUIRED_HLS = {
+  telescope = {
+    "TelescopeTitle",
+    "TelescopePromptNormal",
+    "TelescopePromptBorder",
+    "TelescopeResultsNormal",
+    "TelescopeResultsBorder",
+    "TelescopePreviewNormal",
+    "TelescopePreviewBorder",
+  },
+  incline = {
+    "InclineNormal",
+    "InclineNormalNC",
+  },
+  dropbar = {
+    "WinBar",
+    "WinBarNC",
+    "DropBarCurrentContext",
+    "DropBarMenuCurrentContext",
+    "DropBarIconCurrentContext",
+    "DropBarPreview,",
+  },
+  context_hint = {
+    "BiscuitColor",
+    "TreesitterContextBottom",
+    "NightowlContextHints",
+    "NightowlContextHintsBright",
+    "NightowlStartupHeader",
+    "NightowlStartupEntry",
+    "NightowlStartupConvenience",
+  },
+  indent_blankline = {
+    "IndentBlanklineWhitespace",
+    "IndentBlanklineIndent",
+    "IndentBlanklineScope",
+  },
+}
+
+local function hl_scheme_segments(scheme)
+  return function(colors)
+    colors = type(colors) == "function" and colors() or colors
+  end
+end
+
+local function initialize_required_hl_defaults(skip)
+  skip = skip or {}
+end
 
 return {
   {
@@ -27,6 +75,7 @@ return {
       -- views.
       overrides = function(colors)
         local theme = colors.theme
+        local pcol = colors.palette
         return {
           TelescopeTitle = { fg = theme.ui.special, bold = true },
           TelescopePromptNormal = { bg = theme.ui.bg_p1 },
@@ -42,10 +91,10 @@ return {
           PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
           PmenuSbar = { bg = theme.ui.bg_m1 },
           PmenuThumb = { bg = theme.ui.bg_p2 },
-          InclineNormal = { bg = colors.palette.waveBlue1 },
-          InclineNormalNC = { bg = colors.palette.sumiInk1 },
-          WinBar = { bg = colors.palette.sumiInk4 },
-          WinBarNC = { bg = colors.palette.sumiInk4 },
+          InclineNormal = { bg = theme.ui.bg_p2 },
+          InclineNormalNC = { bg = theme.ui.bg_dim },
+          WinBar = { bg = pcol.sumiInk4 },
+          WinBarNC = { bg = pcol.sumiInk4 },
           DropBarCurrentContext = { bg = "NONE" },
           DropBarMenuCurrentContext = { bg = "NONE" },
           DropBarIconCurrentContext = { bg = "NONE" },
@@ -54,23 +103,23 @@ return {
           TreesitterContextBottom = { underline = true },
           NightowlContextHints = {
             italic = true,
-            fg = colors.palette.springViolet2,
+            fg = pcol.winterGreen,
           },
           NightowlContextHintsBright = {
             italic = true,
-            fg = colors.palette.dragonBlue,
+            fg = pcol.winterYellow,
           },
           NightowlStartupEntry = {
-            bold = false,
-            fg = colors.palette.springViolet2,
+            bold = true,
+            fg = pcol.springViolet2,
           },
           NightowlStartupHeader = {
             bold = true,
-            fg = colors.palette.waveRed,
+            fg = pcol.springViolet1,
           },
           NightowlStartupConvenience = {
-            bold = true,
-            fg = colors.palette.waveBlue2,
+            bold = false,
+            fg = pcol.waveBlue2,
           },
           IndentBlanklineWhitespace = { link = "@comment" },
           IndentBlanklineScope = { link = "@comment" },
@@ -80,28 +129,9 @@ return {
     },
   },
   {
-    "lewpoly/sherbet.nvim",
-    config = function(_, opts)
-      vim.g.sherbet_italic_keywords = opts.italic.keywords or false
-      vim.g.sherbet_italic_functions = opts.italic.functions or true
-      vim.g.sherbet_italic_comments = opts.italic.comments or true
-      vim.g.sherbet_italic_loops = opts.italic.loops or true
-      vim.g.sherbet_italic_conditionals = opts.italic.conditionals or true
-    end,
-    opts = {
-      italic = {
-        keywords = false,
-        functions = true,
-        comments = true,
-        loops = true,
-        conditionals = true,
-      },
-    },
-    lazy = true,
-    priority = 997,
-  },
-  {
     "cryptomilk/nightcity.nvim",
+    priority = 950,
+    enabled = true,
     version = false,
     opts = {
       style = "afterlife",
@@ -131,7 +161,18 @@ return {
         },
       },
       plugins = { default = true },
-      on_highlights = function(groups, colors) end,
+      on_highlights = function(groups, colors)
+        groups.IndentBlanklineWhitespace = comp("Conceal", { "fg" })
+        groups.IndentBlanklineScope = comp("Conceal", { "fg" })
+        groups.IndentBlanklineIndent = comp("Conceal", { "fg" })
+
+        groups.NightowlContextHints = comp("SignColumn", { "bg", "fg" })
+        groups.NightowlContextHintsBright = comp("@repeat", { "bg", "fg" })
+        groups.NightowlStartupEntry = comp("LspInlayHint", { "bg", "fg" })
+        groups.NightowlStartupHeader = comp("@number", { "bg", "fg" })
+        groups.NightowlStartupConvenience =
+          comp("DashboardShortCut", { "bg", "fg" })
+      end,
     },
     config = function(_, opts)
       require("nightcity").setup(opts)
@@ -139,11 +180,12 @@ return {
   },
   {
     "rose-pine/neovim",
+    enabled = true,
     name = "rose-pine",
     opts = function(_, opts)
       local rppal = require("rose-pine.palette")
       opts.variant = "auto" or opts.variant
-      opts.dark_variant = "main" or opts.dark_variant
+      opts.dark_variant = "moon" or opts.dark_variant
       opts.highlight_groups = vim.tbl_deep_extend("force", {
         TelescopeTitle = { fg = rppal.text, bold = true },
         TelescopePromptNormal = { bg = rppal.surface },
@@ -179,24 +221,11 @@ return {
       }, opts.highlight_groups or {})
     end,
     config = true,
-    lazy = true,
-    priority = 999,
-  },
-  {
-    "yorik1984/newpaper.nvim",
-    priority = 900,
-    config = function(_, opts)
-      require("newpaper").setup(opts)
-    end,
-    lazy = true,
-    opts = {
-      style = bg_style,
-    },
+    priority = 960,
   },
   {
     "Verf/deepwhite.nvim",
-    lazy = true,
-    priority = 890,
+    priority = 990,
     config = function(_, opts)
       local dw_accent = "#E5E5E5"
       defhl({ "TreesitterContextBottom" }, { fg = dw_accent, underline = true })
@@ -210,6 +239,7 @@ return {
   },
   {
     "roobert/palette.nvim",
+    priority = 980,
     config = function(_, opts)
       require("palette").setup(opts)
     end,
@@ -221,6 +251,7 @@ return {
           ["kanagawa-lotus"] = {},
           ["deepwhite"] = {},
           ["nano"] = {},
+          -- TODO: Add an implementation for the "hagoromo" colorscheme.
           ["hagoromo"] = {},
         },
       },
@@ -233,10 +264,8 @@ return {
   },
   {
     "ronisbr/nano-theme.nvim",
-    config = function(_, opts)
-      vim.o.background = opts.background.override and opts.background.style
-        or (vim.o.background or "light")
-    end,
+    priority = 970,
+    config = function(_, opts) end,
     opts = {
       background = {
         override = false,
@@ -245,14 +274,96 @@ return {
     },
   },
   {
+    "neanias/everforest-nvim",
+    version = false,
+    lazy = true,
+    priority = 950,
+    config = function(_, opts)
+      require("everforest").setup(opts)
+    end,
+    opts = {
+      background = "soft",
+      sign_column_background = "grey",
+      ui_contrast = "low",
+      float_style = "dim",
+      on_highlights = function(hl, palette) end,
+    },
+  },
+  {
+    "bbjornstad/hagoromo.nvim",
+    dev = true,
+    priority = 1001,
+    opts = {},
+    config = function(_, opts)
+      require("hagoromo").setup(opts)
+    end,
+  },
+  {
+    "EdenEast/nightfox.nvim",
+    config = function(_, opts)
+      require("nightfox").setup(opts)
+    end,
+    opts = {
+      styles = {
+        comments = "italic",
+        functions = "bold",
+        constants = "bold",
+        keywords = "bold",
+      },
+      module_default = true,
+    },
+    priority = 800,
+    lazy = true,
+  },
+  {
+    "yorik1984/newpaper.nvim",
+    config = function(_, opts)
+      require("newpaper").setup(opts)
+    end,
+    priority = 790,
+    opts = {
+      style = bg_style ~= nil and bg_style or "dark",
+      editor_better_view = true,
+      keywords = "bold",
+      doc_keywords = "bold,italic",
+      error_highlight = "undercurl",
+      saturation = -0.2,
+      italic_strings = false,
+      italic_comments = true,
+      italic_doc_comments = true,
+      italic_functions = true,
+      italic_variables = false,
+      borders = true,
+    },
+    lazy = true,
+  },
+  {
     "LazyVim/LazyVim",
     opts = {
       colorscheme = function()
         local bg = bg_style or "dark"
         if bg == "light" then
-          require(env.colorscheme.light).load()
+          local has, pkg = pcall(require, env.colorscheme.light)
+          local ok, res
+          if has then
+            ok, res = pcall(pkg.load)
+          else
+            ok, res = false, nil
+          end
+          if not ok then
+            vim.cmd.colorscheme(env.colorscheme.light)
+          end
         else
-          require(env.colorscheme.dark).load()
+          local has, pkg = pcall(require, env.colorscheme.dark)
+          local ok, res
+          if has then
+            ok, res = pcall(pkg.load)
+          else
+            ok, res = pcall(require(env.colorscheme.dark).load)
+          end
+          if not ok then
+            vim.cmd.colorscheme(env.colorscheme.dark)
+          end
         end
       end,
     },
