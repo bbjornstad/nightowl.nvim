@@ -60,6 +60,9 @@ return {
         -- spelling
         "z=",
         "Z",
+        "qc",
+        "qq",
+        "qg",
       },
       documentation = {
         view = "hover",
@@ -106,6 +109,16 @@ return {
         [stems.action:leader()] = { name = "::| action |::" },
         [stems.replace:leader()] = { name = "::| replace |::" },
         [stems.macro:leader()] = { name = "::| macros |::" },
+        [stems.term:leader()] = { name = "::| utiliterm |::" },
+        [stems.shortcut.fm.explore:leader()] = { name = "::| explore |::" },
+        [stems.multicursor:leader()] = { name = "::| multiline |::" },
+        [stems.session:leader()] = { name = "::| session |::" },
+        [stems.tool.rest:leader()] = { name = "::| REST |::" },
+        [stems.tool.regex:leader()] = { name = "::| regex |::" },
+        [stems.tool.splitjoin:leader()] = { name = "::| splitjoin |::" },
+        [stems.yank:leader()] = { name = "::| yank |::" },
+        [stems.lsp.workspace:leader()] = { name = "::| workspace |::" },
+        [stems.diagnostic:leader()] = { name = "::| diag/trouble |::" },
       },
     },
     keys = {

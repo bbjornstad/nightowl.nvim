@@ -11,15 +11,20 @@ return {
     opts = {
       vscode = true,
       snipmate = true,
+      history = true,
+      delete_check_events = "TextChanged",
     },
     config = function(_, opts)
       opts = opts or {}
       if opts.vscode then
         require("luasnip.loaders.from_vscode").lazy_load()
+        opts.vscode = nil
       end
       if opts.snipmate then
         require("luasnip.loaders.from_snipmate").lazy_load()
+        opts.snipmate = nil
       end
+      require("luasnip").setup(opts)
     end,
   },
   { "honza/vim-snippets", config = false, event = "VeryLazy" },

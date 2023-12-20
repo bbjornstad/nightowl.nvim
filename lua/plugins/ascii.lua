@@ -6,6 +6,9 @@ local key_figlet = key_editor.figlet
 local key_cframe = key_editor.comment_frame
 local key_venn = key_editor.venn
 local key_iconpick = key_editor.glyph.picker
+local key_significant = key_editor.significant
+
+---@diagnostic disable: inject-field
 
 local mopts = require("funsak.table").mopts
 local inp = require("uutils.input")
@@ -251,7 +254,7 @@ return {
       "FigSelectComment",
     },
     config = function(_, opts)
-      require("figlet").Config(mopts({ font = "Impossible" }, opts))
+      require("figlet").Config(opts)
     end,
     opts = { font = "Impossible" },
     keys = {
@@ -283,13 +286,13 @@ return {
       },
       {
         key_figlet.ascii_interface,
-        "<CMD>FigSelect<CR>",
+        ":FigSelect<CR>",
         mode = { "v" },
         desc = "figlet=> ascii select interface",
       },
       {
         key_figlet.ascii_comment_interface,
-        "<CMD>FigSelectComment<CR>",
+        ":FigSelectComment<CR>",
         mode = { "v" },
         desc = "figlet=> ascii select comment interface",
       },
@@ -576,6 +579,23 @@ return {
         "<CMD>PickAltFontAndSymbolsInsert<CR>",
         mode = "n",
         desc = "glyph.icons=> font and symbols (alt)",
+      },
+    },
+  },
+  {
+    "ElPiloto/significant.nvim",
+    opts = {},
+    config = function(_, opts)
+      require("significant").setup(opts)
+    end,
+    keys = {
+      {
+        key_significant.start_signs,
+        function()
+          require("significant").start_animated_sign(10, "dots4", 300)
+        end,
+        mode = "n",
+        desc = "sgnfcnt=> start animation",
       },
     },
   },

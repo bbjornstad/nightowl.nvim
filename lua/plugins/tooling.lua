@@ -1,13 +1,15 @@
 -- vim: set ft=lua sts=2 ts=2 sw=2 et:
 local env = require("environment.ui")
 local kenv = require("environment.keys")
-local kenv_term = kenv.term
+local key_term = kenv.term
 local key_macro = kenv.macro
 local mapx = vim.keymap.set
 local key_treesj = kenv.tool.splitjoin
 local key_code_shot = kenv.editor.code_shot
 local key_replace = kenv.replace
 local key_notes = kenv.editor.notes
+local key_wrap = kenv.editor.wrapping
+local key_view = kenv.view
 
 local utiliterm = require("environment.utiliterm")
 
@@ -72,7 +74,7 @@ return {
     },
     keys = {
       {
-        kenv_term.layout.vertical,
+        key_term.layout.vertical,
         function()
           require("toggleterm").setup({ direction = "vertical" })
         end,
@@ -80,7 +82,7 @@ return {
         desc = "term=> toggle vertical layout",
       },
       {
-        kenv_term.layout.horizontal,
+        key_term.layout.horizontal,
         function()
           require("toggleterm").setup({ direction = "horizontal" })
         end,
@@ -88,7 +90,7 @@ return {
         desc = "term=> toggle horizontal layout",
       },
       {
-        kenv_term.layout.float,
+        key_term.layout.float,
         function()
           require("toggleterm").setup({ direction = "float" })
         end,
@@ -96,7 +98,7 @@ return {
         desc = "term=> toggle float layout",
       },
       {
-        kenv_term.layout.tabbed,
+        key_term.layout.tabbed,
         function()
           require("toggleterm").setup({ direction = "tabbed" })
         end,
@@ -105,25 +107,25 @@ return {
       },
       -- custom terminal mappings go here.
       {
-        kenv_term.utiliterm.btop,
+        key_term.utiliterm.btop,
         utiliterm.btop(),
         mode = "n",
         desc = "term.mon=> btop",
       },
       {
-        kenv_term.utiliterm.sysz,
+        key_term.utiliterm.sysz,
         utiliterm.sysz(),
         mode = "n",
         desc = "term.mon=> sysz",
       },
       {
-        kenv_term.utiliterm.weechat,
+        key_term.utiliterm.weechat,
         utiliterm.weechat(),
         mode = "n",
         desc = "term.mon=> weechat",
       },
       {
-        kenv_term.utiliterm.broot,
+        key_term.utiliterm.broot,
         utiliterm.broot(),
         mode = "n",
         desc = "term.fm=> broot",
@@ -225,11 +227,8 @@ return {
           local ret = true
           local bufname = vim.api.nvim_buf_get_name(bufnr)
           local fsize = vim.fn.getfsize(bufname)
-          if fsize > 100 * 1024 then
+          if (fsize > 100 * 1024) or bufname:match("^fugitive://") then
             -- skip file size greater than 100k
-            ret = false
-          elseif bufname:match("^fugitive://") then
-            -- skip fugitive buffer
             ret = false
           end
           return ret
@@ -282,7 +281,6 @@ return {
         desc = "treesj=> split with splitjoin",
       },
     },
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
     config = function(_, opts)
       require("treesj").setup(opts)
     end,
@@ -309,42 +307,6 @@ return {
 
       -- Use `dot` for repeat action
       dot_repeat = true,
-    },
-  },
-  {
-    "niuiic/code-shot.nvim",
-    config = true,
-    dependencies = {
-      "niuiic/core.nvim",
-    },
-    opts = {
-      ---@return string output file path
-      output = function()
-        local core = require("core")
-        local buf_name = vim.api.nvim_buf_get_name(0)
-        return core.file.name(buf_name) .. ".png"
-      end,
-      ---@return string[]
-      -- select_area: {s_start: {row: number, col: number}, s_end: {row: number, col: number}} | nil
-      options = function(select_area)
-        if not select_area then
-          return {}
-        end
-        return {
-          "--line-offset",
-          select_area.s_start.row,
-        }
-      end,
-    },
-    keys = {
-      {
-        key_code_shot,
-        function()
-          require("code-shot").shot()
-        end,
-        mode = { "n", "v" },
-        desc = "code=> screen shot",
-      },
     },
   },
   {
@@ -472,14 +434,6 @@ return {
     },
   },
   {
-    "echasnovski/mini.extra",
-    version = false,
-    config = function(_, opts)
-      require("mini.extra").setup(opts)
-    end,
-    opts = {},
-  },
-  {
     "chrisgrieser/nvim-recorder",
     event = "VeryLazy",
     dependencies = {
@@ -498,7 +452,7 @@ return {
         switchSlot = key_macro.switch,
         editMacro = key_macro.edit,
         yankMacro = key_macro.yank,
-        add_breakpoint = "##.",
+        add_breakpoint = "<C-q><C-b>",
       },
     },
   },
@@ -522,7 +476,7 @@ return {
     end,
     keys = {
       {
-        "<C-a>",
+        "<C-y>",
         function()
           require("dial.map").manipulate("increment", "normal")
         end,
@@ -530,7 +484,7 @@ return {
         desc = "dial=> increment",
       },
       {
-        "<C-x>",
+        "<C-S-y>",
         function()
           require("dial.map").manipulate("decrement", "normal")
         end,
@@ -538,7 +492,7 @@ return {
         desc = "dial=> decrement",
       },
       {
-        "g<C-a>",
+        "g<C-y>",
         function()
           require("dial.map").manipulate("increment", "gnormal")
         end,
@@ -546,7 +500,7 @@ return {
         desc = "dial=> gincrement",
       },
       {
-        "g<C-x>",
+        "g<C-S-y>",
         function()
           require("dial.map").manipulate("decrement", "gnormal")
         end,
@@ -554,7 +508,7 @@ return {
         desc = "dial=> gdecrement",
       },
       {
-        "<C-a>",
+        "<C-y>",
         function()
           require("dial.map").manipulate("increment", "normal")
         end,
@@ -562,7 +516,7 @@ return {
         desc = "dial=> increment",
       },
       {
-        "<C-x>",
+        "<C-S-y>",
         function()
           require("dial.map").manipulate("decrement", "normal")
         end,
@@ -570,7 +524,7 @@ return {
         desc = "dial=> decrement",
       },
       {
-        "g<C-a>",
+        "g<C-y>",
         function()
           require("dial.map").manipulate("increment", "gnormal")
         end,
@@ -578,7 +532,7 @@ return {
         desc = "dial=> gincrement",
       },
       {
-        "g<C-x>",
+        "g<C-S-y>",
         function()
           require("dial.map").manipulate("decrement", "gnormal")
         end,
@@ -594,7 +548,7 @@ return {
     end,
     opts = {
       default_notes = {
-        "${ project }: ${ project_desc }\n",
+        "${ project }: ${ project_desc }",
       },
       close_key = "qq",
     },
@@ -606,6 +560,97 @@ return {
         end,
         mode = "n",
         desc = "note.eureka=> open",
+      },
+    },
+  },
+  {
+    "krivahtoo/silicon.nvim",
+    enabled = false,
+    build = "./install.sh",
+    opts = {
+      output = {
+        clipboard = true,
+        path = ".",
+        format = vim.fn.expand("%:p")
+          .. "_code_[year][month][day]-[hour][minute][second].png",
+      },
+      font = "Monaspace Argon=16",
+      theme = "Dracula",
+      background = "#15152A",
+      shadow = {
+        blur = 0.4,
+        offset_x = 4,
+        offset_y = 2,
+      },
+    },
+    config = function(_, opts)
+      require("silicon").setup(opts)
+    end,
+  },
+  {
+    "andrewferrier/wrapping.nvim",
+    config = function(_, opts)
+      require("wrapping").setup(opts)
+    end,
+    opts = {
+      create_commands = true,
+      create_keymaps = false,
+      notify_on_switch = true,
+    },
+    keys = {
+      {
+        key_wrap.mode.hard,
+        function()
+          require("wrapping").hard_wrap_mode()
+        end,
+        mode = "n",
+        desc = "wrap=> hard mode",
+      },
+      {
+        key_wrap.mode.soft,
+        function()
+          require("wrapping").soft_wrap_mode()
+        end,
+        mode = "n",
+        desc = "wrap=> soft mode",
+      },
+      {
+        key_wrap.mode.toggle,
+        function()
+          require("wrapping").toggle_wrap_mode()
+        end,
+        mode = "n",
+        desc = "wrap=> toggle mode",
+      },
+      {
+        key_wrap.log,
+        "<CMD>WrappingOpenLog<CR>",
+        mode = "n",
+        desc = "wrap=> log",
+      },
+    },
+  },
+  {
+    "GeekMasher/securitree.nvim",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "MunifTanjim/nui.nvim",
+      -- optional
+      "nvim-treesitter/playground",
+    },
+    config = function()
+      require("securitree").setup({
+        autocmd = false,
+        autopanel = false,
+      })
+    end,
+    event = "VeryLazy",
+    keys = {
+      {
+        key_view.securitree.toggle,
+        "<CMD>SecuriTreeToggle<CR>",
+        mode = "n",
+        desc = "securitree=> toggle",
       },
     },
   },

@@ -7,7 +7,6 @@ local key_pandoc = stems.auto_pandoc
 return {
   {
     "luckasRanarison/nvim-devdocs",
-    enabled = false,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",

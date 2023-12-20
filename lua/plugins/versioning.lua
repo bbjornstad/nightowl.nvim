@@ -112,18 +112,27 @@ return {
     },
   },
   {
+    "tanvirtin/vgit.nvim",
+    opts = {},
+    config = function(_, opts)
+      require("vgit").setup(opts)
+    end,
+    event = "VeryLazy",
+  },
+  {
     "f-person/git-blame.nvim",
     event = "VeryLazy",
     enabled = opt.prefer.gitblame == "f-person",
     cmd = { "GitBlameToggle", "GitBlameEnable" },
     opts = {
       enabled = true,
-      delay = 1000,
-      message_template = "   :: <committer> 󱒊 <date> 󱛠 <summary>",
+      delay = 5000,
+      message_template = "   <committer>:󱒊:<date> 󱛠 <summary>",
       date_format = "%r (%c)",
     },
     config = function(_, opts)
       require("gitblame").setup(opts)
+      vim.g.gitblame_virtual_text_column = vim.go.textwidth or 80
     end,
     keys = {
       {
@@ -223,44 +232,7 @@ return {
     },
   },
   {
-    "APZelos/blamer.nvim",
-    enabled = opt.prefer.gitblame == "APZelos",
-    config = function(_, opts)
-      vim.g.blamer_enabled = 1
-      vim.g.blamer_delay = 1000
-      vim.g.blamer_show_in_visual_modes = 0
-      vim.g.blamer_prefix = "  "
-      vim.g.blamer_template = "<committer>@<committer-time>  󱛠 <summary>"
-      vim.g.blamer_relative_time = 1
-    end,
-    keys = {
-      {
-        key_git.blame.toggle_alt,
-        "<CMD>BlamerToggle<CR>",
-        mode = "n",
-        desc = "::git.blame=> toggle alt global",
-      },
-      {
-        key_git.blame.mode_insert,
-        function()
-          vim.g.blamer_show_in_insert_modes = 1
-        end,
-        mode = "n",
-        desc = "::git.blame=> insert mode show",
-      },
-      {
-        key_git.blame.mode_visual,
-        function()
-          vim.g.blamer_show_in_visual_modes = 1
-        end,
-        mode = "n",
-        desc = "::git.blame=> visual mode show",
-      },
-    },
-  },
-  {
     "mcchrish/info-window.nvim",
-    enabled = false,
     cmd = "InfoWindowToggle",
     keys = {
       {
@@ -292,6 +264,7 @@ return {
   },
   {
     "ahmedkhalf/project.nvim",
+    enabled = false,
     opts = {
       scope_chdir = "tab",
       exclude_dirs = {
@@ -306,22 +279,6 @@ return {
         false,
       },
     },
-  },
-  {
-    "echasnovski/mini.sessions",
-    version = false,
-    opts = {
-      autoread = false,
-      autowrite = true,
-      directory = vim.fs.joinpath(vim.fn.stdpath("data"), "mini.sessions/"),
-      file = "session-local.vim",
-      force = { read = false, write = true, delete = false },
-      verbose = { read = false, write = true, delete = true },
-    },
-    config = function(_, opts)
-      require("mini.sessions").setup(opts)
-    end,
-    event = "VeryLazy",
   },
   {
     "niuiic/git-log.nvim",
@@ -420,5 +377,40 @@ return {
         desc = "session=> delete",
       },
     },
+  },
+  {
+    "willothy/savior.nvim",
+    dependencies = { "j-hui/fidget.nvim" },
+    event = { "InsertEnter", "TextChanged" },
+    opts = {
+      events = {
+        immediate = {
+          "FocusLost",
+          "BufLeave",
+        },
+        deferred = {
+          "InsertLeave",
+          "TextChanged",
+        },
+        cancel = {
+          "InsertEnter",
+          "BufWritePost",
+          "TextChanged",
+        },
+      },
+      callbacks = {},
+      throttle_ms = 3000,
+      interval_ms = 30000,
+      defer_ms = 1000,
+    },
+  },
+  {
+    "echasnovski/mini.visits",
+    config = function(_, opts)
+      require("mini.visits").setup(opts)
+    end,
+    opts = {},
+    keys = {},
+    event = "VeryLazy",
   },
 }

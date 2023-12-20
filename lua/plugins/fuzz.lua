@@ -6,7 +6,8 @@ local key_shortcut = kenv.shortcut
 local key_yank = kenv.yank
 local mapx = vim.keymap.set
 
-local function fza(target)
+local function fza(target, opts)
+  opts = opts or {}
   return function()
     require("fzf-lua")[target]({
       winopts = { title = "󱈇 query: " .. target },
@@ -14,6 +15,9 @@ local function fza(target)
   end
 end
 
+--- creates an fzf-window for browsing directories. Provides options for the
+--- scope of the change of directory (tab, buffer, or global)
+---@param opts table fzf-lua options
 local function fzf_dirs(opts)
   local fzf_lua = require("fzf-lua")
   opts = opts or {}
@@ -24,7 +28,7 @@ local function fzf_dirs(opts)
   end
   opts.actions = {
     ["default"] = function(selected)
-      vim.cmd("cd " .. selected[1])
+      vim.cmd("cd " .. vim.fs.normalize(selected[1]))
     end,
   }
   fzf_lua.fzf_exec("fd --type d --hidden", opts)
@@ -33,6 +37,13 @@ end
 if fenv.directory_switcher.enable_commands == true then
   _G.fzf_dirs = fzf_dirs
   vim.cmd([[command! -nargs=* Directories lua _G.fzf_dirs()]])
+end
+
+local function action(name)
+  return function(...)
+    local f = require("fzf-lua.actions")[name]
+    return f(...)
+  end
 end
 
 return {
@@ -70,6 +81,7 @@ return {
     "ibhagwan/fzf-lua",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
+      "junegunn/fzf",
     },
     opts = {
       keymap = {
@@ -95,9 +107,6 @@ return {
           ["alt-p"] = "toggle-preview",
           ["alt-j"] = "preview-down",
           ["alt-k"] = "preview-up",
-          -- ["ctrl-y"] = function(selected)
-          -- require("fzf-lua").actions.file_edit_or_qf(selected, {})
-          -- end,
           [string.lower(string.gsub(key_fuzz:close(), "[<>]", ""))] = "abort",
         },
       },
@@ -110,6 +119,10 @@ return {
       files = {
         rg_opts = "--color=never --files --hidden --follow -g '!.git'",
         fd_opts = "--color=never --type f --hidden --follow --exclude .git",
+        actions = {
+          ["ctrl-q"] = action("file_sel_to_qf"),
+          ["ctrl-l"] = action("file_sel_to_ll"),
+        },
       },
       winopts = {
         title = "querying: ",
@@ -120,36 +133,42 @@ return {
         col = 0.5,
         fullscreen = fenv.fullscreen,
         border = env.borders.alt,
-        preview = {
-          border = "border",
-          title = true,
-          title_pos = "right",
-          wrap = "wrap",
-          layout = "flex",
-          scrolloff = "-2",
-          scrollbar = "float",
-          winopts = {
-            signcolumn = "no",
-            list = true,
-            foldenable = false,
-            foldmethod = "manual",
-            cursorcolumn = false,
-            number = true,
-          },
-        },
+        preview = fenv.preview,
+        -- {
+        --   border = "border",
+        --   title = true,
+        --   title_pos = "right",
+        --   wrap = "wrap",
+        --   layout = "flex",
+        --   scrolloff = "-2",
+        --   scrollbar = "float",
+        --   winopts = {
+        --     signcolumn = "no",
+        --     list = true,
+        --     foldenable = false,
+        --     foldmethod = "manual",
+        --     cursorcolumn = false,
+        --     number = true,
+        --   },
+        -- },
         on_create = function()
           -- these are necessary to get the fzf bindings to catch correctly even
-          -- though they don't look like they do anything.
+          -- though they don't look like they do anything. Not really sure why
+          -- they need this, but apparently it's the case.
           vim.keymap.set("t", "<C-j>", "<C-j>", { buffer = true })
           vim.keymap.set("t", "<C-k>", "<C-k>", { buffer = true })
           vim.keymap.set("t", "<A-j>", "<A-j>", { buffer = true })
           vim.keymap.set("t", "<A-k>", "<A-k>", { buffer = true })
           vim.keymap.set("t", "<C-n>", "<C-n>", { buffer = true })
           vim.keymap.set("t", "<C-p>", "<C-p>", { buffer = true })
+          vim.keymap.set("t", "<C-d>", "<C-d>", { buffer = true })
+          vim.keymap.set("t", "<C-c>", "<C-c>", { buffer = true })
+          vim.keymap.set("t", "<C-q>", "<C-q>", { buffer = true })
+          vim.keymap.set("t", "<C-l>", "<C-l>", { buffer = true })
           mapx(
             "t",
             key_fuzz:close(),
-            "<cmd>bdelete<cr>",
+            "<cmd>close<cr>",
             { buffer = true, desc = "fz.fzf=> close" }
           )
         end,
@@ -158,11 +177,20 @@ return {
     config = function(_, opts)
       require("fzf-lua").setup({ fenv.fzf_profile })
       require("fzf-lua").setup(opts)
-      require("fzf-lua").register_ui_select()
+      require("fzf-lua").register_ui_select(function(_, items)
+        local min_h, max_h = 0.15, 0.70
+        local h = (#items + 4) / vim.o.lines
+        if h < min_h then
+          h = min_h
+        elseif h > max_h then
+          h = max_h
+        end
+        return { winopts = { height = h, width = 0.60, row = 0.40 } }
+      end)
     end,
     keys = {
       {
-        "<C-x><C-F>",
+        "<C-x><C-S-f>",
         function()
           require("fzf-lua").complete_file()
         end,
@@ -186,16 +214,16 @@ return {
         end,
         mode = { "n", "v", "i" },
         silent = true,
-        desc = "fz.fs=> path completion",
+        desc = "fz.fs=> buffer lines completion",
       },
       {
-        "<C-x><C-B>",
+        "<C-x><C-S-b>",
         function()
           require("fzf-lua").complete_line()
         end,
         mode = { "n", "v", "i" },
         silent = true,
-        desc = "fz.fs=> path completion",
+        desc = "fz.fs=> lines completion",
       },
       {
         key_shortcut.fm.grep.live,
@@ -676,14 +704,6 @@ return {
         desc = "[~]::fz.fs=> directories",
       },
     },
-  },
-  {
-    "echasnovski/mini.pick",
-    version = false,
-    config = function(_, opts)
-      require("mini.pick").setup(opts)
-    end,
-    opts = {},
   },
   {
     "AckslD/nvim-neoclip.lua",
