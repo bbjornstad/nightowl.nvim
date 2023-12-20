@@ -39,7 +39,7 @@ env.enabled = env.enablements({
   navi = { env = true, fallback = false },
   explain_it = { env = true, fallback = false },
   doctor = { env = true, fallback = false },
-  gllm = { env = true, fallback = false },
+  model = { env = true, fallback = false },
   backseat = { env = true, fallback = false },
   wtf = { env = true, fallback = false },
   prompter = { env = true, fallback = false },
@@ -49,6 +49,8 @@ env.enabled = env.enablements({
   llama = { env = true, fallback = false },
   ollero = { env = true, fallback = false },
   gen = { env = true, fallback = false },
+  dante = { env = true, fallback = false },
+  text_to_colorscheme = { env = true, fallback = true },
 })
 env.status_notify_on_startup = false
 

@@ -30,6 +30,18 @@ local function searchcount(props, opts)
   return res
 end
 
+local function wrap_mode(props, opts)
+  props = props or {}
+  local buf = props.buf or nil
+  opts = opts or {}
+
+  local wrapmode = require("wrapping").get_current_mode()
+  if not wrapmode or wrapmode == "" then
+    return
+  end
+  return wrapmode
+end
+
 local function selectioncount(props, opts)
   props = props or {}
   props.buf = props.buf or nil
@@ -104,7 +116,7 @@ function env.memory_use(props, opts)
   props = props or {}
   props.buf = props.buf or nil
   opts = opts or {}
-  local free = vim.loop.get_free_memory() / vim.loop.get_total_memory()
+  local free = vim.uv.get_free_memory() / vim.uv.get_total_memory()
   local used = 1 - free
   used = used * 100
   free = free * 100
@@ -170,8 +182,14 @@ local function grapple(props, opts)
   props = props or {}
   props.buf = props.buf or nil
   opts = opts or {}
-  local ok, grpl = pcall(require, "grapple")
+  if not util.has("grapple.nvim") then
+    return
+  end
 
+  local grpl = require("grapple")
+  if not grpl.exists then
+    return
+  end
   local key = grpl.key()
   return key
 end
@@ -235,9 +253,9 @@ function env.preopts(fn, handler)
 end
 
 function env.preargs(fn, handler)
+  handler = handler or require("funsak.wrap").F
   local function wrap(...)
-    local args = vim.iter({ ... })
-    local handled_args = handler(args)
+    local handled_args = handler(...)
     return fn(unpack(handled_args))
   end
 
@@ -302,7 +320,7 @@ local function incline_handler(props, opts)
     or specsep
 
   return function(fn, ...)
-    local ok, fnres = pcall(fn, unpack({ ... }))
+    local ok, fnres = pcall(fn, ...)
     local ret = ok and fmtstr:gsub("${ fn }", fnres)
     if not ok then
       vim.notify(vim.inspect({ ... }))
@@ -324,6 +342,7 @@ env.count = {
 env.progress = env.incline_join(progress)
 env.grapple = env.incline_join(grapple)
 env.match_local_hl = env.incline_join(match_local_hl)
+env.wrap_mode = env.incline_join(wrap_mode)
 env.fileinfo = function(props, opts)
   return { { fileinfo(props, opts) }, cond = true }
 end
