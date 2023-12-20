@@ -4,7 +4,7 @@ local key_repl = kenv.repl
 local mopts = require("funsak.table").mopts
 
 local mapn = function(lhs, rhs, opts)
-  vim.api.nvim_buf_set_keymap("n", lhs, rhs, opts)
+  vim.api.nvim_buf_set_keymap(0, "n", lhs, rhs, opts)
 end
 
 return {
