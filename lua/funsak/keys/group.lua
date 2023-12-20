@@ -7,13 +7,6 @@ local mopts = require("funsak.table").mopts
 ---@class funsak.keys.group
 local M = {}
 
--- TODO: we have a decent amount left to accomplish, but the big thing is that
--- currently, the inheritence specification does not seem to be functioning
--- appropriately. Leading modifications are normally pretty easy to put
--- together, but a prominent issue is that if a leader is specified and the user
--- wants to bind a subgroup to a key that does not include the leader, it is not
--- possible.
-
 ---@alias BoundKeys
 ---| string # a raw string which is a vim-parseable keymap specification. In
 ---particular, if a value is read at this scope, there should be no more
@@ -73,7 +66,7 @@ local DefaultSpecialMethods = {
 ---@field inherits boolean? if false, parent inheritence is disabled, indicating
 ---that the other behavior specified by the automorphism should not use the
 ---parent leader as a base.
----@field duplicity integer? if desired, a repetition number can be specified.
+---@field multiplicity integer? if desired, a repetition number can be specified.
 ---This has the effect of making the represented leading key-sequence require a
 ---repeated entry on the keyboard in order to access the mapping. In other
 ---words, a duplicity of 2 on a representation of the leading sequence
@@ -137,10 +130,10 @@ local FDNAME_LEADER_AUTOMORPHISM = "${[ leader ]}"
 
 ---@alias LeaderSpec
 ---| string # a simple keybind
----| `LeaderAutomorphism` # a more complicated specification on augmentation of
+---| LeaderAutomorphism # a more complicated specification on augmentation of
 ---existing leader in hierarchy.
 
----@enum Automorphism
+---@class Automorphism
 ---@field leader LeaderAutomorphism?
 ---@field bang CapitalizeAutomorphism?
 ---@field repeats RepetitiousAutomorphism?
@@ -169,7 +162,7 @@ local function parse_leaders(maps, leaders, opts)
 
   -- need to hold the possible additions specified in the __leader__ field of a
   -- maps table.
-  local prepend, append, format, inherits, duplicity
+  local prepend, append, format, inherits, multiplicity
 
   -- check to see if the thing we are trying to bind is a table, if so remove
   -- the possible `__leader__` field and separate it out into its components.
@@ -180,38 +173,35 @@ local function parse_leaders(maps, leaders, opts)
     if modifications then
       -- if we have modifications here, parse them out accordingly into their
       -- separate parts.
-      duplicity = opts.duplicity or modifications.duplicity or 1
+      multiplicity = opts.multiplicity or modifications.multiplicity or 1
       prepend = opts.prepend or modifications.prepend or false
       append = opts.append or modifications.append or false
       inherits = opts.inherits or modifications.inherits or true
       format = opts.format or modifications.format or false
     else
-      duplicity = opts.duplicity or 1
+      multiplicity = opts.multiplicity or 1
       prepend = opts.prepend or false
       append = opts.append or false
       format = opts.format or false
       inherits = opts.inherits or true
     end
+    if not inherits then
+      vim.notify(vim.inspect(modifications))
+    end
   else
-    duplicity = opts.duplicity or 1
+    multiplicity = opts.multiplicity or 1
     prepend = opts.prepend or false
     append = opts.append or false
     inherits = opts.inherits or true
     format = opts.format or false
   end
 
-  local ldr = not inherits and "" or false
-  ldr = ldr
-    and (leaders ~= nil and (vim.is_callable(leaders) and leaders(maps)))
-  -- do all of the preparations of the existing leader here by adding specified
-  -- modifications that were user-configured in the maps table.
-  local ldr = leaders ~= nil and (vim.is_callable(leaders) and leaders(maps))
-    or (inherits and leaders or "")
-    or ""
+  local ldr = not inherits and "" or leaders
+  ldr = not inherits and "" or leaders ~= nil and leaders or ""
   ldr = prepend and (prepend .. ldr) or ldr
   ldr = append and (ldr .. append) or ldr
   ldr = format and format(ldr) or ldr
-  ldr = string.rep(ldr, duplicity, "")
+  ldr = string.rep(ldr, multiplicity)
   return ldr or ""
 end
 
@@ -222,14 +212,14 @@ end
 --- "<C-n>"/"<C-p>" for next and previous. These might frequently be things such
 --- as the actions-type mappings that are commonly found in some plugin `opts`
 --- specifications.
----@param maps KeybindGroupSpec table containing keymap specifications, in KeybindGroupSpec
----style.
+---@param maps KeybindGroupSpec table containing keymap specifications, in
+---KeybindGroupSpec style.
 ---@param leaders string? the leading prefix that must be hit in order to
 ---trigger the mapped behavior, e.g. like <leader> is used typically;
 ---alternatively a function that accepts the maps table and returns the correct
 ---string.
----@param special SpecialMethodSpec? the keys of this table will be
----method names attached to the input keymaps table. The behavior is to attach a
+---@param special SpecialMethodSpec? the keys of this table will be method names
+---attached to the input keymaps table. The behavior is to attach a
 ---method-styled function that will either return the evaluation of the indexed
 ---field in the special definitions if that field is a function, or if that
 ---field is instead a string, it is returned directly.
@@ -289,7 +279,7 @@ local KeybindGroup = {}
 ---@field name string?
 ---@field desc_attributes KeybindGroupDescriptor?
 
---- meant to be called as a method, this creates a new KeybindGroup around a
+--- [meant to be called as a method] this creates a new KeybindGroup around a
 --- user provided specification of left-hand-side mappings. Binding of the
 --- action itself (the right-hand-side) occurs using a separate function and at
 --- a different point in the chain.
@@ -360,11 +350,11 @@ end
 ---@alias fn_binder<T> fun(maps, leaders): T
 ---@alias Keybinder fn_binder<Keybindings>
 
---- given an input table under the `KeybindGroupSpec` specification format, unwraps any
---- internal leader additions that should be made, attaches them after minimal
---- validation, and recursively calls itself in the case of a nested table
---- key subgrouping. See the documentation on `KeybindGroupSpec` specifications for more
---- info.
+--- given an input table under the `KeybindGroupSpec` specification format,
+--- unwraps any internal leader additions that should be made, attaches them
+--- after minimal validation, and recursively calls itself in the case of a
+--- nested table key subgrouping. See the documentation on `KeybindGroupSpec`
+--- specifications for more info.
 ---@param maps Keybindings
 ---@param leader string?
 ---@param opts T_Opts?
@@ -445,19 +435,9 @@ local function from(mapfile, opts)
   return group(maps, leader_base, opts)
 end
 
--- TODO: This is maybe a bit of a reach item at the moment, but it might be kind
--- of nice to have a keygroup be capable of checking map consistency against a
--- set of allowed keys, e.g. with a specific set of keys being allowed in the
--- creation of the universe that lhs specifications in user config files would
--- represent.
-
 M.setup = setup
 M.keygroup = group
 M.from_file = from
 M.sp_register = register_special
-
--- TODO: I would like to be able to have the group not depend on a single
--- leader, which should just be a pretty simple recursive map on tables for
--- leader related function implementations.
 
 return M
