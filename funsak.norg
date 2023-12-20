@@ -1,0 +1,45 @@
+@document.meta
+title: funsak
+description:
+authors: ursa-major
+categories:
+created: 2023-11-27T00:58:03-0700
+updated: 2023-11-28T14:51:40-0700
+version: 1.1.1
+@end
+
+* `funsak`: A Functional Swiss Army Knife for lazy.nvim and neovim configs-nvim
+** `funsak.keys`
+   This submodule contains important or useful utilities for managing large sets
+   of keymaps. The goal is to facilitate disconnecting the keymap topology, e.g.
+   the actual sequences of keystrokes required, from the keymap style or target.
+
+*** `funsak.keys.keybundle`
+    This submodule defines a structure that can be used to more cleanly define
+    keymaps in files which are semantically clear but disjoint from bound
+    action.
+
+    Suppose the following, in an effort to construct a reasonable model of
+    keymap construction and its mechanization in neovim.
+
+    $ Keybind
+    An action bound to a triggering sequence of specific keystrokes.
+    Conceptually, this is something like a single object, which has the sequence
+    which is required and some method of triggering a specific action, along
+    with any additional meta-information required.
+
+    $ Keybundle
+    A collection of semantically related and structurally similar Keybinds.
+
+    $ Automorphism
+    Borrowing terminology from mathematics, we think of an Automorphism as a
+    transformation of a type of structure into another version of itself while
+    preserving certain useful properties.
+
+    $ KeyAutomorphism
+    In the specific context of keybindings, we will let an automorphism be a
+    transformation of the keystrokes to adjust for real-world details but which
+    does not change the semantics of any of the bindings. This is to say that we
+    can create nested tables which have at labels the semantic interpretation of
+    the keymap, while the bind is described in a constructive fashion through
+    the table structure.
