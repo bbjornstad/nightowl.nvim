@@ -1,0 +1,294 @@
+@document.meta
+title: blockers
+description:
+authors: ursa-major
+categories:
+created: 2023-11-25T16:47:04-0700
+updated: 2023-11-25T16:47:04-0700
+version: 1.1.1
+@end
+
+* Nightowl.nvim
+  A project roadmap for [nightowl.nvim]{https://github.com/bbjornstad/nightowl.nvim}
+
+** Critical Blockers
+   The following subsections indicate tracked issues and their possible steps
+   towards resolution. There is not a particular order to them, outside of the
+   order induced by needing certain functionality at certain times for other
+   reasons.
+*** ( ) neorg
+    - (x) Neorg is complaining all the time, specifically about not being able
+          to find the right neorg modules component to load.
+    -- (x) This seems to be a problem that can strike if the external modules
+           haven't been appropriately updated to match with neorg version 6.0
+    -- (x) The easiest solution, and currently implemented solution, is to
+           simply not include the offending external modules.
+    - ( ) There is still an issue of the fact that norg files fail to load
+          through fzf-lua.
+*** (x) edgy.nvim
+    - Edgy is causing problems, once again related to the
+      supposed-to-be-disabled neo-tree...
+    -- this is intensely frustrating as I am doing everything I can to keep the
+       tree plugin out of my configuration. But it just keeps finding its way
+       into the problems.
+    -- It is questionable if i even want to keep edgy as an installed plugin as
+       i rarely end up using it at all
+
+*** ( ) statusline plugins
+    Overall, the statusline plugins are working well together, better than I was
+    originally anticipating. The pair of dropbar and lualine are solidly
+    integrated with the other, but we are currently suffering from a few issues
+    related to the iconography and general modularization of control for
+    incline.nvim.
+    - ( ) debug why the bar is missing completely
+    -- ( ) This seems to be related to grapple, potentially being the one keeping
+           all items filtered. This is to say that because sometimes grapple is a
+           non-required bar element, and therefore isn't always displayed, the
+           filtration of the display is failing for all due to missing elements.
+    - ( ) when the bar is not missing completely, are there any other issues
+          related to things such as displayed components that should be hidden
+          based on context, etc.
+    - ( ) Fix the issues in a clean way, the present implementations are not at
+          all clean
+    - ( ) don't break any of the other statusline plugins
+*** ( ) fzf, fzf.vim, and fzf-lua
+    The main fuzzy matching plugins are represented here, at least until we can
+    integrate nucleo more cleanly into the workflow. Nucleo just seems that much
+    better from the implementation perspective. But that is not ready yet, and
+    may not be for some time, or we'll have to take matters into our own hands.
+    - ( ) there is an issue related to the opening of neorg files from fzf
+          windows, not really sure what that is supposed to be coming from.
+*** ( ) Colorschemes and Highlighting
+    This should be somewhat straightforward, but I have been bikeshedding a lot
+    it seems. We need to create the registration feature for colorschemes to the
+    main highlight manager.
+    - ( ) provide ability to specify accessor for each of:
+    -- ( ) highlight overrides
+    -- ( ) palette
+    -- ( ) theme, e.g. palette usage per ui element...like syntax or treesitter.
+*** ( ) Headlines
+    the headlines.nvim plugin is supposed to load suitable headline highlights
+    and adjustments for text-ish files. Right now we are getting weird opposite
+    color effects when loading, creating off-looking horizontal divisions across
+    the entire sheet.
+    - ( ) figure out what is happening
+    - ( ) fix what is happening
+*** ( ) Website Requirements: zola.nvim and jinja templating.
+    For some strange reason, it seems as though I have some additional trouble
+    loading zola.nvim in certain contexts. These seem to be during load of
+    markdown plugins in cases where there is a notification which is
+    reinterpreted by noice.nvim into markdown-styled text for hierarchy of
+    information purposes.
+    - ( ) figure out what seems to be occurring with zola.
+
+    Jinja is having separate troubles, namely it seems like the syntax file
+    fails to load in every case. This obviously needs to be fixed. Something
+    seems to be happening with the dotted filetype syntax, idk why it fails to
+    register "html.jinja" as both a jinja and html file, as it should.
+    - ( ) figure out why the syntax isn't loading appropriately
+*** Mysterious Error Message
+    I seem to be creating an issue where I'm getting a nice notification of "An
+    Error Occurred ..." with no additional information about its source or
+    nature. I am guessing that it is an issue with one of the autocompletion
+    plugins that links to ai. Perhaps we are suffering from more cmp_ai issues?
+    - ( ) debug and fix
+*** nvim-cmp menu source identification
+    In the menu of nvim-cmp, there would ideally be a column that corresponds to
+    the source of each menu entry. This is supposed to be achievable with the
+    correct configuration, it is possible that using lsp-zero makes more sense
+    in this case since it does have the ability to use a function which does
+    exactly that. This should be available out of the box though.
+*** Animation and SmoothCursor.nvim
+    Another strange issue has cropped up with regard to the SmoothCursor plugin.
+    In particular, it seems to have stopped being displayed in normal windows,
+    the only places where it shows up currently are in lazy.nvim panels...though
+    the fact that it is showing up at all is somewhat surprising if it is also
+    having trouble.
+*** General LSP Configuration Issues
+**** ( ) splitting of lint, format, and server portions of LSP responsibilities
+     This is a matter of the following: right now I have a function which wraps
+     both calls for linting and formatting together with options passable
+     through a mapping with extra keys to desginate between linting and
+     formatting. There is also a separate function which does something somewhat
+     similar for the LSP configurations. Generally speaking, it should be no
+     more significant in terms of boilerplate to just use the individual
+     components for each of these three behaviors
+
+     All of this would be so much easier using only kickstart instead of full
+     lazyvim.
+     - (x) process has begun
+     - (-) functions written
+     -- (-) these are almost completely finished, there is a minor hiccup that
+            must be figured though...
+     -- ( ) Essentially, using `lspsrv` in its current format causes the lazy
+            ordering issues that arise with bare calls to dependent plugins to
+            arise again even in cases where the original was provided in such a
+            way as to prevent this using a callback guard. The reason is because
+            the creation of the callback is then occurring in a file which must
+            be `required` from the files read duruing the processing of `opts`
+     - ( ) use of `deflang` instead of separate component calls complete.
+**** Missing Language Implementations
+     These are any languages that are going to have some trouble until the
+     additional implementation details for lspconfig are determined.
+     - (x) Clojure
+     - ( ) C derivatives and cmake
+     - ( ) Julia
+     - (-) Jinja apparently
+     - ( ) Maybe typescript depending on how effective the lazyvim extra is.
+     - ( ) elm
+     - ( ) fennel
+     - ( ) haxe
+     - ( ) svelte
+     - ( ) dot
+     - ( ) codeql
+     - ( ) bicep
+     - ( ) vue
+     - ( ) pest
+     - (x) ocaml
+     - ( ) nim
+     - ( ) KCL
+     - ( ) prisma
+     - ( ) R
+     - ( ) Reason
+     - ( ) Nix
+     - ( ) Robotframework
+     - ( ) CSS, SCSS, tailwindcss
+     - ( ) prosemd
+     - ( ) arduino
+     - ( ) antlers
+     - ( ) docker
+     ---
+
+** Unimplemented Features
+*** general
+**** Debate if the entire system should be on kickstart.nvim instead
+     The idea here is that I have done so much extra configuration on top of the
+     already existing lazyvim which has included a hefty amount of disabling.
+     This is potentially more problematic than if we were to have just
+     reimplemented the missing things directly off kickstart.nvim, as there is
+     less overwriting that will be done for plugin configurations, etc.
+*** lazyflex.nvim
+    One of the more promising looking plugins that I have found recently,
+    lazyflex allows the definition of groups of plugins to be managed more
+    cleanly and conveniently by providing an extra method of enabling/disabling
+    plugins from a separate collection (e.g. LazyVim components and extras).
+    - ( ) Fully map the remaining plugins to consitutent "components", or
+          high-level groupings of plugins that are desinged to facilitate
+          particular behavior
+    - ( ) correctly format the two files that are needed for this; consult with
+          lazyflex.nvim documentation for more info
+
+*** ( ) dashboard (alpha.nvim, dashboard.nvim, mini.starter, etc).
+    This, for some reason, is just not working the correct way that it is
+    supposed to. We really want veil.nvim to be complete as a plugin, and not
+    in a halfway state with the animation API and surrounding functions.
+
+*** AI Assistants and Code Editing Improvements
+    This is the section devoted specifically to the part of my nvim
+    configuration which handles all interaction with external LLM or
+    chatgpt-like interfaces. Presently, there are some issues it seems with the
+    way that components of this submodule are being configured and used.
+    - ( ) test each plugin in the submodule to see if there are configuration
+          issues.
+    - ( ) Remove any plugins that are strong offenders in the useless category.
+*** `funsak` implementations
+    This, of course, refers to the tools that I have written that are
+    functional swiss army-knife attachments for working with lazy.nvim
+    specifications.
+**** `funsak.color`: for controlling highlights
+     This does need a bit more sprucing up most likely in the way of
+     documentation et al. Moreover, there should be some further development of
+     the implementations to better facilitate the target goal: to achieve
+     consistency in auxillary highlight definitions across color schemes without
+     needing to fork an existing scheme to match ite architecture, or create a
+     bespoke scheme that provides such consistency.
+
+     The distillation of this is that we need tools which externally wrap around
+     colorschemes and provide a registration method for the desired set of
+     colors/base highlight group "palette"
+**** `funsak.keys`
+     The big item that we need to finish off here is the keygroup
+     implementation as a derived class item that can also interpret keymaps
+     from individual files.
+     -----
+
+** A Definitive Specification, Perhaps?
+   Let the following items determine the precise "ideal" definition of how
+   plugins should be specified with regard to their import/setup-order
+   adjusting properties that are available in lazy.nvim.
+
+   ~ A plugin P1 is a dependency of another plugin P2 when the operations of
+     P1 are required in the execution of the specification of the operations
+     of P2. In this case P1 should be marked in the dependencies field of P2.
+   @code lua
+   {
+     "user2/plugin2",
+     dependencies = {
+       "user1/plugin1"
+     }
+   }
+   @end
+   ~ A plugin that is loaded lazily cannot be used directly in the
+     specification of another plugin without an additional function guard
+     across the targeted property, even if the dependent plugin is specified
+     as a dependency. This is most commonly encountered with the `keys` field
+     and using a bare `require('plugin').function` as the action item.
+   ~ A plugin's internal operations do not have to rely on another plugin
+     for the latter to be a dependency of the first. This is to say that
+     there are two main scenarios when a plugin should be marked as a
+     dependency: when that plugin is specified by the author of the dependent
+     plugin as being a dependency, and when the user uses the functionality
+     of the dependency plugin in the lazy specification of the dependent
+     plugin regardless of whether or not the plugin author specifies the
+     dependent plugin as being so.
+   ~ The `keys` and `opts` fields are the two main fields for which a
+     "functionalization" is necessary. These fields are set up prior to the
+     corresponding setup call for the plugin, and so all dependent calls
+     within either the `keys` or the `opts` field must resolve at the time
+     that the  `config` fields are required, hence the noted behavior here.
+   ~ Occasionally, there is need to set up a certain parameter or separate
+     behavior within the configuration of a particular plugin. Examples of
+     this include things like setting up an autocommand, defining a user
+     command, etc. In these cases, there are generally two possibilities:
+     either using the `init` field, or using the `config` field. There are
+     some subtle distinctions between the two.
+   ~~ The `init` field is called first, and all of the init fields
+      represented in the plugin specification are executed together before
+      other setup. If this timing is required for the particular loading
+      configuration of the target plugin, then the `init` field is your best
+      option. However, this is not frequently the case.
+   ~~ The `config` field is called at the time when an action or
+      functionality provided by the plugin is required, or if the importation
+      is otherwise signaled because of lazy.nvim plugin specification fields
+      (e.g. `event`, `ft`, `cmd`, `dependencies`, each of which specifies a
+      different reason for loading a plugin). If this timing seems more
+      optimal for behavioral augmentations at the time of loading, then you
+      should probably use the `config` field unless doing so would overwrite
+      another more necessary `config` present in another spec loation.
+   ~~ Lastly, when lazy loading using lazy.nvim, note that the `init` field
+      is called regardless of the lazy-loading-status of the plugin, while
+      the `config` field is not. This implies that if you wish to include
+      certain setup behavior regardless of whether other plugin functionality
+      is loaded lazily, then you will need to use the `init` field, and
+      further understand that the available operations and manipulations may
+      be somewhat limited. This is, from what I can tell, a major reason why
+      it seems most vim variable definitions or assignments occur in the
+      `init` field instead of a different more deferred option
+   ~~ Note that `init` as a LazyPluginSpec field can be defined only as a
+      function accepting at most the LazyPlugin item that corresponds to the
+      `init` target. This is in contrast to the `keys`, `opts`, and
+      especially `config` fields, which all accept an additional `opts` field
+      representing the "current state" of the cobbling process that creates
+      the final internal representation for the LazyPluginSpec. Hence, it is
+      not possible to modify the `opts` field or other corresponding items
+      using the `init` field, that must be done in a field which can accept
+      the target property as an argument to the property's defining function.
+      Like how `opts` can be given as `fun(LazyPlugin, opts)`
+
+        ===
+
+* Random Notes: Nightowl.nvim
+  This is a section of the document that can hold some random notes related to
+  the implementation of all of the stuff that is listed in the preceding
+  section.
+  ---
