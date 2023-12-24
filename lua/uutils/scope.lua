@@ -30,34 +30,7 @@ function M.extend(name, opts, extension_setup)
       end,
     },
   }
-
-  --- calls the `setup` method of the extension itself, if it exists
-  ---@param extra_opts T_Opts the options that are passed to the extension's
-  ---individual `setup` method
-  ---@return LazyPlugin
-  local function setup(extra_opts)
-    return mopts(new_item, extra_opts)
-  end
-
-  if extension_setup == nil then
-    return setup
-  end
-
-  return extension_setup and setup(setup_opts)
-end
-
-function M.insert_source(configuration, extension)
-  extension = extension or false
-
-  local opter = require('funsak.lazy').opts
-  local opts = opter("telescope")
-  local targeted
-  if extension then
-    targeted = opts.extensions
-  else
-    targeted = opts.pickers
-  end
-  table.insert(targeted, configuration)
+  return new_item
 end
 
 function M.setup_extension(extension, opts, theme, config)
