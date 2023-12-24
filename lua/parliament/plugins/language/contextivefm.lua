@@ -28,22 +28,8 @@ local function contextiveconfig(opts)
 end
 
 return {
-  {
-    "neovim/nvim-lspconfig",
-    opts = function(_, opts)
-      opts.servers = vim.tbl_deep_extend("force", {
-        efm = efmconfig(opts),
-      }, opts.servers or {})
-    end,
-  },
-  {
-    "neovim/nvim-lspconfig",
-    opts = function(_, opts)
-      opts.servers = vim.tbl_deep_extend("force", {
-        contextive = contextiveconfig(opts),
-      }, opts.servers or {})
-    end,
-  },
+  lz.lspsrv("efm", { server  = function(_, opts) return efmconfig(opts) end }),
+  lz.lspsrv("contextive", { server  = function(_, opts) return contextiveconfig(opts) end }),
   {
     "creativenull/efmls-configs-nvim",
     dependencies = { "neovim/nvim-lspconfig" },

@@ -13,6 +13,6 @@ return {
       },
     }),
   }),
-  lz.lsplnt("selene", "lua"),
-  lz.lspfmt("stylua", "lua"),
+  lz.lsplnt({ "selene" }, "lua"),
+  lz.lspfmt({ "stylua" }, "lua"),
 }

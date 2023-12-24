@@ -6,10 +6,7 @@ return {
   {
     "folke/which-key.nvim",
     opts = {
-      plugins = {
-        marks = false,
-        registers = true,
-      },
+      plugins = { marks = false, registers = true },
       hidden = {
         "<silent>",
         "<cmd>",
@@ -55,9 +52,9 @@ return {
         "gc",
         "gz",
         "g`",
-        "g'", -- registers '"',
-        "<c-r>",
-        -- spelling
+        "g'",
+        "\"",    -- registers,
+        "<c-r>", -- spelling
         "z=",
         "Z",
         "qc",
@@ -74,21 +71,17 @@ return {
           win_options = { concealcursor = "n", conceallevel = 3 },
         },
       },
-      icons = {
-        breadcrumb = "󰶻",
-        separator = "",
-        group = " ",
-      },
+      icons = { breadcrumb = "󰶻", separator = "", group = " " },
       defaults = {
         [stems:leader()] = { name = "::| toolbox |::" },
         [stems.editor:leader()] = { name = "::| special/editor |::" },
         [stems.time:leader()] = { name = "::| task/time |::" },
         [stems.ai:leader()] = { name = "::| ai/assistants |::" },
-        [stems.repl:leader()] = { name = "::| repl |::" },
+        [stems.repl:leader()] = { name = "::| build/repl |::" },
         [stems.buffer:leader()] = { name = "::| buffers |::" },
         [stems.search:leader()] = { name = "::| search/scope |::" },
         [stems.ui:leader()] = { name = "::| interface |::" },
-        [stems.code:leader()] = { name = "::| code |::" },
+        [stems.code:leader()] = { name = "::| code/lsp |::" },
         [stems.lsp:leader()] = { name = "::| language servers |::" },
         [stems.fuzz:leader()] = { name = "::| fuzzy find |::" },
         [stems.fm:leader()] = { name = "::| filesystem |::" },
@@ -97,7 +90,7 @@ return {
         [stems.window:leader()] = { name = "::| windows |::" },
         [stems.motion:leader()] = { name = "::| move/goto |::" },
         [stems.lazy:leader()] = { name = "::| lazy |::" },
-        [stems.lang:leader()] = { name = "::| languages |::" },
+        [stems.lang:leader()] = { name = "::| utilang |::" },
         [stems.color:leader()] = { name = "::| colors |::" },
         [stems.build:leader()] = { name = "::| build/run |::" },
         [stems.repl:leader()] = { name = "::| repl |::" },
@@ -110,12 +103,14 @@ return {
         [stems.replace:leader()] = { name = "::| replace |::" },
         [stems.macro:leader()] = { name = "::| macros |::" },
         [stems.term:leader()] = { name = "::| utiliterm |::" },
-        [stems.shortcut.fm.explore:leader()] = { name = "::| explore |::" },
+        [stems.shortcut.fm.explore:leader()] = {
+          name = "::| explore |::",
+        },
         [stems.multicursor:leader()] = { name = "::| multiline |::" },
         [stems.session:leader()] = { name = "::| session |::" },
         [stems.tool.rest:leader()] = { name = "::| REST |::" },
         [stems.tool.regex:leader()] = { name = "::| regex |::" },
-        [stems.tool.splitjoin:leader()] = { name = "::| splitjoin |::" },
+        [stems.tool.splitjoin:leader()] = { name = "::| split/join |::" },
         [stems.yank:leader()] = { name = "::| yank |::" },
         [stems.lsp.workspace:leader()] = { name = "::| workspace |::" },
         [stems.diagnostic:leader()] = { name = "::| diag/trouble |::" },
@@ -130,7 +125,8 @@ return {
       },
     },
     config = function(_, opts)
-      require('which-key').setup(opts)
+      require("which-key").setup(opts)
+      require("which-key").register(opts.defaults)
     end,
   },
   {
