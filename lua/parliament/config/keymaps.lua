@@ -1,9 +1,6 @@
----@module "parliament.config.keymapx(" main keymapx( for nightowl with kickstarter
+---@module "parliament.config.keymap" main keymapx( for nightowl with kickstarter
 ---many of these are ripped directly from LazyVim.
--- Keymapx( are automatically loaded on the VeryLazy event
--- Default keymapx( that are always set:
--- https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymapx(.lua
--- Add any additional keymapx( here
+-- Keymaps are automatically loaded on the VeryLazy event
 local edit_tools = require("uutils.text")
 local kenv = require("environment.keys")
 local key_cline = kenv.editor.cline
@@ -11,7 +8,7 @@ local key_lists = kenv.lists
 local mapx = vim.keymap.set
 local delx = vim.keymap.del
 local has = require("funsak.lazy").has
-local toggle = require('funsak.toggle')
+local toggle = require("funsak.toggle")
 
 --- gets the help in vim documentation for the item under the cursor
 local function helpmapper()
@@ -19,7 +16,7 @@ local function helpmapper()
   vim.cmd(thishelp)
 end
 
--- Keymapx( for better default experience
+-- Keymap( for better default experience
 mapx({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
 -- better up/down, handling word wrap scenarios gracefully.
@@ -76,25 +73,10 @@ mapx(
   { desc = "lazy=> update" }
 )
 mapx({ "n" }, kenv.lazy.log, "<CMD>Lazy log<CR>", { desc = "lazy=> log" })
-mapx(
-  { "n" },
-  kenv.lazy.clean,
-  "<CMD>Lazy clean<CR>",
-  { desc = "lazy=> clean" }
-)
-mapx(
-  { "n" },
-  kenv.lazy.debug,
-  "<CMD>Lazy debug<CR>",
-  { desc = "lazy=> debug" }
-)
+mapx({ "n" }, kenv.lazy.clean, "<CMD>Lazy clean<CR>", { desc = "lazy=> clean" })
+mapx({ "n" }, kenv.lazy.debug, "<CMD>Lazy debug<CR>", { desc = "lazy=> debug" })
 mapx({ "n" }, kenv.lazy.help, "<CMD>Lazy help<CR>", { desc = "lazy=> help" })
-mapx(
-  { "n" },
-  kenv.lazy.build,
-  "<CMD>Lazy build<CR>",
-  { desc = "lazy=> build" }
-)
+mapx({ "n" }, kenv.lazy.build, "<CMD>Lazy build<CR>", { desc = "lazy=> build" })
 mapx(
   { "n" },
   kenv.lazy.reload,
@@ -130,8 +112,6 @@ mapx("i", "<C-k>", "<C-o><up>", { desc = "buf=> cursor up" })
 mapx("i", "<C-h>", "<C-o><left>", { desc = "buf=> cursor left" })
 mapx("i", "<C-l>", "<C-o><right>", { desc = "buf=> cursor right" })
 
-
-
 -- Ctrl-Q Quit Bindings
 mapx("n", "<C-q><C-q>", "<CMD>quit<CR>", { desc = "quit=> terminate" })
 mapx(
@@ -140,12 +120,7 @@ mapx(
   "<CMD>write-quit<CR>",
   { desc = "quit=> save > terminate" }
 )
-mapx(
-  "n",
-  "<C-q>w",
-  "<CMD>write-quit<CR>",
-  { desc = "quit=> save > terminate" }
-)
+mapx("n", "<C-q>w", "<CMD>write-quit<CR>", { desc = "quit=> save > terminate" })
 mapx("n", "<C-q>!", "<CMD>quit!<CR>", { desc = "quit=> [!] terminate" })
 mapx("n", "<C-q><C-!>", "<CMD>quit!<CR>", { desc = "quit=> [!] terminate" })
 mapx(
@@ -233,7 +208,7 @@ mapx(
   { desc = "buf=> [all] write" }
 )
 
--- navigating buffers with non-shortcutted keymapx(.
+-- navigating buffers with non-shortcutted keymaps.
 if not has("cybu.nvim") then
   mapx("n", "<C-S-h>", "<cmd>bprevious<cr>", { desc = "buf=> previous" })
   mapx("n", "<C-S-l>", "<cmd>bnext<cr>", { desc = "buf=> next" })
@@ -244,7 +219,7 @@ end
 mapx("n", "<leader>bb", "<cmd>e #<cr>", { desc = "buf=> autocycle" })
 mapx("n", "<leader>`", "<cmd>e #<cr>", { desc = "buf=> autocycle" })
 
--- Windowing adjustment keymapx(, for things like moving to a window, resizing,
+-- Windowing adjustment keymaps for things like moving to a window, resizing,
 -- reorganizing, etc.
 -- * chorded/shortcut bindings
 mapx("n", "<C-h>", "<C-w>h", { desc = "win.go=> left", remap = true })
@@ -257,12 +232,30 @@ mapx("n", "<A-k>", "<C-w>k", { desc = "win.go=> up", remap = true })
 mapx("n", "<A-l>", "<C-w>l", { desc = "win.go=> right", remap = true })
 
 -- * resize window using <ctrl> + arrow keys
-mapx("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "win.sz.height=> increease" })
-mapx("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "win.sz.height=> decrease" })
-mapx("n", "<C-Left>", "<cmd>vertical resize -2<cr>",
-  { desc = "win.sz.width=> decrease" })
-mapx("n", "<C-Right>", "<cmd>vertical resize +2<cr>",
-  { desc = "win.sz.width=> increase" })
+mapx(
+  "n",
+  "<C-Up>",
+  "<cmd>resize +2<cr>",
+  { desc = "win.sz.height=> increease" }
+)
+mapx(
+  "n",
+  "<C-Down>",
+  "<cmd>resize -2<cr>",
+  { desc = "win.sz.height=> decrease" }
+)
+mapx(
+  "n",
+  "<C-Left>",
+  "<cmd>vertical resize -2<cr>",
+  { desc = "win.sz.width=> decrease" }
+)
+mapx(
+  "n",
+  "<C-Right>",
+  "<cmd>vertical resize +2<cr>",
+  { desc = "win.sz.width=> increase" }
+)
 
 -- * leader submenu for window management
 mapx("n", "<leader>wh", "<C-w>h", { desc = "win.go=> left", remap = false })
@@ -333,12 +326,7 @@ mapx(
   "<C-w>o",
   { desc = "win.close=> all other windows", remap = false }
 )
-mapx(
-  "n",
-  "<leader>wT",
-  "<C-w>T",
-  { desc = "win.tab=> to new", remap = false }
-)
+mapx("n", "<leader>wT", "<C-w>T", { desc = "win.tab=> to new", remap = false })
 mapx(
   "n",
   "<leader>w<tab>",
@@ -346,8 +334,12 @@ mapx(
   { desc = "win.tab=> to new", remap = false }
 )
 mapx("n", "<leader>ww", "<C-W>p", { desc = "win.go=> to other", remap = true })
-mapx("n", "<leader>wd", "<C-W>c",
-  { desc = "win.close=> this window", remap = true })
+mapx(
+  "n",
+  "<leader>wd",
+  "<C-W>c",
+  { desc = "win.close=> this window", remap = true }
+)
 
 -- tabs
 mapx("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "win.tab=> last" })
@@ -355,8 +347,12 @@ mapx("n", "<leader><tab>f", "<cmd>tabfirst<cr>", { desc = "win.tab=> first" })
 mapx("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "win.tab=> new" })
 mapx("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "win.tab=> next" })
 mapx("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "win.tab=> close" })
-mapx("n", "<leader><tab>[", "<cmd>tabprevious<cr>",
-  { desc = "win.tab=> previous" })
+mapx(
+  "n",
+  "<leader><tab>[",
+  "<cmd>tabprevious<cr>",
+  { desc = "win.tab=> previous" }
+)
 
 -- location lists: loclist and quickfix.
 -- * quickfix list
@@ -436,26 +432,54 @@ mapx(
 )
 
 -- keywordprg
-mapx("n", "<leader>K>", "<CMD>norm! K<CR>",
-  { desc = { "vim.keywordprg=> apply" } })
+mapx(
+  "n",
+  "<leader>K>",
+  "<CMD>norm! K<CR>",
+  { desc = { "vim.keywordprg=> apply" } }
+)
 
 -- better indenting
 mapx("v", "<", "<gv", { desc = "vim.indent=> decrease" })
 mapx("v", ">", ">gv", { desc = "vim.indent=> increase" })
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
-mapx("n", "n", "'Nn'[v:searchforward].'zv'",
-  { expr = true, desc = "Next search result" })
-mapx("x", "n", "'Nn'[v:searchforward]",
-  { expr = true, desc = "Next search result" })
-mapx("o", "n", "'Nn'[v:searchforward]",
-  { expr = true, desc = "Next search result" })
-mapx("n", "N", "'nN'[v:searchforward].'zv'",
-  { expr = true, desc = "Prev search result" })
-mapx("x", "N", "'nN'[v:searchforward]",
-  { expr = true, desc = "Prev search result" })
-mapx("o", "N", "'nN'[v:searchforward]",
-  { expr = true, desc = "Prev search result" })
+mapx(
+  "n",
+  "n",
+  "'Nn'[v:searchforward].'zv'",
+  { expr = true, desc = "Next search result" }
+)
+mapx(
+  "x",
+  "n",
+  "'Nn'[v:searchforward]",
+  { expr = true, desc = "Next search result" }
+)
+mapx(
+  "o",
+  "n",
+  "'Nn'[v:searchforward]",
+  { expr = true, desc = "Next search result" }
+)
+mapx(
+  "n",
+  "N",
+  "'nN'[v:searchforward].'zv'",
+  { expr = true, desc = "Prev search result" }
+)
+mapx(
+  "x",
+  "N",
+  "'nN'[v:searchforward]",
+  { expr = true, desc = "Prev search result" }
+)
+mapx(
+  "o",
+  "N",
+  "'nN'[v:searchforward]",
+  { expr = true, desc = "Prev search result" }
+)
 
 -- Some basic line breaks using comment characters.
 -- There are more advanced text-generation and commented breakline methods
@@ -508,36 +532,44 @@ mapx(
 )
 
 -- * under cursor inspection of highlights and extmarks.
-mapx(
-  "n",
-  "<leader>ui",
-  vim.show_pos,
-  { desc = "ui.hl=> inspect under cursor" }
-)
+mapx("n", "<leader>ui", vim.show_pos, { desc = "ui.hl=> inspect under cursor" })
 
-mapx("n", "<leader>us", function() toggle("spell") end,
-  { desc = "ui.spell=> toggle" })
-mapx("n", "<leader>uw", function() toggle("wrap") end,
-  { desc = "ui.wrap=> toggle" })
-mapx("n", "<leader>uL", function() toggle("relativenumber") end,
-  { desc = "ui.number=> toggle rellineno" })
-mapx("n", "<leader>ul", function() toggle.number() end,
-  { desc = "ui.number=> toggle lineno" })
-mapx("n", "<leader>ud", function() toggle.diagnostics() end,
-  { desc = "ui.lsp=> toggle diagnostics" })
+mapx("n", "<leader>us", function()
+  toggle("spell")
+end, { desc = "ui.spell=> toggle" })
+mapx("n", "<leader>uw", function()
+  toggle("wrap")
+end, { desc = "ui.wrap=> toggle" })
+mapx("n", "<leader>uL", function()
+  toggle("relativenumber")
+end, { desc = "ui.number=> toggle rellineno" })
+mapx("n", "<leader>ul", function()
+  toggle.number()
+end, { desc = "ui.number=> toggle lineno" })
+mapx("n", "<leader>ud", function()
+  toggle.diagnostics()
+end, { desc = "ui.lsp=> toggle diagnostics" })
 local conceallevel = vim.o.conceallevel > 0 and vim.o.conceallevel or 3
-mapx("n", "<leader>uc",
-  function() toggle("conceallevel", false, { 0, conceallevel }) end,
-  { desc = "ui.conceal=> toggle" })
+mapx("n", "<leader>uc", function()
+  toggle("conceallevel", false, { 0, conceallevel })
+end, { desc = "ui.conceal=> toggle" })
 if vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint then
-  mapx("n", "<leader>uh", function() toggle.inlay_hints() end,
-    { desc = "ui.lsp=> toggle inlay-hints" })
+  mapx("n", "<leader>uh", function()
+    toggle.inlay_hints()
+  end, { desc = "ui.lsp=> toggle inlay-hints" })
 end
-mapx("n", "<leader>uT",
-  function() if vim.b.ts_highlight then vim.treesitter.stop() else vim
-          .treesitter.start() end end, { desc = "ui.ts=> toggle highlight" })
+mapx("n", "<leader>uT", function()
+  if vim.b.ts_highlight then
+    vim.treesitter.stop()
+  else
+    vim.treesitter.start()
+  end
+end, { desc = "ui.ts=> toggle highlight" })
 
 local scrollval = vim.o.scrolloff
-mapx("n", "<leader>uR",
-  function() toggle("scrolloff", false, { 999 - scrollval, scrollval }) end,
-  { desc = "ui.scroll.vertical=> toggle centered cursor" })
+mapx("n", "<leader>uR", function()
+  toggle("scrolloff", false, { 999 - scrollval, scrollval })
+end, { desc = "ui.scroll.vertical=> toggle centered cursor" })
+
+mapx("n", "g`", "`", { desc = "vim=> marks", remap = true })
+mapx("n", "g''", "\"", { desc = "vim=> registers", remap = true })
