@@ -31,8 +31,6 @@
 
 ---@diagnostic disable: unused-local
 
-local mopts = require("funsak.table").mopts
-local lt = require("lazy.types")
 ---@class funsak.lazy
 local M = {}
 local _notify_mapper
@@ -50,7 +48,7 @@ end
 ---@param ftype (string | string[])? the filetypes that are supposed to be
 ---asscociated with the given linter.
 ---@param lopts LintSakOptions?
----@return lt.LazyPlugin can be easily inset alongside existing language
+---@return LazyPlugin can be easily inset alongside existing language
 ---definitions.
 function M.lsplnt(linter, ftype, lopts)
   lopts = lopts or {}
@@ -60,8 +58,7 @@ function M.lsplnt(linter, ftype, lopts)
     or {}
   )
   linter = (
-    type(linter) == "table" and vim.tbl_islist(linter) and linter
-    or { linter }
+    type(linter) == "table" and vim.tbl_islist(linter) and linter or { linter }
     or {}
   )
   local ret = {
@@ -86,7 +83,7 @@ end
 ---@param ftype (string | string[])? filetypes that are associated with the
 ---given formatters.
 ---@param fopts table? additional formatter options.
----@return lt.LazyPlugin[]? spec a table which is easily inset alongside
+---@return LazyPlugin[]? spec a table which is easily inset alongside
 ---existing language definitions.
 function M.lspfmt(formatter, ftype, fopts)
   fopts = fopts or {}
@@ -137,7 +134,7 @@ end
 ---attached.
 ---@param opts table? additional options passed to internal linter and conform
 ---wrappers.
----@return lt.LazySpec[] tables representing the appropriate Lazy
+---@return LazySpec[] tables representing the appropriate Lazy
 ---Specification stem portions that can be added alongside other language
 ---options.
 function M.lintformat(ft, formatter, linter, opts)
@@ -154,7 +151,7 @@ end
 ---@param name string plugin name/uri as a part of lazy.nvim specification.
 ---@param field string? name of a lazy.nvim spec field to access, if none is
 ---given the whole specification is returned.
----@return lt.LazyPlugin? | any? spec the plugin's specification within
+---@return LazyPlugin? | any? spec the plugin's specification within
 ---lazy.nvim. This can be used to make adjustments.
 function M.spec(name, field)
   local plugin = require("lazy.core.config").plugins[name]
@@ -198,70 +195,6 @@ function M.compinvert(name, field, fn)
     return plg and vim.is_callable(plg) and plg(fn(...))
   end
 end
-
----@alias MasonSetupOptionSpec T_Opts
----@alias MasonServerOptionSpec T_Opts
----@alias LazyDeps lt.LazyPluginSpec | lt.LazyPluginSpec[]
---- adds a specification component which sets up a language server within the
---- lsp support in neovim; essentially just a reduction of boilerplate when
---- writing the configuration for languages separately--we now can simply know a
---- target "conceptual schema" for language setup and skip writing in all the
---- superfluous table elements.
----@param name string language server name, e.g. "lua_ls"
----@param opts { server: (LSPConfigServerConfigOptsSpec | fun(): LSPConfigServerConfigOptsSpec)?, setup: LSPConfigServerSetupOptsSpec?, mason: LSPConfigMasonServerOptsSpec?, dependencies: (LazyDeps | fun(): LazyDeps)? }?
----@return lt.LazyPlugin
-function M.lspsrv(name, opts)
-  opts = opts or {}
-
-  ---@class LSPConfigServerConfigOptsSpec
-  local server_opts = opts.server ~= nil and opts.server or {}
-  server_opts = vim.is_callable(server_opts) and server_opts() or server_opts
-
-  ---@class LSPConfigServerSetupOptsSpec
-  ---@field hooks { before: fun(srv: string, opts: T_Opts), after: fun(srv: string, opts: T_Opts) }
-  ---@field handler fun()?
-  local setup_config = opts.setup or {}
-
-  ---@class LSPConfigMasonServerOptsSpec
-  ---@field enabled boolean?
-  ---@field blacklist boolean?
-  local mason_config = opts.mason or {}
-
-  local hooks = setup_config.hooks or {}
-  local handler = setup_config.handler ~= nil and setup_config.handler or nil
-
-  local deps = opts.dependencies ~= nil and opts.dependencies
-    or {}
-  deps = vim.is_callable(deps) and deps() or deps
-
-  return {
-    "neovim/nvim-lspconfig",
-    dependencies = deps,
-    opts = function(_, o)
-      if server_opts then
-        ---@cast server_opts MasonServerOptionSpec
-        o.servers = vim.tbl_deep_extend("force", o.servers or {}, {
-          [name] = server_opts
-        })
-        o.setup = vim.tbl_deep_extend("force", o.setup or {}, {
-          handlers = {
-            [name] = handler
-          },
-          hooks = {
-            [name] = hooks,
-          },
-        })
-        o.mason = vim.tbl_deep_extend("force", o.mason or {}, {
-          enabled = {
-            [name] = mason_config.enabled ~= nil and mason_config.enabled or true
-          },
-        })
-      end
-    end,
-  }
-end
-
-local strip = require('funsak.table').strip
 -- NOTE: A unified API:
 -- how do we take the lsp server configuration and make it a bit easier to use,
 -- seamless with the rest of the implementations used? Note the following
@@ -301,24 +234,76 @@ local strip = require('funsak.table').strip
 -- 6. If the server is not mason available, we need to come up with a similar
 -- step that will do the setup of all servers, then execute the custom setup
 -- hoos then.
-function M.newsrv(name, server_opts)
-  local use_mason = server_opts.mason ~= nil and server_opts.mason or true
-  local lsp_opts = server_opts.lang or {}
-  lsp_opts = type(lsp_opts) == "table" and lsp_opts or lsp_opts()
-  local lsp_handlers = server_opts.handlers or {}
-  lsp_handlers = type(lsp_handlers) == "table" and lsp_handlers or { lsp_handlers }
-  local lsp_hooks = server_opts.setup_hooks or {}
-  local lz_deps = server_opts.dependencies or {}
+
+---@generic T
+---@alias tFn `T` | fun(...): `T`?
+
+---@alias owlsp.SetupHooks { before: fun(srv: string, opts: T_Opts), after: fun(srv: string, opts: T_Opts) }
+
+---@class owlsp.SetupConfig
+---@field hooks owlsp.SetupHooks
+---@field handler fun()?
+
+---@class owlsp.MasonConfig
+---@field enabled boolean?
+
+---@class owlsp.ClientConfig: lsp.ClientConfig
+
+---@class owlsp.DependencyConfig: LazyPluginSpec[]
+
+--- adds a specification component which sets up a language server within the
+--- lsp support in neovim; essentially just a reduction of boilerplate when
+--- writing the configuration for languages separately--we now can simply know a
+--- target "conceptual schema" for language setup and skip writing in all the
+--- superfluous table elements.
+---@param name string language server name, e.g. "lua_ls"
+---@param opts { server: tFn<owlsp.ClientConfig>?, setup: owlsp.SetupConfig?, mason: owlsp.MasonConfig?, dependencies: tFn<owlsp.DependencyConfig>? }?
+---@return LazyPlugin
+function M.lspsrv(name, opts)
+  opts = opts or {}
+
+  local server_opts = opts.server ~= nil and opts.server or {}
+  local setup_config = opts.setup ~= nil and opts.setup or {}
+  local mason_config = opts.mason ~= nil and opts.mason or {}
+
+  local hooks = setup_config.hooks or {}
+  local handler = setup_config.handler ~= nil and setup_config.handler or nil
+
+  local deps = opts.dependencies ~= nil and opts.dependencies or {}
+  deps = vim.is_callable(deps) and (deps(name, opts) or deps()) or deps
 
   return {
     "neovim/nvim-lspconfig",
-    opts = function(_, opts)
-      opts.servers = vim.tbl_deep_extend("force", opts.servers or {}, { [name] = lsp_opts })
-      opts.handlers = vim.tbl_deep_extend("force", opts.handlers or {}, { [name] = lsp_handlers })
+    dependencies = vim.tbl_deep_extend("force", { "VonHeikemen/lsp-zero.nvim" }, deps),
+    opts = function(_, o)
+      o.servers = o.servers or {}
+      if server_opts then
+        server_opts = vim.is_callable(server_opts) and (server_opts(name, opts) or server_opts()) or server_opts
+        server_opts = type(server_opts) == "table" and server_opts or { server_opts }
+        o.servers = vim.tbl_deep_extend("force", o.servers , { [name] = server_opts })
+      end
+      o.setup = o.setup or {}
+      if setup_config then
+        o.setup.handlers = vim.tbl_deep_extend("force", o.setup.handlers or {},
+          {
+            [name] = handler
+          })
+        o.setup.hooks = vim.tbl_deep_extend("force", o.setup.hooks or {},
+          {
+            [name] = hooks
+          })
+      end
+      o.mason = o.mason or {}
+      if mason_config then
+        o.mason.enabled  = vim.tbl_deep_extend("force", o.mason.enabled or {}, {
+            [name] = mason_config.enabled ~= nil and mason_config.enabled or true
+        })
+      end
     end,
-    dependencies = vim.tbl_deep_extend("force", { "VonHeikemen/lsp-zero.nvim" }, lz_deps)
   }
 end
+
+
 
 --- wraps a potentially failing call or indexing of a field within an installed
 --- plugin module, if the cause of failure is due to initialization
@@ -369,8 +354,8 @@ local function lazy_notify(type)
 end
 
 local function mtidx(t, k)
-  -- rawset(t, k, t[k] or lazy_notify(k) or nil)
-  return rawget(t, k) or lazy_notify(k) or nil
+  rawset(t, k, rawget(t, k) or lazy_notify(k) or nil)
+  return t[k]
 end
 
 return setmetatable(M, { __index = mtidx })
