@@ -4,11 +4,7 @@ local kenv = require("environment.keys").motion.standard
 local qenv = require("environment.keys").motion.qortal
 
 return {
-  {
-    "echasnovski/mini.bracketed",
-    event = "VeryLazy",
-    version = false,
-  },
+  { "echasnovski/mini.bracketed", event = "VeryLazy", version = false },
   {
     "abecodes/tabout.nvim",
     enabled = opt.tabout,
@@ -23,12 +19,12 @@ return {
       enable_backwards = true,
       completion = true,
       tabouts = {
-        { open = "'", close = "'" },
+        { open = "'",  close = "'" },
         { open = "\"", close = "\"" },
-        { open = "`", close = "`" },
-        { open = "(", close = ")" },
-        { open = "[", close = "]" },
-        { open = "{", close = "}" },
+        { open = "`",  close = "`" },
+        { open = "(",  close = ")" },
+        { open = "[",  close = "]" },
+        { open = "{",  close = "}" },
       },
       ignore_beginning = true,
       exclude = {},
@@ -36,18 +32,13 @@ return {
     config = function(_, opts)
       require("tabout").setup(opts)
     end,
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "hrsh7th/nvim-cmp",
-    },
+    dependencies = { "nvim-treesitter/nvim-treesitter", "hrsh7th/nvim-cmp" },
   },
   {
     "cbochs/grapple.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
+    dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
-      eog_level = "warn",
+      log_level = "warn",
       scope = "git",
       save_path = tostring(vim.fn.stdpath("data") .. "/grapple"),
       ---Window options used for the popup menu
@@ -242,10 +233,7 @@ return {
       ---Keys used for exiting portal selection. Disable with [{key}] = false
       ---to `false`.
       ---@type table<string, boolean>
-      escape = {
-        ["<esc>"] = true,
-        ["q"] = true,
-      },
+      escape = { ["<esc>"] = true, ["q"] = true },
 
       ---The raw window options used for the portal window
       window_options = {
@@ -260,10 +248,7 @@ return {
     },
     config = true,
     cmd = { "Portal" },
-    dependencies = {
-      "cbochs/grapple.nvim",
-      "ThePrimeagen/harpoon",
-    },
+    dependencies = { "cbochs/grapple.nvim", "ThePrimeagen/harpoon" },
   },
   {
     "ThePrimeagen/harpoon",
@@ -356,10 +341,7 @@ return {
       debug = true,
       -- disable key bindings
       -- key_bindings_disabled = true,
-      key_bindings = {
-        next = "<Tab>",
-        previous = "<S-Tab>",
-      },
+      key_bindings = { next = "<Tab>", previous = "<S-Tab>" },
       -- use TSPlaygroundToggle to discover the (capture group)
       -- @capture_name can be anything
       language_configs = {
@@ -371,9 +353,7 @@ return {
               (argument_list) @argument_list_capture
             ]],
           -- experimental feature, to move the cursor in certain situations like when handling python f-strings
-          offsets = {
-            string_start_capture = 1,
-          },
+          offsets = { string_start_capture = 1 },
         },
       },
       default_config = {
@@ -391,33 +371,13 @@ return {
     "folke/flash.nvim",
     ---@type Flash.Config
     opts = {
-      label = {
-        rainbow = {
-          enabled = true,
-          shade = 8,
-        },
-        style = "overlay",
-      },
-      modes = {
-        char = {
-          keys = { "f", "F", "t", "T", "," },
-        },
-      },
-      jump = {
-        autojump = true,
-      },
+      label = { rainbow = { enabled = true, shade = 8 }, style = "overlay" },
+      modes = { char = { keys = { "f", "F", "t", "T", "," } } },
+      jump = { autojump = true },
     },
     keys = {
-      {
-        "s",
-        false,
-        mode = { "n", "x", "o" },
-      },
-      {
-        "S",
-        false,
-        mode = { "n", "x", "o" },
-      },
+      { "s", false, mode = { "n", "x", "o" } },
+      { "S", false, mode = { "n", "x", "o" } },
       {
         "<CR>",
         function()

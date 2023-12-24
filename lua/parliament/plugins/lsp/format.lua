@@ -36,6 +36,9 @@ return {
       "mfussenegger/nvim-lint",
     },
     event = { "LspAttach" },
+    opts = {
+      test_opts = "asdf"
+    }
   },
   {
     "stevearc/conform.nvim",

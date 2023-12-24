@@ -17,6 +17,10 @@ local function zero_default_keymaps(client, bufnr)
   end)
   vim.keymap.set("n", key_lsp.auxiliary.rename, vim.lsp.buf.rename,
     { desc = "lsp=> rename" })
+  vim.keymap.set("n", key_lsp.auxiliary.info, "<CMD>LspInfo<CR>",
+    { desc = "lsp=> server info" })
+  vim.keymap.set("n", key_lsp.auxiliary.log, "<CMD>LspLog<CR>",
+    { desc = "lsp.log=> view" })
 end
 
 --- creates a version of the attach_handler for a language server with
@@ -110,7 +114,8 @@ return {
   }, { "VonHeikemen/lsp-zero.nvim" },         -- enhancement controlled
     { "jubnzv/virtual-types.nvim", optional = true },
     { "nvim-lua/lsp-status.nvim",  optional = true },
-    { "nvimtools/none-ls.nvim",    optional = true }
+    { "nvimtools/none-ls.nvim",    optional = true },
+    { "rshkarin/mason-nvim-lint",  optional = true }
   },
   -- LSP Configuration
   -- =================
@@ -133,6 +138,7 @@ return {
   ---@field format { on_write: boolean?, format_opts: table?, blacklist: { [owlsp.ServerClient]: boolean? }? }?
   ---@field capabilities table globally available capabilities that should be
   ---added to all servers.
+  ---@field log_level vim.lsp.log_levels
 
   ---@param opts owlsp.LSPConfigSpec
   config = function(_, opts)
@@ -306,7 +312,10 @@ return {
     end
 
     local has_masonlint, masonlint = pcall(require, "mason-nvim-lint")
-    if has_masonlint then masonlint.setup() end
+    if has_masonlint then
+      lz.info(lz.spec("mason-nvim-lint", "opts"))
+      masonlint.setup()
+    end
 
     -- these are technically not required, I still use them both due to the
     -- fact that nushell's main LSP implementation requires using null-ls as a
@@ -339,6 +348,8 @@ return {
     }, {}, false)
     zero.format_on_save({})
     zero.format_mapping()
+
+    vim.lsp.set_log_level(opts.log_level or vim.lsp.log_levels.WARN)
   end,
   opts = function(_, opts)
     opts.inlay_hints = mopts(opts.inlay_hints or {}, { enabled = true })
@@ -371,13 +382,7 @@ return {
     "neovim/nvim-lspconfig",
     { "jay-babu/mason-null-ls.nvim", enabled = opt.lsp.null_ls }
   },
-  config = function(_, opts)
-    require("null-ls").setup(opts)
-    require("mason-null-ls").setup({
-      ensure_installed = {},
-      automatic_installation = true
-    })
-  end,
+  config = function(_, opts) require("null-ls").setup(opts) end,
   opts = {
     border = env.borders.main
     -- should_attach = function(bufnr)

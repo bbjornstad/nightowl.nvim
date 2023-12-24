@@ -287,6 +287,8 @@ kenv.lsp = keygroup({
     output_panel = "p",
     toggle = { [LEADER_ID] = { append = "t" }, server = "s", nullls = "n" },
     rules = { ignore = "I", lookup = "L" },
+    info = "i",
+    log = "g",
   },
   workspace = {
     [LEADER_ID] = { append = "<leader>W" },
