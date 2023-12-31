@@ -81,7 +81,6 @@ kenv.shortcut = keygroup({
         remote = "r",
       },
     },
-    nnn = { [LEADER_ID] = { append = "nn" }, explorer = "n", picker = "N" },
     grep = { live = "/" },
     files = {
       [LEADER_ID] = { append = "f" },
@@ -89,6 +88,7 @@ kenv.shortcut = keygroup({
       find_cwd = "F",
       recent = "r",
       recent_cwd = "R",
+  config = "c",
     },
   },
   move_window = {
@@ -98,6 +98,7 @@ kenv.shortcut = keygroup({
     up = "<C-k>",
   },
   buffers = { [LEADER_ID] = { append = "<leader>b" }, fuzz = "b", scope = "z" },
+  weather = { [LEADER_ID] = { append = "<leader>" }, open = "W" },
 }, leader_shortcut, {})
 
 kenv.treesitter = keygroup({
@@ -160,6 +161,7 @@ kenv.motion = keygroup({
     grapple = { [LEADER_ID] = { append = "g" }, forward = "f", backward = "b" },
     quickfix = { [LEADER_ID] = { append = "q" }, forward = "f", backward = "b" },
     jumplist = { [LEADER_ID] = { append = "j" }, forward = "f", backward = "b" },
+    harpoon = { [LEADER_ID] = { append = "h" }, forward = "f", backward = "b" },
   },
   standard = {
     [LEADER_ID] = { append = leader_motion },
@@ -280,7 +282,14 @@ kenv.lsp = keygroup({
   auxiliary = {
     [LEADER_ID] = { append = leader_code },
     rename = "r",
-    format = "f",
+    format = {
+      [LEADER_ID] = { append = "f" },
+      zero = "F",
+      default = "f",
+      pick = "p",
+      list = "l",
+      info = "i",
+    },
     lint = "l",
     code_action = "a",
     open_float = "d",
@@ -295,6 +304,11 @@ kenv.lsp = keygroup({
     add = "a",
     list = "l",
     remove = "r",
+  },
+  calls = {
+    [LEADER_ID] = { append = leader_code },
+    incoming = "n",
+    outgoing = "o",
   },
 }, false, {})
 
@@ -344,6 +358,7 @@ kenv.ui = keygroup({
     toggle_lines = "l",
   },
   matchparen = { [LEADER_ID] = { append = "m" }, enable = "m", disable = "d" },
+  focus = "f",
 }, leader_ui, {})
 
 local leader_color = "<leader>C"
@@ -370,7 +385,7 @@ kenv.completion = keygroup({
     complete_fuzzy_path = "<C-f>",
   },
   submenus = {
-    [LEADER_ID] = { append = "<C-;>" },
+    [LEADER_ID] = { append = "<C-Space>" },
     ai = { libre = "<C-a>", langfull = "<C-:>" },
     git = "<C-g>",
     shell = "<C-s>",
@@ -386,6 +401,14 @@ kenv.completion = keygroup({
     down = "<C-d>",
     j = "<C-j>",
     k = "<C-k>",
+    reverse = {
+      next = "<C-S-n>",
+      j = "<C-S-j>",
+      previous = "<C-S-p>",
+      k = "<C-S-k>",
+      up = "<C-S-u>",
+      down = "<C-S-d>",
+    },
   },
   confirm = "<C-y>",
 }, false, {})
@@ -1209,6 +1232,12 @@ kenv.help = keygroup({
     alt = "c",
   },
 }, leader_help, {})
+
+local leader_newts = "<leader>n"
+kenv.newts = keygroup({
+  notifications = "n",
+  messages = "m",
+}, leader_newts, {})
 
 function kenv:leader()
   return NVIM_DYN_LEADER
