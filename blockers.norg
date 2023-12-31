@@ -4,7 +4,7 @@ description:
 authors: ursa-major
 categories:
 created: 2023-11-25T16:47:04-0700
-updated: 2023-11-25T16:47:04-0700
+updated: 2023-12-31T11:29:11-0700
 version: 1.1.1
 @end
 
@@ -16,7 +16,7 @@ version: 1.1.1
    towards resolution. There is not a particular order to them, outside of the
    order induced by needing certain functionality at certain times for other
    reasons.
-*** ( ) neorg
+*** (-) neorg
     - (x) Neorg is complaining all the time, specifically about not being able
           to find the right neorg modules component to load.
     -- (x) This seems to be a problem that can strike if the external modules
@@ -34,29 +34,29 @@ version: 1.1.1
     -- It is questionable if i even want to keep edgy as an installed plugin as
        i rarely end up using it at all
 
-*** ( ) statusline plugins
+*** (-) statusline plugins
     Overall, the statusline plugins are working well together, better than I was
     originally anticipating. The pair of dropbar and lualine are solidly
     integrated with the other, but we are currently suffering from a few issues
     related to the iconography and general modularization of control for
     incline.nvim.
-    - ( ) debug why the bar is missing completely
-    -- ( ) This seems to be related to grapple, potentially being the one keeping
+    - (x) debug why the bar is missing completely
+    -- (x) This seems to be related to grapple, potentially being the one keeping
            all items filtered. This is to say that because sometimes grapple is a
            non-required bar element, and therefore isn't always displayed, the
            filtration of the display is failing for all due to missing elements.
-    - ( ) when the bar is not missing completely, are there any other issues
+    - (-) when the bar is not missing completely, are there any other issues
           related to things such as displayed components that should be hidden
           based on context, etc.
     - ( ) Fix the issues in a clean way, the present implementations are not at
           all clean
     - ( ) don't break any of the other statusline plugins
-*** ( ) fzf, fzf.vim, and fzf-lua
+*** (-) fzf, fzf.vim, and fzf-lua
     The main fuzzy matching plugins are represented here, at least until we can
     integrate nucleo more cleanly into the workflow. Nucleo just seems that much
     better from the implementation perspective. But that is not ready yet, and
     may not be for some time, or we'll have to take matters into our own hands.
-    - ( ) there is an issue related to the opening of neorg files from fzf
+    - (-) there is an issue related to the opening of neorg files from fzf
           windows, not really sure what that is supposed to be coming from.
 *** ( ) Colorschemes and Highlighting
     This should be somewhat straightforward, but I have been bikeshedding a lot
@@ -66,6 +66,7 @@ version: 1.1.1
     -- ( ) highlight overrides
     -- ( ) palette
     -- ( ) theme, e.g. palette usage per ui element...like syntax or treesitter.
+    -- ( ) light/dark toggler ability
 *** ( ) Headlines
     the headlines.nvim plugin is supposed to load suitable headline highlights
     and adjustments for text-ish files. Right now we are getting weird opposite
@@ -73,39 +74,47 @@ version: 1.1.1
     the entire sheet.
     - ( ) figure out what is happening
     - ( ) fix what is happening
-*** ( ) Website Requirements: zola.nvim and jinja templating.
+*** (-) Website Requirements: zola.nvim and jinja templating.
     For some strange reason, it seems as though I have some additional trouble
     loading zola.nvim in certain contexts. These seem to be during load of
     markdown plugins in cases where there is a notification which is
     reinterpreted by noice.nvim into markdown-styled text for hierarchy of
     information purposes.
-    - ( ) figure out what seems to be occurring with zola.
+    - (-) figure out what seems to be occurring with zola.
 
     Jinja is having separate troubles, namely it seems like the syntax file
     fails to load in every case. This obviously needs to be fixed. Something
     seems to be happening with the dotted filetype syntax, idk why it fails to
     register "html.jinja" as both a jinja and html file, as it should.
-    - ( ) figure out why the syntax isn't loading appropriately
-*** Mysterious Error Message
+    - (-) figure out why the syntax isn't loading appropriately
+*** Update 2023-12-31
+    I don't really think that this is fixed, per-se but maybe more like
+    superceded? The transition to Kickstart instead of LazyVim has proven that
+    the zola/jinja issues are fixable and can be worked into something that
+    actually is useable for Zola. However, there is another issue where it seems
+    like loading a CSS or SCSS file causes the syntax to fail on any jinja/html
+    file that is opened after the fact. That seems to be the bigger issue.
+
+*** (x) Mysterious Error Message
     I seem to be creating an issue where I'm getting a nice notification of "An
     Error Occurred ..." with no additional information about its source or
     nature. I am guessing that it is an issue with one of the autocompletion
     plugins that links to ai. Perhaps we are suffering from more cmp_ai issues?
-    - ( ) debug and fix
+    - (x) debug and fix
 *** nvim-cmp menu source identification
     In the menu of nvim-cmp, there would ideally be a column that corresponds to
     the source of each menu entry. This is supposed to be achievable with the
     correct configuration, it is possible that using lsp-zero makes more sense
     in this case since it does have the ability to use a function which does
     exactly that. This should be available out of the box though.
-*** Animation and SmoothCursor.nvim
+*** (x) Animation and SmoothCursor.nvim
     Another strange issue has cropped up with regard to the SmoothCursor plugin.
     In particular, it seems to have stopped being displayed in normal windows,
     the only places where it shows up currently are in lazy.nvim panels...though
     the fact that it is showing up at all is somewhat surprising if it is also
     having trouble.
 *** General LSP Configuration Issues
-**** ( ) splitting of lint, format, and server portions of LSP responsibilities
+**** (x) splitting of lint, format, and server portions of LSP responsibilities
      This is a matter of the following: right now I have a function which wraps
      both calls for linting and formatting together with options passable
      through a mapping with extra keys to desginate between linting and
@@ -117,16 +126,15 @@ version: 1.1.1
      All of this would be so much easier using only kickstart instead of full
      lazyvim.
      - (x) process has begun
-     - (-) functions written
-     -- (-) these are almost completely finished, there is a minor hiccup that
+     - (x) functions written
+     -- (x) these are almost completely finished, there is a minor hiccup that
             must be figured though...
-     -- ( ) Essentially, using `lspsrv` in its current format causes the lazy
+     -- (x) Essentially, using `lspsrv` in its current format causes the lazy
             ordering issues that arise with bare calls to dependent plugins to
             arise again even in cases where the original was provided in such a
             way as to prevent this using a callback guard. The reason is because
             the creation of the callback is then occurring in a file which must
             be `required` from the files read duruing the processing of `opts`
-     - ( ) use of `deflang` instead of separate component calls complete.
 **** Missing Language Implementations
      These are any languages that are going to have some trouble until the
      additional implementation details for lspconfig are determined.
@@ -140,10 +148,10 @@ version: 1.1.1
      - ( ) haxe
      - ( ) svelte
      - ( ) dot
-     - ( ) codeql
+     - (x) codeql
      - ( ) bicep
      - ( ) vue
-     - ( ) pest
+     - (x) pest
      - (x) ocaml
      - ( ) nim
      - ( ) KCL
@@ -152,7 +160,7 @@ version: 1.1.1
      - ( ) Reason
      - ( ) Nix
      - ( ) Robotframework
-     - ( ) CSS, SCSS, tailwindcss
+     - (-) CSS, SCSS, tailwindcss
      - ( ) prosemd
      - ( ) arduino
      - ( ) antlers
@@ -160,13 +168,6 @@ version: 1.1.1
      ---
 
 ** Unimplemented Features
-*** general
-**** Debate if the entire system should be on kickstart.nvim instead
-     The idea here is that I have done so much extra configuration on top of the
-     already existing lazyvim which has included a hefty amount of disabling.
-     This is potentially more problematic than if we were to have just
-     reimplemented the missing things directly off kickstart.nvim, as there is
-     less overwriting that will be done for plugin configurations, etc.
 *** lazyflex.nvim
     One of the more promising looking plugins that I have found recently,
     lazyflex allows the definition of groups of plugins to be managed more
@@ -195,7 +196,7 @@ version: 1.1.1
     This, of course, refers to the tools that I have written that are
     functional swiss army-knife attachments for working with lazy.nvim
     specifications.
-**** `funsak.color`: for controlling highlights
+**** ( ) `funsak.color`: for controlling highlights
      This does need a bit more sprucing up most likely in the way of
      documentation et al. Moreover, there should be some further development of
      the implementations to better facilitate the target goal: to achieve
@@ -206,7 +207,7 @@ version: 1.1.1
      The distillation of this is that we need tools which externally wrap around
      colorschemes and provide a registration method for the desired set of
      colors/base highlight group "palette"
-**** `funsak.keys`
+**** ( ) `funsak.keys`
      The big item that we need to finish off here is the keygroup
      implementation as a derived class item that can also interpret keymaps
      from individual files.
