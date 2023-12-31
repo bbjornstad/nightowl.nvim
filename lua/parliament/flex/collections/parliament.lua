@@ -1,3 +1,8 @@
+--- lazyflex.nvim core collection specification file
+--- ================================================
+--- This file contains the required function implementations that lazyflex.nvim
+--- uses to determine the enabled or disabled status of a particular plugin.
+---@class parliament.flex.collections.parliament
 local M = {}
 
 M.get_preset_keywords = function(name, enable_match)

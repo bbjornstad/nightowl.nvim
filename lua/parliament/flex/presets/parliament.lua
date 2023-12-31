@@ -16,13 +16,28 @@ M.presets = {
     "auto-indent.nvim",
     "dial.nvim",
   },
+  pairs = {
+    "mini.pairs",
+    "nvim-autopairs"
+  },
   organization = {
     "neorg",
     "orgmode",
     "eureka",
   },
+  organization_extras = {
+    "headlines.nvim",
+    "org-modern.nvim",
+    "org-bullets.nvim",
+    "telescope-orgmode.nvim"
+  },
+  neorg_extras = {
+    "neorg-figlet-module",
+    "neorg-templates",
+    "neorg-jupyter",
+    "neorg-exec"
+  },
   time = {
-    "pomodoro.nvim",
     "due.nvim",
     "vim-wakatime",
     "usage-tracker.nvim",
@@ -35,6 +50,7 @@ M.presets = {
     "copilot.lua",
     "codeium.nvim",
     "tabnine-nvim",
+    "cmp-tabnine",
     "huggingface/llm.nvim",
     "cmp-ai",
   },
@@ -57,6 +73,28 @@ M.presets = {
     "ollero.nvim",
     "gen.nvim",
   },
+  buffers = {
+    "mini.bufremove",
+    "JABS.nvim",
+    "cybu.nvim",
+  },
+  autoclose = {
+    "nvim-early-retirement",
+    "hbac.nvim"
+  },
+  windows = {
+    "focus.nvim",
+    "dressing.nvim",
+    "colorful-winsep.nvim",
+    "edgy.nvim",
+    "help-vsplit.nvim",
+    "stickybuf.nvim",
+    "flatten.nvim",
+    "ventana.nvim",
+    "scope.nvim",
+    "bufresize.nvim",
+    "accordian.nvim",
+  },
   lsp = {
     "nvim-lspconfig",
     "lsp-zero.nvim",
@@ -66,26 +104,78 @@ M.presets = {
     "mason-lspconfig.nvim",
     "none-ls.nvim",
   },
-  lsp_tools = {
-    "nvim-lspfuzzy",
-    "lsp_lines.nvim",
-    "aerial.nvim",
+  lsp_extras = {
     "outline.nvim",
-    "lsp-lens.nvim",
     "actions-preview.nvim",
     "output-panel.nvim",
     "lsp-toggle.nvim",
     "clear-action.nvim",
-    "gentags.lua",
     "glance.nvim",
   },
-  lsp_format = {
-    "conform.nvim",
-    "nvim-lint",
+  null_ls = {
+    "none-ls.nvim",
+    "mason-null-ls.nvim"
   },
-  format_utils = {
+  lint = {
+    "nvim-lint",
+    "mason-nvim-lint",
+  },
+  format = {
+    "conform.nvim",
+  },
+  format_extras = {
     "pick-lsp-formatter.nvim",
     "nvim-rulebook",
+  },
+  cmp = {
+    "nvim-cmp",
+    "LuaSnip",
+    ""
+  },
+  cmp_sources = {
+    "cmp-nvim-lsp",
+    "cmp-buffer",
+    "cmp-path",
+    "cmp-fuzzy-path",
+    "cmp-cmdline",
+    "cmp-nvim-lua",
+    "cmp-nvim-lsp-signature-help",
+    "cmp-nvim-lsp-document-symbol",
+    "cmp-emoji",
+    "cmp-git",
+    "cmp-rg",
+    "cmp-zsh",
+    "cmp-ctags",
+    "cmp-dap",
+    "cmp-calc",
+    "cmp-treesitter",
+    "cmp-crates.nvim",
+    "cmp-env",
+    "cmp-color-names",
+  },
+  cmp_sources_extras = {
+    "cmp-color-names",
+    "cmp-pandoc=references",
+    "nvim-cmp-fonts",
+    "cmp-nerdfonts",
+    "cmp-nerdfont",
+    "cmp_luasnip",
+    "cmp-plugins",
+    "cmp-diag-codes",
+    "cmp-dictionary",
+    "cmp-spell",
+    "cmp-tw2css",
+    "cmp-gitlog",
+    "cmp-latex-symbol",
+    "cmp-natdat",
+    "cmp-digraphs",
+    "cmp-omni",
+    "cmp-look",
+  },
+  snippet_sources = {
+    "vim-snippets",
+    "friendly-snippets",
+    "telescope-luasnip.nvim"
   },
   build = {
     "executor.nvim",
@@ -95,6 +185,13 @@ M.presets = {
     "rapid.nvim",
     "launch.nvim",
   },
+  repl = {
+    "vlime",
+    "sniprun",
+    "iron.nvim",
+    "molten-nvim",
+    "yarepl.nvim",
+  },
   refactor = {
     "inc-rename.nvim",
     "ssr.nvim",
@@ -102,6 +199,22 @@ M.presets = {
   },
   quickfix = {
     "nvim-bqf",
+    "trouble.nvim"
+  },
+  debug = {
+    "nvim-dap",
+    "nvim-dap-ui",
+    "mason-nvim-dap",
+    "debugprint.nvim",
+    "nvim-coverage",
+    "printer.nvim"
+  },
+  dap_extras = {
+    "nvim-dap-virtual-text",
+    "nvim-dap-repl-highlights",
+    "dap-utils.nvim",
+    "dap-helper.nvim",
+    "goto-breakpoints.nvim"
   },
   terminal = {
     "toggleterm.nvim",
@@ -140,6 +253,18 @@ M.presets = {
     "telescope-env.nvim",
     "telescope-toggleterm.nvim",
   },
+  env = {
+    "direnv.vim",
+    "dotenv.nvim",
+  },
+  folding = {
+    "nvim-ufo",
+    "foldhue.nvim",
+    "pretty-fold.nvim",
+    "promise-async",
+    "nvim-origami",
+    "nvim-foldsign",
+  },
   ascii = {
     "comment-box.nvim",
     "nvim-comment-frame",
@@ -151,6 +276,10 @@ M.presets = {
     "nerdy.nvim",
     "nerdicons.nvim",
     "icon-picker.nvim",
+  },
+  dates = {
+    "dates.nvim",
+    "nvim-relative-date",
   },
   huevos = {
     "cellular-automaton.nvim",
