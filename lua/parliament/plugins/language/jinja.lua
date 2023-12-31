@@ -1,5 +1,4 @@
-local deflang = require("funsak.lazy").lintformat
-local lz = require("funsak.lazy")
+local lsp = require("funsak.lsp")
 
 return {
   {
@@ -9,14 +8,14 @@ return {
   {
     "HiPhish/jinja.vim",
     config = function(_, opts)
-      vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-        pattern = "*.html",
-        command = "jinja#AdjustFiletype()",
-      })
+      -- vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+      --   pattern = "*.html",
+      --   command = "jinja#AdjustFiletype()",
+      -- })
     end,
     ft = { "jinja", "jinja2" },
   },
-  lz.lsplnt({ "djlint", "curlylint" }, { "jinja", "jinja2" }),
-  lz.lsplnt({ "curlylint" }, { "liquid" }),
-  lz.lspfmt("djlint", { "jinja", "jinja2" }),
+  lsp.linters(lsp.per_ft("curlylint", { "liquid" })),
+  lsp.linters(lsp.per_ft({ "djlint", "curlylint" }, { "jinja", "jinja2" })),
+  lsp.formatters(lsp.per_ft("djlint", { "jinja", "jinja2" })),
 }

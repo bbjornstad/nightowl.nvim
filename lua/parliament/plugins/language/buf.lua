@@ -1,4 +1,4 @@
-local lz = require("funsak.lazy")
+local lsp = require("funsak.lsp")
 
 return {
   {
@@ -6,5 +6,6 @@ return {
     ft = { "proto" },
     init = function() end,
   },
-  lz.lspsrv("bufls", { server = {} }),
+  lsp.server("bufls", { server = {} }),
+  lsp.formatters({ buf = { "buf" } }),
 }

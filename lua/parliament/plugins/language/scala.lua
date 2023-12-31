@@ -1,8 +1,8 @@
-local lz = require('funsak.lazy')
+local lsp = require('funsak.lsp')
 
 return {
-  lz.lspsrv("metals", { handler = lz.noop }),
-  lz.lspfmt({ "scalafmt" }, { "scala", "scl" }),
+  lsp.server("metals", { handler = lsp.noop }),
+  lsp.formatters(lsp.per_ft("scalafmt", { "scala", "scl" })),
   {
     "scalameta/nvim-metals",
     dependencies = {

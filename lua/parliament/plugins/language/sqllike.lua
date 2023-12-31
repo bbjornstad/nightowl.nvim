@@ -1,9 +1,10 @@
-local lz = require('funsak.lazy')
+local lsp = require("funsak.lsp")
+local lz = require("funsak.lazy")
 
 return {
-  lz.lspsrv("sqlls", { server = {} }),
-  lz.lspfmt({ "sql-formatter", "sqlfmt" }, { "sql" }),
-  lz.lsplnt({ "sqlfluff" }, { "sql" }),
+  lsp.server("sqlls", { server = {} }),
+  lsp.formatters(lsp.per_ft({ "sql-formatter", "sqlfmt" }, { "sql" })),
+  lsp.linters(lsp.per_ft("sqlfluff", { "sql" })),
   {
     "kndndrj/nvim-dbee",
     dependencies = {

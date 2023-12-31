@@ -1,9 +1,9 @@
 local env = require("environment.ui")
-local lz = require('funsak.lazy')
+local lsp = require('funsak.lsp')
 
 return {
-  lz.lspsrv("rust_analyzer", { handler = lz.noop }),
-  lz.lspfmt("rustfmt", { "rust", "rs" }),
+  lsp.server("rust_analyzer", { handler = lsp.noop }),
+  lsp.formatters(lsp.per_ft("rustfmt", { "rust", "rs" })),
   {
     "simrat39/rust-tools.nvim",
     ft = { "rust" },

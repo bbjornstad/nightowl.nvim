@@ -1,3 +1,4 @@
+local lsp = require("funsak.lsp")
 local key_api = require("environment.keys").lang.api
 
 return {
@@ -15,37 +16,37 @@ return {
       {
         key_api.endpoint.go,
         "<cmd>ApiBrowserGoto<cr>",
-        desc = "Open API endpoints valid for replacement text on cursor.",
+        desc = "api.endpt=> text under cursor",
       },
       {
         key_api.endpoint.recents,
         "<cmd>ApiBrowserRecents<cr>",
-        desc = "Open list of recently opened API endpoints.",
+        desc = "api.endpt=> recent",
       },
       {
         key_api.endpoint.list,
         "<cmd>ApiBrowserEndpoints<cr>",
-        desc = "Open list of endpoints for current API.",
+        desc = "api.endpt=> current api",
       },
       {
         key_api.refresh,
         "<cmd>ApiBrowserRefresh<cr>",
-        desc = "Refresh list of APIs and Endpoints.",
+        desc = "api.endpt=> refresh",
       },
       {
         key_api.select,
         "<cmd>ApiBrowserAPI<cr>",
-        desc = "Select an API.",
+        desc = "api.api=> select",
       },
       {
         key_api.select_env,
         "<cmd>ApiBrowserSelectEnv<cr>",
-        desc = "Select environment.",
+        desc = "api.env=> select",
       },
       {
         key_api.remote_env,
         "<cmd>ApiBrowserSelectRemoteEnv<cr>",
-        desc = "Select remote environment.",
+        desc = "api.env=> remote select",
       },
     },
   },

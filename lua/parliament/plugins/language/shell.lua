@@ -1,3 +1,4 @@
+local lsp = require("funsak.lsp")
 local lopts = require("funsak.table").lopts
 
 return {
@@ -50,4 +51,8 @@ return {
       { "nvimtools/none-ls.nvim" },
     },
   },
+  lsp.server("bashls", { server = {} }),
+  lsp.formatters({ bash = { "shellharden", "shfmt", "beautysh" } }),
+  lsp.formatters({ zsh = { "beautysh" } }),
+  lsp.linters({ bash = { "shellcheck" } }),
 }

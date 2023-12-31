@@ -1,7 +1,7 @@
 local kenv = require("environment.keys")
 local key_norg = kenv.time.neorg
 local key_scope = kenv.scope
-local inp = require("uutils.input")
+local inp = require("parliament.utils.input")
 
 local function norgbinder(norgbind, op)
   op = op or {}
@@ -24,6 +24,7 @@ local function norgbinder(norgbind, op)
       desc = opts.desc or nil,
     })
   end
+
   function binder.remap_key(bound, seq_remap, opts)
     opts = opts or {}
     opts.leader = opts.leader or {}
@@ -66,10 +67,10 @@ return {
         },
       },
       "lukas-reineke/headlines.nvim",
-      { "madskjeldgaard/neorg-figlet-module", optional = true, ft = "norg" },
-      { "pysan3/neorg-templates", optional = true, ft = "norg" },
-      { "tamton-aquib/neorg-jupyter", optional = true, ft = "norg" },
-      { "laher/neorg-exec", optional = true, ft = "norg" },
+      { "madskjeldgaard/neorg-figlet-module", optional = true },
+      { "pysan3/neorg-templates", optional = true },
+      { "tamton-aquib/neorg-jupyter", optional = true },
+      { "laher/neorg-exec", optional = true },
     },
     build = ":Neorg sync-parsers",
     cmd = "Neorg",
@@ -240,58 +241,62 @@ return {
             end,
             neorg_leader = key_norg:leader(),
           },
-          keys = {
-            {
-              key_norg.journal.daily,
-              function()
-                vim.cmd([[Neorg journal today]])
-              end,
-              mode = "n",
-              desc = "neorg.jrnl=> daily",
-            },
-            {
-              key_norg.journal.yesterday,
-              function()
-                vim.cmd([[Neorg journal yesterday]])
-              end,
-              mode = "n",
-              desc = "neorg.jrnl=> yesterday",
-            },
-            {
-              key_norg.journal.tomorrow,
-              function()
-                vim.cmd([[Neorg journal tomorrow]])
-              end,
-              mode = "n",
-              desc = "neorg.jrnl=> tomorrow",
-            },
-            {
-              key_norg.journal.templates,
-              function()
-                vim.cmd([[Neorg journal template]])
-              end,
-              mode = "n",
-              desc = "neorg.jrnl=> contents",
-            },
-            {
-              key_norg.journal.toc,
-              function()
-                vim.cmd([[Neorg journal toc]])
-              end,
-              mode = "n",
-              desc = "neorg.jrnl=> contents",
-            },
-            {
-              key_norg.notes.new,
-              function()
-                vim.cmd([[enew ./newscratch.norg]])
-              end,
-              mode = "n",
-              desc = "neorg.note=> new",
-            },
-          },
         },
       },
     },
+    keys = {
+      {
+        key_norg.journal.daily,
+        function()
+          vim.cmd([[Neorg journal today]])
+        end,
+        mode = "n",
+        desc = "neorg.jrnl=> daily",
+      },
+      {
+        key_norg.journal.yesterday,
+        function()
+          vim.cmd([[Neorg journal yesterday]])
+        end,
+        mode = "n",
+        desc = "neorg.jrnl=> yesterday",
+      },
+      {
+        key_norg.journal.tomorrow,
+        function()
+          vim.cmd([[Neorg journal tomorrow]])
+        end,
+        mode = "n",
+        desc = "neorg.jrnl=> tomorrow",
+      },
+      {
+        key_norg.journal.templates,
+        function()
+          vim.cmd([[Neorg journal template]])
+        end,
+        mode = "n",
+        desc = "neorg.jrnl=> contents",
+      },
+      {
+        key_norg.journal.toc,
+        function()
+          vim.cmd([[Neorg journal toc]])
+        end,
+        mode = "n",
+        desc = "neorg.jrnl=> contents",
+      },
+      {
+        key_norg.notes.new,
+        function()
+          vim.cmd([[new ./newscratch.norg]])
+        end,
+        mode = "n",
+        desc = "neorg.note=> new",
+      },
+    },
   },
+  { "madskjeldgaard/neorg-figlet-module", ft = "norg" },
+  { "pysan3/neorg-templates", ft = "norg" },
+  { "tamton-aquib/neorg-jupyter", ft = "norg" },
+  { "laher/neorg-exec", ft = "norg" },
 }

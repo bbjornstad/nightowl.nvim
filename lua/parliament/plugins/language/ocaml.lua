@@ -1,4 +1,4 @@
-local lz = require("funsak.lazy")
+local lsp = require("funsak.lsp")
 
 return {
   {
@@ -7,14 +7,15 @@ return {
     ft = { "ocaml" },
     opts = {},
     config = function(_, opts)
-      require("ocaml").setup(opts)
+      require("ocaml").setup()
     end,
   },
-  lz.lspsrv("ocamllsp", {
+  lsp.server("ocamllsp", {
     server = {
       get_language_id = function(_, ftype)
         return ftype
       end,
     },
   }),
+  lsp.formatters({ ocaml = { "ocamlformat" } }),
 }

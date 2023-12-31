@@ -1,9 +1,15 @@
-local lz = require('funsak.lazy')
+local lsp = require("funsak.lsp")
+local lz = require("funsak.lazy")
 
 return {
-  lz.lspsrv("hls", { handler = lz.noop }),
-  lz.lspfmt({ "ormolu" }, { "haskell", "lhaskell", "cabal", "cabalproject" }),
-  lz.lsplnt({ "hlint" }, { "haskell", "lhaskell", "cabal", "cabalproject" }),
+  lsp.server("hls", { server = lsp.noop }),
+  -- lsp.linters(
+  --   lsp.per_ft("hlint", { "haskell", "lhaskell", "cabal", "cabalproject" }),
+  --   { mason_nvim_lint = { enable = false } }
+  -- ),
+  lsp.formatters(
+    lsp.per_ft("ormolu", { "haskell", "lhaskell", "cabal", "cabalproject" })
+  ),
   {
     "mrcjkb/haskell-tools.nvim",
     dependencies = {
@@ -17,9 +23,7 @@ return {
   {
     "mrcjkb/haskell-snippets.nvim",
     ft = { "haskell", "hl" },
-    dependencies = {
-      "L3MON4D3/LuaSnip",
-    },
+    dependencies = { "L3MON4D3/LuaSnip" },
     config = function(_, opts)
       local ls = require("luasnip")
       local snips = require("haskell-snippets").all
@@ -41,8 +45,6 @@ return {
       }, opts.config or {})
     end,
     optional = true,
-    dependencies = {
-      "mrcjkb/haskell-tools.nvim",
-    },
+    dependencies = { "mrcjkb/haskell-tools.nvim" },
   },
 }

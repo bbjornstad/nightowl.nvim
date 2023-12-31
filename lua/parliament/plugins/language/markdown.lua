@@ -1,16 +1,21 @@
 local env = require("environment.ui")
 local key_glow = require("environment.keys").tool.glow
-
-local deflang = require("funsak.lazy").lintformat
-local lz = require("funsak.lazy")
+local lsp = require("funsak.lsp")
 
 return {
-  lz.lspsrv("marksman", { server = {} }),
-  lz.lsplnt({ "markdownlint" }, { "markdown", "md", "rmd", "qmd", "quarto" }),
-  lz.lspfmt(
-    { "markdown-toc", "markdownlint", "mdformat" },
-    { "markdown", "md", "rmd", "qmd", "quarto" }
+  lsp.server("marksman", { server = {} }),
+  lsp.server("prosemd_lsp", { server = {} }),
+  lsp.linters(
+    lsp.per_ft({ "markdownlint" }, { "markdown", "md", "rmd", "qmd", "quarto" })
   ),
+  lsp.formatters(lsp.per_ft({
+    "prettier",
+    "markdown-toc",
+    "markdownlint",
+    -- "mdformat",
+    -- "remark-cli",
+    "doctoc",
+  }, { "markdown", "md", "rmd", "qmd", "quarto" })),
   {
     "preservim/vim-markdown",
     ft = { "markdown", "md", "rmd", "qmd", "quarto" },

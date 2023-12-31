@@ -1,7 +1,7 @@
-local lz = require('funsak.lazy')
+local lsp = require('funsak.lsp')
 
 return {
-  lz.lspsrv("taplo", {
+  lsp.server("taplo", {
     server = {
       settings = {
         evenBetterToml = {

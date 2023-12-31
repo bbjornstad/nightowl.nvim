@@ -1,8 +1,8 @@
-local lz = require('funsak.lazy')
+local lsp = require('funsak.lsp')
 local key_preview = require("environment.keys").tool.preview
 
 return {
-  lz.lspsrv("typst_lsp", { server = {} }),
+  lsp.server("typst_lsp", { server = {} }),
   {
     "kaarmu/typst.vim",
     ft = { "typst" },

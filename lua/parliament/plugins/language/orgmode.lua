@@ -1,6 +1,6 @@
 -- vim: set ft=lua ts=2 sts=2 sw=2 et:
 local colors = require("kanagawa.colors").setup({ theme = "wave" }).palette
-local inp = require("uutils.input")
+local inp = require("parliament.utils.input")
 local kenv = require("environment.keys")
 local key_time = kenv.time
 local key_org = key_time.org
@@ -46,9 +46,9 @@ local organization_tools = {
           }, opts.highlight or {})
         end,
       },
-      { "akinsho/org-bullets.nvim", ft = { "org" } },
+      { "akinsho/org-bullets.nvim",       ft = { "org" } },
       { "joaomsa/telescope-orgmode.nvim", ft = { "org" } },
-      { "danilshvalov/org-modern.nvim", ft = { "org" } },
+      { "danilshvalov/org-modern.nvim",   ft = { "org" } },
       { "lukas-reineke/headlines.nvim" },
     },
     ft = { "org" },
@@ -137,7 +137,8 @@ local organization_tools = {
         },
         [key_org.task.full] = {
           description = "Full",
-          template = "* TODO %? | [%]\n  SCHEDULED: <%^{Start: |%<%Y-%m-%d %a>}> DEADLINE: <%^{End: |%<%Y-%m-%d %a>}>",
+          template =
+          "* TODO %? | [%]\n  SCHEDULED: <%^{Start: |%<%Y-%m-%d %a>}> DEADLINE: <%^{End: |%<%Y-%m-%d %a>}>",
         },
         [key_org.event:leader()] = "Event",
         [key_org.event._until] = {
@@ -150,7 +151,8 @@ local organization_tools = {
         },
         [key_org.event.range] = {
           description = "Range",
-          template = "* TODO %? | [%]\n  <%^{Start: |%<%Y-%m-%d %a>}>--<%^{End: |%<%Y-%m-%d %a>}>",
+          template =
+          "* TODO %? | [%]\n  <%^{Start: |%<%Y-%m-%d %a>}>--<%^{End: |%<%Y-%m-%d %a>}>",
         },
       },
       mappings = {
@@ -197,10 +199,6 @@ local organization_tools = {
     },
     config = true,
   },
-  { "madskjeldgaard/neorg-figlet-module", enabled = false, ft = "norg" },
-  { "pysan3/neorg-templates", ft = "norg" },
-  { "tamton-aquib/neorg-jupyter", enabled = false, ft = "norg" },
-  { "laher/neorg-exec", enabled = true, ft = "norg" },
 }
 
 return organization_tools

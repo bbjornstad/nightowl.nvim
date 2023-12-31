@@ -1,5 +1,3 @@
-local deflang = require("funsak.lazy").lintformat
-
 return {
   {
     "yorik1984/zola.nvim",

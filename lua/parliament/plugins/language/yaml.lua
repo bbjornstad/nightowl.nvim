@@ -1,11 +1,11 @@
 local kenv = require("environment.keys")
 local key_yaml = kenv.lang.yaml
-local lz = require("funsak.lazy")
+local lsp = require("funsak.lsp")
 
-local toggle_fmtoption = require("uutils.text").toggle_fmtopt
+local toggle_fmtoption = require("parliament.utils.text").toggle_fmtopt
 
 return {
-  lz.lspsrv("yamlls", {
+  lsp.server("yamlls", {
     server = {
       capabilities = {
         textDocument = {
@@ -33,8 +33,8 @@ return {
       { "b0o/SchemaStore.nvim" },
     },
   }),
-  lz.lsplnt("yamllint", { "yaml", "yml" }),
-  lz.lspfmt("yamlfmt", { "yaml", "yml" }),
+  lsp.linters(lsp.per_ft("yamllint", { "yaml", "yml" })),
+  lsp.formatters(lsp.per_ft("yamlfmt", { "yaml", "yml" })),
   {
     "cuducos/yaml.nvim",
     ft = { "yaml" },

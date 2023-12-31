@@ -1,16 +1,31 @@
 local key_jupyter = require("environment.keys").repl.jupyter
 local key_fstring_toggle =
   require("environment.keys").lang.python.fstring_toggle
-local lz = require("funsak.lazy")
+local lsp = require("funsak.lsp")
 
 return {
-  lz.lspsrv("jedi_language_server", { server = {} }),
-  lz.lsplnt("ruff", { "python", "py", "jupyter", "ipynb" }),
-  lz.lspfmt(
-    { "black", "isort", "ruff-fix", "ruff-format" },
-    { "python", "py", "jupyter", "ipynb" }
+  lsp.server("jedi_language_server", { server = {} }),
+  lsp.linters(
+    lsp.per_ft(
+      { "ruff", "flake8", "mypy", "pydocstyle", "vulture" },
+      { "python", "py", "jupyter", "ipynb" }
+    )
   ),
-  { "jmcantrell/vim-virtualenv", ft = { "python" } },
+  lsp.formatters(lsp.per_ft({
+    "black",
+    "isort",
+    "ruff-fix",
+    "ruff-format",
+    "autoflake",
+    "autopep8",
+    "docformatter",
+    "pyment",
+    "usort",
+  }, { "python", "py", "jupyter", "ipynb" })),
+  {
+    "jmcantrell/vim-virtualenv",
+    ft = { "python" },
+  },
   {
     "mfussenegger/nvim-dap-python",
     ft = { "python" },

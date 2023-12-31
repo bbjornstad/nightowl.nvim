@@ -1,14 +1,19 @@
-local lz = require("funsak.lazy")
+local lsp = require("funsak.lsp")
 
 return {
-  lz.lspsrv("clojure_lsp", { server = {} }),
-  lz.lsplnt("clj-kondo", "clojure"),
-  lz.lspfmt("cljstyle", "clojure"),
+  lsp.server("clojure_lsp", { server = {} }),
+  -- lsp.linters(lsp.per_ft({ "clj-kondo", "joker" }, { "clojure" })),
+  lsp.formatters(
+    lsp.per_ft(
+      { "zprint", "zprint-clj", "joker" },
+      { "clojure", "clojurescript" }
+    )
+  ),
   {
     "clojure-vim/acid.nvim",
     config = function() end,
     build = ":UpdateRemotePlugins",
-    ft = { "clojure" },
+    ft = { "clojure", "clojurescript" },
   },
   {
     "clojure-vim/jazz.nvim",
@@ -16,7 +21,7 @@ return {
       "clojure-vim/acid.nvim",
       "hkupty/impromptu.nvim",
     },
-    ft = { "clojure" },
+    ft = { "clojure", "clojurescript" },
   },
   {
     "hkupty/impromptu.nvim",
@@ -30,7 +35,7 @@ return {
   },
   {
     "Olical/conjure",
-    ft = { "clojure", "fennel", "python" },
+    ft = { "clojurescript", "clojure", "fennel", "python" },
     dependencies = {
       {
         "PaterJason/cmp-conjure",
@@ -52,6 +57,6 @@ return {
     config = function(_, opts)
       require("nvim-paredit").setup(opts)
     end,
-    ft = { "clojure", "lisp" },
+    ft = { "clojurescript", "clojure", "lisp" },
   },
 }
