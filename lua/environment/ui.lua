@@ -39,10 +39,10 @@ env.ft_ignore_list = {
   "dropbar_menu",
   "noice",
   "nnn",
-  "quickfix",
-  "nofile",
   "prompt",
   "broot",
+  "gundo",
+  "NvimTree"
 }
 
 env.ft_ignore_list_alt = vim.iter(env.ft_ignore_list):fold({}, function(t, v)

@@ -22,7 +22,7 @@ env.lsp = {
   diagnostics = {
     lsp_lines = true,
   },
-  null_ls = true,
+  null_ls = false,
 }
 env.symbol = {
   aerial = false,

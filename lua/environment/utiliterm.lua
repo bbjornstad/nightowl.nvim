@@ -1,4 +1,4 @@
-local termlib = require("uutils.term")
+local termlib = require("parliament.utils.term")
 
 local mod = {}
 

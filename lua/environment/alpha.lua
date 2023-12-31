@@ -97,16 +97,15 @@ M.nightowl_splash_frames = M.generate_animation(M.nightowl_splash, {
 })
 
 M.nightowl_splash_compact_frames =
-  M.generate_animation(M.nightowl_splash_compact, {
-    n_frame = 10,
-    replace_char = "%.",
-    replace_with = "*",
-    frequency = 0.05,
-  })
+    M.generate_animation(M.nightowl_splash_compact, {
+      n_frame = 10,
+      replace_char = "%.",
+      replace_with = "*",
+      frequency = 0.05,
+    })
 
 M.week_headers = {
   monday = {
-
     [[        _   _         _            _             _            _    _        _  ]],
     [[       /\_\/\_\ _    /\ \         /\ \     _    /\ \         / /\ /\ \     /\_\]],
     [[      / / / / //\_\ /  \ \       /  \ \   /\_\ /  \ \____   / /  \\ \ \   / / /]],
@@ -202,9 +201,13 @@ M.week_headers = {
 M.fn_menu = {}
 
 function M.fn_menu.files() end
+
 function M.fn_menu.projects() end
+
 function M.fn_menu.recent_files() end
+
 function M.fn_menu.grep() end
+
 function M.fn_menu.git() end
 
 function M.fn_menu.tip() end

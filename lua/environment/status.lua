@@ -1,5 +1,5 @@
 local env = {}
-local has = require('funsak.lazy').has
+local has = require("funsak.lazy").has
 local conv = require("funsak.convert").booleanize
 
 local function arglax(fn, ranking_priority)
@@ -56,11 +56,13 @@ local function progress(props, opts)
   props.buf = props.buf or nil
   opts = opts or {}
   local res = require("lualine.components.progress")
+  ---@cast res +string
   res = res()
   local num = string.gmatch(res, "%d+")
 
-  local res2 = num()
-  return res2
+  res = num()
+  vim.api.nvim_buf_set_var(props.buf, "owlincline_progress", res)
+  return vim.b[props.buf].owlincline_progress
 end
 
 local function init_custom_fname(highlight)
@@ -219,7 +221,7 @@ end
 --- collects metadata information about the currently open file for display in a
 --- component. used in incline.
 ---@param props table buffer id number
----@param opts T_Opts
+---@param opts pts
 ---@return string
 local function fileinfo(props, opts)
   props = props or {}
@@ -321,12 +323,8 @@ local function incline_handler(props, opts)
 
   return function(fn, ...)
     local ok, fnres = pcall(fn, ...)
-    local ret = ok and fmtstr:gsub("${ fn }", fnres)
-    if not ok then
-      -- vim.notify(vim.inspect({ ... }))
-      -- vim.notify(vim.inspect(fnres))
-    end
-    return { { ret }, cond = conv(ret and ok) }
+    local ret = ok and fmtstr:gsub("${ fn }", tostring(fnres) or "")
+    return { { ret }, cond = ret and ok }
   end
 end
 
