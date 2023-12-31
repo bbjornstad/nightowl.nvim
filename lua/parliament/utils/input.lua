@@ -8,10 +8,10 @@ function mod.varfmt(argtable, input)
   return res
 end
 
---- Prompter creates an object whose purpose is to store a couple of key string
---- formatting fields/components alongside a series of functional-style methods
---- which wrap existing functions to create suitably formatted user input for
---- things like keymappings, custom commands, etc.
+--- an object whose purpose is to store a couple of key string formatting
+--- fields/components alongside a series of functional-style methods which wrap
+--- existing functions to create suitably formatted user input for things like
+--- keymappings, custom commands, etc.
 mod.Prompter = {}
 mod.Prompter.__index = mod.Prompter
 function mod.Prompter.new(opts)

@@ -1,18 +1,19 @@
----@module "uutils.text" important text manipulation functions, mainly things
----like commented line breaks made from particular characters, but also controls
----some other formatting behavior as well.
+---@Mule "parliament.utils.text" important text manipulation functions,
+---mainly things like commented line breaks made from particular characters, but
+---also controls some other formatting behavior as well.
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 local api = vim.api
-local inp = require("uutils.input")
+local inp = require("parliament.utils.input")
 
-local mod = {}
+---@class parliament.utils.text
+local M = {}
 
 --- appends or removes a given character from the internal formatoptions vim
 --- option, which controls document formatting behavior; most often used in
 --- toggling autoformatting on insert behavior.
 ---@param char string the string value to toggle.
-function mod.toggle_fmtopt(char)
+function M.toggle_fmtopt(char)
   local currentopts = vim.opt.formatoptions:get()
   if currentopts[char] then
     vim.opt.formatoptions:remove(char)
@@ -20,17 +21,17 @@ function mod.toggle_fmtopt(char)
     vim.opt.formatoptions:append(char)
   end
 end
---- computes the remaining number of characters between the current cursor
 
+--- computes the remaining number of characters between the current cursor
 --- position and the colorcolumn or textwidth variables (in this order).
 ---@param offset number? the target width can be "shifted" by adding or removing
 ---a number of characters with this parameter.
----@param target number?|boolean? if desired, an alternative end position is specifiable,
----instead of either colorcolumn or textwidth. Boolean false disables the
----behavior; defaults to false.
+---@param target (number | boolean)? if desired, an alternative end position is
+---specifiable, instead of either colorcolumn or textwidth. Boolean false
+---disables the behavior; defaults to false.
 ---@return number the remaining characters until vim.opt.colorcolumn, or until
 ---vim.opt.textwidth if that fails.
-function mod.compute_remaining_width(offset, target)
+function M.compute_remaining_width(offset, target)
   offset = offset or 0
   local res = (
     tonumber(vim.opt.colorcolumn:get())
@@ -40,12 +41,13 @@ function mod.compute_remaining_width(offset, target)
   return target and (target - offset) or (res - offset)
 end
 
----@alias t_ftype string a filetype designation string used in neovim, e.g.
----"rust" or "markdown".
+---@alias t_ftype
+---| vim.opt.filetype # a filetype designation string used in neovim, e.g. "rust" or
+---"markdown".
 
 -- TODO: update the below function so that the mechanism of handling specific
 -- filetypes is configurable to the end user
-function mod.ftype_break_character(ftype)
+function M.ftype_break_character(ftype)
   ftype = type(ftype) ~= "table" and { ftype } or ftype
   return vim.tbl_map(function(ft)
     if ft == "lua" then
@@ -64,18 +66,18 @@ end
 ---@param character (string|fun(ft: t_ftype): string)? the pattern of characters
 ---that should be repeated to create the text to insert after the cursor.
 ---(default fun(ft: t_ftype): string)
-function mod.InsertDashBreak(colstop, character)
+function M.InsertDashBreak(colstop, character)
   colstop = tonumber(colstop) or 0
   if character == nil then
-    character = mod.ftype_break_character
+    character = M.ftype_break_character
   end
   local dashchar = (vim.is_callable(character) and character(vim.bo.filetype))
-    or (tostring(character) or "-")
+      or (tostring(character) or "-")
 
   local row, col = unpack(api.nvim_win_get_cursor(0))
   local dashtil
   if colstop == 0 then
-    dashtil = mod.compute_remaining_width()
+    dashtil = M.compute_remaining_width()
   else
     dashtil = tonumber(colstop) or 0
   end
@@ -85,11 +87,11 @@ function mod.InsertDashBreak(colstop, character)
   -- dashchar pattern. This gives the number of times to repeat dashchar between
   -- the cursor and the end of the line.
   local dashn = ((tonumber(dashtil) or 0) - (tonumber(col) or 0) - 1)
-    / string.len(tostring(dashchar))
+      / string.len(tostring(dashchar))
 
   local dashes = string.rep(
     type(dashchar) == "table" and table.concat(dashchar, "")
-      or tostring(dashchar),
+    or tostring(dashchar),
     dashn
   )
 
@@ -113,7 +115,7 @@ end
 ---that will be repeated to create the inserted text. (defaults to `"-"`)
 ---@param include_space boolean? whether or not to include a space following the
 ---comment delimiting characters for the file, e.g. "#{text}" vs "# {text}"
-function mod.InsertCommentBreak(colstop, dashchar, include_space)
+function M.InsertCommentBreak(colstop, dashchar, include_space)
   colstop = tonumber(colstop) or 0
   include_space = include_space or false
   local comment_string = vim.opt.commentstring:get()
@@ -127,7 +129,7 @@ function mod.InsertCommentBreak(colstop, dashchar, include_space)
     printstr = comment_linestart
   end
   api.nvim_buf_set_text(0, row - 1, 0, row - 1, 0, { printstr })
-  return mod.InsertDashBreak(colstop, dashchar)
+  return M.InsertDashBreak(colstop, dashchar)
 end
 
 --- prompts the user for a character to repeat in order to generate the
@@ -138,15 +140,15 @@ end
 ---colorcolumn and textwidth to have values is used.
 ---@param include_space boolean? whether or not a space should be included between
 ---the common character and separation division. defaults to false.
-function mod.SelectedCommentBreak(colstop, include_space)
+function M.SelectedCommentBreak(colstop, include_space)
   colstop = tonumber(colstop) or 0
   include_space = include_space or false
   inp.callback_input("break character: ", function(input)
-    mod.InsertCommentBreak(colstop, input, include_space)
+    M.InsertCommentBreak(colstop, input, include_space)
   end)()
 end
 
-function mod.get_previous_linelen()
+function M.get_previous_linelen()
   local row = api.nvim_win_get_cursor(0)[1]
 
   -- the following is required since we are not using the form including the
@@ -155,16 +157,16 @@ function mod.get_previous_linelen()
   return vim.fn.strlen(vim.fn.getline(row))
 end
 
-function mod.SucceedingCommentBreak(dashchar, include_space)
-  local target_column = mod.get_previous_linelen()
-  mod.InsertCommentBreak(target_column, dashchar, include_space)
+function M.SucceedingCommentBreak(dashchar, include_space)
+  local target_column = M.get_previous_linelen()
+  M.InsertCommentBreak(target_column, dashchar, include_space)
 end
 
-function mod.SucceedingSelectedBreak(include_space)
-  local target_column = mod.get_previous_linelen()
+function M.SucceedingSelectedBreak(include_space)
+  local target_column = M.get_previous_linelen()
   if target_column then
-    mod.SelectedCommentBreak(target_column, include_space)
+    M.SelectedCommentBreak(target_column, include_space)
   end
 end
 
-return mod
+return M

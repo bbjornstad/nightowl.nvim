@@ -1,12 +1,12 @@
----@module "uutils.window" helpers and utilities for window management
+---@module "parliament.utils.window" helpers and utilities for window management
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 
----@class uutils.window
+---@class parliament.utils.window
 local M = {}
 
 local function focus_direction_mapper(dir_indicated)
-  local has = require("funsak.table").contains
+  local has = vim.tbl_contains
   if has({ "j", "<Down>" }, dir_indicated) then
     return "j"
   elseif has({ "k", "<Up>" }, dir_indicated) then
@@ -20,6 +20,8 @@ end
 
 function M.focus_split_helper()
   local dir_indicated = vim.v.char
+  require('funsak.lazy').info(vim.inspect(dir_indicated))
+  require('funsak.lazy').info(type(dir_indicated))
   dir_indicated = focus_direction_mapper(dir_indicated)
   return function()
     require("focus").split_command(dir_indicated)

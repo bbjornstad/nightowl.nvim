@@ -1,9 +1,9 @@
----@module "uutils.ucmp" user-facing utilities for management of nvim-cmp
----interface
+---@module "parliament.utils.ucmp" user-facing utilities for management of
+---nvim-cmp interface
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 
----@class uutils.ucmp
+---@class parliament.utils.ucmp
 local M = {}
 
 M.cmp_actions = {}
@@ -12,10 +12,10 @@ local function has_words_before()
   local unpack = unpack or table.unpack
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
   return col ~= 0
-    and vim.api
-        .nvim_buf_get_lines(0, line - 1, line, true)[1]
-        :sub(col, col)
-        :match("%s")
+      and vim.api
+      .nvim_buf_get_lines(0, line - 1, line, true)[1]
+      :sub(col, col)
+      :match("%s")
       == nil
 end
 
@@ -25,8 +25,8 @@ function M.cmp_actions.luasnip_supertab()
     local luasnip = require("luasnip")
     if cmp.visible() then
       cmp.select_next_item()
-    -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-    -- that way you will only jump inside the snippet region
+      -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
+      -- that way you will only jump inside the snippet region
     elseif luasnip.expand_or_jumpable() then
       luasnip.expand_or_jump()
     elseif has_words_before() then
@@ -54,12 +54,12 @@ end
 local function source_parse(source, iopts)
   source = type(source) ~= "table" and { name = source } or source
   iopts = type(iopts) ~= "table" and { group_index = iopts or 1 }
-    or (vim.tbl_islist(iopts) and vim.tbl_map(function(opt)
-      return type(opt) ~= "table" and { group_index = opt or 1 }
-        or opt
-        or { group_index = 1 }
-    end, iopts))
-    or iopts
+      or (vim.tbl_islist(iopts) and vim.tbl_map(function(opt)
+        return type(opt) ~= "table" and { group_index = opt or 1 }
+            or opt
+            or { group_index = 1 }
+      end, iopts))
+      or iopts
 end
 
 local function add_single_opts(source, iopts)
@@ -72,10 +72,10 @@ local function filetype(ft, defaults)
   defaults = defaults or vim.deepcopy(env.default_sources)
   return function(sources, iopts)
     sources = type(sources) ~= table and { add_single_opts(sources, iopts) }
-      or vim.tbl_map(function(sname)
-        return add_single_opts(sname, iopts)
-      end, sources)
-      or sources
+        or vim.tbl_map(function(sname)
+          return add_single_opts(sname, iopts)
+        end, sources)
+        or sources
     require("cmp").setup.filetype(ft, {
       sources = defaults and vim.list_extend(defaults, sources) or sources,
     })
@@ -88,7 +88,7 @@ local function attach_handler(map_p, map_o, attach_opts, behavior)
     local potential
     if type(this_attach) ~= "table" then
       potential = (behavior == "force" and (map_o[k] or this_attach))
-        or (behavior == "preserve" and this_attach)
+          or (behavior == "preserve" and this_attach)
       if not potential then
         require("lazy.core.util").error(
           string.format(
@@ -125,17 +125,17 @@ function M.ftwrap(ft, attach_to, wrap_opts)
       -- if it was a table, then it ensures that those values are merged to the new
       -- wrapper function's arguments.
       attach_to.opts = (
-        vim.is_callable(attach_to.opts)
-        and function(p, o)
-          local ret = attach_to.opts(p, o) or attach_to.opts()
-          source_fun(sources, iopts)
-          return ret
-        end
-      )
-        or function(p, o)
-          attach_handler(p, o, attach_to.opts, behavior)
-          source_fun(sources, iopts)
-        end
+            vim.is_callable(attach_to.opts)
+            and function(p, o)
+              local ret = attach_to.opts(p, o) or attach_to.opts()
+              source_fun(sources, iopts)
+              return ret
+            end
+          )
+          or function(p, o)
+            attach_handler(p, o, attach_to.opts, behavior)
+            source_fun(sources, iopts)
+          end
       return attach_to
     else
       -- in this case, the attach_to argument is epxected to be a string, which is the
@@ -155,9 +155,9 @@ end
 
 function M.insert(sources, iopts)
   sources = type(sources) ~= "table" and { add_single_opts(sources, iopts) }
-    or vim.tbl_map(function(sname)
-      return add_single_opts(sname, iopts)
-    end, sources)
+      or vim.tbl_map(function(sname)
+        return add_single_opts(sname, iopts)
+      end, sources)
   return {
     "hrsh7th/nvim-cmp",
     opts = function(_, opts)
