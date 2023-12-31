@@ -16,24 +16,6 @@ local comp = require("funsak.colors").component
 
 return {
   {
-    "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
-    config = function(_, opts)
-      vim.diagnostic.config(opts)
-    end,
-    event = "LspAttach",
-    opts = { virtual_lines = { only_current_line = false } },
-    keys = {
-      {
-        key_view.diagnostic.lsp_lines.toggle,
-        function()
-          require("lsp_lines").toggle()
-        end,
-        mode = "n",
-        desc = "lsp.diag=> toggle ex-lines",
-      },
-    },
-  },
-  {
     "hedyhli/outline.nvim",
     enabled = opt.symbol.outline and opt.prefer.symbol_outline == "outline",
     cmd = { "Outline", "OutlineOpen", "OutlineClose" },
@@ -97,19 +79,19 @@ return {
         key_view.symbols_outline.toggle,
         "<CMD>Outline<CR>",
         mode = "n",
-        desc = "symbol.outline=> toggle",
+        desc = "symbol:| outline |=> toggle",
       },
       {
         key_view.symbols_outline.close,
         "<CMD>OutlineClose<CR>",
         mode = "n",
-        desc = "symbol.outline=> close",
+        desc = "symbol:| outline |=> close",
       },
       {
         key_view.symbols_outline.open,
         "<CMD>OutlineOpen<CR>",
         mode = "n",
-        desc = "symbol.outline=> open",
+        desc = "symbol:| outline |=> open",
       },
     },
   },
@@ -138,19 +120,19 @@ return {
         key_view.lens.toggle,
         "<CMD>LspLensToggle<CR>",
         mode = { "n" },
-        desc = "lsp.lens=> toggle",
+        desc = "lsp:| lens |=> toggle",
       },
       {
         key_view.lens.on,
         "<CMD>LspLensOn<CR>",
         mode = { "n" },
-        desc = "lsp.lens=> on",
+        desc = "lsp:| lens |=> on",
       },
       {
         key_view.lens.off,
         "<CMD>LspLensOff<CR>",
         mode = { "n" },
-        desc = "lsp.lens=> off",
+        desc = "lsp:| lens |=> off",
       },
     },
   },
@@ -209,24 +191,23 @@ return {
   {
     "mhanberg/output-panel.nvim",
     config = function(_, opts)
-      require("output_panel").setup(opts)
+      require("output_panel").setup()
       vim.api.nvim_create_autocmd({ "FileType" }, {
         pattern = "outputpanel",
         callback = function(ev)
           vim.keymap.set("n", "q", function()
             vim.cmd([[close]])
-          end, { desc = "lsp.log=> close panel", buffer = ev.buf })
+          end, { desc = "lsp:| log |=> close panel", buffer = ev.buf })
         end,
       })
     end,
-    opts = {},
-    event = "LspAttach",
+    event = "VeryLazy",
     keys = {
       {
         key_lsp.auxiliary.output_panel,
         "<CMD>OutputPanel<CR>",
         mode = "n",
-        desc = "lsp.log=> panel",
+        desc = "lsp:| log |=> panel",
       },
     },
   },
@@ -243,13 +224,13 @@ return {
         key_lsp.auxiliary.toggle.server,
         "<CMD>ToggleLSP<CR>",
         mode = "n",
-        desc = "lsp=> toggle buffer server",
+        desc = "lsp:buf| toggle |=> server",
       },
       {
         key_lsp.auxiliary.toggle.nullls,
         "<CMD>ToggleNullLSP<CR>",
         mode = "n",
-        desc = "lsp=> toggle buffer null-ls",
+        desc = "lsp:buf| toggle |=> null-ls",
       },
     },
   },
@@ -274,37 +255,37 @@ return {
         hide_cursor = true,
       },
       mappings = {
-        code_action = { key_action.code_action, "action=> code actions" },
+        code_action = { key_action.code_action, "action:| code |=> list" },
         apply_first = {
           key_action.apply_first,
-          "action=> apply first action",
+          "action:| code |=> apply first",
         },
         quickfix = {
           key_action.quickfix.quickfix,
-          "action.qf=> quickfix",
+          "action:| qf |=> quickfix",
         },
-        quickfix_next = { key_action.quickfix.next, "action.qf=> next" },
+        quickfix_next = { key_action.quickfix.next, "action:| qf |=> next" },
         quickfix_prev = {
           key_action.quickfix.prev,
-          "action.qf=> previous",
+          "action:| qf |=> previous",
         },
         refactor = {
           key_action.refactor.refactor,
-          "action.rf=> refactor",
+          "action:| rf |=> refactor",
         },
         refactor_inline = {
           key_action.refactor.inline,
-          "action.rf=> inline",
+          "action:| rf |=> inline",
         },
         refactor_extract = {
           key_action.refactor.extract,
-          "action.rf=> extract",
+          "action:| rf |=> extract",
         },
         refactor_rewrite = {
           key_action.refactor.rewrite,
-          "action.rf=> rewrite",
+          "action:| rf |=> rewrite",
         },
-        source = { key_action.source, "action=> source" },
+        source = { key_action.source, "action:| code |=> source" },
       },
     },
     config = function(_, opts)
@@ -315,13 +296,13 @@ return {
         key_ui.signs.actions.toggle,
         "<CMD>CodeActionToggleSigns<CR>",
         mode = "n",
-        desc = "ui.action=> toggle signs",
+        desc = "ui:| action |=> toggle signs",
       },
       {
         key_ui.signs.actions.toggle_label,
         "<CMD>CodeActionToggleLabel<CR>",
         mode = "n",
-        desc = "ui.action=> toggle labels",
+        desc = "ui:| action |=> toggle labels",
       },
     },
   },
@@ -335,9 +316,9 @@ return {
       -- Or use a function to enable `detached` only when the active window is too small
       -- (default behavior)
       opts.detached = opts.detached
-          or function(winid)
-            return vim.api.nvim_win_get_width(winid) < 100
-          end
+        or function(winid)
+          return vim.api.nvim_win_get_width(winid) < 100
+        end
 
       opts.preview_win_opts = mopts({
         -- Configure preview window
@@ -410,7 +391,7 @@ return {
         folded = true,
       }, opts.folds)
       opts.indent_lines =
-          mopts({ enable = true, icon = "│" }, opts.indent_lines)
+        mopts({ enable = true, icon = "│" }, opts.indent_lines)
       opts.winbar = mopts({
         -- Available starting from nvim-0.8+
         enable = true,
@@ -421,25 +402,25 @@ return {
         key_lsp.go.glance.references,
         "<CMD>Glance references<CR>",
         mode = "n",
-        desc = "glance=> references",
+        desc = "glance:| |=> references",
       },
       {
         key_lsp.go.glance.definition,
         "<CMD>Glance definitions<CR>",
         mode = "n",
-        desc = "glance=> definitions",
+        desc = "glance:| |=> definitions",
       },
       {
         key_lsp.go.glance.type_definition,
         "<CMD>Glance type_definitions<CR>",
         mode = "n",
-        desc = "glance=> type definitions",
+        desc = "glance:| |=> type definitions",
       },
       {
         key_lsp.go.glance.implementation,
         "<CMD>Glance implementations<CR>",
         mode = "n",
-        desc = "glance=> implementations",
+        desc = "glance:| |=> implementations",
       },
     },
   },
@@ -469,7 +450,7 @@ return {
           require("diaglist").open_all_diagnostics()
         end,
         mode = "n",
-        desc = "lsp.diag=> list all",
+        desc = "lsp:| diag |=> list all",
       },
       {
         key_view.diagnostic.diaglist.buffer,
@@ -477,106 +458,99 @@ return {
           require("diaglist").open_buffer_diagnostics()
         end,
         mode = "n",
-        desc = "lsp.diag=> list buffer",
+        desc = "lsp:| diag |=> list buffer",
       },
     },
   },
   {
-    "bbjornstad/corn.nvim",
-    config = function(_, opts)
-      require("corn").setup(opts)
-    end,
-    opts = {
-      auto_cmds = true,
-      sort_method = "severity",
-      scope = "line",
-      highlights = {
-        error = "DiagnosticFloatingError",
-        warn = "DiagnosticFloatingWarn",
-        info = "DiagnosticFloatingInfo",
-        hint = "DiagnosticFloatingHint",
-      },
-      icons = {
-        error = env.icons.diagnostic.Error,
-        warn = env.icons.diagnostic.Warn,
-        info = env.icons.diagnostic.Info,
-        hint = env.icons.diagnostic.Hint,
-      },
-      on_toggle = function(is_hidden)
-        vim.diagnostic.config({
-          virtual_text = not vim.diagnostic.config().virtual_text,
-        })
-      end,
-      item_preprocess_func = function(item)
-        return item
-      end,
-      window_opts = function()
-        return {
-          border = env.borders.alt,
-          anchor = "SE",
-          relative = "win",
-          zindex = 100,
-          title = "lsp::diagnostic",
-          title_pos = "right",
-          row = 0.96 * vim.api.nvim_win_get_height(0),
-          col = 0.98 * vim.api.nvim_win_get_width(0),
-        }
-      end,
-    },
-    event = "LspAttach",
-  },
-  {
-    "chikko80/error-lens.nvim",
-    enabled = false,
-    dependencies = { "nvim-telescope/telescope.nvim" },
+    "patrickpichler/hovercraft.nvim",
     opts = function(_, opts)
-      local error = comp("DiagnosticSignError", { "fg", "bg" })
-      local warn = comp("DiagnosticSignWarn", { "fg", "bg" })
-      local info = comp("DiagnosticSignInfo", { "fg", "bg" })
-      local hint = comp("DiagnosticSignHint", { "fg", "bg" })
-      local fb = comp("FloatBorder", { "bg" })
-
-      return {
-        enabled = false,
-        auto_adjust = {
-          enable = true,
-          fallback_bg_color = "#2a2a37",
-          step = 7,
-          total = 40,
+      local function prov(provider_id)
+        return require("hovercraft.provider" .. provider_id).new()
+      end
+      opts.providers = vim.tbl_deep_extend("force", opts.providers or {}, {
+        {
+          "󱟺 LSP",
+          prov("lsp.hover"),
         },
-        prefix = 4,
-        colors = {
-          error_fg = error.fg,
-          error_bg = error.bg,
-          warn_fg = warn.fg,
-          warn_bg = warn.bg,
-          info_fg = info.fg,
-          info_bg = info.bg,
-          hint_fg = hint.fg,
-          hint_bg = hint.bg,
+        {
+          "󱟺 Diag",
+          prov("diagnostics"),
         },
-      }
+        {
+          "󰋽 Man",
+          prov("man"),
+        },
+        {
+          "󰋽 Dictionary",
+          prov("dictionary"),
+        },
+        {
+          " Issues",
+          prov("github.issue"),
+        },
+        {
+          " Repo",
+          prov("github.repo"),
+        },
+        {
+          " User",
+          prov("github.user"),
+        },
+        {
+          " Blame",
+          prov("git.blame"),
+        },
+      })
+      opts.window = vim.tbl_deep_extend("force", opts.window or {}, {
+        border = env.borders.main,
+      })
+      opts.keys = vim.tbl_deep_extend("force", opts.keys or {}, {
+        {
+          "<C-u>",
+          function()
+            require("hovercraft").scroll({ delta = -4 })
+          end,
+          desc = "lsp:| hover => scroll up",
+        },
+        {
+          "<C-d>",
+          function()
+            require("hovercraft").scroll({ delta = 4 })
+          end,
+          desc = "lsp:| hover => scroll down",
+        },
+        {
+          "<TAB>",
+          function()
+            require("hovercraft").hover_next()
+          end,
+          desc = "lsp:| hover => next source",
+        },
+        {
+          "<S-TAB>",
+          function()
+            require("hovercraft").hover_next({ step = -1 })
+          end,
+          desc = "lsp:| hover => previous source",
+        },
+        {
+          key_lsp.hover,
+          function()
+            local hc = require("hovercraft")
+            if hc.is_visible() then
+              hc.enter_popup()
+            else
+              hc.hover()
+            end
+          end,
+          mode = "n",
+          desc = "lsp:| hover |=> focus/open",
+        },
+      })
     end,
     config = function(_, opts)
-      require("error-lens").setup(opts)
+      require("hovercraft").setup(opts)
     end,
-    keys = {
-      {
-        key_view.diagnostic.error_lens.toggle,
-        function()
-          require("error-lens").toggle()
-        end,
-        mode = "n",
-        desc = "lsp.diag=> toggle error-lens",
-      },
-      {
-        key_scope.diagnostic.error_lens,
-        function()
-          require("telescope").load_extension("error-lens")
-        end,
-        mode = "n",
-        desc = "scope.ext=> error lens diagnostics",
-      },
-    },
   },
 }

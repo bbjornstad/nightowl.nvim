@@ -1,11 +1,11 @@
-local env = require('environment.ui')
-local kenv = require('environment.keys')
+local env = require("environment.ui")
+local kenv = require("environment.keys")
 local key_trouble = kenv.diagnostic
 
 return {
   {
     "folke/trouble.nvim",
-    dependencies = {"nvim-tree/nvim-web-devicons"},
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       position = "bottom",
       height = 24,
@@ -27,19 +27,19 @@ return {
         open_split = { "<c-x>" }, -- open buffer in new split
         open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
         open_tab = { "<c-t>" }, -- open buffer in new tab
-        jump_close = {"o"}, -- jump to the diagnostic and close the list
+        jump_close = { "o" }, -- jump to the diagnostic and close the list
         toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
         switch_severity = "s", -- switch "diagnostics" severity filter level to HINT / INFO / WARN / ERROR
         toggle_preview = "P", -- toggle auto_preview
         hover = "K", -- opens a small popup with the full multiline message
         preview = "p", -- preview the diagnostic location
         open_code_href = "c", -- if present, open a URI with more information about the diagnostic error
-        close_folds = {"zM", "zm"}, -- close all folds
-        open_folds = {"zR", "zr"}, -- open all folds
-        toggle_fold = {"zA", "za"}, -- toggle fold of current file
+        close_folds = { "zM", "zm" }, -- close all folds
+        open_folds = { "zR", "zr" }, -- open all folds
+        toggle_fold = { "zA", "za" }, -- toggle fold of current file
         previous = "k", -- previous item
         next = "j", -- next item
-        help = "?" -- help menu
+        help = "?", -- help menu
       },
       multiline = true, -- render multi-line messages
       indent_lines = true, -- add an indent guide below the fold icons
@@ -49,7 +49,11 @@ return {
       auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
       auto_fold = false, -- automatically fold a file trouble list at creation
       auto_jump = { "lsp_definitions", "lsp_implementations" }, -- for the given modes, automatically jump if there is only a single result
-      include_declaration = { "lsp_references", "lsp_implementations", "lsp_definitions"  }, -- for the given modes, include the declaration of the current symbol in the results
+      include_declaration = {
+        "lsp_references",
+        "lsp_implementations",
+        "lsp_definitions",
+      }, -- for the given modes, include the declaration of the current symbol in the results
       signs = {
         -- icons / text used for a diagnostic
         error = env.icons.diagnostic.Error,
@@ -58,54 +62,59 @@ return {
         information = env.icons.diagnostic.Info,
         other = env.icons.diagnostic.Info,
       },
-      use_diagnostic_signs = false
+      use_diagnostic_signs = false,
     },
     config = function(_, opts)
-      require('trouble').setup(opts)
+      require("trouble").setup(opts)
     end,
     keys = {
       {
         key_trouble.toggle,
         function()
-          require('trouble').toggle()
+          require("trouble").toggle()
         end,
         mode = "n",
-        desc = "lsp.trouble=> toggle",
-      },{
+        desc = "lsp:| trouble |=> toggle",
+      },
+      {
         key_trouble.workspace,
         function()
-          require('trouble').toggle("workspace_diagnostics")
+          require("trouble").toggle("workspace_diagnostics")
         end,
         mode = "n",
-        desc = "lsp.trouble=> workspace",
-      },{
+        desc = "lsp:| trouble |=> workspace",
+      },
+      {
         key_trouble.document,
         function()
-          require('trouble').toggle("document_diagnostics")
+          require("trouble").toggle("document_diagnostics")
         end,
         mode = "n",
-        desc = "lsp.trouble=> document",
-      }, {
+        desc = "lsp:| trouble |=> document",
+      },
+      {
         key_trouble.quickfix,
         function()
-          require('trouble').toggle("quickfix")
+          require("trouble").toggle("quickfix")
         end,
         mode = "n",
-        desc = "lsp.trouble=> quickfix list",
-      },{
+        desc = "lsp:| trouble |=> quickfix list",
+      },
+      {
         key_trouble.loclist,
         function()
-          require('trouble').toggle("loclist")
+          require("trouble").toggle("loclist")
         end,
         mode = "n",
-        desc = "lsp.trouble=> location list",
-      }, {
+        desc = "lsp:| trouble |=> location list",
+      },
+      {
         key_trouble.lsp_references,
         function()
-          require('trouble').toggle('lsp_references')
+          require("trouble").toggle("lsp_references")
         end,
         mode = "n",
-        desc = "lsp.trouble=> lsp references"
+        desc = "lsp:| trouble |=> lsp references",
       },
     },
     event = "LspAttach",
@@ -119,17 +128,23 @@ return {
       -- keywords recognized as todo comments
       keywords = {
         FIX = {
-          icon = "󰅝 ", -- icon used for the sign, and in search results
-          color = "error", -- can be a hex color, or a named color (see below)
-          alt = { "FIXME", "BUG", "FIXIT", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
-          -- signs = false, -- configure signs for some keywords individually
+          -- icon used for the sign, and in search results
+          icon = "󰅝 ",
+          -- can be a hex color, or a named color (see below)
+          color = "error",
+          -- a set of other keywords that all map to this FIX keywords
+          alt = { "FIXME", "BUG", "FIXIT", "ISSUE" },
         },
         TODO = { icon = "󱔳 ", color = "info" },
         HACK = { icon = " ", color = "warning" },
         WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
         PERF = { icon = "󱕎 ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
         NOTE = { icon = "󱝾 ", color = "hint", alt = { "INFO" } },
-        TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
+        TEST = {
+          icon = "⏲ ",
+          color = "test",
+          alt = { "TESTING", "PASSED", "FAILED" },
+        },
       },
       gui_style = {
         fg = "NONE", -- The gui style to use for the fg highlight group.
@@ -160,7 +175,7 @@ return {
         info = { "DiagnosticInfo", "#2563EB" },
         hint = { "DiagnosticHint", "#10B981" },
         default = { "Identifier", "#7C3AED" },
-        test = { "Identifier", "#FF00FF" }
+        test = { "Identifier", "#FF00FF" },
       },
       search = {
         command = "rg",
@@ -178,7 +193,7 @@ return {
       },
     },
     config = function(_, opts)
-      require('todo-comments').setup(opts)
+      require("todo-comments").setup(opts)
     end,
     event = {
       "VeryLazy",
@@ -187,27 +202,84 @@ return {
       {
         "[t",
         function()
-          require('todo-comments').jump_prev()
+          require("todo-comments").jump_prev()
         end,
         mode = "n",
-        desc = "todo=> prev comment"
+        desc = "todo:| |=> prev comment",
       },
       {
         "]t",
         function()
-          require('todo-comments').jump_next()
+          require("todo-comments").jump_next()
         end,
         mode = "n",
-        desc = "todo=> next comment"
+        desc = "todo:| |=> next comment",
       },
     },
+  },
+  {
+    "bbjornstad/corn.nvim",
+    config = function(_, opts)
+      require("corn").setup(opts)
+    end,
+    opts = {
+      auto_cmds = true,
+      sort_method = "severity",
+      scope = "line",
+      highlights = {
+        error = "DiagnosticFloatingError",
+        warn = "DiagnosticFloatingWarn",
+        info = "DiagnosticFloatingInfo",
+        hint = "DiagnosticFloatingHint",
+      },
+      icons = {
+        error = env.icons.diagnostic.Error,
+        warn = env.icons.diagnostic.Warn,
+        info = env.icons.diagnostic.Info,
+        hint = env.icons.diagnostic.Hint,
+      },
+      on_toggle = function(is_hidden)
+        vim.diagnostic.config({
+          virtual_text = not vim.diagnostic.config().virtual_text,
+        })
+      end,
+      item_preprocess_func = function(item)
+        return item
+      end,
+      window_opts = function()
+        return {
+          border = env.borders.alt,
+          anchor = "SE",
+          relative = "win",
+          zindex = 100,
+          title = "󰼀 lsp::diagnostic",
+          title_pos = "right",
+          row = 0.96 * vim.api.nvim_win_get_height(0),
+          col = 0.98 * vim.api.nvim_win_get_width(0),
+        }
+      end,
+    },
+    event = "LspAttach",
   },
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
       opts.diagnostics = vim.tbl_deep_extend("force", opts.diagnostics or {}, {
-
+        underline = true,
+        update_in_insert = false,
+        virtual_text = {
+          spacing = 2,
+          source = "if_many",
+          prefix = "󰛯",
+        },
+        severity_sort = true,
+        float = {
+          border = env.borders.alt,
+          title = "󰼀 lsp::diagnostic",
+          title_pos = "right",
+        },
       })
-    end
-  }
+      opts.log_level = vim.log.levels.WARN
+    end,
+  },
 }
