@@ -1,8 +1,13 @@
 {
   "workspace.checkThirdParty": false,
   "diagnostics.workspaceDelay": 500,
-  "diagnostics.disable": ["different-requires", "unused-local"],
-  "diagnostics.globals": ["vim"],
+  "diagnostics.disable": [
+    "different-requires",
+    "unused-local"
+  ],
+  "diagnostics.globals": [
+    "vim"
+  ],
   "completion": {
     "callSnippet": "Both"
   },
