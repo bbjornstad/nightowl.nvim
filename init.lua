@@ -1,77 +1,95 @@
+-- SPDX-FileCopyrightText: 2023 Bailey Bjornstad | ursa-major <bailey@bjornstad.dev>
+-- SPDX-License-Identifier: MIT
+
+-- MIT License
+
+--  Copyright (c) 2023 Bailey Bjornstad | ursa-major bailey@bjornstad.dev
+
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+
+-- The above copyright notice and this permission notice (including the next
+-- paragraph) shall be included in all copies or substantial portions of the
+-- Software.
+
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+
 ---@module "parliament.nvim" kickstart version of nightowl.nvim neovim
 ---configuration setup. The goal is to make neovim capable of doing anything.
 ---@author Bailey Bjornstad | ursa-major
----@license not settled yet.
+---@license MIT
 
 -- we have to be very careful what we include here using a require call. This is
 -- an easy place to accidentally create a circular dependency.
-local uienv = require('environment.ui')
+local uienv = require("environment.ui")
 
--- [[ Install `lazy.nvim` plugin manager ]]
--- ========================================
+-- Install `lazy.nvim` plugin manager
+-- ==================================
 -- https://github.com/folke/lazy.nvim
 --`:help lazy.nvim.txt` for more info
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system {
-    'git',
-    'clone',
-    '--filter=blob:none',
-    'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.uv.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    -- latest stable release
+    "--branch=stable",
     lazypath,
-  }
+  })
 end
 vim.opt.rtp:prepend(lazypath)
 
--- [[ Setting options ]]
--- =====================
+-- setting options
+-- ===============
 -- See `:help vim.o`
---
 -- NOTE: The default kickstart.nvim sets all of its options in this init.lua
 -- file, I prefer to have them separated in file structure, so as to keep a
 -- simple modular approach and style across the entire configuration structure.
-require('parliament.config.options')
+require("parliament.config.options")
 
--- [[ Configure plugins ]]
--- =======================
+-- Configure Plugins
+-- =================
 -- NOTE: Here is where you install your plugins. You can configure plugins using
 -- the `config` key. You can also configure plugins after the setup call, as
 -- they will be available in your neovim runtime.
-require('lazy').setup({
-  -- these are a couple of extra plugin specifications that are included with
-  -- kickstart.nvim, might as well use them since they do replace some of the
-  -- functionality previously preconfigured with lazyvim.
-  require 'kickstart.plugins.autoformat',
-  -- require 'kickstart.plugins.debug',
-
+require("lazy").setup({
+  {
+    "abeldekat/lazyflex.nvim",
+    version = "*",
+    import = "lazyflex.hook",
+    opts = {},
+  },
   -- this imports all additional plugins that are not covered by the four core
   -- components below. It is necessary to load these first, as they contain the
   -- colorscheme plugins which must be loaded first according to lazy.nvim
   -- specifications for usage.
-  { import = 'parliament.plugins' },
+  { import = "parliament.plugins" },
 
   -- the following sets up the core components that are a part of the
   -- nightowl.nvim configuration. These are the most important to have correct
-  { import = 'parliament.plugins.interface' },
-  { import = 'parliament.plugins.lsp' },
-  { import = 'parliament.plugins.cmp' },
-  { import = 'parliament.plugins.language' },
-
-  -- these
-
-  -- the below is unlikely to be used all that much but it does exist if
-  -- desired, so technically we could put additional plugins in here. This seems
-  -- highly superfluous though, given that we overhauled with our own custom
-  -- directory. It probably just makes the most sense to remove this line in the
-  -- long run
-  { import = 'custom.plugins' },
+  { import = "parliament.plugins.interface" },
+  { import = "parliament.plugins.lsp" },
+  { import = "parliament.plugins.cmp" },
+  { import = "parliament.plugins.language" },
 }, {
   defaults = {
-    -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins
-    -- will load during startup. If you know what you're doing, you can set this
-    -- to `true` to have all your custom plugins lazy-loaded by default.
+    -- LazyVim and lazy.nvim by default do not lazy load user-specified
+    -- plugins. Because of the sheer volume contained here, we really benefit
+    -- from having this set to true instead
     lazy = true,
+    -- allow for the most up-to-date versions for git plugins
     version = false,
   },
   install = {
@@ -84,9 +102,17 @@ require('lazy').setup({
     },
   },
   checker = { enabled = true },
+  -- TODO: the below RTP plugin manipulations are somewhat problematic from the
+  -- modularity perspective. As far as I can tell, they are required to be put
+  -- into this specification instead of a self-contained one or better,
+  -- modularly spread out according to language definitions.
   performance = {
     rtp = {
-      paths = { "/home/ursa-major/.opam/default/share/ocp-indent/vim" },
+      paths = {
+        -- ocaml
+        "/home/ursa-major/.opam/default/share/ocp-indent/vim",
+        vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "lazyflex.nvim"),
+      },
       disabled_plugins = {
         -- these are disabled based on the fact that we are including other,
         -- plugins which are more powerful matchparen implementations and are
@@ -145,12 +171,10 @@ require('lazy').setup({
   },
 })
 
--- [[ Basic Keymaps ]]
--- ===================
-require('parliament.config.keymaps')
+-- Basic Keymaps
+-- =============
+require("parliament.config.keymaps")
 
--- [[ Basic Autocommands ]]
--- ========================
-require('parliament.config.autocmds')
-
--- vim: ts=2 sts=2 sw=2 et
+-- Basic Autocommands
+-- ==================
+require("parliament.config.autocmds")
