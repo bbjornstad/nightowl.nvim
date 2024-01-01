@@ -4,6 +4,7 @@ local kenv = require("environment.keys")
 local key_scope = kenv.scope
 local key_tool = kenv.tool
 local key_shortcut = kenv.shortcut
+local key_newts = kenv.newts
 
 local target_pickers = {
   "find_files",
@@ -96,7 +97,7 @@ local target_extensions = {
   "whaler",
 }
 
-local scopeutils = require("uutils.scope")
+local scopeutils = require("parliament.utils.scope")
 local pickspec = scopeutils.setup_pickers(target_pickers, {
   layout_strategy = "bottom_pane",
   layout_config = { height = 0.85 },
@@ -179,8 +180,7 @@ return {
         borderchars = env.borders.telescope,
         path_display = "smart",
       },
-      pickers = pickspec,
-      extensions = extspec,
+      -- pickers = pickspec,
     },
     dependencies = {
       "nvim-lua/popup.nvim",
@@ -192,25 +192,25 @@ return {
         key_scope.files.find,
         funblt("find_files"),
         mode = "n",
-        desc = "scope.pick=> find files",
+        desc = "scope:| pick |=> find files",
       },
       {
         key_scope.pickers.builtin,
         funblt("builtin"),
         mode = "n",
-        desc = "scope.pick=> builtin",
+        desc = "scope:| pick |=> builtin",
       },
       {
         key_scope.treesitter,
         funblt("treesitter"),
         mode = "n",
-        desc = "scope.pick=> treesitter nodes",
+        desc = "scope:| pick |=> treesitter nodes",
       },
       {
         key_scope.pickers.extensions,
         funblt("pickers"),
         mode = "n",
-        desc = "scope.pick=> pickers",
+        desc = "scope:| pick |=> pickers",
       },
       {
         key_shortcut.buffers.scope,
@@ -218,7 +218,7 @@ return {
           require("telescope.builtin").buffers()
         end,
         mode = "n",
-        desc = "scope.pick=> buffers",
+        desc = "scope:| pick |=> buffers",
       },
     },
   },
@@ -247,7 +247,7 @@ return {
           require("telescope").extensions.toggleterm.toggleterm()
         end,
         mode = "n",
-        desc = "scope.ext=> toggleterm",
+        desc = "scope:| ext |=> toggleterm",
       },
     },
   },
@@ -269,7 +269,7 @@ return {
           require("telescope").extensions.file_browser.file_browser()
         end,
         mode = "n",
-        desc = "scope.ext=> find files",
+        desc = "scope:| ext |=> find files",
       },
     },
   },
@@ -286,7 +286,7 @@ return {
           require("telescope").extensions.repo.list()
         end,
         mode = "n",
-        desc = "scope.ext:repo=> list",
+        desc = "scope:| ext:repo |=> list",
       },
     },
   },
@@ -303,7 +303,7 @@ return {
           require("telescope").extensions.env.env()
         end,
         mode = "n",
-        desc = "scope.ext=> environment vars",
+        desc = "scope:| ext |=> environment vars",
       },
     },
   },
@@ -320,7 +320,7 @@ return {
           require("telescope").extensions.changes.changes()
         end,
         mode = "n",
-        desc = "scope.ext=> changes",
+        desc = "scope:| ext |=> changes",
       },
     },
   },
@@ -337,7 +337,7 @@ return {
           require("telescope").extensions.lazy.lazy()
         end,
         mode = "n",
-        desc = "scope.ext=> lazy",
+        desc = "scope:| ext |=> lazy",
       },
     },
   },
@@ -354,7 +354,7 @@ return {
           require("telescope").extensions.menu.menu()
         end,
         mode = "n",
-        desc = "scope.ext:menu=> menu",
+        desc = "scope:| ext:menu |=> menu",
       },
     },
   },
@@ -371,7 +371,7 @@ return {
           require("telescope").extensions.heading.heading()
         end,
         mode = "n",
-        desc = "scope.ext=> heading",
+        desc = "scope:| ext |=> heading",
       },
     },
   },
@@ -457,7 +457,7 @@ return {
           require("telescope").extensions.dap.commands()
         end,
         mode = "n",
-        desc = "scope.ext:dap=> commands",
+        desc = "scope:| ext:dap |=> commands",
       },
       {
         key_scope.dap.configurations,
@@ -465,7 +465,7 @@ return {
           require("telescope").extensions.dap.configurations()
         end,
         mode = "n",
-        desc = "scope.ext:dap=> configurations",
+        desc = "scope:| ext:dap |=> configurations",
       },
       {
         key_scope.dap.list_breakpoints,
@@ -473,7 +473,7 @@ return {
           require("telescope").extensions.dap.list_breakpoints()
         end,
         mode = "n",
-        desc = "scope.ext:dap=> list breakpoints",
+        desc = "scope:| ext:dap |=> list breakpoints",
       },
       {
         key_scope.dap.variables,
@@ -481,7 +481,7 @@ return {
           require("telescope").extensions.dap.variables()
         end,
         mode = "n",
-        desc = "scope.ext:dap=> variables",
+        desc = "scope:| ext:dap |=> variables",
       },
       {
         key_scope.dap.frames,
@@ -489,7 +489,7 @@ return {
           require("telescope").extensions.dap.frames()
         end,
         mode = "n",
-        desc = "scope.ext:dap=> frames",
+        desc = "scope:| ext:dap |=> frames",
       },
     },
   },
@@ -504,7 +504,7 @@ return {
           require("telescope.builtin").symbols({})
         end,
         mode = "n",
-        desc = "scope.ext=> symbols",
+        desc = "scope:| ext |=> symbols",
       },
     },
   },
@@ -521,7 +521,7 @@ return {
           require("telescope").extensions.glyph.glyph()
         end,
         mode = "n",
-        desc = "scope.ext=> glyph",
+        desc = "scope:| ext |=> glyph",
       },
     },
   },
@@ -538,7 +538,7 @@ return {
           require("telescope").extensions.media_files.media_files()
         end,
         mode = "n",
-        desc = "scope.ext=> media files",
+        desc = "scope:| ext |=> media files",
       },
     },
   },
@@ -555,7 +555,7 @@ return {
           require("telescope").extensions.conventional_commits.conventional_commits()
         end,
         mode = "n",
-        desc = "scope.ext=> cc",
+        desc = "scope:| ext |=> cc",
       },
     },
   },
@@ -572,7 +572,7 @@ return {
           require("telescope").extensions.undo.undo()
         end,
         mode = "n",
-        desc = "scope.ext=> undo",
+        desc = "scope:| ext |=> undo",
       },
     },
   },
@@ -589,7 +589,7 @@ return {
           require("telescope").extensions.color_names.color_names()
         end,
         mode = "n",
-        desc = "scope.ext=> color names",
+        desc = "scope:| ext |=> color names",
       },
     },
   },
@@ -606,7 +606,7 @@ return {
           require("telescope").extensions.find_pickers.find_pickers()
         end,
         mode = "n",
-        desc = "scope.ext=> all pickers",
+        desc = "scope:| ext |=> all pickers",
       },
     },
   },
@@ -623,7 +623,7 @@ return {
           require("telescope").extensions.http.list()
         end,
         mode = "n",
-        desc = "scope.ext=> http status code",
+        desc = "scope:| ext |=> http status code",
       },
     },
   },
@@ -640,7 +640,7 @@ return {
           require("telescope").extensions.ports.ports()
         end,
         mode = "n",
-        desc = "scope.ext=> ports",
+        desc = "scope:| ext |=> ports",
       },
     },
   },
@@ -701,7 +701,7 @@ return {
         key_scope.whaler,
         funext("whaler"),
         mode = "n",
-        desc = "scope.ext=> directories (whaler)",
+        desc = "scope:| ext |=> directories (whaler)",
       },
     },
     config = function(_, opts)
@@ -715,7 +715,7 @@ return {
     },
     keys = {
       {
-        key_tool.notice,
+        key_newts.notifications,
         funext("notify"),
         mode = "n",
         desc = "scope=> search notifications",

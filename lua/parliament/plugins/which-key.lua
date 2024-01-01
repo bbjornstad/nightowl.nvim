@@ -53,13 +53,17 @@ return {
         "gz",
         "g`",
         "g'",
-        "\"",    -- registers,
+        "\"", -- registers,
         "<c-r>", -- spelling
         "z=",
         "Z",
         "qc",
         "qq",
         "qg",
+        "q",
+        "qj",
+        "qc",
+        "<C-Space>",
       },
       documentation = {
         view = "hover",

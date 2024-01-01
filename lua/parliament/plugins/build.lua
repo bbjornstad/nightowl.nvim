@@ -22,7 +22,7 @@ return {
         key_executor,
         "<CMD>ExecutorRun<CMD>",
         mode = "n",
-        desc = "repl.gexec=> run",
+        desc = "repl:| gexec |=> run",
       },
     },
   },
@@ -113,7 +113,7 @@ return {
           require("overseer").open()
         end,
         mode = "n",
-        desc = "task.seer=> open overseer",
+        desc = "task:| seer |=> open ",
       },
       {
         key_overseer.close,
@@ -121,7 +121,7 @@ return {
           require("overseer").close()
         end,
         mode = "n",
-        desc = "task.seer=> close overseer",
+        desc = "task:| seer |=> close",
       },
       {
         key_overseer.toggle,
@@ -129,7 +129,7 @@ return {
           require("overseer").toggle()
         end,
         mode = "n",
-        desc = "task.seer=> toggle overseer",
+        desc = "task:| seer |=> toggle",
       },
       {
         key_overseer.task.new,
@@ -137,7 +137,7 @@ return {
           require("overseer").new_task()
         end,
         mode = "n",
-        desc = "task.seer=> new overseer task",
+        desc = "task:| seer |=> new task",
       },
       {
         key_overseer.bundle.list,
@@ -145,7 +145,7 @@ return {
           require("overseer").list_task_bundles()
         end,
         mode = "n",
-        desc = "task.seer=> list overseer task bundles",
+        desc = "task:| seer |=> list bundles",
       },
       {
         key_overseer.task.list,
@@ -153,7 +153,7 @@ return {
           require("overseer").list_tasks()
         end,
         mode = "n",
-        desc = "task.seer=> load overseer task bundle",
+        desc = "task:| seer |=> load bundle",
       },
       {
         key_overseer.bundle.load,
@@ -161,7 +161,7 @@ return {
           require("overseer").load_task_bundle()
         end,
         mode = "n",
-        desc = "task.seer=> load overseer task bundle",
+        desc = "task:| seer |=> load bundle",
       },
       {
         key_overseer.bundle.delete,
@@ -169,7 +169,7 @@ return {
           require("overseer").delete_task_bundle()
         end,
         mode = "n",
-        desc = "task.seer=> load overseer task bundle",
+        desc = "task:| seer |=> load bundle",
       },
       {
         key_overseer.run.template,
@@ -177,7 +177,7 @@ return {
           require("overseer").run_template()
         end,
         mode = "n",
-        desc = "task.seer=> run overseer template",
+        desc = "task:| seer |=> run template",
       },
       {
         key_overseer.run.action,
@@ -185,7 +185,7 @@ return {
           require("overseer").run_action()
         end,
         mode = "n",
-        desc = "task.seer=> run overseer action",
+        desc = "task:| seer |=> run action",
       },
     },
   },
@@ -207,7 +207,7 @@ return {
           require("runner").run()
         end,
         mode = "n",
-        desc = "build.run=> run",
+        desc = "build:| run |=> run",
       },
       {
         key_runner.autorun.enable,
@@ -215,7 +215,7 @@ return {
           require("runner").autorun()
         end,
         mode = "n",
-        desc = "build.run=> enable autorun",
+        desc = "build:| run |=> enable autorun",
       },
       {
         key_runner.autorun.disable,
@@ -223,7 +223,7 @@ return {
           require("runner").autorun_stop()
         end,
         mode = "n",
-        desc = "build.run=> disable autorun",
+        desc = "build:| run |=> disable autorun",
       },
     },
   },
@@ -239,7 +239,7 @@ return {
         key_rapid,
         "<CMD>Rapid<CR>",
         mode = "n",
-        desc = "build.rapid=> command",
+        desc = "build:| rapid |=> command",
       },
     },
   },
@@ -254,61 +254,61 @@ return {
         key_launch.task,
         "<CMD>LaunchTask<CR>",
         mode = "n",
-        desc = "build.launch=> cwd tasks",
+        desc = "build:| launch |=> cwd tasks",
       },
       {
         key_launch.ft_task,
         "<CMD>LaunchTaskFT<CR>",
         mode = "n",
-        desc = "build.launch=> filetype tasks",
+        desc = "build:| launch |=> filetype tasks",
       },
       {
         key_launch.config_show,
         "<CMD>LaunchShowTaskConfigs<CR>",
         mode = "n",
-        desc = "build.launch=> all task configs",
+        desc = "build:| launch |=> all task configs",
       },
       {
         key_launch.ft_config_show,
         "<CMD>LaunchShowTaskConfigsFT<CR>",
         mode = "n",
-        desc = "build.launch=> filetype task configs",
+        desc = "build:| launch |=> filetype task configs",
       },
       {
         key_launch.active,
         "<CMD>LaunchShowActiveTasks<CR>",
         mode = "n",
-        desc = "build.launch=> cwd tasks",
+        desc = "build:| launch |=> cwd tasks",
       },
       {
         key_launch.debugger,
         "<CMD>LaunchDebugger<CR>",
         mode = "n",
-        desc = "build.launch=> cwd debug configs",
+        desc = "build:| launch |=> cwd debug configs",
       },
       {
         key_launch.ft_debugger,
         "<CMD>LaunchDebuggerFT<CR>",
         mode = "n",
-        desc = "build.launch=> filetype debug configs",
+        desc = "build:| launch |=> filetype debug configs",
       },
       {
         key_launch.config_debug,
         "<CMD>LaunchShowDebugConfigs<CR>",
         mode = "n",
-        desc = "build.launch=> all debug configs",
+        desc = "build:| launch |=> all debug configs",
       },
       {
         key_launch.ft_config_debug,
         "<CMD>LaunchShowDebugConfigsFT<CR>",
         mode = "n",
-        desc = "build.launch=> show filetype debug configs",
+        desc = "build:| launch |=> show filetype debug configs",
       },
       {
         key_launch.config_edit,
         "<CMD>LaunchOpenConfigFile<CR>",
         mode = "n",
-        desc = "build.launch=> open/edit current config",
+        desc = "build:| launch |=> open/edit current config",
       },
     },
   },

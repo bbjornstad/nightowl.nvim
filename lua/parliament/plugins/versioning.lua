@@ -33,7 +33,7 @@ return {
       limit_archives_size = 256,
     },
     config = function(_, opts)
-      require('fundo').setup(opts)
+      require("fundo").setup(opts)
     end,
     init = function()
       vim.o.undofile = true
@@ -46,11 +46,9 @@ return {
   {
     "jiaoshijie/undotree",
     enabled = opt.undotree,
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
+    dependencies = { "nvim-lua/plenary.nvim" },
     config = function(_, opts)
-      require('undotree').setup(opts)
+      require("undotree").setup(opts)
     end,
     keys = {
       {
@@ -88,9 +86,7 @@ return {
       float_diff = false, -- using float window previews diff, set this `true` will disable layout option
       layout = "left_left_bottom", -- "left_bottom", "left_left_bottom"
       ignore_filetype = env.ft_ignore_list,
-      window = {
-        winblend = 20,
-      },
+      window = { winblend = 20 },
       keymaps = {
         ["j"] = "move_next",
         ["k"] = "move_prev",
@@ -275,9 +271,7 @@ return {
         width_ratio = 0.6,
         height_ratio = 0.6,
       },
-      keymap = {
-        close = "q",
-      },
+      keymap = { close = "q" },
     },
     config = function(_, opts)
       require("git-log").setup(opts)
@@ -321,11 +315,7 @@ return {
   {
     "gennaro-tedesco/nvim-possession",
     dependencies = { "ibhagwan/fzf-lua" },
-    opts = {
-      autoswitch = {
-        enable = true,
-      },
-    },
+    opts = { autoswitch = { enable = true } },
     config = function(_, opts)
       require("nvim-possession").setup(opts)
     end,
@@ -370,19 +360,9 @@ return {
     event = { "InsertEnter", "TextChanged" },
     opts = {
       events = {
-        immediate = {
-          "FocusLost",
-          "BufLeave",
-        },
-        deferred = {
-          "InsertLeave",
-          "TextChanged",
-        },
-        cancel = {
-          "InsertEnter",
-          "BufWritePost",
-          "TextChanged",
-        },
+        immediate = { "FocusLost", "BufLeave" },
+        deferred = { "InsertLeave", "TextChanged" },
+        cancel = { "InsertEnter", "BufWritePost", "TextChanged" },
       },
       callbacks = {},
       throttle_ms = 3000,

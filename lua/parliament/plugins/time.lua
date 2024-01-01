@@ -1,17 +1,18 @@
 local env = require("environment.ui")
-local opt = require("environment.optional")
-local inp = require("uutils.input")
+local inp = require("parliament.utils.input")
 local kenv = require("environment.keys")
+local opt = require("environment.optional")
 local key_time = kenv.time
 local key_pomodoro = key_time.pomodoro
 local key_pulse = key_time.pulse
 local key_mail = kenv.mail
+local key_sc = kenv.shortcut
 
 return {
   {
     "nfrid/due.nvim",
     config = function(_, opts)
-      require('due_nvim').setup(opts)
+      require("due_nvim").setup(opts)
     end,
     opts = {
       prescript = "󰅑 due: ",
@@ -222,7 +223,7 @@ return {
     cmd = { "Weather" },
     keys = {
       {
-        key_time.weather,
+        key_sc.weather.open,
         "<CMD>Weather<CR>",
         mode = "n",
         desc = "weather=> current conditions",

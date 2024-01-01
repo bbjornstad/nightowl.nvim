@@ -14,42 +14,22 @@ return {
     end,
     keys = {
       {
-        "<leader>e",
-        false,
-      },
-      {
-        "<leader>fe",
-        false,
-      },
-      {
-        "<leader>fE",
-        false,
-      },
-      {
-        "<leader>e",
-        false,
-      },
-      {
-        "<leader>E",
-        false,
-      },
-      {
         key_shortcut.fm.explore.tree.fs,
         "<CMD>Neotree filesystem<CR>",
         mode = "n",
-        desc = "fm.tree=> explore filesystem",
+        desc = "fm:| tree |=> explore filesystem",
       },
       {
         key_shortcut.fm.explore.tree.git,
         "<CMD>Neotree git_status<CR>",
         mode = "n",
-        desc = "fm.tree=> explore filesystem",
+        desc = "fm:| tree |=> explore filesystem",
       },
       {
         key_shortcut.fm.explore.tree.remote,
         "<CMD>Neotree netman.ui.neo-tree<CR>",
         mode = "n",
-        desc = "fm.tree=> explore filesystem",
+        desc = "fm:| tree |=> explore filesystem",
       },
     },
     dependencies = {
@@ -129,7 +109,7 @@ return {
           vim.cmd([[BrootWorkingDirectory]])
         end,
         mode = "n",
-        desc = "fm.broot=> working directory",
+        desc = "fm:| broot |=> cwd",
       },
       {
         key_fm.broot.current_dir,
@@ -138,7 +118,7 @@ return {
           vim.cmd([[BrootCurrentDirectory]])
         end,
         mode = "n",
-        desc = "fm.broot=> working directory",
+        desc = "fm:| broot |=> root",
       },
     },
   },
@@ -249,7 +229,7 @@ return {
             )
             vim.b.oil_extended_column_mode = extended_is_target
           end,
-          desc = "fm.oil=> toggle succinct columns",
+          desc = "fm:| oil |=> toggle succinct columns",
         },
         ["<C-v>"] = "actions.select_vsplit",
         ["<C-s>"] = "actions.select_split",
@@ -277,7 +257,7 @@ return {
           return require("oil").open_float()
         end,
         mode = { "n" },
-        desc = "fm.oil=> open (float)",
+        desc = "fm:| oil |=> open (float)",
       },
       {
         key_fm.oil.split,
@@ -286,7 +266,7 @@ return {
           require("oil").open()
         end,
         mode = "n",
-        desc = "fm.oil=> open (split)",
+        desc = "fm:| oil |=> open (split)",
       },
       {
         key_fm.oil.open,
@@ -294,7 +274,7 @@ return {
           require("oil").open()
         end,
         mode = { "n" },
-        desc = "fm.oil=> open",
+        desc = "fm:| oil |=> open",
       },
       {
         key_shortcut.fm.explore.explore,
@@ -302,7 +282,7 @@ return {
           require("oil").open_float()
         end,
         mode = { "n" },
-        desc = "fm.oil=> open",
+        desc = "fm:| oil |=> open",
       },
       {
         key_shortcut.fm.explore.split,
@@ -312,7 +292,7 @@ return {
           require("oil").open()
         end,
         mode = { "n" },
-        desc = "fm.oil=> open oil (split)",
+        desc = "fm:| oil |=> open oil (split)",
       },
     },
   },
@@ -361,31 +341,19 @@ return {
         key_fm.nnn.explorer,
         "<CMD>NnnExplorer<CR>",
         mode = "n",
-        desc = "fm.nnn=> explorer mode",
+        desc = "fm:| nnn |=> explorer",
       },
       {
         key_fm.nnn.explorer_here,
         "<CMD>NnnExplorer %:p<CR>",
         mode = "n",
-        desc = "fm.nnn=> explorer mode",
+        desc = "fm:| nnn |=> explorer",
       },
       {
         key_fm.nnn.picker,
         "<CMD>NnnPicker<CR>",
         mode = { "n" },
-        desc = "fm.nnn=> picker mode",
-      },
-      {
-        key_shortcut.fm.nnn.picker,
-        "<CMD>NnnPicker<CR>",
-        mode = { "n" },
-        desc = "fm.nnn=> picker mode",
-      },
-      {
-        key_shortcut.fm.nnn.explorer,
-        "<CMD>NnnExplorer<CR>",
-        mode = { "n" },
-        desc = "fm.nnn=> explorer mode",
+        desc = "fm:| nnn |=> picker",
       },
     },
   },
@@ -425,7 +393,7 @@ return {
           require("attempt").new_select()
         end,
         mode = "n",
-        desc = "scratch=> new buffer",
+        desc = "fm:| scratch |=> new buffer",
       },
       {
         key_fm.attempt.new_input_ext,
@@ -433,7 +401,7 @@ return {
           require("attempt").new_input_ext()
         end,
         mode = "n",
-        desc = "scratch=> new buffer (custom extension)",
+        desc = "fm:| scratch |=> new buffer (custom extension)",
       },
       {
         key_fm.attempt.run,
@@ -441,7 +409,7 @@ return {
           require("attempt").run()
         end,
         mode = "n",
-        desc = "scratch=> run",
+        desc = "fm:| scratch |=> run",
       },
       {
         key_fm.attempt.delete,
@@ -449,7 +417,7 @@ return {
           require("attempt").delete_buf()
         end,
         mode = "n",
-        desc = "scratch=> delete buffer",
+        desc = "fm:| scratch |=> delete buffer",
       },
       {
         key_fm.attempt.rename,
@@ -457,7 +425,7 @@ return {
           require("attempt").rename_buf()
         end,
         mode = "n",
-        desc = "scratch=> rename buffer",
+        desc = "fm:| scratch |=> rename buffer",
       },
       {
         key_fm.attempt.open_select,
@@ -465,7 +433,7 @@ return {
           require("attempt").open_select()
         end,
         mode = "n",
-        desc = "scratch=> select buffer",
+        desc = "fm:| scratch |=> select buffer",
       },
     },
   },
@@ -487,7 +455,7 @@ return {
           require("memento").toggle()
         end,
         mode = "n",
-        desc = "mem=> recently closed files",
+        desc = "fm:| mem |=> recently closed",
       },
       {
         key_fm.memento.clear,
@@ -495,7 +463,7 @@ return {
           require("memento").clear_history()
         end,
         mode = "n",
-        desc = "mem=> clear closed file history",
+        desc = "fm:| mem |=> clear history",
       },
     },
   },
@@ -527,7 +495,7 @@ return {
           require("arena").toggle()
         end,
         mode = "n",
-        desc = "fm.arena=> toggle",
+        desc = "fm:| arena |=> toggle",
       },
       {
         key_fm.arena.open,
@@ -535,7 +503,7 @@ return {
           require("arena").open()
         end,
         mode = "n",
-        desc = "fm.arena=> open",
+        desc = "fm:| arena |=> open",
       },
       {
         key_fm.arena.close,
@@ -543,7 +511,7 @@ return {
           require("arena").close()
         end,
         mode = "n",
-        desc = "fm.arena=> close",
+        desc = "fm:| arena |=> close",
       },
     },
   },

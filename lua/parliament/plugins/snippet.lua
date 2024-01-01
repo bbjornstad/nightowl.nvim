@@ -4,7 +4,7 @@ return {
   {
     "L3MON4D3/LuaSnip",
     dependencies = {
-      { "honza/vim-snippets", optional = true },
+      { "honza/vim-snippets",           optional = true },
       { "rafamadriz/friendly-snippets", optional = true },
     },
     event = "VeryLazy",
@@ -27,7 +27,7 @@ return {
       require("luasnip").setup(opts)
     end,
   },
-  { "honza/vim-snippets", config = false, event = "VeryLazy" },
+  { "honza/vim-snippets",           config = false, event = "VeryLazy" },
   { "rafamadriz/friendly-snippets", config = false, event = "VeryLazy" },
   {
     "benfowler/telescope-luasnip.nvim",
@@ -49,9 +49,5 @@ return {
         desc = "scope.ext=> snippets",
       },
     },
-  },
-  {
-    "b0o/SchemaStore.nvim",
-    event = "VeryLazy",
   },
 }

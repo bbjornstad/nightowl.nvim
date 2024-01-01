@@ -175,7 +175,7 @@ return {
         groups.NightowlStartupEntry = comp("LspInlayHint", { "bg", "fg" })
         groups.NightowlStartupHeader = comp("@number", { "bg", "fg" })
         groups.NightowlStartupConvenience =
-          comp("DashboardShortCut", { "bg", "fg" })
+            comp("DashboardShortCut", { "bg", "fg" })
       end,
     },
     config = function(_, opts)
@@ -296,6 +296,7 @@ return {
   {
     "bbjornstad/hagoromo.nvim",
     dev = true,
+    enabled = false,
     priority = 1001,
     opts = {},
     config = function(_, opts)
@@ -341,6 +342,11 @@ return {
     },
     lazy = true,
   },
+  {
+    "katawful/kat.nvim",
+    tag = "3.1",
+    config = false,
+  }
   -- {
   --   "LazyVim/LazyVim",
   --   opts = {

@@ -11,8 +11,8 @@ local key_significant = key_editor.significant
 ---@diagnostic disable: inject-field
 
 local mopts = require("funsak.table").mopts
-local inp = require("uutils.input")
-local compute_remaining_width = require("uutils.text").compute_remaining_width
+local inp = require("parliament.utils.input")
+local compute_remaining_width = require("parliament.utils.text").compute_remaining_width
 
 local function change_figlet_font(fontopts)
   vim.g.figban_fontstyle = fontopts.name or "Impossible"

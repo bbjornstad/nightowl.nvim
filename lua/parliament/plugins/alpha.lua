@@ -8,13 +8,13 @@ local nightowl_splash_compact_frames =
 
 local function alpha_state()
   vim.cmd([[Veil]])
-  -- require("fsplash").open_window()
+  require("fsplash").open_window()
 end
 
 return {
   {
     "jovanlanik/fsplash.nvim",
-    lazy = true,
+    event = "VimEnter",
     config = true,
     opts = {
       lines = nightowl_splash,
@@ -28,21 +28,10 @@ return {
       border = env.borders.main,
       winblend = 30,
     },
-    -- keys = {
-    --   {
-    --     "<Home>",
-    --     function()
-    --       require("fsplash").open_window()
-    --     end,
-    --     mode = "n",
-    --     desc = "א.α => splash screen",
-    --   },
-    -- },
   },
   {
     "willothy/veil.nvim",
     lazy = false,
-    -- event = "VimEnter",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "ibhagwan/fzf-lua",
@@ -57,7 +46,7 @@ return {
             {
               icon = "󰙅",
               text = "fzf::files",
-              shortcut = "f",
+              shortcut = "F",
               callback = function()
                 require("fzf-lua").files()
               end,
@@ -65,7 +54,7 @@ return {
             {
               icon = "󱇚",
               text = "fzf::projects",
-              shortcut = "p",
+              shortcut = "P",
               callback = function() end,
             },
             {
@@ -106,7 +95,7 @@ return {
             {
               icon = "󱪞",
               text = "edit::new",
-              shortcut = "n",
+              shortcut = "N",
               callback = function()
                 vim.ui.input({ prompt = "new file name:" }, function(input)
                   local cmdstr = ([[edit %s]]):format(input)
@@ -117,7 +106,7 @@ return {
             {
               icon = "󱥳",
               text = "edit::.candy.d",
-              shortcut = "d",
+              shortcut = "D",
               callback = function()
                 vim.cmd([[tcd ~/.candy.d]])
                 vim.cmd([[edit .]])
@@ -126,7 +115,7 @@ return {
             {
               icon = "󰺾",
               text = "edit::neovim",
-              shortcut = "v",
+              shortcut = "V",
               callback = function()
                 vim.cmd([[tcd ~/.config/nvim]])
                 vim.cmd([[edit .]])
@@ -144,12 +133,12 @@ return {
       require("veil").setup(opts)
     end,
     keys = {
-      -- {
-      --   "<Home>",
-      --   alpha_state,
-      --   mode = { "n" },
-      --   desc = "א.α => return to alpha state",
-      -- },
+      {
+        "<Home>",
+        alpha_state,
+        mode = { "n" },
+        desc = "א:| α => alpha state",
+      },
     },
   },
 }

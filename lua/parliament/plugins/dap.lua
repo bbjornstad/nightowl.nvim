@@ -14,16 +14,12 @@ return {
             "folke/neodev.nvim",
             opts = function(_, opts)
               opts.library = require("funsak.table").mopts({
-                plugins = {
-                  { "nvim-dap-ui" },
-                  types = true,
-                },
+                plugins = { { "nvim-dap-ui" }, types = true },
               }, opts.library or {})
             end,
           },
         },
-      },
-      -- virtual text for the debugger
+      }, -- virtual text for the debugger
       { "theHamsta/nvim-dap-virtual-text", optional = true },
 
       -- which key integration
@@ -32,7 +28,9 @@ return {
         opts = {
           defaults = {
             [key_debug:leader()] = { name = "::debug::" },
-            [key_debug.adapters] = { name = "::debug.dap=> adapters::" },
+            [key_debug.adapters] = {
+              name = "::debug.dap=> adapters::",
+            },
           },
         },
       }, -- mason.nvim integration
@@ -48,25 +46,18 @@ return {
           -- You'll need to check that you have the required things installed
           -- online, please don't ask me how to install them :)
           ensure_installed = {
-            -- Update this to ensure that you have the debuggers for the langs you want
+            -- Update this to ensure that you have the debuggers for the langs
+            -- you want
           },
         },
-        dependencies = {
-          "williamboman/mason.nvim",
-        },
+        dependencies = { "williamboman/mason.nvim" },
       },
-      {
-        "LiadOz/nvim-dap-repl-highlights",
-        optional = true,
-      },
-      {
-        "niuiic/dap-utils.nvim",
-        optional = true,
-      },
-      {
-        "daic0r/dap-helper.nvim",
-        optional = true,
-      },
+      { "LiadOz/nvim-dap-repl-highlights", optional = true },
+      { "niuiic/dap-utils.nvim", optional = true },
+      -- {
+      --   "daic0r/dap-helper.nvim",
+      --   optional = true,
+      -- },
     },
   },
   {
@@ -91,10 +82,7 @@ return {
   {
     "andrewferrier/debugprint.nvim",
     event = "VeryLazy",
-    opts = {
-      create_keymaps = true,
-      move_to_debugline = true,
-    },
+    opts = { create_keymaps = true, move_to_debugline = true },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   {
@@ -109,21 +97,17 @@ return {
     config = function(_, opts)
       require("printer").setup(opts)
     end,
-    opts = {
-      keymap = key_debug.printer,
-      behavior = "insert_below",
-    },
-  },
-  {
-    "daic0r/dap-helper.nvim",
-    dependencies = {
-      "rcarriga/nvim-dap-ui",
-      "mfussenegger/nvim-dap",
-    },
-    config = function(_, opts)
-      require("dap-helper").setup()
-    end,
-  },
+    opts = { keymap = key_debug.printer, behavior = "insert_below" },
+  }, -- {
+  --   "daic0r/dap-helper.nvim",
+  --   dependencies = {
+  --     "rcarriga/nvim-dap-ui",
+  --     "mfussenegger/nvim-dap",
+  --   },
+  --   config = function()
+  --     require("dap-helper").setup()
+  --   end,
+  -- },
   {
     "theHamsta/nvim-dap-virtual-text",
     dependencies = { "mfussenegger/nvim-dap" },
