@@ -12,7 +12,7 @@ end
 
 local function toggle_cmp_autocompletion()
   local status = vim.b.enable_cmp_autocompletion
-    or vim.g.enable_cmp_autocompletion
+      or vim.g.enable_cmp_autocompletion
   status = not status
   if status then
     require("cmp").setup.buffer({
@@ -63,9 +63,9 @@ return {
     opts = function(_, opts)
       local has = require("funsak.lazy").has
       opts.enabled = opts.enabled
-        or function()
-          return vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
-        end
+          or function()
+            return vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
+          end
       opts.snippet = vim.tbl_deep_extend("force", {
         expand = function(args)
           require("luasnip").lsp_expand(args)
