@@ -1,6 +1,6 @@
 local env = require("environment.ui")
 local sts = require("environment.status")
-local has = require('funsak.lazy').has
+local has = require("funsak.lazy").has
 
 local function lubar()
   local res = vim
@@ -100,7 +100,7 @@ return {
             or nil
           return ret
         end, {
-          { { "⟓:║ " }, cond = true },
+          { { "⟓∷ " }, cond = true },
           sts.count.search(props, { icon = "󱈅", separator = "⦙" }),
           sts.count.selection(props, { icon = "󱊄", separator = "⦙" }),
           sts.progress(props, {
@@ -388,7 +388,6 @@ return {
               local mod = vim.fn.getbufvar(bufnr, "&mod")
               local thisdir = vim.fn.getcwd(winnr, context.tabnr)
               local dirtail = vim.fn.fnamemodify(thisdir, ":t")
-              -- vim.notify(vim.inspect(dirtail))
 
               dirtail = (mod == 1 and "⦗ " or "⦋ ")
                 .. dirtail
@@ -601,7 +600,7 @@ return {
           require("dropbar.api").pick()
         end,
         mode = "n",
-        desc = "::win=> breadcrumbs",
+        desc = "win:| |=> breadcrumbs",
       },
     },
   },
