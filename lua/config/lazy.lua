@@ -1,5 +1,5 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   -- bootstrap lazy.nvim
   vim.fn.system({
     "git",
@@ -16,8 +16,6 @@ local uienv = require("environment.ui")
 
 local lazyconf = {
   spec = {
-    -- <Log:2023-10-15> use lazyflex for componentized lazyvim implementation
-    -- and provide more configuration.
     {
       "abeldekat/lazyflex.nvim",
       version = "*",
@@ -31,8 +29,6 @@ local lazyconf = {
             {
               "coding",
               "editor",
-              -- if desired, I could theoretically remove the lsp component
-              -- here. It would be replaced with lsp-zero
               "lsp",
               "extras",
               "formatting",
@@ -46,9 +42,8 @@ local lazyconf = {
         kw = {
           "tokyonight",
           "catppuccin",
-          -- "alpha",
           "bufferline",
-          "neo-tree",
+          -- "neo-tree",
           "illuminate",
           "dashboard",
         },
@@ -63,54 +58,31 @@ local lazyconf = {
         },
       },
     },
-    -- Extra LazyVim bundled plugin specifications
-    -- We want basically everything that we can stuff into this specification,
-    -- so we are enabling almost all of the extra options.
-    --  Note that as of more recent versions of LazyVim (nightowl.nvim should be
-    --  kept as up to date as possible ideally), the `LazyExtras` command in
-    --  neovim provides a popup menu a-la lazy.nvim for (un)installation of any
-    --  of the extras. Neat...
 
-    -- ~~ lsp tooling ~~
-    { import = "lazyvim.plugins.extras.lsp.none-ls" },
-
-    -- language specification
-    -- >>> update 11/13/2023 removed the language options from this list, now to
-    -- be managed with the lazyextras builtin. But the rest of this we want to
-    -- keep here in config.
-
-    -- - ~~ ui tooling ~~
-    { import = "lazyvim.plugins.extras.ui.mini-animate" },
+    -- ui tooling
     { import = "lazyvim.plugins.extras.ui.edgy" },
-    -- { import = "lazyvim.plugins.extras.ui.mini-starter" },
 
-    -- ~~ formatting and linting ~~
+    -- formatting and linting
     { import = "lazyvim.plugins.extras.formatting.black" },
     { import = "lazyvim.plugins.extras.formatting.prettier" },
     { import = "lazyvim.plugins.extras.linting.eslint" },
 
-    -- - debugging, adapters, and testing
+    -- debugging, adapters, and testing
     { import = "lazyvim.plugins.extras.test.core" },
     { import = "lazyvim.plugins.extras.dap.core" },
     { import = "lazyvim.plugins.extras.dap.nlua" },
 
-    -- - ~~ utility tooling ~~
+    -- utility tooling
     { import = "lazyvim.plugins.extras.util.project" },
     { import = "lazyvim.plugins.extras.util.dot" },
-    -- { import = "lazyvim.plugins.extras.editor.aerial" },
     { import = "lazyvim.plugins.extras.editor.symbols-outline" },
 
-    -- ~~ ai tooling ~~
+    --  ai tooling
     { import = "lazyvim.plugins.extras.coding.copilot" },
     { import = "lazyvim.plugins.extras.coding.codeium" },
     { import = "lazyvim.plugins.extras.coding.tabnine" },
 
     -- user-level plugin configuration
-    -- * exists namely to allow for modularziation of the specification
-    --   configuration. Ideally, we will offload most of the spec to lazyflex
-    --   loaded presets. When that has been achieved, the following will be
-    --   uncommented.
-    -- { import = "flexspec" },
     { import = "plugins" },
     { import = "plugins.lsp" },
     { import = "plugins.language" },
@@ -118,9 +90,10 @@ local lazyconf = {
     { import = "plugins.interface" },
   },
   defaults = {
-    -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
-    -- If you know what you're doing, you can set this to `true` to have all your custom plugins lazy-loaded by default.
-    lazy = false,
+    -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins
+    -- will load during startup. If you know what you're doing, you can set this
+    -- to `true` to have all your custom plugins lazy-loaded by default.
+    lazy = true,
     version = false,
   },
   install = {
@@ -134,14 +107,15 @@ local lazyconf = {
       "sherbet",
     },
   },
-  checker = { enabled = true }, -- automatically check for plugin updates
+  checker = { enabled = true },
   performance = {
     rtp = {
-      -- disable some rtp plugins
+      paths = { "/home/ursa-major/.opam/default/share/ocp-indent/vim" },
       disabled_plugins = {
-        -- TODO: conditionalize these dynamically based on what specification is
-        -- created for the plugins. This may not be possible.
-        --
+        -- these are disabled based on the fact that we are including other,
+        -- plugins which are more powerful matchparen implementations and are
+        -- written in lua (these might be written in lua too, idk the internals
+        -- of neovim well enough).
         "matchit",
         "matchparen",
 
@@ -190,8 +164,8 @@ local lazyconf = {
     fallback = true,
   },
   profiling = {
-    loader = true,
-    require = true,
+    loader = false,
+    require = false,
   },
 }
 

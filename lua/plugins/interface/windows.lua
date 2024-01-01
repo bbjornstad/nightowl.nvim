@@ -1,3 +1,4 @@
+---@diagnostic disable: inject-field
 local env = require("environment.ui")
 local opt = require("environment.optional")
 local kenv = require("environment.keys")
@@ -6,14 +7,6 @@ local key_view = kenv.view
 local key_buffer = kenv.buffer
 local mopts = require("funsak.table").mopts
 local has = require("lazyvim.util").has
-
-local function pdel(mode, keys, opts)
-  local ok, res = pcall(vim.keymap.del, mode, keys, opts)
-  if not ok then
-    return nil
-  end
-  return res
-end
 
 local function winsep_disable_ft()
   local colorful_winsep = require("colorful-winsep")
@@ -29,6 +22,10 @@ local function winsep_disable_ft()
 end
 
 return {
+  {
+    "folke/persistence.nvim",
+    enabled = opt.sessions.persistence,
+  },
   {
     "echasnovski/mini.bufremove",
     opts = function(_, opts) end,
@@ -197,62 +194,6 @@ return {
     config = true,
   },
   {
-    "folke/persistence.nvim",
-    enabled = false,
-    opts = function(_, opts)
-      pdel({ "n" }, "q")
-      pdel({ "n" }, "<leader>qs")
-      pdel({ "n" }, "<leader>ql")
-      pdel({ "n" }, "<leader>qd")
-    end,
-    keys = {
-      {
-        "q",
-        false,
-        mode = "n",
-      },
-      {
-        "<leader>qs",
-        false,
-        mode = "n",
-      },
-      {
-        "qss",
-        function()
-          require("persistence").load()
-        end,
-        mode = "n",
-        desc = "sesh=> load session",
-      },
-      {
-        "<leader>ql",
-        false,
-        mode = "n",
-      },
-      {
-        "qsl",
-        function()
-          require("persistence").load({ last = true })
-        end,
-        mode = "n",
-        desc = "sesh=> load last session",
-      },
-      {
-        "<leader>qd",
-        false,
-        mode = "n",
-      },
-      {
-        "qst",
-        function()
-          require("persistence").stop()
-        end,
-        mode = "n",
-        desc = "sesh=> stop session",
-      },
-    },
-  },
-  {
     "anuvyklack/help-vsplit.nvim",
     event = "VeryLazy",
     config = function(_, opts)
@@ -264,13 +205,13 @@ return {
       buftype = { "help" },
       filetype = { "man" },
     },
-    ft = { "man", "vimdoc", "help" },
   },
   {
     "folke/edgy.nvim",
     init = function()
       vim.opt.splitkeep = "screen"
     end,
+    enabled = false,
     keys = {
       {
         "<leader>ue",
@@ -404,8 +345,6 @@ return {
       --     height = 0.5,
       --   },
       -- })
-
-      return res
     end,
   },
   {
@@ -433,7 +372,6 @@ return {
     "nvim-focus/focus.nvim",
     version = false,
     event = "BufWinEnter",
-    enabled = opt.prefer.focus_windows == "focus",
     config = function(_, opts)
       local ignore_buftypes = { "nofile", "prompt", "popup" }
       local ignore_filetypes = env.ft_ignore_list
@@ -464,15 +402,17 @@ return {
       })
     end,
     opts = {
+      enable = true,
       autoresize = {
         minwidth = 12,
         minheight = 18,
-        height_quickfix = 12,
+        height_quickfix = 16,
       },
       split = {
         bufnew = true,
       },
       ui = {
+        number = false,
         hybridnumber = true,
         absolutenumber_unfocussed = true,
         cursorline = true,
@@ -482,6 +422,7 @@ return {
           enable = true,
           list = "+1",
         },
+        signcolumn = false,
       },
     },
     keys = {
@@ -510,34 +451,69 @@ return {
   {
     "anuvyklack/windows.nvim",
     event = "BufWinEnter",
-    enabled = opt.prefer.focus_windows == "windows",
+    enabled = false,
+    -- enabled = opt.windowing.windows and (opt.prefer.focus_windows == "windows"),
     dependencies = {
       "anuvyklack/middleclass",
       "anuvyklack/animation.nvim",
     },
     config = function(_, opts)
-      vim.o.winwidth = 10
-      vim.o.winminwidth = 10
+      vim.o.winwidth = 12
+      vim.o.winminwidth = 12
       vim.o.equalalways = false
       require("windows").setup(opts)
     end,
     opts = {
       autowidth = {
-        enable = true,
+        enable = false,
         winwidth = 5,
         filetype = {
           help = 2,
         },
       },
       ignore = {
-        buftype = { "quickfix" },
+        buftype = { "nofile", "prompt", "popup", "quickfix" },
         filetype = env.ft_ignore_list,
       },
       animation = {
-        enable = true,
-        duration = 300,
+        enable = false,
+        duration = 100,
         fps = 60,
         easing = "in_out_sine",
+      },
+    },
+    keys = {
+      {
+        key_win.windows.maximize,
+        function()
+          vim.cmd("WindowsMaximize")
+        end,
+        mode = "n",
+        desc = "win=> maximize",
+      },
+      {
+        key_win.windows.maximize_horizontal,
+        function()
+          vim.cmd("WindowsMaximizeHorizontally")
+        end,
+        mode = "n",
+        desc = "win=> maximize horizontally",
+      },
+      {
+        key_win.windows.maximize_vertical,
+        function()
+          vim.cmd("WindowsMaximizeVertically")
+        end,
+        mode = "n",
+        desc = "win=> maximize vertically",
+      },
+      {
+        key_win.windows.equalize,
+        function()
+          vim.cmd("WindowsEqualize")
+        end,
+        mode = "n",
+        desc = "win=> maximize",
       },
     },
   },
@@ -577,7 +553,7 @@ return {
   },
   {
     "jyscao/ventana.nvim",
-    enabled = false,
+    enabled = opt.windowing.ventana,
     cmd = {
       "VentanaTranspose",
       "VentanaShift",
@@ -606,6 +582,7 @@ return {
   },
   {
     "ghillb/cybu.nvim",
+    enabled = opt.windowing.cybu,
     event = "VeryLazy",
     branch = "main",
     dependencies = {
@@ -690,6 +667,7 @@ return {
   },
   {
     "nvim-zh/colorful-winsep.nvim",
+    enabled = opt.windowing.colorful_winsep,
     event = "BufWinEnter",
     config = function(_, opts)
       require("colorful-winsep").setup(opts)
@@ -698,11 +676,12 @@ return {
     opts = {
       interval = 30,
       no_exec_files = env.ft_ignore_list,
-      symbols = { "╍", "┋", "┏", "┓", "┗", "┛" },
+      symbols = { "═", "║", "╔", "╗", "╚", "╝" },
     },
   },
   {
     "chrisgrieser/nvim-early-retirement",
+    enabled = opt.windowing.early_retirement,
     config = function(_, opts)
       require("early-retirement").setup(opts)
     end,
@@ -711,7 +690,7 @@ return {
       retirementAgeMins = 30,
 
       -- filetypes to ignore
-      ignoredFiletypes = {},
+      ignoredFiletypes = env.ft_ignore_list,
 
       -- ignore files matching this lua pattern; empty string disables this setting
       ignoreFilenamePattern = "",
@@ -748,5 +727,148 @@ return {
       deleteBufferWhenFileDeleted = true,
     },
     event = "VeryLazy",
+  },
+  {
+    "axkirillov/hbac.nvim",
+    opts = {
+      autoclose = true,
+      threshold = 5,
+      close_command = function(bufnr)
+        require("mini.bufremove").delete(bufnr)
+      end,
+    },
+    config = function(_, opts)
+      require("hbac").setup(opts)
+      require("telescope").load_extension("hbac")
+    end,
+    event = { "VeryLazy" },
+    cmd = { "Hbac" },
+    keys = {
+      {
+        key_buffer.hbac.pin.toggle,
+        function()
+          require("hbac").toggle_pin()
+        end,
+        mode = "n",
+        desc = "buf.pin=> toggle",
+      },
+      {
+        key_buffer.hbac.pin.all,
+        function()
+          require("hbac").pin_all()
+        end,
+        mode = "n",
+        desc = "buf.pin=> toggle",
+      },
+      {
+        key_buffer.hbac.pin.unpin_all,
+        function()
+          require("hbac").toggle_pin()
+        end,
+        mode = "n",
+        desc = "buf.pin=> toggle",
+      },
+      {
+        key_buffer.hbac.pin.close_unpinned,
+        function()
+          require("hbac").toggle_pin()
+        end,
+        mode = "n",
+        desc = "buf.pin=> toggle",
+      },
+      {
+        key_buffer.hbac.telescope,
+        function()
+          require("hbac").toggle_pin()
+        end,
+        mode = "n",
+        desc = "buf.pin=> toggle",
+      },
+    },
+  },
+  {
+    "kwkarlwang/bufresize.nvim",
+    opts = {
+      register = {
+        keys = {
+          {
+            "n",
+            "<C-w><",
+            "<C-w><",
+            { noremap = true, silent = true },
+          },
+          {
+            "n",
+            "<C-w>>",
+            "<C-w>>",
+            { silent = true, noremap = true },
+          },
+          {
+            "n",
+            "<C-w>+",
+            "<C-w>+",
+            { silent = true, noremap = true },
+          },
+          {
+            "n",
+            "<C-w>-",
+            "<C-w>-",
+            { silent = true, noremap = true },
+          },
+          {
+            "n",
+            "<C-w>_",
+            "<C-w>_",
+            { silent = true, noremap = true },
+          },
+          {
+            "n",
+            "<C-w>=",
+            "<C-w>=",
+            { silent = true, noremap = true },
+          },
+          {
+            "n",
+            "<C-w>|",
+            "<C-w>|",
+            { silent = true, noremap = true },
+          },
+          {
+            "",
+            "<LeftRelease>",
+            "<LeftRelease>",
+            { silent = true, noremap = true },
+          },
+          {
+            "i",
+            "<LeftRelease>",
+            "<LeftRelease><C-o>",
+            { silent = true, noremap = true },
+          },
+        },
+      },
+    },
+    config = function(_, opts)
+      require("bufresize").setup(opts)
+    end,
+    enabled = true,
+    event = "BufWinEnter",
+  },
+  {
+    "michaelPotter/accordian.nvim",
+    opts = {},
+    enabled = true,
+    config = function(_, opts)
+      require("accordian").setup(opts)
+    end,
+    event = "VeryLazy",
+    keys = {
+      {
+        key_win.accordian,
+        "<CMD>Accordian<CR>",
+        mode = "n",
+        desc = "win.accordian=> toggle",
+      },
+    },
   },
 }

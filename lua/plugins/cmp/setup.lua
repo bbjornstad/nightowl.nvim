@@ -5,7 +5,8 @@ local kenv = require("environment.keys").completion
 local function toggle_cmp_enabled()
   local status = vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
   status = not status
-  vim.notify(("nvim-cmp: %s"):format(status and "enabled" or "disabled"))
+  vim.notify(("nvim-cmp: %s"):format(status and "enabled" or "ditabled"))
+  ---@diagnostic disable-next-line: inject-field
   vim.b.enable_cmp_completion = status
 end
 
@@ -17,8 +18,8 @@ local function toggle_cmp_autocompletion()
     require("cmp").setup.buffer({
       completion = {
         autocomplete = {
-          require("cmp.types").cmp.TriggerEvent.InsertEnter,
-          require("cmp.types").cmp.TriggerEvent.TextChanged,
+          require("cmp").TriggerEvent.InsertEnter,
+          require("cmp").TriggerEvent.TextChanged,
         },
       },
     })
@@ -27,6 +28,7 @@ local function toggle_cmp_autocompletion()
       autocomplete = false,
     })
   end
+  ---@diagnostic disable-next-line: inject-field
   vim.b.enable_cmp_autocompletion = status
   vim.notify(("Autocompletion: %s"):format(vim.b.enable_cmp_autocompletion))
 end
@@ -34,8 +36,8 @@ end
 local function initialize_autocompletion()
   if vim.g.enable_cmp_autocompletion then
     return {
-      require("cmp.types").cmp.TriggerEvent.InsertEnter,
-      require("cmp.types").cmp.TriggerEvent.TextChanged,
+      require("cmp").TriggerEvent.InsertEnter,
+      require("cmp").TriggerEvent.TextChanged,
     }
   end
   return false
@@ -46,7 +48,7 @@ return {
     ncmp,
     dependencies = {
       "L3MON4D3/LuaSnip",
-      { "VonHeikemen/lsp-zero.nvim", optional = true },
+      { "VonHeikemen/lsp-zero.nvim" },
     },
     init = function()
       vim.g.enable_cmp_completion = true
@@ -54,9 +56,6 @@ return {
     end,
     opts = function(_, opts)
       local has = require("lazyvim.util").has
-      if has("lsp-zero.nvim") then
-        require("lsp-zero").extend_cmp()
-      end
       opts.enabled = opts.enabled
         or function()
           return vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
@@ -67,19 +66,16 @@ return {
         end,
       }, opts.snippet or {})
       opts.performance = vim.tbl_deep_extend("force", {
-        debounce = 100,
-        max_view_entries = 500,
+        debounce = 300,
+        max_view_eneries = 200,
+        throttle = 1000,
       }, opts.performance or {})
 
-      -- =======================================================================
-      -- The following changes the behavior of the menu. Noteably, we are
-      -- turning off autocompletion on insert, in other words we need to hit one
-      -- of the configured keys to be able to use the completion menu.
       opts.completion = vim.tbl_deep_extend("force", {
-        -- autocomplete = false,
         autocomplete = initialize_autocompletion(),
-        scrolloff = true,
+        completeopt = "menu,menuone,noinsert",
       }, opts.completion or {})
+      opts.preselect = require("cmp").PreselectMode.None
     end,
     keys = {
       {

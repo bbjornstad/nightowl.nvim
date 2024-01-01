@@ -109,23 +109,12 @@ local extspec = scopeutils.setup_extensions(target_extensions, {
 local funext = scopeutils.extendoscope
 local funblt = scopeutils.builtinoscope
 
-local function extend_scope(name, opts)
-  opts = opts or {}
-  local target = opts.target_action or name
-  local function wrap(...)
-    local fn = require("telescope").extensions[name][target]
-    fn()
-  end
-
-  return wrap
-end
-
 return {
   {
     "folke/which-key.nvim",
     opts = {
       defaults = {
-        [key_scope:leader()] = { name = "::telescope::" },
+        [key_scope:leader()] = { name = "::| telescope |::" },
       },
     },
   },
@@ -484,7 +473,7 @@ return {
                   vim.cmd.tcd(selection.path)
                 end,
               },
-              ["<A-CR>"] = {
+              ["<C-CR>"] = {
                 action = function(selection)
                   vim.cmd.tcd(selection.path)
                 end,
@@ -785,5 +774,23 @@ return {
       "nvim-lua/plenary.nvim",
     },
     event = "VeryLazy",
+  },
+  {
+    "IrisRainbow7/telescope-lsp-server-capabilities.nvim",
+    config = function(_, opts)
+      require("telescope").load_extension("lsp_server_capabilities")
+    end,
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    opts = {},
+    keys = {
+      {
+        key_scope.lsp_capabilities,
+        function()
+          require("telescope").extensions.lsp_server_capabilities.lsp_server_capabilities()
+        end,
+        mode = "n",
+        desc = "scope=> lsp capabilities",
+      },
+    },
   },
 }

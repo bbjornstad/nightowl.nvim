@@ -3,3 +3,32 @@ contexts:
     domainVisionStatement: |
       To describe core component types for my lazyvim configuration in a
       descriptive and accessible way
+  - name: Keymapping
+    domainVisionStatement: |
+      To elucidate certain uses of mathematical terminology as applied to the
+      process of defining keymaps for neovim.
+    terms:
+      - name: Keybind
+        definition: |
+          conceptually, an item which represents both a sequence of keystrokes
+          entered on a keyboard in a Neovim window, together with the associated
+          triggered action (plus any metadata such as description, etc.)
+        examples:
+          - The Keybind { "<leader>fr", function()
+            require('telescope.builtin').oldfiles() end, mode = "n", desc =
+            "recent files" } is a representation in lazy.nvim spec style
+  - name: ObjectOrientation
+    domainVisionStatement: |
+      Identify the distinctions between commonly thrown about terms related to
+      object oriented programming, namely distinctions between instances of
+      objects and the classes they are defined from.
+    terms:
+      - name: Object
+        definition: |
+          a collection of data conveying certain context or situation-specific
+          information and functions, called Methods, which are associated with
+          transformation, operation, or other forms of using the data.
+      - name: Class
+        definition: |
+          An Object with data and methods that describe the construction of
+          another Object, and can be thought of as a form of blueprint.

@@ -1,4 +1,6 @@
+---@diagnostic disable: param-type-mismatch
 local env = require("environment.ui")
+local key_mc = require("environment.keys").multicursor
 local signs = env.icons.cursorsigns
 
 local cb = require("funsak.wrap").cb
@@ -17,86 +19,70 @@ return {
       always_scroll = true,
       centered = false,
       disabled = false,
-      default_delay = 3,
+      default_delay = 1,
       hide_cursor = false,
       horizontal_scroll = true,
     },
-    event = "VeryLazy",
+    event = "BufWinEnter",
   },
   {
     "gen740/SmoothCursor.nvim",
-    event = "VeryLazy",
+    lazy = false,
     config = function(_, opts)
       require("smoothcursor").setup(opts)
       local autocmd = vim.api.nvim_create_autocmd
-
       autocmd({ "ModeChanged" }, {
+        group = vim.api.nvim_create_augroup(
+          "smoothcursor_clear",
+          { clear = true }
+        ),
         callback = function()
           local current_mode = vim.fn.mode()
-          if current_mode == "n" then
-            vim.api.nvim_set_hl(
-              0,
-              "SmoothCursor",
-              hlcomp("lualine_b_normal", "fg")
-            )
-          elseif current_mode == "v" then
-            vim.api.nvim_set_hl(
-              0,
-              "SmoothCursor",
-              hlcomp("lualine_b_visual", "fg")
-              -- hlcomp("ModesVisual", "bg", { bg = "fg" })
-            )
-          elseif current_mode == "V" then
-            vim.api.nvim_set_hl(
-              0,
-              "SmoothCursor",
-              hlcomp("lualine_b_visual", "fg")
-              -- hlcomp("ModesVisual", "bg", { bg = "fg" })
-            )
-          elseif current_mode == "�" then
-            vim.api.nvim_set_hl(
-              0,
-              "SmoothCursor",
-              hlcomp("lualine_b_visual", "fg")
-              -- hlcomp("ModesVisual", "bg", { bg = "fg" })
-            )
-          elseif current_mode == "i" then
-            vim.api.nvim_set_hl(
-              0,
-              "SmoothCursor",
-              hlcomp("lualine_b_insert", "fg")
-              -- hlcomp("ModesInsert", "bg", { bg = "fg" })
-            )
-          end
+          local mode_map = {
+            n = "Normal",
+            i = "Insert",
+            v = "Visual",
+            V = "Visual",
+            ["�"] = "Visual",
+            c = "Command",
+            t = "Terminal",
+          }
+          local full_mode = mode_map[current_mode] or false
+          full_mode = full_mode and full_mode .. "Mode" or nil
+
+          local hlres = full_mode and hlcomp(full_mode, { "fg" })
+          vim.api.nvim_set_hl(0, "SmoothCursor", { link = full_mode })
+          -- vim.fn.sign_define(
+          --   "smoothcursor",
+          --   { text = "󰮶", texthl = "SmoothCursor" }
+          -- )
         end,
       })
     end,
     opts = {
       type = "matrix",
       autostart = true,
-      text_hl = "SmoothCursor",
-      line_hl = "CursorLine",
-      speed = 64,
+      -- texthl = "SmoothCursor",
+      speed = 42,
       threshold = 3,
+      intervals = 10,
+      priority = 50,
+      -- flyin_effect = "bottom",
       matrix = {
         head = {
-          cursor = vim.is_callable(signs.head) and cb(signs.head) or signs.head,
-          text_hl = "SmoothCursor",
+          cursor = signs.head,
+          texthl = "SmoothCursor",
         },
         body = {
-          cursor = vim.is_callable(signs.body) and cb(signs.body) or signs.body,
-          length = 6,
-          text_hl = "SmoothCursor",
+          cursor = signs.body,
+          length = 8,
+          texthl = "SmoothCursor",
         },
         tail = {
-          cursor = vim.is_callable(signs.tail) and cb(signs.tail) or signs.tail,
-          text_hl = "SmoothCursor",
+          cursor = signs.tail,
+          texthl = "SmoothCursor",
         },
-      },
-      fancy = {
-        enable = false,
-        head = { cursor = "󰵵" },
-        body = {},
+        unstop = false,
       },
     },
   },

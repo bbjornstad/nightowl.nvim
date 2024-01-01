@@ -1,4 +1,5 @@
 local env = require("environment.ui")
+local key_help = require("environment.keys").help
 
 return {
   {
@@ -19,7 +20,7 @@ return {
     },
     keys = {
       {
-        "<F3>",
+        key_help.cheatsheet,
         function()
           require("telescope").extensions.cheatsheet.cheatsheet()
         end,
@@ -33,7 +34,7 @@ return {
     cmd = { "Cheat", "CheatWithoutComments" },
     keys = {
       {
-        "<F4>",
+        key_help.cheatsh.search,
         function()
           vim.ui.input({
             prompt = "cheat.sh=> search: ",
@@ -45,7 +46,7 @@ return {
         desc = "cheat=> search cheat.sh",
       },
       {
-        "<F5>",
+        key_help.cheatsh.no_comments,
         function()
           vim.ui.input({
             prompt = "cheat.sh=> search (no comments): ",
@@ -77,10 +78,33 @@ return {
     cmd = { "CheatSH" },
     keys = {
       {
-        "<F6>",
+        key_help.cheatsh.alt,
         "<CMD>CheatSH<CR>",
         mode = { "n" },
         desc = "cheat=> cheat.sh interface",
+      },
+    },
+  },
+  {
+    "acuteenvy/tldr.nvim",
+    cmd = "Tldr",
+    config = function(_, opts)
+      require("tldr").setup(opts)
+    end,
+    opts = {
+      client_args = "--color always --render",
+      window = {
+        height = 0.8,
+        width = 0.8,
+        border = env.borders.main,
+      },
+    },
+    keys = {
+      {
+        key_help.tldr,
+        "<CMD>Tldr<CR>",
+        mode = "n",
+        desc = "help.tldr=> view",
       },
     },
   },

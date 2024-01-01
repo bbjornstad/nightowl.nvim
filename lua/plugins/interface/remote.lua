@@ -2,6 +2,68 @@ local key_remote = require("environment.keys").tool.remote
 
 return {
   {
+    "miversen33/netman.nvim",
+    config = function(_, opts)
+      require("netman").setup(opts)
+    end,
+    event = "VeryLazy",
+  },
+  {
+    "chipsenkbeil/distant.nvim",
+    branch = "v0.3",
+    config = function(_, opts)
+      require("distant"):setup(opts)
+    end,
+    cmd = {
+      "Distant",
+      "DistantLaunch",
+      "DistantCheckHealth",
+      "DistantInstall",
+      "DistantOpen",
+      "DistantClientVersion",
+      "DistantConnect",
+      "DistantCopy",
+      "DistantMetadata",
+      "DistantMkdir",
+      "DistantRemove",
+      "DistantSearch",
+      "DistantSessionInfo",
+      "DistantShell",
+      "DistantSpawn",
+      "DistantSystemInfo",
+    },
+    opts = {
+      manager = {
+        daemon = false,
+        lazy = true,
+      },
+      network = {
+        private = false,
+        timeout = {
+          max = 20000,
+          interval = 256,
+        },
+      },
+      servers = {
+        ["*"] = {
+          connect = {
+            default = {
+              scheme = "ssh",
+              username = "ursa-major",
+            },
+          },
+          launch = {
+            default = {
+              scheme = "ssh",
+              username = "ursa-major",
+            },
+          },
+        },
+      },
+    },
+    keys = {},
+  },
+  {
     "nosduco/remote-sshfs.nvim",
     cmd = {
       "RemoteSSHFSConnect",

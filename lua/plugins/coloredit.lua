@@ -11,24 +11,45 @@ return {
       "CccHighlighterEnable",
       "CccHighlighterToggle",
     },
-    opts = {
-      win_opts = {
-        style = "minimal",
-        relative = "cursor",
-        border = env.borders.main,
-      },
-      auto_close = true,
-      preserve = true,
-      default_color = default_colorizer("Delimiter"),
-      recognize = {
-        input = true,
-        output = true,
-      },
-      highlighter = {
-        auto_enable = true,
-      },
-      bar_len = 50,
-    },
+    event = "VeryLazy",
+    opts = function()
+      local ccc = require("ccc")
+      return {
+        inputs = {
+          ccc.input.rgb,
+          ccc.input.hsl,
+          ccc.input.cmyk,
+          ccc.input.hwb,
+          ccc.input.lab,
+          ccc.input.lch,
+          ccc.input.oklab,
+          ccc.input.oklch,
+          ccc.input.hsluv,
+          ccc.input.okhsl,
+          ccc.input.hsv,
+          ccc.input.okhsv,
+          ccc.input.xyz,
+        },
+        win_opts = {
+          style = "minimal",
+          relative = "cursor",
+          border = env.borders.main,
+        },
+        auto_close = true,
+        preserve = true,
+        -- default_color = default_colorizer("Delimiter"),
+        recognize = {
+          input = true,
+          output = true,
+        },
+        highlighter = {
+          auto_enable = true,
+          update_insert = true,
+        },
+        bar_len = 60,
+        save_on_quit = true,
+      }
+    end,
     keys = {
       {
         key_color.pick.ccc,

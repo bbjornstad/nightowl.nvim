@@ -1,15 +1,13 @@
 local key_jupyter = require("environment.keys").repl.jupyter
 local key_fstring_toggle =
   require("environment.keys").lang.python.fstring_toggle
-local deflang = require("funsak.lazy").lintformat
+local lz = require("funsak.lazy")
 
 return {
-  unpack(
-    deflang(
-      { "python", "py" },
-      { "black", "isort", "ruff-fix", "ruff-format" },
-      { "ruff" }
-    )
+  lz.lsplnt("ruff", { "python", "py", "jupyter", "ipynb" }),
+  lz.lspfmt(
+    { "black", "isort", "ruff-fix", "ruff-format" },
+    { "python", "py", "jupyter", "ipynb" }
   ),
   { "jmcantrell/vim-virtualenv", ft = { "python" } },
   {

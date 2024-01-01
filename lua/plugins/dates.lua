@@ -18,7 +18,7 @@ return {
             options = {},
             handler = function(_, opt) end,
           })
-          require("dates").get()
+          require("dates").get(tostring())
         end,
       },
     },

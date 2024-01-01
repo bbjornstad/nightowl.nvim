@@ -24,7 +24,7 @@ return {
         },
       },
       -- virtual text for the debugger
-      { "theHamsta/nvim-dap-virtual-text" },
+      { "theHamsta/nvim-dap-virtual-text", optional = true },
 
       -- which key integration
       {
@@ -57,6 +57,15 @@ return {
       },
       {
         "LiadOz/nvim-dap-repl-highlights",
+        optional = true,
+      },
+      {
+        "niuiic/dap-utils.nvim",
+        optional = true,
+      },
+      {
+        "daic0r/dap-helper.nvim",
+        optional = true,
       },
     },
   },

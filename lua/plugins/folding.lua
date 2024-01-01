@@ -46,7 +46,7 @@ return { -- add folding range to capabilities
   },
   {
     "milisims/foldhue.nvim",
-    event = "BufEnter",
+    event = "BufWinEnter",
     config = function(_, opts)
       require("foldhue").enable()
     end,
@@ -56,7 +56,7 @@ return { -- add folding range to capabilities
     dependencies = {
       "kevinhwang91/promise-async",
       "anuvyklack/pretty-fold.nvim",
-      { "VonHeikemen/lsp-zero.nvim", optional = true },
+      "VonHeikemen/lsp-zero.nvim",
     },
     config = function(_, opts)
       require("ufo").setup(opts)
@@ -72,9 +72,16 @@ return { -- add folding range to capabilities
             },
           },
         })
+      else
+        require("lazyvim.util").warn({
+          "Failed to load lsp-zero.nvim as dependency for nvim-ufo",
+          "",
+          "Check lsp configuration and server capabilities. Error Status:"
+            .. zero,
+        })
       end
     end,
-    event = "BufEnter",
+    event = "BufWinEnter",
     opts = {
       fold_virt_text_handler = handler,
       preview = {
@@ -144,7 +151,7 @@ return { -- add folding range to capabilities
   {
     "anuvyklack/pretty-fold.nvim",
     config = true,
-    event = "BufEnter",
+    event = "BufWinEnter",
     opts = {
       sections = {
         left = {
@@ -201,7 +208,7 @@ return { -- add folding range to capabilities
       pauseFoldsOnSearch = true,
       setupFoldKeymaps = true,
     },
-    event = "BufEnter",
+    event = "BufWinEnter",
   },
   {
     "yaocccc/nvim-foldsign",

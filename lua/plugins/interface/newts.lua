@@ -1,5 +1,4 @@
 local env = require("environment.ui")
-
 return {
   {
     "folke/noice.nvim",
@@ -26,11 +25,15 @@ return {
         inc_rename = true,
         lsp_doc_border = true,
       },
+      smart_move = {
+        enabled = true,
+        excluded_filetypes = { "notify" },
+      },
       views = {
         popup = {
           border = {
             style = env.borders.main,
-            padding = env.padding.noice,
+            padding = env.padding.noice.main,
           },
         },
         cmdline_popup = {
@@ -42,7 +45,10 @@ return {
           -- 1200 because it was larger than the largest present zindex
           -- definition for any other component)
           zindex = 200,
-          border = { style = env.borders.main, padding = env.padding.noice },
+          border = {
+            style = env.borders.main,
+            padding = env.padding.noice.main,
+          },
           win_options = {
             winhighlight = {
               -- Normal = "Normal",
@@ -58,7 +64,10 @@ return {
           -- once again, put it on top of everything else that could exist below.
           -- 1200 rationale still holds here too.
           zindex = 65,
-          border = { style = env.borders.main, padding = env.padding.noice },
+          border = {
+            style = env.borders.main,
+            padding = env.padding.noice.main,
+          },
           win_options = {
             winhighlight = {
               -- Normal = "Normal",
@@ -75,7 +84,7 @@ return {
           },
           border = {
             style = env.borders.main,
-            padding = env.padding.noice,
+            padding = env.padding.noice.small,
           },
         },
         split = {
@@ -98,8 +107,7 @@ return {
         confirm = {
           border = {
             style = env.borders.main,
-            padding = env.padding.noice,
-            text = { "test" },
+            padding = env.padding.noice.main,
           },
           win_options = {
             winhighlight = {
@@ -109,7 +117,10 @@ return {
           },
         },
         notify = {
-          border = { style = env.borders.main, env.padding.noice },
+          border = {
+            style = env.borders.main,
+            padding = env.padding.noice.small,
+          },
           relative = "editor",
         },
         messages = {
@@ -186,6 +197,62 @@ return {
             skip = true,
           },
         },
+        -- {
+        --   view = "confirm",
+        --   filter = {
+        --     event = "msg_show",
+        --     kind = "",
+        --     find = "break:standard went off!",
+        --   },
+        -- },
+        -- {
+        --   view = "confirm",
+        --   filter = {
+        --     warning = true,
+        --     find = "Time for a drink",
+        --   },
+        -- },
+        -- {
+        --   view = "confirm",
+        --   filter = {
+        --     warning = true,
+        --     find = "Time to stand",
+        --   },
+        -- },
+      },
+    },
+    keys = {
+      {
+        "<S-CR>",
+        function()
+          require("noice").redirect(vim.fn.getcmdline())
+        end,
+        mode = "c",
+        desc = "noice=> redirect cmdline",
+      },
+      {
+        "<C-d>",
+        function()
+          if not require("noice.lsp").scroll(4) then
+            return "<C-f>"
+          end
+        end,
+        mode = { "n", "i", "s" },
+        silent = true,
+        expr = true,
+        desc = "lsp.doc=> down",
+      },
+      {
+        "<C-u>",
+        function()
+          if not require("noice.lsp").scroll(-4) then
+            return "<C-u>"
+          end
+        end,
+        mode = { "n", "i", "s" },
+        silent = true,
+        expr = true,
+        desc = "lsp.doc=> up",
       },
     },
   },

@@ -1,4 +1,3 @@
--- vim: set ft=lua: --
 local env = require("environment.ui")
 local opt = require("environment.optional")
 
@@ -9,30 +8,137 @@ local key_shortcut = kenv.shortcut
 return {
   {
     "nvim-neo-tree/neo-tree.nvim",
-    enabled = false,
-    module = false,
+    enabled = true,
+    config = function(_, opts)
+      require("neo-tree").setup(opts)
+    end,
+    keys = {
+      {
+        "<leader>e",
+        false,
+      },
+      {
+        "<leader>fe",
+        false,
+      },
+      {
+        "<leader>fE",
+        false,
+      },
+      {
+        "<leader>e",
+        false,
+      },
+      {
+        "<leader>E",
+        false,
+      },
+      {
+        key_shortcut.fm.explore.tree.fs,
+        "<CMD>Neotree filesystem<CR>",
+        mode = "n",
+        desc = "fm.tree=> explore filesystem",
+      },
+      {
+        key_shortcut.fm.explore.tree.git,
+        "<CMD>Neotree git_status<CR>",
+        mode = "n",
+        desc = "fm.tree=> explore filesystem",
+      },
+      {
+        key_shortcut.fm.explore.tree.remote,
+        "<CMD>Neotree netman.ui.neo-tree<CR>",
+        mode = "n",
+        desc = "fm.tree=> explore filesystem",
+      },
+    },
+    dependencies = {
+      "miversen33/netman.nvim",
+    },
+    opts = {
+      sources = {
+        "filesystem",
+        "git_status",
+        "netman.ui.neo-tree",
+      },
+      source_selector = {
+        winbar = true,
+        sources = {
+          {
+            source = "filesystem",
+            display_name = "fs::files",
+          },
+          {
+            source = "git_status",
+            display_name = "git::status",
+          },
+          {
+            source = "netman.ui.neo-tree",
+            display_name = "netfs::files",
+          },
+        },
+      },
+      popup_border_style = env.borders.main,
+      close_if_last_window = true,
+      enable_git_status = true,
+      enable_diagnostics = true,
+      enable_normal_mode_for_inputs = false,
+      default_component_configs = {
+        indent = {
+          padding = 2,
+          indent_marker = "╽",
+          last_indent_marker = "┖",
+        },
+        name = {
+          trailing_slash = true,
+          use_git_status_colors = true,
+        },
+      },
+      window = {
+        width = 24,
+        position = "left",
+      },
+      filesystem = {
+        follow_current_file = {
+          enabled = true,
+          leave_dirs_open = true,
+        },
+        hijack_netrw_behavior = "disabled",
+      },
+      buffers = {
+        follow_current_file = {
+          enabled = true,
+          leave_dirs_open = true,
+        },
+      },
+    },
   },
   {
-    "lstwn/broot.vim",
+    "bbjornstad/broot.nvim",
     enabled = opt.file_managers.broot,
+    opts = {},
+    config = function(_, opts) end,
     init = function()
-      vim.g.broot_default_conf_path = (
-        vim.env.XDG_CONFIG_HOME .. "/broot/conf.hjson"
-      )
-      vim.g.broot_replace_netrw = 0
+      vim.g.broot_replace_netrw = 1
     end,
     keys = {
       {
         key_fm.broot.working_dir,
-        "<CMD>BrootWorkingDir<CR>",
+        function()
+          vim.cmd([[vsplit | wincmd l | vertical resize 24]])
+          vim.cmd([[BrootWorkingDirectory]])
+        end,
         mode = "n",
         desc = "fm.broot=> working directory",
       },
       {
         key_fm.broot.current_dir,
-        "<CMD>BrootCurrentDir<CR>",
+        function()
+          vim.cmd([[vsplit | wincmd l | vertical resize 24]])
+          vim.cmd([[BrootCurrentDirectory]])
+        end,
         mode = "n",
-        desc = "fm.broot=> current directory",
+        desc = "fm.broot=> working directory",
       },
     },
   },
@@ -93,7 +199,8 @@ return {
       vim.g.oil_extended_column_mode = env.oil.init_columns == "extended"
     end,
     opts = {
-      default_file_explorer = true,
+      default_file_explorer = false,
+      skip_confirm_for_simple_edits = true,
       prompt_save_on_select_new_entry = true,
       columns = env.oil.init_columns == "succinct" and env.oil.columns.succinct
         or env.oil.columns.extended,
@@ -120,8 +227,8 @@ return {
         },
       },
       keymaps = {
-        ["<A-`>"] = "actions.tcd",
-        ["<A-CR>"] = "actions.tcd",
+        ["`"] = "actions.tcd",
+        ["<C-CR>"] = "actions.tcd",
         ["<BS>"] = "actions.toggle_hidden",
         ["."] = "actions.toggle_hidden",
         ["-"] = "actions.parent",
@@ -130,8 +237,8 @@ return {
         [key_fm.oil:close()] = "actions.close",
         [".."] = "actions.parent",
         ["<C-r>"] = "actions.refresh",
-        ["<C-P>"] = "actions.preview",
-        ["<C-C>"] = {
+        ["<C-p>"] = "actions.preview",
+        ["<C-e>"] = {
           callback = function()
             local extended_is_target = vim.b.oil_extended_column_mode
               or vim.g.oil_extended_column_mode
@@ -147,8 +254,12 @@ return {
         ["<C-v>"] = "actions.select_vsplit",
         ["<C-s>"] = "actions.select_split",
         ["?"] = "actions.show_help",
-        ["<S-CR>"] = "actions.select",
-        ["<CR>"] = false,
+        ["<S-CR>"] = "actions.select_vsplit",
+        ["<CR>"] = "actions.select",
+        ["e"] = "actions.select",
+        ["<C-y>"] = "actions.select",
+        ["<C-t>"] = "actions.toggle_trash",
+        ["T"] = "actions.toggle_trash",
       },
       view_options = {
         sort = {
@@ -171,7 +282,7 @@ return {
       {
         key_fm.oil.split,
         function()
-          vim.cmd([[vsplit]])
+          vim.cmd([[vsplit | wincmd l | vertical resize 24]])
           require("oil").open()
         end,
         mode = "n",
@@ -197,7 +308,7 @@ return {
         key_shortcut.fm.explore.split,
         function()
           -- local cwd = vim.loop.cwd() or "."
-          -- vim.cmd([[vsplit]])
+          vim.cmd([[vsplit | wincmd l | vertical resize 24]])
           require("oil").open()
         end,
         mode = { "n" },
@@ -213,7 +324,7 @@ return {
       opts.replace_netrw = opts.replace_netrw or nil
       opts.quitcd = opts.quitcd or "tcd"
       opts.explorer = vim.tbl_deep_extend("force", {
-        width = 20,
+        width = 10,
         side = "topleft",
         session = "shared",
         tabs = true,
@@ -221,7 +332,7 @@ return {
       }, opts.explorer or {})
       opts.picker = vim.tbl_deep_extend("force", {
         style = {
-          width = 0.2,
+          width = 0.12,
           height = 0.6,
           border = env.borders.main,
         },
@@ -235,10 +346,10 @@ return {
         { "<C-p>", builtin.open_in_preview }, -- open file in preview split keeping nnn focused
         { "<C-y>", builtin.copy_to_clipboard }, -- copy file(s) to clipboard
         { "g.", builtin.cd_to_path }, -- cd to file directory
-        { "<A-CR>", builtin.cd_to_path }, -- cd to file directory
+        { "<C-CR>", builtin.cd_to_path }, -- cd to file directory
         { "<A-:>", builtin.populate_cmdline }, -- populate cmdline (:) with file(s)
       }, opts.mappings or {})
-      opts.auto_close = opts.auto_close or true
+      opts.auto_close = opts.auto_close ~= nil and opts.auto_close or true
       opts.auto_open = vim.tbl_deep_extend("force", {
         tabpage = "picker",
         empty = "explorer",
@@ -355,25 +466,6 @@ return {
         end,
         mode = "n",
         desc = "scratch=> select buffer",
-      },
-    },
-  },
-  {
-    "ripxorip/bolt.nvim",
-    enabled = opt.file_managers.bolt,
-    build = ":UpdateRemotePlugins",
-    keys = {
-      {
-        key_fm.bolt.open_root,
-        "<CMD>Bolt<CR>",
-        mode = "n",
-        desc = "fm.bolt=> open project root",
-      },
-      {
-        key_fm.bolt.open_cwd,
-        "<CMD>BoltCwd<CR>",
-        mode = "n",
-        desc = "fm.bolt=> open cwd",
       },
     },
   },

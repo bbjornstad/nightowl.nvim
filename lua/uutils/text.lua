@@ -1,6 +1,6 @@
----@module uutils_text uutils.text defines important text manipulation functions, mainly
----things like commented line breaks made from particular characters, but also
----controls some other formatting behavior as well.
+---@module "uutils.text" important text manipulation functions, mainly things
+---like commented line breaks made from particular characters, but also controls
+---some other formatting behavior as well.
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 local api = vim.api

@@ -1,4 +1,5 @@
 local env = require("environment.ui")
+local opt = require("environment.optional")
 local mopts = require("funsak.table").mopts
 local has = require("lazyvim.util").has
 
@@ -66,12 +67,14 @@ local function default_keymaps()
     mode = "n",
     desc = "::lsp.act=> code actions",
   }
-  lk[#lk + 1] = {
-    kenv.auxillary.open_float,
-    vim.diagnostic.open_float,
-    mode = "n",
-    desc = "::lsp.diag=> line-float",
-  }
+  if not (has("diaglist.nvim") or has("lsp_lines.nvim")) then
+    lk[#lk + 1] = {
+      kenv.diagnostic.buffer,
+      vim.diagnostic.open_float,
+      mode = "n",
+      desc = "::lsp.diag=> line-float",
+    }
+  end
   lk[#lk + 1] = {
     scenv.diagnostics.go.next,
     vim.diagnostic.goto_next,
@@ -84,30 +87,65 @@ local function default_keymaps()
     mode = "n",
     desc = "::lsp.diag=> previous",
   }
+  lk[#lk + 1] = {
+    kenv.workspace.add,
+    vim.lsp.buf.add_workspace_folder,
+    mode = "n",
+    desc = "::lsp.space=> add folders",
+  }
+
+  lk[#lk + 1] = {
+    kenv.workspace.remove,
+    vim.lsp.buf.remove_workspace_folder,
+    mode = "n",
+    desc = "::lsp.space=> remove folders",
+  }
+  lk[#lk + 1] = {
+    kenv.workspace.list,
+    vim.lsp.buf.list_workspace_folders,
+    mode = "n",
+    desc = "::lsp.space=> list folders",
+  }
+  lk[#lk + 1] = {
+    "<C-s>",
+    vim.lsp.buf.signature_help,
+    mode = "i",
+    desc = "::lsp.go=> signature help",
+  }
+  lk[#lk + 1] = {
+    "<C-k>",
+    false,
+    mode = "i",
+  }
 end
 
 local function zero_default_keymaps(client, bufnr)
   local zero = require("lsp-zero")
   zero.default_keymaps({
     buffer = bufnr,
-    exclude = { "<CR>", "gl", "go", "gs", "<F2>", "<F3>", "<F4>" },
+    exclude = { "<CR>", "gl", "go", "gs", "<F2>", "<F3>", "<F4>", "<C-k>" },
   })
 end
 
 local function attach_handler(client, bufnr)
   require("lsp-status").on_attach(client)
   if
-    client.supports_method("textDocument/codeLens")
-    and has("virtual-types.nvim")
+    (
+      client.supports_method("textDocument/codeLens")
+      or client.server_capabilities.codeLensProvider
+    ) and has("virtual-types.nvim")
   then
     require("virtualtypes").on_attach(client, bufnr)
   end
-  if client.server_capabilities.inlayHintProvider then
-    if has("lsp-inlayhints.nvim") then
-      require("lsp-inlayhints").on_attach(client, bufnr)
-    else
-      vim.lsp.inlay_hint(bufnr, true)
-    end
+  if
+    client.supports_method("textDocument/inlayHint")
+    or client.server_capabilities.inlayHintProvider
+  then
+    -- if has("lsp-inlayhints.nvim") then
+    --   require("lsp-inlayhints").on_attach(client, bufnr)
+    -- else
+    vim.lsp.inlay_hint.enable(bufnr, true)
+    -- end
   end
 end
 
@@ -129,7 +167,7 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = {
       { "folke/neoconf.nvim" },
-      { "folke/neodev.nvim", opts = {} },
+      { "folke/neodev.nvim" },
       { "williamboman/mason-lspconfig.nvim" },
       {
         "hrsh7th/nvim-cmp",
@@ -141,7 +179,7 @@ return {
       { "jubnzv/virtual-types.nvim", optional = true },
       { "lvimuser/lsp-inlayhints.nvim", optional = true },
       { "nvim-lua/lsp-status.nvim" },
-      { "VonHeikemen/lsp-zero.nvim", optional = true },
+      { "VonHeikemen/lsp-zero.nvim" },
     },
     opts = function(_, opts)
       local status = require("lsp-status")
@@ -154,32 +192,36 @@ return {
         indicator_ok = env.icons.misc.Ok,
       })
       opts.inlay_hints = mopts(opts.inlay_hints or {}, { enabled = true })
-      opts.capabilities = mopts(opts.capabilities or {}, {})
-      opts.format_notify = opts.format_notify or true
+      opts.format_notify = opts.format_notify ~= nil or true
       opts.format = mopts(opts.format or {}, {
         formatting_options = nil,
         timeout_ms = 10000,
       })
-      opts.diagnostics = mopts(opts.diagnostics or {}, {
-        underline = true,
-        update_in_insert = false,
-        virtual_text = {
-          spacing = 4,
-          source = "if_many",
-          prefix = "icons",
-        },
-        severity_sort = true,
-      })
-      opts.servers = mopts({
-        efm = {},
-        contextive = {},
-      }, opts.servers or {})
+      local diag = not has("lsp_lines.nvim")
+          and mopts(opts.diagnostics or {}, {
+
+            underline = true,
+            update_in_insert = false,
+            virtual_text = {
+              spacing = 2,
+              source = "if_many",
+              prefix = "icons",
+            },
+            severity_sort = true,
+            float = {
+              border = env.borders.main,
+              title = "󰼀 lsp::diagnostic",
+              title_pos = "right",
+            },
+          })
+        or {}
+      opts.diagnostics = mopts(opts.diagnostics or {}, diag)
 
       local fn_setup
       if has("lsp-zero.nvim") then
         local zero = require("lsp-zero")
-        vim.notify("Inside zero setup...")
         zero.extend_lspconfig()
+        zero.extend_cmp()
         fn_setup = function(server, o)
           zero.default_setup(server)
         end
@@ -191,12 +233,12 @@ return {
         })
       else
         fn_setup = function(server, o)
-          require("lspconfig")[server].setup(mopts(o, {
+          require("lspconfig")[server].setup(vim.tbl_deep_extend("force", o, {
             on_attach = attach_handler,
           }))
         end
       end
-      opts.setup = mopts(opts.setup or {}, {
+      opts.setup = vim.tbl_deep_extend("force", opts.setup or {}, {
         ["*"] = fn_setup,
       })
     end,
@@ -204,9 +246,11 @@ return {
   },
   {
     "nvimtools/none-ls.nvim",
+    optional = true,
+    enabled = opt.lsp.null_ls,
     dependencies = {
       "neovim/nvim-lspconfig",
-      "jay-babu/mason-null-ls.nvim",
+      { "jay-babu/mason-null-ls.nvim", enabled = opt.lsp.null_ls },
     },
     config = function(_, opts)
       require("null-ls").setup(opts)
@@ -219,14 +263,13 @@ return {
   },
   {
     "jay-babu/mason-null-ls.nvim",
-    dependencies = { "williamboman/mason.nvim", "nvimtools/none-ls.nvim" },
+    dependencies = {
+      "williamboman/mason.nvim",
+      { "nvimtools/none-ls.nvim", optional = true },
+    },
+    optional = true,
   },
   { "williamboman/mason.nvim" },
   { "jubnzv/virtual-types.nvim", event = "LspAttach" },
   { "lvimuser/lsp-inlayhints.nvim", event = "LspAttach" },
-  {
-    "creativenull/efmls-configs-nvim",
-    version = "v1.x.x",
-    dependencies = { "neovim/nvim-lspconfig" },
-  },
 }

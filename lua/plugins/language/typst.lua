@@ -2,6 +2,14 @@ local key_preview = require("environment.keys").tool.preview
 
 return {
   {
+    "neovim/nvim-lspconfig",
+    opts = function(_, opts)
+      opts.servers = vim.tbl_deep_extend("force", {
+        typst_lsp = {},
+      }, opts.servers or {})
+    end,
+  },
+  {
     "kaarmu/typst.vim",
     ft = { "typst" },
     keys = {

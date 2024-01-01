@@ -18,7 +18,7 @@ local scope_theme = "ivy"
 ---sent to a `setup` method if desired. If not given, the setup function will be
 ---returned. If a boolean, the value of the flag will indicate whether or not a
 ---setup method should be called with empty parameters.
----@return LazyPlugin | fun(o: T_Opts): LazyPlugin
+---@return LazyPlugin? | fun(o: T_Opts): LazyPlugin?
 function M.extend(name, opts, extension_setup)
   local setup_opts = extension_setup == true and {} or extension_setup
   local new_item = {

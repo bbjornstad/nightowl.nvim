@@ -6,19 +6,15 @@ local nightowl_splash_frames =
 local nightowl_splash_compact_frames =
   require("environment.alpha").nightowl_splash_compact_frames
 
-local function ai_quote(opts)
-  opts = opts or {}
-end
-
 local function alpha_state()
   vim.cmd([[Veil]])
-  require("fsplash").open_window()
+  -- require("fsplash").open_window()
 end
 
 return {
   {
     "jovanlanik/fsplash.nvim",
-    lazy = false,
+    lazy = true,
     config = true,
     opts = {
       lines = nightowl_splash,
@@ -30,23 +26,23 @@ return {
         "WinScrolled",
       },
       border = env.borders.main,
-      winblend = 10,
+      winblend = 30,
     },
-    keys = {
-      {
-        "<Home>",
-        function()
-          require("fsplash").open_window()
-        end,
-        mode = "n",
-        desc = "א.α => splash screen",
-      },
-    },
+    -- keys = {
+    --   {
+    --     "<Home>",
+    --     function()
+    --       require("fsplash").open_window()
+    --     end,
+    --     mode = "n",
+    --     desc = "א.α => splash screen",
+    --   },
+    -- },
   },
   {
     "willothy/veil.nvim",
-    enabled = false,
-    event = "VimEnter",
+    lazy = false,
+    -- event = "VimEnter",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "ibhagwan/fzf-lua",

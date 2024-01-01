@@ -1,4 +1,77 @@
+local recurser = require("funsak.wrap").recurser
+
 local M = {}
+
+---@alias NightowlHighlightSpec table
+
+M.__highlights__ = {
+  TelescopeTitle = {},
+  TelescopePromptNormal = {},
+  TelescopePromptBorder = {},
+  TelescopeResultsNormal = {},
+  TelescopeResultsBorder = {},
+  TelescopePreviewNormal = {},
+  TelescopePreviewBorder = {},
+  Pmenu = {},
+  PmenuSel = {},
+  PmenuSbar = {},
+  PmenuThumb = {},
+  InclineNormal = {},
+  InclineNormalNC = {},
+  WinBar = {},
+  WinBarNC = {},
+  DropBarCurrentContext = {},
+  DropBarMenuCurrentContext = {},
+  DropBarIconCurrentContext = {},
+  DropBarPreview = {},
+  BiscuitColor = {},
+  TreesitterContextBottom = {},
+  NightowlContextHints = {},
+  NightowlContextHintsBright = {},
+  NightowlStartupEntry = {},
+  NightowlStartupHeader = {},
+  NightowlStartupConvenience = {},
+  IndentBlanklineWhitespace = {},
+  IndentBlanklineScope = {},
+  IndentBlanklineIndent = {},
+}
+M.__highlights__.__index = M.__highlights__
+
+M.__schemes__ = {
+  kanagawa = {},
+  deepwhite = {},
+  ["nano-theme"] = {},
+  ["rose-pine"] = {},
+  sherbet = {},
+  palettee = {},
+}
+
+function M.__highlights__:new(opts)
+  M.__schemes__ = M.__schemes__
+end
+
+--- internal helper to register a new highlight definition amongst the rest
+---@param cls table highlight definitions by scheme mapping.
+---@param scheme string name of the colorscheme to register this highlight to
+---@param hl string name of the highlight group
+---@param definition NightowlHighlightSpec highlight group definition mapping
+function M.__highlights__.register_highlight(cls, scheme, hl, definition)
+  local prev = cls[hl] or {}
+  M.__highlights__[hl] =
+    vim.tbl_deep_extend("force", prev, { [scheme] = definition })
+end
+
+--- registers a new highlight target to the internal highlights by scheme
+--- mapping. Registered highlights are indexed by the target or current
+--- colorscheme to determine the final set of highlights applied.
+---@param hl string name of the target highlights
+---@param schemes string | string[] name of the colorscheme or schemes for which
+---this highlight is registered.
+---@param definition NightowlHighlightSpec highlight group definition mapping
+function M.__highlights__:register(hl, schemes, definition)
+  local fn = recurser(M.__highlights__.register_highlight, true)
+  fn(self, schemes, hl, definition)
+end
 
 function M.get_colors(options)
   local colors = {
@@ -68,10 +141,7 @@ local function highlights(colors)
       italic = true,
       fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,
     },
-    NightowlContextHintsBright = {
-      italic = true,
-      fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.dragonBlue,
-    },
+    NightowlContextHintsBright = { link = "DiagnosticHint" },
     NightowlStartupEntry = {
       bold = false,
       fg = require("kanagawa.colors").setup({ theme = "wave" }).palette.springViolet2,

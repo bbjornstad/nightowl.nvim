@@ -41,17 +41,44 @@ function M.conditionalize(fn, condition)
   return condition_wrap
 end
 
-function M.recurser(fn)
-  local function recurse_wrap(targ, ...)
-    local args = { ... }
-    if type(targ) == "table" then
-      return vim.tbl_map(function(t)
-        return fn(t, unpack(args))
-      end, targ)
+--- wraps a function of a a single variable such that it can operate on an
+--- interable collection of such input variables as well as the single variable.
+--- In other words, given an input function f(var: any): any?, allows the
+--- operation of f across iterable collections of var, e.g. by returning a
+--- function f'(var: any|any[]): any?
+---@param fn fun(var: any, ...): any? a function that accepts at least a single
+---argument, which will be wrapped to accept a collection of such `var`
+---@param is_method boolean? a flag that indicates whether or not the function
+---being wrapped is called using a typical method syntax; this is required to
+---safely handle the method case since it is normally assumed that the first
+---variable (which would correspond to `self` in a method) is the argument which
+---is supposed to be recursed over.
+---@return fun(var: any|any[], ...): any? fn the new wrapped function, which can
+---accept the collection form of `var`
+function M.recurser(fn, is_method)
+  is_method = is_method or false
+  local recurse_wrap
+  if is_method then
+    function recurse_wrap(cls, targ, ...)
+      local args = { ... }
+      if type(targ) == "table" then
+        return vim.tbl_map(function(t)
+          return fn(cls, t, unpack(args))
+        end, targ)
+      end
+      return fn(cls, targ, unpack(args))
     end
-    return fn(targ, unpack(args))
+  else
+    function recurse_wrap(targ, ...)
+      local args = { ... }
+      if type(targ) == "table" then
+        return vim.tbl_map(function(t)
+          return fn(t, unpack(args))
+        end, targ)
+      end
+      return fn(targ, unpack(args))
+    end
   end
-
   return recurse_wrap
 end
 
@@ -191,10 +218,12 @@ function M.F(...)
   return ...
 end
 
+---@generic T
+---@alias Fn fun(...): T?
 --- turns the given function into a callback function. A callback function is in
 --- this context simply a bare wrapper around the function.
----@param fn fun(...): any? a function to wrap in a callback
----@return fun(fun...): any? fn the callback
+---@param fn Fn a function to wrap in a callback
+---@return Fn fn the callback wrapper
 function M.cb(fn)
   return function(...)
     return fn(...)
@@ -248,6 +277,85 @@ function M.inject(fn, handler, consume_optarg)
   end
 
   return wrap
+end
+
+--- "conditional callback" creates a function wrapping factory whose returned
+--- output are functions that when evaluated check a condition and applies the
+--- affirmative function when true, and a fallback when false
+---@param fn fun(...): any? any function whose output should be conditional on
+---the result of the given expression.
+---@return fun(fallback: (fun(...): any?), condition: any?): any?
+function M.ccb(fn)
+  return function(fallback, condition)
+    condition = condition ~= nil and condition or true
+    return function(...)
+      if condition then
+        return fn(...)
+      end
+      return fallback(...)
+    end
+  end
+end
+
+local function treat_args(args, treatments, opts)
+  opts = opts or {}
+  args = vim
+    .iter(ipairs(args))
+    :map(function(i, val)
+      local treater = treatments[i] or M.eff
+      return treater(val)
+    end)
+    :totable()
+
+  return opts.unpack and unpack(args) or args
+end
+
+function M.dynamo(tbl_or_fn, arg_treatments)
+  arg_treatments = arg_treatments or false
+  if vim.is_callable(tbl_or_fn) then
+    return function(...)
+      local args = { ... }
+      if arg_treatments then
+        args = vim
+          .iter(ipairs(args))
+          :map(function(i, val)
+            local treater = arg_treatments[i] or M.eff
+            return treater(val)
+          end)
+          :totable()
+      end
+      return tbl_or_fn(unpack(args))
+    end
+  else
+    return function(...)
+      local args = { ... }
+      if arg_treatments then
+        args = vim
+          .iter(ipairs(args))
+          :map(function(i, val)
+            local treater = arg_treatments[i] or M.eff
+            return treater(val)
+          end)
+          :totable()
+      end
+      return tbl_or_fn
+    end
+  end
+end
+
+function M.extermiwrap(fn)
+  return function(...)
+    local args = { ... }
+    local maxarg = #args - 1
+    local slicer = require("funsak.table").firstn(#args - 1)
+    local operargs = vim.iter(args)
+    local last = operargs:peekback()
+    args = slicer(args)
+    local res
+    if last.debug == true then
+      res = fn(unpack(args))
+    end
+  end
 end
 
 return M

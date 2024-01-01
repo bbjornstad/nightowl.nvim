@@ -1,15 +1,15 @@
----@module "uutils.cmp" user-facing utilities for management of nvim-cmp
+---@module "uutils.ucmp" user-facing utilities for management of nvim-cmp
 ---interface
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 
----@class uutils.cmp
+---@class uutils.ucmp
 local M = {}
 
 M.cmp_actions = {}
 
 local function has_words_before()
-  unpack = unpack or table.unpack
+  local unpack = unpack or table.unpack
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
   return col ~= 0
     and vim.api

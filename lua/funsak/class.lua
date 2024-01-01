@@ -1,5 +1,8 @@
 ---@module "funsak.class" extensible definition of a standard-style class for
----holding data and methods.
+---holding data and methods. This is a commonly found implementation originally
+---from the GitHub user `rsi` and which is also featured in plenary. We could
+---use plenary directly, but that would mean introducing that as a hard
+---dependency.
 ---@author Bailey Bjornstad | ursa-major [Via https://github.com/rxi/classic]
 ---@license MIT
 

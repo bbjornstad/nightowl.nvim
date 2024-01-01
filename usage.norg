@@ -1,10 +1,70 @@
 @document.meta
 title: usage
-description:
+description: a usage guide for nightowl.nvim, a personal Neovim setup for maximalists using Neovim
 authors: ursa-major
-categories:
+categories: dotfiles,neovim,unix-utils,spacebar
 created: 2023-09-01
-updated: 2023-09-01
+updated: 2023-12-11T03:28:54-0700
 version: 1.1.1
 @end
 
+* nightowl.nvim usage guide
+  The following documentation provides typical intended use cases for the
+  nightowl.nvim implementation/LazyVim sidegrade. This is needed because the
+  code structure, as it currently exists, is rather lengthy, but the things that
+  neovim should be capable of accomplishing now are much more within reach,
+  literally and figureatively.
+** goal 0: Maximalism, Baby
+   Many individuals who would reach for a modal style text-editor like vim do so
+   because they want to minimize the amount of overhead in their development
+   setup. This could be for a host of reasons: the most prominent of which is
+   that in a minimal form, these programs can run efficiently on older hardware
+   that may not be as well supported any more. Alternatively, it may be that the
+   developer in question makes it a strange point of pride to be able to get a
+   few "extras" into the virtual rubbish pile in lieu of pure vimscript or lua
+   implementations.
+
+   This was, decidedly, not the goal with this collection of tools. Instead, I
+   wanted to take the polar opposite approach, in that I wanted to make neovim
+   as fully-featured as I could possibly muster (within reason, of course--I
+   still need a working text editor and using something other than vim is moot
+   personally). If there exist plugins for things like language servers,
+   completion sources, behavioral modifications, AI tooling, then I wanted all
+   of it.
+
+   I will admit that this is not the most effective use of the editor, as it
+   wasn't necessarily designed with this sort of use-case in mind. However, the
+   ecosystem that is available through Neovim and the community bank of plugins,
+   at least in this case more than makes up for the minor hiccups caused when
+   plugins seem to conflict. If pure performance is the paramount goal, you would
+   be a fool to not start from the ground up and introduce new features only as
+   needed.
+
+   For one reason or another, this was not my target. Instead, I took on the
+   maximalist attitude and set out to make Neovim do anything (yes, even fly
+   with a pig).
+* features
+  With this approach in mind, there were a few concrete targets that I wanted to
+  be able to accomplish specifically. For the most part, these have all been
+  ironed out to an extent that hopefully makes sense for the reader/user. If
+  that is not the case, please ask for clarification so that I can correctly
+  make a note of plugin status for future readers.
+
+  Please note that this approach to configuration of neovim relies heavily on
+  the particular code architecture of lazy.nvim as a package management system.
+  While this may seem like quite the lift if you have never experienced
+  lazy.nvim, I hope that by documenting my implementation process and solutions
+  to certain thorny issues, other users wishing to implement this to any extent
+  in their configuration can have a valuable resource to refer to some of the
+  more arcane portions of this process, or just plain technical. To be fair,
+  however, lazy.nvim is the current de-facto standard manager for neovim, and
+  makes numerous improvements on its predecessor, packer.nvim, the previous
+  de-facto standard.
+
+** goal 1: Compartmentalized Submodular Implementation
+   Please note that this relies heavily on the implementation structure of
+   lazy.nvim. In particular, lazy.nvim is sort of the whole reason that one
+   might even consider adding as many plugins as I have added to the
+   configuration. I don't think that I have the largest configuration based
+   on either metric of plugin count vs overall code quantity, but I have the
+   largest that I have seen so far. Having 64gb of ram helps too.

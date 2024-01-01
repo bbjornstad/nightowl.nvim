@@ -34,17 +34,28 @@ local default_sources = {
     name = "dap",
     group_index = 1,
   },
+  {
+    name = "ctags",
+    group_index = 1,
+  },
   -- {
   --   name = "dynamic",
   --   group_index = 1,
   -- },
   {
     name = "look",
+    option = {
+      convert_case = true,
+      loud = true,
+    },
     group_index = 1,
   },
   {
     name = "omni",
-    group_index = 2,
+    option = {
+      disable_omnifuncs = { "v:lua.vim.lsp.omnifunc" },
+    },
+    group_index = 1,
   },
   {
     name = "rg",
@@ -81,6 +92,13 @@ local default_sources = {
     group_index = 1,
   },
   {
+    name = "digraphs",
+    option = {
+      cache_digraphs_on_start = true,
+    },
+    group_index = 2,
+  },
+  {
     name = "emoji",
     trigger_characters = { ":" },
     group_index = 1,
@@ -112,6 +130,22 @@ local default_sources = {
   },
   {
     name = "natdat",
+    group_index = 1,
+  },
+  {
+    name = "codeium",
+    group_index = 1,
+  },
+  {
+    name = "tabnine",
+    group_index = 1,
+  },
+  {
+    name = "copilot",
+    group_index = 1,
+  },
+  {
+    name = "cmp_ai",
     group_index = 1,
   },
 }
@@ -153,6 +187,9 @@ return {
       "barklan/cmp-gitlog",
       "uga-rosa/cmp-latex-symbol",
       "Gelio/cmp-natdat",
+      "dmitmel/cmp-digraphs",
+      "hrsh7th/cmp-omni",
+      "octaltree/cmp-look",
     },
     opts = function(_, opts)
       local cmp = require("cmp")
@@ -162,10 +199,10 @@ return {
 
       cmp.setup.cmdline({ "/", "?" }, {
         mapping = cmp.mapping.preset.cmdline(),
-        sources = {
+        sources = cmp.config.sources({
           { name = "buffer" },
           { name = "rg" },
-        },
+        }),
       })
 
       cmp.setup.cmdline(":", {
@@ -217,7 +254,12 @@ return {
       cmp.setup.filetype({ "lua" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
           { name = "nvim_lua", group_index = 1 },
-          { name = "plugins", group_index = 2 },
+          { name = "plugins", group_index = 1 },
+        }),
+      })
+      cmp.setup.filetype({ "clojure", "fennel", "python" }, {
+        sources = vim.list_extend(vim.deepcopy(default_sources), {
+          { name = "conjure", group_index = 1 },
         }),
       })
 
@@ -326,6 +368,13 @@ return {
     dependencies = { ncmp },
   },
 
+  {
+    "micangl/cmp-vimtex",
+    optional = true,
+    dependencies = { ncmp },
+    ft = { "latex" },
+  },
+
   -- AI tooling
   { "tzachar/cmp-ai", optional = true, dependencies = { ncmp } },
   { "Exafunction/codeium.nvim", optional = true, dependencies = { ncmp } },
@@ -341,19 +390,23 @@ return {
     dependencies = { ncmp },
     config = true,
     ft = { "html", "css", "js", "md", "org", "norg" },
-    opts = {},
   },
   { "hrsh7th/cmp-emoji", dependencies = { ncmp } },
+  { "dmitmel/cmp-digraphs", dependencies = { ncmp } },
   { "chrisgrieser/cmp-nerdfont", dependencies = { ncmp } },
   { "davidmh/cmp-nerdfonts", dependencies = { ncmp } },
   { "amarakon/nvim-cmp-fonts", dependencies = { ncmp } },
   { "f3fora/cmp-spell", dependencies = { ncmp } },
   { "jcha0713/cmp-tw2css", dependencies = { ncmp } },
+  { "delphinus/cmp-ctags", dependencies = { ncmp } },
   {
     "Gelio/cmp-natdat",
     config = function(_, opts)
       require("cmp_natdat").setup()
     end,
+    opts = {
+      cmp_kind_text = "[date]",
+    },
     dependencies = { ncmp },
   },
 }

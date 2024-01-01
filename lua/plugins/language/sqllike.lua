@@ -1,4 +1,15 @@
+local deflang = require("funsak.lazy").lintformat
+
 return {
+  {
+    "neovim/nvim-lspconfig",
+    opts = function(_, opts)
+      opts.servers = vim.tbl_deep_extend("force", {
+        sqlls = {},
+      }, opts.servers or {})
+    end,
+  },
+  deflang({ "sql" }, { "sql-formatter", "sqlfmt" }, { "sqlfluff" }),
   {
     "kndndrj/nvim-dbee",
     dependencies = {

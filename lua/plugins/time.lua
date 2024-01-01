@@ -9,39 +9,6 @@ local key_mail = kenv.mail
 
 return {
   {
-    "wthollingsworth/pomodoro.nvim",
-    enabled = opt.prefer.timers.pomodoro == "pomodoro",
-    dependencies = { "MunifTanjim/nui.nvim" },
-    opts = {
-      time_work = 50,
-      time_break_short = 10,
-      time_break_long = 30,
-      timers_to_long_break = 2,
-      border = { style = env.borders.main },
-    },
-    cmd = { "PomodoroStart", "PomodoroStop", "PomodoroStatus" },
-    keys = {
-      {
-        key_pomodoro.start,
-        "<CMD>PomodoroStart<CR>",
-        desc = "::pom=> start pomodoro timer",
-        mode = { "n" },
-      },
-      {
-        key_pomodoro.stop,
-        "<CMD>PomodoroStop<CR>",
-        desc = "::pom=> stop pomodoro timer",
-        mode = { "n" },
-      },
-      {
-        key_pomodoro.status,
-        "<CMD>PomodoroStatus<CR>",
-        desc = "::pom=> pomodoro timer status",
-        mode = { "n" },
-      },
-    },
-  },
-  {
     "nfrid/due.nvim",
     config = true,
     opts = {
@@ -102,7 +69,7 @@ return {
   },
   {
     "linguini1/pulse.nvim",
-    enabled = opt.prefer.timers.pomodoro == "pulse",
+    enabled = opt.prefer.timers.pomodoro == "pulse.nvim",
     version = "*",
     cmd = {
       "PulseEnable",
@@ -239,5 +206,25 @@ return {
     config = function(_, opts)
       require("hydrate").setup(opts)
     end,
+  },
+  {
+    "ellisonleao/weather.nvim",
+    config = function(_, opts)
+      require("weather").setup(opts)
+    end,
+    opts = {
+      city = "Denver",
+      win_height = 32,
+      win_width = 80,
+    },
+    cmd = { "Weather" },
+    keys = {
+      {
+        key_time.weather,
+        "<CMD>Weather<CR>",
+        mode = "n",
+        desc = "weather=> current conditions",
+      },
+    },
   },
 }

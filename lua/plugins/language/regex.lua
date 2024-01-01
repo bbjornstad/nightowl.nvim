@@ -53,7 +53,6 @@ return {
       },
     },
     dependencies = {
-      "nvim-treesitter/nvim-treesitter",
       "MunifTanjim/nui.nvim",
     },
   },

@@ -9,29 +9,12 @@ local key_view = kenv("view")
 local key_lsp = kenv("lsp")
 local key_ui = kenv("ui")
 local key_oper = kenv("shortcut").operations
+local key_scope = kenv("scope")
 
 local mopts = require("funsak.table").mopts
+local comp = require("funsak.colors").component
 
 return {
-  {
-    "ojroques/nvim-lspfuzzy",
-    event = "LspAttach",
-    enabled = opt.lsp.diagnostics.lspfuzzy,
-    dependencies = {
-      "junegunn/fzf",
-      "junegunn/fzf.vim",
-    },
-    config = function(_, opts)
-      require("lspfuzzy").setup(opts)
-    end,
-    opts = {
-      methods = "all",
-      jump_one = true,
-      save_last = true,
-      fzf_trim = true,
-      fzf_modifier = ":~:.",
-    },
-  },
   {
     "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
     config = function(_, opts)
@@ -40,145 +23,17 @@ return {
     event = "LspAttach",
     opts = {
       virtual_lines = {
-        virtual_lines = true,
-        only_current_line = true,
+        only_current_line = false,
       },
     },
     keys = {
       {
-        key_ui.diagnostics.toggle_lines,
+        key_view.diagnostic.lsp_lines.toggle,
         function()
           require("lsp_lines").toggle()
         end,
         mode = "n",
         desc = "lsp.diag=> toggle ex-lines",
-      },
-    },
-  },
-  {
-    "stevearc/aerial.nvim",
-    enabled = opt.symbol.aerial,
-    opts = {
-      layout = {
-        max_width = { 36, 0.2 },
-        min_width = 12,
-      },
-      open_automatic = false,
-      keymaps = {
-        ["?"] = "actions.show_help",
-        ["gh"] = "actions.show_help",
-        ["<cr>"] = "actions.jump",
-        ["<2-leftmouse>"] = "actions.jump",
-        ["<c-v>"] = "actions.jump_vsplit",
-        ["<C-s>"] = "actions.jump_split",
-        ["p"] = "actions.scroll",
-        ["<C-d>"] = "actions.down_and_scroll",
-        ["<C-u>"] = "actions.up_and_scroll",
-        ["{"] = "actions.prev",
-        ["}"] = "actions.next",
-        ["[["] = "actions.prev_up",
-        ["]]"] = "actions.next_up",
-        ["Q"] = "actions.close",
-        ["o"] = "actions.tree_toggle",
-        ["za"] = "actions.tree_toggle",
-        ["O"] = "actions.tree_toggle_recursive",
-        ["zA"] = "actions.tree_toggle_recursive",
-        ["l"] = "actions.tree_open",
-        ["zo"] = "actions.tree_open",
-        ["L"] = "actions.tree_open_recursive",
-        ["zO"] = "actions.tree_open_recursive",
-        ["h"] = "actions.tree_close",
-        ["zc"] = "actions.tree_close",
-        ["H"] = "actions.tree_close_recursive",
-        ["zC"] = "actions.tree_close_recursive",
-        ["zr"] = "actions.tree_increase_fold_level",
-        ["zR"] = "actions.tree_open_all",
-        ["zm"] = "actions.tree_decrease_fold_level",
-        ["zM"] = "actions.tree_close_all",
-        ["zx"] = "actions.tree_sync_folds",
-        ["zX"] = "actions.tree_sync_folds",
-      },
-      filter_kind = false,
-      show_guides = true,
-      guides = {
-        mid_item = "╠",
-        last_item = "╚",
-        nested_top = "║",
-        whitespace = " ",
-      },
-      highlight_on_hover = true,
-      highlight_on_jump = 800,
-      autojump = true,
-      ignore = {
-        filetypes = env.ft_ignore_list,
-      },
-      float = {
-        border = env.borders.main,
-        relative = "cursor",
-        max_height = 0.8,
-        min_height = { 12, 0.1 },
-      },
-      nav = {
-        border = env.borders.main,
-        max_height = 0.8,
-        min_height = { 12, 0.1 },
-        max_width = 0.6,
-        min_width = { 0.2, 24 },
-        autojump = true,
-        preview = true,
-      },
-    },
-    config = function(_, opts)
-      require("aerial").setup(opts)
-    end,
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-tree/nvim-web-devicons",
-    },
-    cmd = {
-      "AerialToggle",
-      "AerialOpen",
-      "AerialOpenAll",
-      "AerialInfo",
-      "AerialNavToggle",
-      "AerialNavOpen",
-    },
-    keys = {
-      {
-        key_view.aerial.toggle,
-        "<CMD>AerialToggle<CR>",
-        mode = "n",
-        desc = "symbol.aerial=> toggle",
-      },
-      {
-        key_view.aerial.close,
-        "<CMD>AerialClose<CR>",
-        mode = "n",
-        desc = "symbol.aerial=> close",
-      },
-      {
-        key_view.aerial.open,
-        "<CMD>AerialOpen<CR>",
-        mode = "n",
-        desc = "symbol.aerial=> open ",
-      },
-      {
-        key_view.aerial.force.toggle,
-        "<CMD>AerialToggle<CR>",
-        mode = "n",
-        desc = "symbol.aerial=> toggle[!]",
-      },
-      {
-        key_view.aerial.force.close,
-        "<CMD>AerialClose<CR>",
-        mode = "n",
-        desc = "symbol.aerial=> close[!]",
-      },
-      {
-        key_view.aerial.force.open,
-        "<CMD>AerialOpen<CR>",
-        mode = "n",
-        desc = "symbol.aerial=> open[!]",
       },
     },
   },
@@ -190,13 +45,13 @@ return {
       outline_window = {
         position = "left",
         split_command = nil,
-        width = 20,
+        width = 14,
         relative_width = true,
         auto_close = false,
         auto_jump = true,
         show_cursorline = true,
         show_relative_numbers = false,
-        show_numbers = true,
+        show_numbers = false,
         wrap = true,
         winhl = "OutlineDetails:Comment,OutlineLineno:LineNr",
       },
@@ -208,9 +63,9 @@ return {
       guides = {
         enabled = true,
         markers = {
-          bottom = "╌",
-          middle = "╵",
-          vertical = "┆",
+          bottom = "┖",
+          middle = "╹",
+          vertical = "┊",
         },
       },
       symbol_folding = {
@@ -370,16 +225,25 @@ return {
   },
   {
     "mhanberg/output-panel.nvim",
-    cmd = { "OutputPanel" },
     config = function(_, opts)
       require("output_panel").setup(opts)
+      vim.api.nvim_create_autocmd({ "FileType" }, {
+        pattern = "outputpanel",
+        callback = function(ev)
+          vim.keymap.set("n", "q", function()
+            vim.cmd([[close]])
+          end, { desc = "lsp.log=> close panel", buffer = ev.buf })
+        end,
+      })
     end,
+    opts = {},
+    event = "LspAttach",
     keys = {
       {
         key_lsp.auxillary.output_panel,
         "<CMD>OutputPanel<CR>",
         mode = "n",
-        desc = "lsp=> toggle log panel",
+        desc = "lsp.log=> panel",
       },
     },
   },
@@ -423,8 +287,8 @@ return {
       popup = {
         enable = true,
         center = false,
-        border = env.borders.main,
-        hide_cursor = false,
+        border = env.borders.alt,
+        hide_cursor = true,
       },
       mappings = {
         code_action = { key_action.code_action, "action=> code actions" },
@@ -460,49 +324,6 @@ return {
         "<CMD>CodeActionToggleLabel<CR>",
         mode = "n",
         desc = "ui.action=> toggle labels",
-      },
-    },
-  },
-  {
-    "JMarkin/gentags.lua",
-    enabled = false,
-    event = "VeryLazy",
-    cond = vim.fn.executable("ctags") == 1,
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
-    config = function(_, opts)
-      local Path = require("plenary.path")
-      opts = opts or {}
-      opts.cache = opts.cache or {}
-      opts.cache.path = Path:new(vim.fn.stdpath(opts.cache.path or "cache"))
-      require("gentags").setup(opts)
-    end,
-    opts = {
-      root_dir = vim.g.gentags_root_dir or vim.loop.cwd(),
-      bin = "ctags",
-      cache = {
-        path = "cache",
-      },
-      args = { -- extra args
-        "--extras=+r+q",
-        "--exclude=.git",
-        "--exclude=node_modules*",
-        "--exclude=.mypy*",
-        "--exclude=.pytest*",
-        "--exclude=.ruff*",
-        "--exclude=BUILD",
-        "--exclude=vendor*",
-        "--exclude=*.min.*",
-      },
-      -- mapping ctags --languages <-> neovim filetypes
-      lang_ft_map = {
-        ["Python"] = { "python" },
-        ["Lua"] = { "lua" },
-        ["Vim"] = { "vim" },
-        ["C,C++,CUDA"] = { "c", "cpp", "h", "cuda" },
-        ["JavaScript"] = { "javascript" },
-        ["Go"] = { "go" },
       },
     },
   },
@@ -623,6 +444,150 @@ return {
         "<CMD>Glance implementations<CR>",
         mode = "n",
         desc = "glance=> implementations",
+      },
+    },
+  },
+  {
+    "kosayoda/nvim-lightbulb",
+    config = function(_, opts)
+      require("nvim-lightbulb").setup(opts)
+    end,
+    opts = {
+      autocmd = { enabled = true },
+      ignore = {
+        ft = env.ft_ignore_list,
+      },
+      sign = {
+        enabled = true,
+        text = "󰸊",
+      },
+    },
+    event = "LspAttach",
+  },
+  {
+    "onsails/diaglist.nvim",
+    opts = {
+      debug = false,
+      debounce_ms = 300,
+    },
+    config = function(_, opts)
+      require("diaglist").init(opts)
+    end,
+    event = "LspAttach",
+    keys = {
+      {
+        key_view.diagnostic.diaglist.workspace,
+        function()
+          require("diaglist").open_all_diagnostics()
+        end,
+        mode = "n",
+        desc = "lsp.diag=> list all",
+      },
+      {
+        key_view.diagnostic.diaglist.buffer,
+        function()
+          require("diaglist").open_buffer_diagnostics()
+        end,
+        mode = "n",
+        desc = "lsp.diag=> list buffer",
+      },
+    },
+  },
+  {
+    "bbjornstad/corn.nvim",
+    config = function(_, opts)
+      require("corn").setup(opts)
+    end,
+    opts = {
+      auto_cmds = true,
+      sort_method = "severity",
+      scope = "line",
+      highlights = {
+        error = "DiagnosticFloatingError",
+        warn = "DiagnosticFloatingWarn",
+        info = "DiagnosticFloatingInfo",
+        hint = "DiagnosticFloatingHint",
+      },
+      icons = {
+        error = env.icons.diagnostic.Error,
+        warn = env.icons.diagnostic.Warn,
+        info = env.icons.diagnostic.Info,
+        hint = env.icons.diagnostic.Hint,
+      },
+      on_toggle = function(is_hidden)
+        vim.diagnostic.config({
+          virtual_text = not vim.diagnostic.config().virtual_text,
+        })
+      end,
+      item_preprocess_func = function(item)
+        return item
+      end,
+      window_opts = function()
+        return {
+          border = env.borders.alt,
+          anchor = "SE",
+          relative = "win",
+          zindex = 100,
+          title = "lsp::diagnostic",
+          title_pos = "right",
+          row = 0.96 * vim.api.nvim_win_get_height(0),
+          col = 0.98 * vim.api.nvim_win_get_width(0),
+        }
+      end,
+    },
+    event = "LspAttach",
+  },
+  {
+    "chikko80/error-lens.nvim",
+    enabled = false,
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    opts = function(_, opts)
+      local error = comp("DiagnosticSignError", { "fg", "bg" })
+      local warn = comp("DiagnosticSignWarn", { "fg", "bg" })
+      local info = comp("DiagnosticSignInfo", { "fg", "bg" })
+      local hint = comp("DiagnosticSignHint", { "fg", "bg" })
+      local fb = comp("FloatBorder", { "bg" })
+
+      return {
+        enabled = false,
+        auto_adjust = {
+          enable = true,
+          fallback_bg_color = "#2a2a37",
+          step = 7,
+          total = 40,
+        },
+        prefix = 4,
+        colors = {
+          error_fg = error.fg,
+          error_bg = error.bg,
+          warn_fg = warn.fg,
+          warn_bg = warn.bg,
+          info_fg = info.fg,
+          info_bg = info.bg,
+          hint_fg = hint.fg,
+          hint_bg = hint.bg,
+        },
+      }
+    end,
+    config = function(_, opts)
+      require("error-lens").setup(opts)
+    end,
+    keys = {
+      {
+        key_view.diagnostic.error_lens.toggle,
+        function()
+          require("error-lens").toggle()
+        end,
+        mode = "n",
+        desc = "lsp.diag=> toggle error-lens",
+      },
+      {
+        key_scope.diagnostic.error_lens,
+        function()
+          require("telescope").load_extension("error-lens")
+        end,
+        mode = "n",
+        desc = "scope.ext=> error lens diagnostics",
       },
     },
   },

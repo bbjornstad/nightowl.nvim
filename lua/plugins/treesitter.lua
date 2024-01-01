@@ -1,17 +1,17 @@
 local env = require("environment.ui")
 local key_view = require("environment.keys").view
-local key_treesitter = require("environment.keys").treesitter
 
 return {
   {
     "nvim-treesitter/nvim-treesitter",
     dependencies = {
-      "RRethy/nvim-treesitter-endwise",
-      "nvim-treesitter/nvim-treesitter-textobjects",
-      "nvim-treesitter/nvim-treesitter-context",
-      "windwp/nvim-ts-autotag",
-      "JoosepAlviste/nvim-ts-context-commentstring",
-      "nvim-treesitter/nvim-treesitter-refactor",
+      { "RRethy/nvim-treesitter-endwise", optional = true },
+      { "nvim-treesitter/nvim-treesitter-textobjects", optional = true },
+      { "nvim-treesitter/nvim-treesitter-context", optional = true },
+      { "windwp/nvim-ts-autotag", optional = true },
+      { "JoosepAlviste/nvim-ts-context-commentstring", optional = true },
+      { "nvim-treesitter/nvim-treesitter-refactor", optional = true },
+      { "nvim-treesitter/playground", optional = true },
     },
     opts = {
       ensure_installed = "all",
@@ -37,48 +37,40 @@ return {
       matchup = { enable = true },
       context_commentstring = {
         enable = true,
-        enable_autocmd = false,
       },
-      -- textsubjects = {
-      --   enable = true,
-      --   prev_selection = key_treesitter.modules.textsubjects.previous,
-      --   keymaps = {
-      --     [key_treesitter.modules.textsubjects.smart] = "textsubjects-smart",
-      --     [key_treesitter.modules.textsubjects.outer] = "textsubjects-container-outer",
-      --     [key_treesitter.modules.textsubjects.inner] = "textsubjects-container-inner",
-      --   },
-      -- },
       refactor = {
         highlight_definitions = {
           enable = true,
           -- Set to false if you have an `updatetime` of ~100.
-          clear_on_cursor_move = false,
+          clear_on_cursor_move = true,
         },
       },
     },
-    build = ":TSUpdate",
+    build = ":TSUpdateSync",
+    event = "VeryLazy",
   },
   {
     "JoosepAlviste/nvim-ts-context-commentstring",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = "VeryLazy",
     init = function()
       vim.g.skip_ts_context_commentstring_module = true
     end,
     config = function(_, opts)
       require("ts_context_commentstring").setup(opts)
     end,
-    opts = {},
   },
   {
     "RRethy/nvim-treesitter-endwise",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = "VeryLazy",
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = "VeryLazy",
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
+    event = "VeryLazy",
     keys = {
       {
         "[c",
@@ -95,15 +87,18 @@ return {
       mode = "cursor",
       zindex = 10,
     },
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
   {
     "windwp/nvim-ts-autotag",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = "VeryLazy",
   },
   {
     "nvim-treesitter/nvim-treesitter-refactor",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = "VeryLazy",
+  },
+  {
+    "nvim-treesitter/playground",
+    event = "VeryLazy",
   },
   {
     "sustech-data/wildfire.nvim",
@@ -120,16 +115,15 @@ return {
         { "[", "]" },
       },
       keymaps = {
-        init_selection = "<C-CR>",
-        node_incremental = "<C-CR>",
-        node_decremental = "<C-BS>",
+        init_selection = "<S-CR>",
+        node_incremental = "<S-CR>",
+        node_decremental = "<S-BS>",
       },
       filetype_exclude = env.ft_ignore_list,
     },
   },
   {
     "haringsrob/nvim_context_vt",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
     event = "VeryLazy",
     config = true,
     opts = {
@@ -156,23 +150,25 @@ return {
   },
   {
     "code-biscuits/nvim-biscuits",
-    enabled = false,
-    event = "VeryLazy",
+    event = "LspAttach",
     dependencies = {
-      {
-        "nvim-treesitter/nvim-treesitter",
-        build = ":TSUpdate",
-      },
+      "nvim-treesitter/nvim-treesitter",
     },
     opts = {
-      cursor_line_only = true,
+      cursor_line_only = false,
       default_config = {
-        prefix_string = " 󰡱 󱛠 ",
-        max_length = 10,
+        prefix_string = " 󱦆 ",
+        max_length = 32,
         min_distance = 3,
-        trim_by_words = true,
+        trim_by_words = false,
       },
       language_config = {
+        markdown = {
+          disabled = true,
+        },
+        org = {
+          disabled = true,
+        },
         norg = {
           disabled = true,
         },

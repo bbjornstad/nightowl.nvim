@@ -3,19 +3,6 @@ local key_rest = stems.tool.rest
 local key_licenses = stems.editor.licenses
 
 return {
-  {
-    "lepture/vim-jinja",
-    ft = { "jinja", "j2", "jinja2", "tfy" },
-    dependencies = {
-      "Glench/Vim-Jinja2-Syntax",
-      ft = { "jinja", "j2", "jinja2", "tfy" },
-    },
-  },
-  {
-    "saltstack/salt-vim",
-    ft = { "Saltfile", "sls", "top" },
-    dependencies = { "Glench/Vim-Jinja2-Syntax", "lepture/vim-jinja" },
-  },
   { "Fymyte/rasi.vim", ft = { "rasi" } },
   {
     "joelbeedle/pseudo-syntax",
