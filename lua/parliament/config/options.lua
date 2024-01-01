@@ -44,7 +44,7 @@ vim.opt.breakindentopt:append("sbr")
 --  See `:help 'clipboard'`
 --  * 2023-12-20: this is the neovim default, kickstart also includes it but it is
 --  now explicitly included in nightowl.
-vim.o.clipboard = 'unnamedplus'
+vim.o.clipboard = "unnamedplus"
 
 -- cmdline behavior.
 -- * NOTE: This is generally going to be completely overhauled with noice.nvim
@@ -141,6 +141,10 @@ vim.opt.encoding = "utf-8"
 
 -- turn on fancy colors, requires terminal emulator support
 vim.opt.termguicolors = true
+
+vim.opt.filetype = "on"
+
+vim.opt.conceallevel = 3
 
 -- disable the perl provider for neovim, I just generally don't use it at all.
 -- vim.g.loaded_perl_provider = 0
