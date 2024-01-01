@@ -52,35 +52,32 @@ return {
 
           local hlres = full_mode and hlcomp(full_mode, { "fg" })
           vim.api.nvim_set_hl(0, "SmoothCursor", { link = full_mode })
-          -- vim.fn.sign_define(
-          --   "smoothcursor",
-          --   { text = "󰮶", texthl = "SmoothCursor" }
-          -- )
+          vim.fn.sign_define("smoothcursor", { texthl = "SmoothCursor" })
         end,
       })
     end,
     opts = {
       type = "matrix",
       autostart = true,
-      -- texthl = "SmoothCursor",
-      speed = 36,
+      texthl = "SmoothCursor",
+      speed = 28,
       threshold = 4,
-      intervals = 40,
-      priority = 50,
-      -- flyin_effect = "bottom",
+      intervals = 20,
+      priority = 5,
+      flyin_effect = "bottom",
       matrix = {
         head = {
           cursor = signs.head,
-          texthl = "SmoothCursor",
+          texthl = { "SmoothCursor" },
         },
         body = {
           cursor = signs.body,
           length = 8,
-          texthl = "SmoothCursor",
+          texthl = { "SmoothCursor" },
         },
         tail = {
           cursor = signs.tail,
-          texthl = "SmoothCursor",
+          texthl = { "SmoothCursor" },
         },
         unstop = false,
       },
