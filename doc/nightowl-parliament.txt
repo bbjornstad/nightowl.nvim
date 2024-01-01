@@ -1,0 +1,44 @@
+================================================================================
+INTRODUCTION                                            *nightowl-parliament.nvim*
+
+lazy.nvim is a neovim plugin manager, noteable for many reasons including its
+clean code and nicely packaged plugin configurations complete with hands-off
+lazy-loading. There could be no other choice to base an implementation such as
+this on.
+
+Kickstart.nvim is a project to help you get started on your neovim journey. It
+is the minimal base configuration upon which nightowl-parliament.nvim is
+built.
+
+LazyVim is a distribution to (among other tasks) get a neovim distribution up
+to snuff in a short amount of time, using sensible default choices for plugin
+options and keybinding configuration. It was the original starting point for
+the first versions of nightowl-parliament.nvim, and serves as an inspiration
+and guide on the most ideal methods for configuring lazy.nvim.
+
+nightowl-parliament.nvim is not a distribution per-se, but rather is a
+personal attempt at making neovim capable of "doing anything" that I might ask
+out of a text editor. It is somewhere in between kickstart.nvim and LazyVim
+in terms of its spirit of implementation, but exceeds both in configured
+capabilities and takes a slightly more opinionated approach to the
+methodical configuration of keybindings.
+
+                                                            *kickstart-is-not*
+It is not:
+- Complete framework for every plugin under the sun
+- Place to add every plugin that could ever be useful
+
+                                                                *kickstart-is*
+It is:
+- Somewhere that has a good start for the most common "IDE" type features:
+    - autocompletion
+    - goto-definition
+    - find references
+    - fuzzy finding
+    - and hinting at what more can be done :)
+- A place to _kickstart_ your journey.
+    - You should fork this project and use/modify it so that it matches your
+      style and preferences. If you don't want to do that, there are probably
+      other projects that would fit much better for you (and that's great!)!
+
+ vim:tw=78:ts=8:ft=help:norl:
