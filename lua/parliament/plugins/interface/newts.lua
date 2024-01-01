@@ -1,4 +1,7 @@
 local env = require("environment.ui")
+local kenv = require("environment.keys")
+local key_newts = kenv.newts
+
 return {
   {
     "folke/noice.nvim",
@@ -34,6 +37,12 @@ return {
           border = {
             style = env.borders.main,
             padding = env.padding.noice.main,
+          },
+          win_options = {
+            winhighlight = {
+              Normal = "NormalFloat",
+              FloatBorder = "FloatBorder",
+            },
           },
         },
         cmdline_popup = {
@@ -240,7 +249,7 @@ return {
         mode = { "n", "i", "s" },
         silent = true,
         expr = true,
-        desc = "lsp.doc=> down",
+        desc = "lsp:| doc |=> down",
       },
       {
         "<C-u>",
@@ -252,7 +261,13 @@ return {
         mode = { "n", "i", "s" },
         silent = true,
         expr = true,
-        desc = "lsp.doc=> up",
+        desc = "lsp:| doc |=> up",
+      },
+      {
+        key_newts.messages,
+        "<CMD>messages<CR>",
+        mode = "n",
+        desc = "newts:| msg |=> open",
       },
     },
   },
@@ -273,11 +288,11 @@ return {
       {
         "<leader>un",
         function()
-          require('notify').dismiss({ silent = true, pending = true })
+          require("notify").dismiss({ silent = true, pending = true })
         end,
         mode = "n",
-        desc = "ui.newts=> clear all"
-      }
-    }
+        desc = "newts:| ui |=> clear all",
+      },
+    },
   },
 }

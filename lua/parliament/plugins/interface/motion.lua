@@ -4,7 +4,15 @@ local kenv = require("environment.keys").motion.standard
 local qenv = require("environment.keys").motion.qortal
 
 return {
-  { "echasnovski/mini.bracketed", event = "VeryLazy", version = false },
+  {
+    "echasnovski/mini.bracketed",
+    event = "VeryLazy",
+    version = false,
+    opts = {},
+    config = function(_, opts)
+      require("mini.bracketed").setup(opts)
+    end,
+  },
   {
     "abecodes/tabout.nvim",
     enabled = opt.tabout,
@@ -19,12 +27,12 @@ return {
       enable_backwards = true,
       completion = true,
       tabouts = {
-        { open = "'",  close = "'" },
+        { open = "'", close = "'" },
         { open = "\"", close = "\"" },
-        { open = "`",  close = "`" },
-        { open = "(",  close = ")" },
-        { open = "[",  close = "]" },
-        { open = "{",  close = "}" },
+        { open = "`", close = "`" },
+        { open = "(", close = ")" },
+        { open = "[", close = "]" },
+        { open = "{", close = "}" },
       },
       ignore_beginning = true,
       exclude = {},
@@ -147,7 +155,7 @@ return {
           require("portal.builtin").changelist.tunnel()
         end,
         mode = "n",
-        desc = "portal=> forward changelist",
+        desc = "portal.chng=> forward",
       },
       {
         qenv.changelist.backward,
@@ -155,7 +163,7 @@ return {
           require("portal.builtin").changelist.tunnel_backward()
         end,
         mode = "n",
-        desc = "portal=> backward changelist",
+        desc = "portal.chng=> backward",
       },
       {
         qenv.grapple.forward,
@@ -163,7 +171,7 @@ return {
           require("portal.builtin").grapple.tunnel()
         end,
         mode = "n",
-        desc = "portal=> forward grapple",
+        desc = "portal.grpl=> forward",
       },
       {
         qenv.grapple.backward,
@@ -171,7 +179,7 @@ return {
           require("portal.builtin").grapple.tunnel_backward()
         end,
         mode = "n",
-        desc = "portal=> backward grapple",
+        desc = "portal.grpl=> backward",
       },
       {
         qenv.quickfix.forward,
@@ -179,7 +187,7 @@ return {
           require("portal.builtin").quickfix.tunnel()
         end,
         mode = "n",
-        desc = "portal=> forward quickfix",
+        desc = "portal.qf=> forward",
       },
       {
         qenv.quickfix.backward,
@@ -187,7 +195,7 @@ return {
           require("portal.builtin").quickfix.tunnel_backward()
         end,
         mode = "n",
-        desc = "portal=> backward quickfix",
+        desc = "portal.qf=> backward",
       },
       {
         qenv.jumplist.forward,
@@ -195,7 +203,7 @@ return {
           require("portal.builtin").jumplist.tunnel()
         end,
         mode = "n",
-        desc = "portal=> backward jumplist",
+        desc = "portal.jump=> backward",
       },
       {
         qenv.jumplist.backward,
@@ -203,7 +211,23 @@ return {
           require("portal.builtin").jumplist.tunnel_backward()
         end,
         mode = "n",
-        desc = "portal=> forward jumplist",
+        desc = "portal.jump=> forward",
+      },
+      {
+        qenv.harpoon.forward,
+        function()
+          require("portal.builtin").harpoon.tunnel()
+        end,
+        mode = "n",
+        desc = "portal.hrpn=> forward",
+      },
+      {
+        qenv.harpoon.backward,
+        function()
+          require("portal.builtin").harpoon.tunnel_backward()
+        end,
+        mode = "n",
+        desc = "portal.hrpn=> forward",
       },
     },
     opts = {

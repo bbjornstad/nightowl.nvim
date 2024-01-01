@@ -174,6 +174,10 @@ return {
     opts = {
       enabled = true,
       char = "╵",
+      virtcolumn = "+1",
+      exclude = {
+        filetypes = env.ft_ignore_list,
+      },
     },
   },
   {
