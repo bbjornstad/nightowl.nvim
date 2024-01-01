@@ -1,5 +1,5 @@
----@module "funsak.rendezvous" tools for creating a rendezvous point for data and
----specification options before main use.
+---@module "funsak.rendezvous" tools for creating a rendezvous point for data
+---and specification options before main use.
 ---@author Bailey Bjornstad
 ---@license MIT
 -- vim: set ft=lua ts=2 sw=2 sts=2 et:
@@ -8,11 +8,15 @@
 
 ---@enum MergerSpecialField
 local MergerSpecialField = {
-  DataIndices = "__data_indices__", -- corresponds to registered data targets by tag
-  TagIdentifier = "__tag_identifier__", -- corresponds to the particular tag for a Merger instance.
-  DataProxyIdentifier = "__data_proxy_identifier__", -- corresponds to the identifier assigned to this particular Merger
+  -- corresponds to registered data targets by tag
+  DataIndices = "__data_indices__",
+  -- corresponds to the particular tag for a Merger instance.
+  TagIdentifier = "__tag_identifier__",
+  -- corresponds to the identifier assigned to this particular Merger
+  DataProxyIdentifier = "__data_proxy_identifier__",
   DataProxyTable = "__data_proxy_table__",
-  MergePriority = "__data_merge_priority__", -- out of the set, which items should take priority during merge
+  -- out of the set, which items should take priority during merge
+  MergePriority = "__data_merge_priority__",
 }
 
 ---@class funsak.rendezvous
@@ -54,14 +58,14 @@ function Merger:priority()
 end
 
 function Merger:__register_proxy__(tbl, opts)
-  local proxy = {}
+  local outer_proxy = {}
   local proxy_mt = {}
   -- TODO: finish proxy table metamethods
   function proxy_mt.__index(cls, idx)
     local tag = cls:tag()
-    local proxy = cls:proxy()
+    local inner_proxy = cls:proxy()
     local mergeable = cls:__idx__(tag, true)
-    return proxy
+    return inner_proxy
   end
 
   function proxy_mt.__new_index(cls, idx, value) end
@@ -71,12 +75,12 @@ function Merger:__register_proxy__(tbl, opts)
 
   self[MergerSpecialField.MergePriority] = opts.merge_priority
 
-  return setmetatable(proxy, proxy_mt)
+  return setmetatable(outer_proxy, proxy_mt)
 end
 
--- TODO: implement metaindex method for access of items via merger, e.g. this should
--- direct requests to the underlying proxy. this facilitates returning the whole Merger
--- which provides some utility methods.
+-- TODO: implement metaindex method for access of items via merger, e.g. this
+-- should direct requests to the underlying proxy. this facilitates returning
+-- the whole Merger which provides some utility methods.
 local function __metaindex__(cls, idx) end
 
 function Merger.new(cls, tag, tbl, opts)
@@ -84,10 +88,10 @@ function Merger.new(cls, tag, tbl, opts)
   local merger_target = cls:idx(tag)
 
   cls[MergerSpecialField.TagIdentifier] = tag
-  -- construct a new proxy table, this table serves only to fail on standard access, thus
-  -- accessing the __index metamethod every time that the "table" is accessed.
-  -- n.b. apparently this strategy does not work for traversal of tables. We will need
-  -- to adjust that behavior somewhat.
+  -- construct a new proxy table, this table serves only to fail on standard
+  -- access, thus accessing the __index metamethod every time that the "table"
+  -- is accessed. n.b. apparently this strategy does not work for traversal of
+  -- tables. We will need to adjust that behavior somewhat.
 
   cls[MergerSpecialField.DataProxyTable] = cls:__register_proxy__(tbl, opts)
 

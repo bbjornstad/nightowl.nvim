@@ -45,7 +45,8 @@ function M.option(option, silent, values)
       ---@diagnostic disable-next-line: no-unknown
       vim.opt_local[option] = values[1]
     end
-    return lz.info("Set " .. option .. " to " .. vim.opt_local[option]:get(), { title = "Option" })
+    return lz.info("Set " .. option .. " to " .. vim.opt_local[option]:get(),
+      { title = "Option" })
   end
   ---@diagnostic disable-next-line: no-unknown
   vim.opt_local[option] = not vim.opt_local[option]:get()
@@ -61,7 +62,11 @@ end
 local nu = { number = true, relativenumber = true }
 function M.number()
   if vim.opt_local.number:get() or vim.opt_local.relativenumber:get() then
-    nu = { number = vim.opt_local.number:get(), relativenumber = vim.opt_local.relativenumber:get() }
+    nu = {
+      number = vim.opt_local.number:get(),
+      relativenumber = vim.opt_local
+          .relativenumber:get()
+    }
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
     lz.warn("Disabled line numbers", { title = "Option" })
@@ -72,10 +77,10 @@ function M.number()
   end
 end
 
-local enabled = true
+local diagnostics_enabled = true
 function M.diagnostics()
-  enabled = not enabled
-  if enabled then
+  diagnostics_enabled = not diagnostics_enabled
+  if diagnostics_enabled then
     vim.diagnostic.enable()
     lz.info("Enabled diagnostics", { title = "Diagnostics" })
   else
@@ -95,6 +100,17 @@ function M.inlay_hints(buf, value)
       value = not ih.is_enabled(buf)
     end
     ih.enable(buf, value)
+  end
+end
+
+local focus_enabled = true
+function M.focus(buf)
+  buf = buf or 0
+  focus_enabled = not focus_enabled
+  if not focus_enabled then
+    vim.b[buf].focus_disable = true
+  else
+    vim.b[buf].focus_disable = false
   end
 end
 

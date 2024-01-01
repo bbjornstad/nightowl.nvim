@@ -3,6 +3,10 @@
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 
+--- a collection of utilities that are related to functors acting as a wrap over
+--- other functions, in order to enhance the behavior of those wrapped
+--- functions. Some of the other `funsak` utilities also fit this description
+--- but may be in a more specific submodule if the domain fits.
 ---@class funsak.wrap
 local M = {}
 
@@ -61,7 +65,7 @@ function M.recurser(fn, is_method)
   if is_method then
     function recurse_wrap(cls, targ, ...)
       local args = { ... }
-      if type(targ) == "table" then
+      if type(targ) == "table" and vim.tbl_islist(targ) then
         return vim.tbl_map(function(t)
           return fn(cls, t, unpack(args))
         end, targ)
@@ -71,7 +75,7 @@ function M.recurser(fn, is_method)
   else
     function recurse_wrap(targ, ...)
       local args = { ... }
-      if type(targ) == "table" then
+      if type(targ) == "table" and vim.tbl_islist(targ) then
         return vim.tbl_map(function(t)
           return fn(t, unpack(args))
         end, targ)
@@ -357,5 +361,12 @@ function M.extermiwrap(fn)
     end
   end
 end
+
+---@alias EvaluatedExpression fun(...): 
+--- creates and returns an anonynous function based on the input expression
+--- representation as a string in the form: `"arg1,arg2,...argn |="`
+---@param expr string expression of form `"arg1,arg2...argn |=> ~expr~"`
+---@return EvaluatedExpression<fun> fun(...): EvaluatedExpression
+function M.lambda(expr) end
 
 return M

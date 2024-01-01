@@ -44,7 +44,8 @@ end
 --- is not enforced.
 ---@param item table<Ix, any> any table for which certain elements should be
 ---popped
----@param strip Ix[] indices of the target items to strip out of the `item` table
+---@param strip Ix | Ix[] indices of the target items to strip out of the `item`
+---table
 ---@param defaults table<Ix, any>? a table containing optional defaults if the
 ---items are
 ---@param deepcopy boolean? whether or not the stripped item should be copied
@@ -53,11 +54,12 @@ end
 ---input table, and the input table will not have the corresponding elements.
 function M.strip(item, strip, defaults, deepcopy)
   local res = {}
+  strip = type(strip) ~= "table" and { strip } or strip
   defaults = defaults or {}
   deepcopy = deepcopy or false
   for _, v in ipairs(strip) do
-    res[v] = deepcopy and vim.deepcopy(item[v] or defaults[v])
-      or (item[v] or defaults[v])
+    local this = item[v] or defaults[v]
+    res[v] = deepcopy and vim.deepcopy(this) or this
     item[v] = nil
   end
   return res
@@ -72,21 +74,21 @@ end
 ---already one.
 ---@param enforce_list_input boolean? if the function should fail with an error
 ---if the input item is not list-like. Defaults to `false`.
----@param allow_empty_return boolean? if the function should return an empty
+---@param return_empty boolean? if the function should return an empty
 ---table if the computed value does not represent any elements or otherwise
 ---fails. Defaults to `true`.
-function M.tabler(item, enforce_list_input, allow_empty_return)
+function M.tabler(item, enforce_list_input, return_empty)
   enforce_list_input = enforce_list_input or false
-  allow_empty_return = allow_empty_return or true
+  return_empty = return_empty or true
   local tbl = type(item) == "table"
       and (enforce_list_input and vim.tbl_islist(item))
       and item
     or { item }
-  return not allow_empty_return and (tbl or {}) or tbl
+  return not return_empty and (tbl or {}) or tbl
 end
 
----@alias OptifyHandlersPhase Ix_OptsField
----@alias OptsFunction fun(plugin: LazyPlugin, opts: T_Opts)|fun(plugin: LazyPluginSpec, opts: T_OptsField)
+---@alias OptifyHandlersPhase owl.Ix_Options
+---@alias OptsFunction fun(plugin: LazyPlugin, opts: owl.GenericOpts)
 
 --- turns a table that is specified in an opts field of a LazyPluginSpec into a
 --- function which deeply merges each indexed field of the spec with the _opts
@@ -101,11 +103,11 @@ end
 --- this would allow the user to specify the field in a more standard/readable
 --- format, but still allow for the definition of variables or otherwise enable
 --- more complex behavior.
----@param opts T_Opts any field specified as a table format, but generally ones
----for which the behavioral modifications allowed with this tool make sense,
----e.g. `opts`. Rarely `keys` could be used. It is unlikely that other fields
----will find all that much utility from this function otherwise.
----@param handlers OptsFunction|OptsFunction[]|{[OptifyHandlersPhase]: OptsFunction}
+---@param opts owl.GenericOpts any field specified as a table format, but
+---generally ones for which the behavioral modifications allowed with this tool
+---make sense, e.g. `opts`. Rarely `keys` could be used. It is unlikely that
+---other fields will find all that much utility from this function otherwise.
+---@param handlers OptsFunction | OptsFunction[] | { [OptifyHandlersPhase]: OptsFunction }
 ---a collection of optional handlers that should be applied. The behavior is as
 ---follows: if this argument is a single function, it is applied after the
 ---merging is complete. If the argument is a list of functions, they are each
@@ -114,7 +116,7 @@ end
 ---assumed that the keys match a subset of the keys of the original opts table,
 ---and each handler is applied after the specific step that merges a single
 ---field.
----@param behavior {merge_before: boolean, tbl_merge: MergeBehavior}
+---@param behavior {merge_before: boolean, tbl_merge: TblExtendBehavior}
 ---@return OptsFunction optified
 function M.fopts(opts, handlers, behavior)
   opts = opts or {}
@@ -123,7 +125,7 @@ function M.fopts(opts, handlers, behavior)
   local merge_before = behavior.merge_before or false
 
   local function get_handler(key)
-    key = key or false
+    key = key or nil
     return type(handlers) == "table" and handlers[key] or handlers
   end
 
@@ -143,7 +145,7 @@ function M.fopts(opts, handlers, behavior)
         handler(plugin, v)
       end
       local merged =
-        vim.tbl_deep_merge(behavior.tbl_merge or "force", v, opts[k])
+        vim.tbl_deep_extend(behavior.tbl_merge or "force", v, opts[k])
       if inset_merge and not merge_before and handler then
         handler(plugin, merged)
       end
@@ -167,7 +169,7 @@ end
 ---are no user overrides for the matching key.
 ---@param overrides table? the options which should override the defaults by
 ---passing values explicitly in this table.
----@param error MOptsError? one of "suppress" or "raise", indicating what should
+---@param error TblExtendErrorBehavior? one of "suppress" or "raise", indicating what should
 ---happen if there is no passed overrides to this function. This is helpful in
 ---cases where it is not clear if the user has passed additional options.
 ---Defaults to `"suppress"`.
@@ -187,7 +189,7 @@ end
 --- merges recursively and deeply the input arguments. This is basically the
 --- same as the `mopts` function which is used commonly but can work on multiple
 --- tables, not only a single pair, but the signature is switched.
----@param error MOptsError?
+---@param error TblExtendErrorBehavior?
 ---@param defaults table the default selections which will be used when no toher
 ---matching key is present to override the value.
 ---@vararg table[] other tables that should be considered during recursive
@@ -231,21 +233,82 @@ function M.rget(tbl, field, sep)
       operated_on = operated_on[fld]
     end
   else
-    require('funsak.lazy').warn(
+    require("funsak.lazy").warn(
       "No indexing field given, returning entire table..."
     )
   end
   return operated_on
 end
 
+function M.xtd(behavior, deep_extend, ...)
+  --- We only merge empty tables or tables that are not an array (indexed by integers)
+  local function can_merge(v)
+    return type(v) == "table" and (vim.tbl_isempty(v) or not vim.tbl_isarray(v))
+  end
+
+  if
+    behavior ~= "error"
+    and behavior ~= "keep"
+    and behavior ~= "force"
+    and not vim.is_callable(behavior)
+  then
+    error("invalid \"behavior\": " .. tostring(behavior))
+  end
+
+  if select("#", ...) < 2 then
+    error(
+      "wrong number of arguments (given "
+        .. tostring(1 + select("#", ...))
+        .. ", expected at least 3)"
+    )
+  end
+
+  local ret = {}
+  if
+    vim._empty_dict_mt ~= nil
+    and getmetatable(select(1, ...)) == vim._empty_dict_mt
+  then
+    ret = vim.empty_dict()
+  end
+
+  for i = 1, select("#", ...) do
+    local tbl = select(i, ...)
+    vim.validate({ ["after the second argument"] = { tbl, "t" } })
+    if tbl then
+      for k, v in pairs(tbl) do
+        if deep_extend and can_merge(v) and can_merge(ret[k]) then
+          ret[k] = M.xtd(behavior, true, ret[k], v)
+        elseif behavior ~= "force" and ret[k] ~= nil then
+          if vim.is_callable(behavior) then
+            ret[k] = behavior(ret[k], v)
+          elseif behavior == "error" then
+            error("key found in more than one map: " .. k)
+          end -- Else behavior is "keep".
+        else
+          ret[k] = v
+        end
+      end
+    end
+  end
+  return ret
+end
+
+function M.idxr(list)
+  local res = {}
+  for _, v in ipairs(list) do
+    res[v] = v
+  end
+  return res
+end
+
 --- converts a list-like table into a table whose keys are the corresponding
 --- list items and the value is their ordering; essentially just a reversing of
 --- keys and values.
----@param list any[] list like collection
+---@param tbl table list like collection
 ---@return table { [any]: integer }
-function M.idxlist(list)
+function M.idxlist(tbl)
   local res = {}
-  for i, v in ipairs(list) do
+  for i, v in pairs(tbl) do
     res[v] = i
   end
   return res
@@ -285,6 +348,40 @@ function M.firstn(n)
         return v
       end)
       :totable()
+  end
+end
+
+function M.zip(indexer, values)
+  local res = {}
+  for i, v in ipairs(indexer) do
+    local new_idx = indexer[i]
+    local new_val = values[i]
+    res[new_idx] = new_val
+  end
+  return res
+end
+
+---@generic Axis: table
+--- creates a handler which accepts a function operating over a certain feature
+--- element of the given table, and effectively maps the input function along
+--- the chosen axis. Generally a thin wrapper around calls to vim standard
+--- library iterable operation functions, but with some additional conveniences
+--- to make this a bit more helpful
+---@param tbl table any table type could theoretically use this function. Most
+---often, this will be hidden away behind a method-invocation syntax using a
+---`:`. But this is not strictly necessary, and this function can be called
+---directly on the table and indexer directly from the module.
+---@param idxr Axis reference to an `axis` of the table `tbl`. Note that this
+---can be
+function M.per(tbl, idxr)
+  return function(fn, ...)
+    local args = { ... }
+    local idx = vim.iter(idxr)
+    idx:map(function(k, v)
+      -- there are really two possibilities here, either we are iterating over a
+      -- list-like item in which case, 
+      return fn(v, unpack(args))
+    end)
   end
 end
 

@@ -2,7 +2,6 @@
 ---modules written for lazy.nvim specifications and configurations.
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
-
 ---@class funsak.masquerade
 local M = {}
 
@@ -17,8 +16,9 @@ local ModReturner = {}
 
 --- retrieves the modules specified by the argument if they are present in the
 --- proxied table containing defined submodules.
----@param names string|string[]? name or list of names to retrieve from proxied
----table. If none provided, then function returns the entire proxied table.
+---@param names string | string[]? name or list of names to retrieve from
+---proxied table. If none provided, then function returns the entire proxied
+---table.
 ---@return table<string, table>
 function ModReturner:get_mods(names)
   if not names then
@@ -33,11 +33,11 @@ end
 --- either checks for the existence of the specified modules in the proxied
 --- table as a boolean function, or when no argument is provided, retrieves the
 --- entire set of module names which are the index-keys of the proxied table.
----@param names string|string[]? name or list of names to check for the
+---@param names string | string[]? name or list of names to check for the
 ---existence of; if none are provided, then function returns the set of proxied
 ---table keys.
----@return boolean|string[] result the boolean condition indicating if the given
----keys are all found, or the set of all keys contained.
+---@return boolean | string[] result the boolean condition indicating if the
+---given keys are all found, or the set of all keys contained.
 function ModReturner:contains(names)
   if names then
     local requested_n = #names
@@ -57,15 +57,16 @@ end
 
 --- creates a new ModReturner object, proxying the table to be returned during
 --- module importation, such that indexing the ModReturner will give back the
---- appropritate proxied field. Also allows for the imported module to be used
---- as a function with module name arguments for the same importation purposes
---- by overloading the __call metamethod.
+--- appropriate proxied field. Also allows for the imported module to be used as
+--- a function with module name arguments for the same importation purposes by
+--- overloading the __call metamethod.
 ---@param rt_modules table the module that is to be wrapped, will use a default
 ---empty table {} if none given, but note that this will require assignment of
 ---module items after object instantiation.
 ---@param opts table options to be passed to the returner, which can alter some
 ---behavior like output validation.
----@return ModReturner masked the instantiated object now proxying the target module.
+---@return ModReturner masked the instantiated object now proxying the target
+---module.
 function ModReturner:new(rt_modules, opts)
   opts = opts or {}
   rt_modules = rt_modules or {}
@@ -85,7 +86,7 @@ end
 --- table.
 ---@vararg any number of module subcomponents that are to be retrieved; these
 ---items are the keys of the underlying table.
----@return table|any[] results the results of the call application, e.g. the
+---@return table | any[] results the results of the call application, e.g. the
 ---requested components as if this table were accessed normally.
 function ModReturner:__call(...)
   local requested = { ... }
@@ -104,9 +105,9 @@ end
 
 --- creates a new ModReturner object, proxying the table to be returned during
 --- module importation, such that indexing the ModReturner will give back the
---- appropritate proxied field. Also allows for the imported module to be used
---- as a function with module name arguments for the same importation purposes
---- by overloading the __call metamethod.
+--- appropriate proxied field. Also allows for the imported module to be used as
+--- a function with module name arguments for the same importation purposes by
+--- overloading the __call metamethod.
 ---@param rt_modules table the module that is to be wrapped, will use a default
 ---empty table {} if none given, but note that this will require assignment of
 ---module items after object instantiation.
@@ -133,8 +134,7 @@ end
 --- honored unless explicitly asked.
 ---@param mod table module to wrap in masqued behavior.
 ---@param root T_Path? location of the modules in configurable components
----@param opts T_Opts? additional options that should be passed, and I believe
----that I may have your motivation somewhere in the car instead.
+---@param opts owl.GenericOpts? additional options that should be passed
 function M.masque(mod, root, opts)
   opts = opts or {}
   root = root and root .. "." or ""
@@ -151,8 +151,8 @@ end
 --- this is the main user-facing interface for configuration of the masquerade
 --- behavior.
 ---@param root T_Path root folder of the modules that should be treated
----@param opts T_Opts
----@return fun(mod: any, opts: T_Opts): any |
+---@param opts owl.GenericOpts?
+---@return fun(mod: any, opts: owl.GenericOpts): any |
 function M.requisition(root, opts)
   return function(mod, o)
     opts = require("funsak.table").mopts(opts, o)

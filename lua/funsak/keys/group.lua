@@ -146,7 +146,7 @@ local FDNAME_LEADER_AUTOMORPHISM = "${[ leader ]}"
 ---@param opts { fd_automorphism: string?, special: SpecialMethodSpec? }
 local function setup(opts)
   FDNAME_LEADER_AUTOMORPHISM = opts.fd_automorphism
-    or FDNAME_LEADER_AUTOMORPHISM
+      or FDNAME_LEADER_AUTOMORPHISM
   DefaultSpecialMethods = mopts({}, DefaultSpecialMethods, opts.special)
 end
 
@@ -227,7 +227,7 @@ end
 ---methods.
 local function attach_special_methods(maps, leaders, special)
   special = special and mopts(DefaultSpecialMethods, special)
-    or DefaultSpecialMethods
+      or DefaultSpecialMethods
   local special_mt = {}
   special_mt.__index = special_mt
 
@@ -238,15 +238,15 @@ local function attach_special_methods(maps, leaders, special)
       return leaders(maps)
     end
   ) or function(cls)
-      return leaders or ""
-    end
+    return leaders or ""
+  end
 
   for k, v in pairs(special) do
     local this_fn = (
       vim.is_callable(v)
-        and function(cls, ...)
-          return v(...)
-        end
+      and function(cls, ...)
+        return v(...)
+      end
       or function(cls, ...)
         return v
       end

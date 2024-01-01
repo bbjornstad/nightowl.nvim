@@ -1,3 +1,29 @@
+-- SPDX-FileCopyrightText: 2023 Bailey Bjornstad | ursa-major <bailey@bjornstad.dev>
+-- SPDX-License-Identifier: MIT
+
+-- MIT License
+
+--  Copyright (c) 2023 Bailey Bjornstad | ursa-major bailey@bjornstad.dev
+
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+
+-- The above copyright notice and this permission notice (including the next
+-- paragraph) shall be included in all copies or substantial portions of the
+-- Software.
+
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+
 ---@module "funsak.colors" color manipulation utilities for functional swiss army
 ---knives and lazy nvim configurations.
 ---@author Bailey Bjornstad | ursa-major
@@ -13,10 +39,10 @@
 ---@alias HSVColor { hue: integer, sat: integer, light: integer, alpha: integer? }
 ---@alias Hexpanded { red: hexadecimal, green: hexadecimal, blue: hexadecimal, alpha: hexadecimal? }
 ---@alias HexColor
----| string # a string of the form "#??????" or "#????????", where each successive
----pair of hexadecimal digits represents the red, green, and blue channels. If
----the string has a full 8 characters, the last pair represents the alpha
----channel.
+---| string # a string of the form "#??????" or "#????????", where each
+---successive pair of hexadecimal digits represents the red, green, and blue
+---channels. If the string has a full 8 characters, the last pair represents the
+---alpha channel.
 ---| Hexpanded # Hex representation in table form with individual components
 ---separated but given in hex form
 
@@ -166,7 +192,7 @@ end
 --- options.
 ---@param hls HighlightGroup | HighlightGroup[] list of highlight group names
 ---that are to receive the `opts` as their definitions.
----@param opts T_Opts options that are passed to the underlying call to
+---@param opts owl.GenericOpts options that are passed to the underlying call to
 ---nvim_set_hl
 function M.initialize_custom_highlights(hls, opts)
   hls = type(hls) ~= "table" and { hls } or hls
@@ -233,7 +259,7 @@ end
 
 function M.dvalue(name, component, hlmap)
   component = type(component) ~= "string" and tostring(component) or nil
-  hl = M.get_hl(name)
+  local hl = M.get_hl(name)
   local compid = hlmap and hlmap[component] or component
   local comp = hl and hl[compid] or nil
   return comp
