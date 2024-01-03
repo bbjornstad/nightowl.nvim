@@ -4,7 +4,7 @@ description:
 authors: ursa-major
 categories:
 created: 2023-11-25T16:47:04-0700
-updated: 2023-12-31T11:29:11-0700
+updated: 2024-01-02T15:35:38-0700
 version: 1.1.1
 @end
 
@@ -101,12 +101,16 @@ version: 1.1.1
     nature. I am guessing that it is an issue with one of the autocompletion
     plugins that links to ai. Perhaps we are suffering from more cmp_ai issues?
     - (x) debug and fix
-*** nvim-cmp menu source identification
+*** (x) nvim-cmp menu source identification
     In the menu of nvim-cmp, there would ideally be a column that corresponds to
     the source of each menu entry. This is supposed to be achievable with the
     correct configuration, it is possible that using lsp-zero makes more sense
     in this case since it does have the ability to use a function which does
     exactly that. This should be available out of the box though.
+**** Update 2024-01-02:
+     This is seemingly fixed by simply transitioning to kickstart instead of
+     lazyvim.
+
 *** (x) Animation and SmoothCursor.nvim
     Another strange issue has cropped up with regard to the SmoothCursor plugin.
     In particular, it seems to have stopped being displayed in normal windows,
@@ -141,7 +145,7 @@ version: 1.1.1
      - (x) Clojure
      - ( ) C derivatives and cmake
      - ( ) Julia
-     - (-) Jinja apparently
+     - (x) Jinja apparently
      - ( ) Maybe typescript depending on how effective the lazyvim extra is.
      - ( ) elm
      - ( ) fennel
@@ -211,81 +215,6 @@ version: 1.1.1
      The big item that we need to finish off here is the keygroup
      implementation as a derived class item that can also interpret keymaps
      from individual files.
-     -----
-
-** A Definitive Specification, Perhaps?
-   Let the following items determine the precise "ideal" definition of how
-   plugins should be specified with regard to their import/setup-order
-   adjusting properties that are available in lazy.nvim.
-
-   ~ A plugin P1 is a dependency of another plugin P2 when the operations of
-     P1 are required in the execution of the specification of the operations
-     of P2. In this case P1 should be marked in the dependencies field of P2.
-   @code lua
-   {
-     "user2/plugin2",
-     dependencies = {
-       "user1/plugin1"
-     }
-   }
-   @end
-   ~ A plugin that is loaded lazily cannot be used directly in the
-     specification of another plugin without an additional function guard
-     across the targeted property, even if the dependent plugin is specified
-     as a dependency. This is most commonly encountered with the `keys` field
-     and using a bare `require('plugin').function` as the action item.
-   ~ A plugin's internal operations do not have to rely on another plugin
-     for the latter to be a dependency of the first. This is to say that
-     there are two main scenarios when a plugin should be marked as a
-     dependency: when that plugin is specified by the author of the dependent
-     plugin as being a dependency, and when the user uses the functionality
-     of the dependency plugin in the lazy specification of the dependent
-     plugin regardless of whether or not the plugin author specifies the
-     dependent plugin as being so.
-   ~ The `keys` and `opts` fields are the two main fields for which a
-     "functionalization" is necessary. These fields are set up prior to the
-     corresponding setup call for the plugin, and so all dependent calls
-     within either the `keys` or the `opts` field must resolve at the time
-     that the  `config` fields are required, hence the noted behavior here.
-   ~ Occasionally, there is need to set up a certain parameter or separate
-     behavior within the configuration of a particular plugin. Examples of
-     this include things like setting up an autocommand, defining a user
-     command, etc. In these cases, there are generally two possibilities:
-     either using the `init` field, or using the `config` field. There are
-     some subtle distinctions between the two.
-   ~~ The `init` field is called first, and all of the init fields
-      represented in the plugin specification are executed together before
-      other setup. If this timing is required for the particular loading
-      configuration of the target plugin, then the `init` field is your best
-      option. However, this is not frequently the case.
-   ~~ The `config` field is called at the time when an action or
-      functionality provided by the plugin is required, or if the importation
-      is otherwise signaled because of lazy.nvim plugin specification fields
-      (e.g. `event`, `ft`, `cmd`, `dependencies`, each of which specifies a
-      different reason for loading a plugin). If this timing seems more
-      optimal for behavioral augmentations at the time of loading, then you
-      should probably use the `config` field unless doing so would overwrite
-      another more necessary `config` present in another spec loation.
-   ~~ Lastly, when lazy loading using lazy.nvim, note that the `init` field
-      is called regardless of the lazy-loading-status of the plugin, while
-      the `config` field is not. This implies that if you wish to include
-      certain setup behavior regardless of whether other plugin functionality
-      is loaded lazily, then you will need to use the `init` field, and
-      further understand that the available operations and manipulations may
-      be somewhat limited. This is, from what I can tell, a major reason why
-      it seems most vim variable definitions or assignments occur in the
-      `init` field instead of a different more deferred option
-   ~~ Note that `init` as a LazyPluginSpec field can be defined only as a
-      function accepting at most the LazyPlugin item that corresponds to the
-      `init` target. This is in contrast to the `keys`, `opts`, and
-      especially `config` fields, which all accept an additional `opts` field
-      representing the "current state" of the cobbling process that creates
-      the final internal representation for the LazyPluginSpec. Hence, it is
-      not possible to modify the `opts` field or other corresponding items
-      using the `init` field, that must be done in a field which can accept
-      the target property as an argument to the property's defining function.
-      Like how `opts` can be given as `fun(LazyPlugin, opts)`
-
         ===
 
 * Random Notes: Nightowl.nvim
