@@ -150,4 +150,11 @@ return {
     },
     cmd = "KeySeer",
   },
+  {
+    "tris203/hawtkeys.nvim",
+    event = "VeryLazy",
+    config = function(_, opts)
+      require("hawtkeys").setup(opts)
+    end,
+  },
 }

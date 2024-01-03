@@ -125,6 +125,9 @@ return {
           ["ctrl-l"] = action("file_sel_to_ll"),
         },
       },
+      lsp = {
+        async_or_timeout = 3000,
+      },
       winopts = {
         title = "querying: ",
         title_pos = "left",

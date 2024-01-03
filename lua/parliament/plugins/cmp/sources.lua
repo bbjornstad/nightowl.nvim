@@ -275,6 +275,11 @@ return {
           }),
         }
       )
+      cmp.setup.filetype({ "latex", "tex", "bibtex" }, {
+        sources = vim.list_extend(vim.deepcopy(default_sources), {
+          { name = "vimtex", group_index = 1 },
+        }),
+      })
       cmp.setup.filetype({ "neorg", "norg" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
           { name = "neorg", group_index = 1 },
@@ -409,4 +414,5 @@ return {
     },
     dependencies = { ncmp },
   },
+  {},
 }

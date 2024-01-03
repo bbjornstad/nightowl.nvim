@@ -61,7 +61,7 @@ return {
   {
     "rebelot/kanagawa.nvim",
     lazy = false,
-    priority = 1000,
+    priority = 999,
     opts = {
       globalStatus = true,
       dimInactive = true,
@@ -128,9 +128,9 @@ return {
       end,
     },
     config = function(_, opts)
-      require('kanagawa').setup(opts)
-      require('kanagawa').load("wave")
-    end
+      require("kanagawa").setup(opts)
+      require("kanagawa").load("wave")
+    end,
   },
   {
     "cryptomilk/nightcity.nvim",
@@ -175,7 +175,7 @@ return {
         groups.NightowlStartupEntry = comp("LspInlayHint", { "bg", "fg" })
         groups.NightowlStartupHeader = comp("@number", { "bg", "fg" })
         groups.NightowlStartupConvenience =
-            comp("DashboardShortCut", { "bg", "fg" })
+          comp("DashboardShortCut", { "bg", "fg" })
       end,
     },
     config = function(_, opts)
@@ -346,7 +346,28 @@ return {
     "katawful/kat.nvim",
     tag = "3.1",
     config = false,
-  }
+  },
+  {
+    "linrongbin16/colorbox.nvim",
+    lazy = false,
+    priority = 1000,
+    cmd = { "Colorbox" },
+    dependencies = {
+      "rktjmp/lush.nvim",
+    },
+    opts = {
+      policy = "single",
+      timing = "startup",
+      background = bg_style,
+    },
+    build = function()
+      require("colorbox").update()
+    end,
+    config = function(_, opts)
+      require("colorbox").setup()
+      vim.cmd([[colorscheme kanagawa]])
+    end,
+  },
   -- {
   --   "LazyVim/LazyVim",
   --   opts = {

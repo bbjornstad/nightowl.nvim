@@ -515,4 +515,62 @@ return {
       },
     },
   },
+  {
+    "rolv-apneseth/tfm.nvim",
+    lazy = true,
+    event = "VeryLazy",
+    cmd = { "Tfm", "TfmSplit", "TfmVsplit", "TfmTabedit" },
+    opts = {
+      file_manager = "yazi",
+      replace_netrw = false,
+      enable_cmds = true,
+      keybindings = {
+        ["<ESC>"] = "q",
+      },
+      ui = {
+        border = env.borders.main,
+        height = 1,
+        width = 1,
+        x = 0.6,
+        y = 0.8,
+      },
+    },
+    keys = {
+      {
+        key_fm.tfm.open,
+        function()
+          require("tfm").open()
+        end,
+        mode = "n",
+        desc = "fm:| tfm |=> open",
+      },
+      {
+        key_fm.tfm.hsplit,
+        function()
+          local tfm = require("tfm")
+          tfm.open(nil, tfm.OPEN_MODE.split)
+        end,
+        mode = "n",
+        desc = "fm:| tfm |=> hsplit",
+      },
+      {
+        key_fm.tfm.vsplit,
+        function()
+          local tfm = require("tfm")
+          tfm.open(nil, tfm.OPEN_MODE.vsplit)
+        end,
+        mode = "n",
+        desc = "fm:| tfm |=> vsplit",
+      },
+      {
+        key_fm.tfm.tab,
+        function()
+          local tfm = require("tfm")
+          tfm.open(nil, tfm.OPEN_MODE.tabedit)
+        end,
+        mode = "n",
+        desc = "fm:| tfm |=> new tab",
+      },
+    },
+  },
 }

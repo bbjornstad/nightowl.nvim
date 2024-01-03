@@ -117,7 +117,7 @@ return {
         return retit
       end,
       hide = {
-        cursorline = false,
+        cursorline = true,
         focused_win = false,
         only_win = false,
       },
@@ -134,7 +134,7 @@ return {
         },
       },
       window = {
-        margin = { vertical = 0, horizontal = 1 },
+        margin = { vertical = 1, horizontal = 1 },
         padding = 1,
         padding_char = " ",
         placement = { horizontal = "right", vertical = "top" },

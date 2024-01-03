@@ -138,9 +138,15 @@ return {
         diagnostics = {
           enabled = true,
           triggers = { "BufWritePost" },
-          completion = {
-            enabled = true,
-          },
+        },
+        completion = {
+          enabled = true,
+        },
+        codeRunner = {
+          enabled = true,
+          default_method = "molten",
+          ft_runners = {},
+          never_run = { "yaml" },
         },
         keymap = {
           hover = "K",
