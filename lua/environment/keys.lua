@@ -88,7 +88,7 @@ kenv.shortcut = keygroup({
       find_cwd = "F",
       recent = "r",
       recent_cwd = "R",
-  config = "c",
+      config = "c",
     },
   },
   move_window = {
@@ -250,6 +250,13 @@ kenv.fm = keygroup({
     toggle = "a",
     open = "o",
     close = "c",
+  },
+  tfm = {
+    [LEADER_ID] = { append = "i" },
+    open = "i",
+    vsplit = "v",
+    hsplit = "h",
+    tab = "<tab>",
   },
 }, leader_fm, {})
 

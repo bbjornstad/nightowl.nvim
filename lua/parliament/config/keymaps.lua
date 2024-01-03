@@ -643,3 +643,15 @@ end, { desc = "ui.scroll:| vertical |=> toggle centered cursor" })
 
 mapx("n", "g`", "`", { desc = "vim:| |=> marks", remap = true })
 mapx("n", "g''", "\"", { desc = "vim:| |=> registers", remap = true })
+
+mapx("n", "<C-:>", function()
+  local keys = vim.api.nvim_replace_termcodes("<CMD>lua ", true, false, true)
+  vim.api.nvim_feedkeys("<CMD>lua ", "n", false)
+end, { desc = "vim:| cmd |=> luastart" })
+
+mapx(
+  "n",
+  "<localleader>dt",
+  "<CMD>put=strftime('< %Y-%m-%d >')<CR>",
+  { desc = "insert date" }
+)
