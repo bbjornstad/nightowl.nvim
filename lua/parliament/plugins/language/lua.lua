@@ -26,4 +26,13 @@ return {
       },
     },
   },
+  {
+    "nvimtools/none-ls.nvim",
+    opts = function(_, opts)
+      opts.disabled = vim.tbl_deep_extend("force", opts.disabled or {}, {
+        filetypes = { "lua" },
+        names = { "luacheck", "editorconfig-checker" },
+      })
+    end,
+  },
 }

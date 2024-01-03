@@ -5,5 +5,5 @@
 local lsp = require("funsak.lsp")
 
 return {
-  lsp.linters({ ["*"] = { "codespell", "cspell" } }),
+  lsp.linters({ ["*"] = { "codespell" } }),
 }

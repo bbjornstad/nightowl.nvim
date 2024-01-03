@@ -193,6 +193,10 @@ return {
     config = function(_, opts)
       require("output_panel").setup()
       vim.api.nvim_create_autocmd({ "FileType" }, {
+        group = vim.api.nvim_create_augroup(
+          "purpose of this:\n" .. "Dear Upstairs Fuckheads.",
+          { clear = true }
+        ),
         pattern = "outputpanel",
         callback = function(ev)
           vim.keymap.set("n", "q", function()
@@ -465,92 +469,126 @@ return {
   {
     "patrickpichler/hovercraft.nvim",
     opts = function(_, opts)
-      local function prov(provider_id)
-        return require("hovercraft.provider" .. provider_id).new()
-      end
-      opts.providers = vim.tbl_deep_extend("force", opts.providers or {}, {
-        {
-          "󱟺 LSP",
-          prov("lsp.hover"),
-        },
-        {
-          "󱟺 Diag",
-          prov("diagnostics"),
-        },
-        {
-          "󰋽 Man",
-          prov("man"),
-        },
-        {
-          "󰋽 Dictionary",
-          prov("dictionary"),
-        },
-        {
-          " Issues",
-          prov("github.issue"),
-        },
-        {
-          " Repo",
-          prov("github.repo"),
-        },
-        {
-          " User",
-          prov("github.user"),
-        },
-        {
-          " Blame",
-          prov("git.blame"),
-        },
-      })
+      -- local prov = require("hovercraft.provider")
+      opts = opts or {}
+      -- opts.providers = opts.providers or {}
+      -- opts.providers.providers =
+      --   vim.tbl_extend("force", opts.providers.providers or {}, {
+      --     {
+      --       "LSP",
+      --       prov.Lsp.Hover.new(),
+      --     },
+      --     {
+      --       "Diag",
+      --       prov.Diagnostics.new(),
+      --     },
+      --     {
+      --       "Man",
+      --       prov.Man.new(),
+      --     },
+      --     {
+      --       "Dictionary",
+      --       prov.Dictionary.new(),
+      --     },
+      --     {
+      --       "Issues",
+      --       prov.Github.Issue.new(),
+      --     },
+      --     {
+      --       "Repo",
+      --       prov.Github.Repo.new(),
+      --     },
+      --     {
+      --       "User",
+      --       prov.Github.User.new(),
+      --     },
+      --     {
+      --       "Blame",
+      --       prov.Git.Blame.new(),
+      --     },
+      --   })
       opts.window = vim.tbl_deep_extend("force", opts.window or {}, {
         border = env.borders.main,
       })
-      opts.keys = vim.tbl_deep_extend("force", opts.keys or {}, {
-        {
-          "<C-u>",
-          function()
-            require("hovercraft").scroll({ delta = -4 })
-          end,
-          desc = "lsp:| hover => scroll up",
-        },
-        {
-          "<C-d>",
-          function()
-            require("hovercraft").scroll({ delta = 4 })
-          end,
-          desc = "lsp:| hover => scroll down",
-        },
-        {
-          "<TAB>",
-          function()
-            require("hovercraft").hover_next()
-          end,
-          desc = "lsp:| hover => next source",
-        },
-        {
-          "<S-TAB>",
-          function()
-            require("hovercraft").hover_next({ step = -1 })
-          end,
-          desc = "lsp:| hover => previous source",
-        },
-        {
-          key_lsp.hover,
-          function()
-            local hc = require("hovercraft")
-            if hc.is_visible() then
-              hc.enter_popup()
-            else
-              hc.hover()
-            end
-          end,
-          mode = "n",
-          desc = "lsp:| hover |=> focus/open",
-        },
-      })
+      -- opts.keys = vim.tbl_deep_extend("force", opts.keys or {}, {
+      --   {
+      --     "<C-u>",
+      --     function()
+      --       require("hovercraft").scroll({ delta = -4 })
+      --     end,
+      --     desc = "lsp:| hover => scroll up",
+      --   },
+      --   {
+      --     "<C-d>",
+      --     function()
+      --       require("hovercraft").scroll({ delta = 4 })
+      --     end,
+      --     desc = "lsp:| hover => scroll down",
+      --   },
+      --   {
+      --     "<TAB>",
+      --     function()
+      --       require("hovercraft").hover_next()
+      --     end,
+      --     desc = "lsp:| hover => next source",
+      --   },
+      --   {
+      --     "<S-TAB>",
+      --     function()
+      --       require("hovercraft").hover_next({ step = -1 })
+      --     end,
+      --     desc = "lsp:| hover => previous source",
+      --   },
+      --   {
+      --     key_lsp.hover,
+      --     function()
+      --       local hc = require("hovercraft")
+      --       if hc.is_visible() then
+      --         hc.enter_popup()
+      --       else
+      --         hc.hover()
+      --       end
+      --     end,
+      --     mode = "n",
+      --     desc = "lsp:| hover |=> focus/open",
+      --   },
+      -- })
     end,
+    keys = {
+      {
+        key_lsp.hover,
+        function()
+          local hc = require("hovercraft")
+          if hc.is_visible() then
+            hc.enter_popup()
+          else
+            hc.hover_select()
+          end
+        end,
+        mode = "n",
+        desc = "lsp:| hover |=> focus/open",
+      },
+    },
     config = function(_, opts)
       require("hovercraft").setup(opts)
     end,
+  },
+  {
+    "linrongbin16/gentags.nvim",
+    event = "VeryLazy",
+    opts = {
+      tool = "ctags",
+      exclude_filetypes = env.ft_ignore_list,
+      command = { name = "GenTags", desc = "generate tags" },
+      debug = {
+        enable = false,
+        console_log = true,
+      },
+    },
+    config = function(_, opts)
+      require("gentags").setup(opts)
+    end,
+    cmd = { "GenTags" },
+    keys = {},
   },
 }

@@ -55,4 +55,12 @@ return {
   lsp.formatters({ bash = { "shellharden", "shfmt", "beautysh" } }),
   lsp.formatters({ zsh = { "beautysh" } }),
   lsp.linters({ bash = { "shellcheck" } }),
+  {
+    "nvimtools/none-ls.nvim",
+    opts = function(_, opts)
+      opts.enabled = vim.tbl_deep_extend("force", opts.enabled or {}, {
+        filetypes = { "nu" },
+      })
+    end,
+  },
 }

@@ -5,7 +5,51 @@ local key_lsp = require("environment.keys").lsp
 local key_sc = require("environment.keys").shortcut
 local mopts = require("funsak.table").mopts
 local lz = require("funsak.lazy")
-local has = lz.has
+
+-- LSP Configuration
+-- =================
+-- Main LSP Configuration is in the config and opts fields of the nvim-lspconfig
+-- specification. `config` can only be defined once, while opts can be defined
+-- as many times as needed, but there is some extra functionality that is not
+-- available at the `opts` stage in comparison to the `config` stage.
+
+--- extension of the standard lsp.Client object to hold additional parliament
+--- specific options.
+---@class owl.lsp.ServerClient: string
+
+---@class owl.lsp.ClientConfig: lspconfig.options
+
+---@alias owl.lsp.EnhancementSpec
+---| boolean # flag to enable or disable the corresponding enhancement
+---| table # alternatively, a table of configuration options overriding
+---defaults, if it makes sense to give this for the target enhancement.
+
+--- enhancement components specification for all language servers.
+---@class owl.lsp.Enhancements
+--- enabling flag or options for lsp-status.nvim
+---@field status owl.lsp.EnhancementSpec?
+--- enabling flag or options for virtual-types.nvim
+---@field virtual_types owl.lsp.EnhancementSpec?
+--- enabling flag or options for lsp inlay_hints
+---@field inlay_hints owl.lsp.EnhancementSpec?
+
+--- extension of lsp.ConfigurationParams to hold additional parliament
+--- specific options.
+---@class owl.lsp.LSPConfigSpec: lsp.ConfigurationParams
+--- options for vim.diagnostic.config
+---@field diagnostics lsp.DiagnosticOptions?
+--- specification of lsp servers
+---@field servers { [owl.lsp.ServerClient]: owl.lsp.ClientConfig | fun(): owl.lsp.ClientConfig }?
+--- alternative setup specification
+---@field setup { handlers: { [owl.lsp.ServerClient]: fun() }?, hooks: { [owl.lsp.ServerClient]: owl.lsp.SetupHooks? } }?
+--- mason behavioral adjustments
+---@field mason { enabled: { [owl.lsp.ServerClient]: boolean }?, extra_installed: owl.lsp.ServerClient[]? }?
+--- formatting configuration specification. Generally overridden by conform.
+---@field format { on_write: boolean?, format_opts: table?, blacklist: { [owl.lsp.ServerClient]: boolean? }? }?
+--- globally available capabilities that should be added to all servers.
+---@field capabilities lsp.ClientCapabilities?
+--- target log level for the lsp system.
+---@field log_level vim.log.levels?
 
 local function generate_lsp_keymapper(opts)
   local function lsp_keymapper(client, bufnr)
@@ -103,32 +147,42 @@ end
 local function generate_zero_keymapper(opts)
   local function zero_keymaps(client, bufnr)
     local zero = require("lsp-zero")
-    zero.default_keymaps(vim.tbl_deep_extend("force", {
+    zero.default_keymaps({
       buffer = bufnr,
-      exclude = { "gl", "go", "gs", "<F2>", "<F3>", "<F4>", "<C-k>" },
-    }, opts))
+      exclude = opts.exclude or {},
+    })
   end
   return zero_keymaps
 end
 
-local function generate_keymappers(enhancements)
-  enhancements = enhancements or {}
-  local zk = enhancements.zero_keymaps ~= nil and enhancements.zero_keymaps
-    or {}
+local function generate_keymappers()
+  local zk = lz.opts("lsp-zero.nvim").default_keymaps or {}
   zk = vim.tbl_contains({ "boolean", "table" }, type(zk)) and zk or { zk }
   zk = zk == true and {} or zk
   local zkm = generate_zero_keymapper(zk)
 
-  local lspk = generate_lsp_keymapper(enhancements)
+  local lspk = generate_lsp_keymapper()
 
   return zkm, lspk
 end
 
 --- creates a version of the attach_handler for a language server with
 --- customizable "enhancement" plugin integrations.
----@param enhancements { status: (boolean | table)?, virtual_types: (boolean | table)?, zero_keymaps: (boolean | table)?, null_ls: (boolean | table)?, inlay_hints: (boolean | table)?  }
+---@param enhancements owl.lsp.Enhancements
 ---@return fun(client: lsp.Client, bufnr: integer) handler
 local function generate_attach_handler(enhancements)
+  local null_enabled
+  if lz.has("none-ls.nvim") then
+    local null_opts = vim.deepcopy(lz.opts("none-ls.nvim"))
+    ---@cast null_opts +owl.NullLSPluginSpecOpts
+    null_enabled =
+      require("funsak.table").strip(null_opts, { "disabled", "enabled" })
+    ---@cast null_enabled +owl.NullLSActiveOpts
+    if null_enabled.disabled.by_default or not null_enabled.enabled then
+      require("null-ls").disable({})
+    end
+  end
+
   local status = enhancements.status ~= nil and enhancements.status or true
   status = not vim.tbl_contains({ "table", "boolean" }, type(status))
       and { status }
@@ -144,19 +198,62 @@ local function generate_attach_handler(enhancements)
   hints = not vim.tbl_contains({ "table", "boolean" }, type(hints))
       and { hints }
     or hints
+
+  ---@param client lsp.Client
   local function attach_handler(client, bufnr)
-    if status and has("lsp-status.nvim") then
+    if lz.has("none-ls.nvim") then
+      local ftype = vim.api.nvim_buf_get_option(bufnr, "filetype")
+      local name = client.name
+      local null_disabled = null_enabled.disabled
+      local startup_disable = null_disabled.by_default
+      if startup_disable then
+        require("null-ls").disable({ name = name, filetype = ftype })
+      end
+      null_enabled = null_enabled.enabled
+      if null_enabled then
+        if vim.tbl_contains(null_enabled.filetypes, ftype) then
+          require("null-ls").enable({ filetype = ftype })
+        end
+        if vim.tbl_contains(null_enabled.names, name) then
+          require("null-ls").enable({ name = name })
+        end
+        if
+          vim.tbl_contains(null_enabled.methods, function(method)
+            return client.supports_method(method)
+          end, { predicate = true })
+        then
+          require("null-ls").enable({ method = null_enabled.methods })
+        end
+      end
+      if null_disabled then
+        if vim.tbl_contains(null_disabled.filetypes, ftype) then
+          require("null-ls").disable({ filetype = ftype })
+        end
+        if vim.tbl_contains(null_disabled.names, name) then
+          require("null-ls").disable({ name = name })
+        end
+        if
+          vim.tbl_contains(null_disabled.methods, function(method)
+            return client.supports_method(method)
+          end, { predicate = true })
+        then
+          require("null-ls").disable({ method = null_disabled.methods })
+        end
+      end
+    end
+
+    if status and lz.has("lsp-status.nvim") then
       require("lsp-status").on_attach(client)
     end
     if
       vtypes
       and client.supports_method("textDocument/codeLens")
-      and has("virtual-types.nvim")
+      and lz.has("virtual-types.nvim")
     then
       require("virtualtypes").on_attach(client, bufnr)
     end
     if hints and client.supports_method("textDocument/inlayHint") then
-      if vim.fn.has("nvim-0.10.0") == 0 and has("lsp-inlayhints.nvim") then
+      if vim.fn.has("nvim-0.10.0") == 0 and lz.has("lsp-inlayhints.nvim") then
         require("lsp-inlayhints").on_attach(client, bufnr)
       else
         local ih = vim.lsp.inlay_hint.enable ~= nil
@@ -195,7 +292,13 @@ return {
       vim.g.lsp_zero_ui_float_border = env.borders.main
       vim.g.lsp_zero_ui_signcolumn = 1
     end,
-    config = false,
+    config = function(_, opts) end,
+    opts = {
+      default_keymaps = {
+        enabled = true,
+        excluded = { "gl", "go", "gs", "<F2>", "<F3>", "<F4>", "<C-k>" },
+      },
+    },
   },
   -- Mason.nvim
   -- ==========
@@ -255,57 +358,8 @@ return {
       { "nvim-lua/lsp-status.nvim", optional = true },
       { "nvimtools/none-ls.nvim", optional = true },
     },
-    -- LSP Configuration
-    -- =================
-    -- Main LSP Configuration is in the config and opts fields of the
-    -- nvim-lspconfig specification. `config` can only be defined once, while
-    -- opts can be defined as many times as needed, but there is some extra
-    -- functionality that is not available at the `opts` stage in comparison to
-    -- the `config` stage.
 
-    --- extension of the standard lsp.Client object to hold additional
-    --- parliament specific options.
-    ---@class owl.lsp.ServerClient: string
-
-    ---@class owl.lsp.ClientConfig: lspconfig.options
-
-    ---@alias owl.lsp.EnhancementSpec
-    ---| boolean # flag to enable or disable the corresponding enhancement
-    ---| table # alternatively, a table of configuration options overriding
-    ---defaults, if it makes sense to give this for the target enhancement.
-
-    --- enhancement components specification for all language servers.
-    ---@class owl.lsp.Enhancements
-    ---@field status owl.lsp.EnhancementSpec? enabling flag or options for
-    ---lsp-status.nvim
-    ---@field virtual_types owl.lsp.EnhancementSpec? enabling flag or options
-    ---for virtual-types.nvim
-    ---@field zero_keymaps owl.lsp.EnhancementSpec? enabling flag or options for
-    ---lsp-zero default keymaps
-    ---@field null_ls owl.lsp.EnhancementSpec? enabling flag or options for
-    ---null-ls
-    ---@field inlay_hints owl.lsp.EnhancementSpec? enabling flag or options for
-    ---lsp inlay_hints
-
-    --- extension of lsp.ConfigurationParams to hold additional parliament
-    --- specific options.
-    ---@class owl.lsp.LSPConfigSpec: lsp.ConfigurationParams
-    ---@field diagnostics lsp.DiagnosticOptions? options for
-    ---vim.diagnostic.config
-    ---@field enhancements owl.lsp.Enhancements configuration for enhancement
-    ---plugin modules
-    ---@field servers { [owl.lsp.ServerClient]: owl.lsp.ClientConfig | fun(): owl.lsp.ClientConfig }?
-    ---specification of lsp servers
-    ---@field setup { handlers: { [owl.lsp.ServerClient]: fun() }?, hooks: { [owl.lsp.ServerClient]: owl.lsp.SetupHooks? } }?
-    ---alternative setup specification
-    ---@field mason { enabled: { [owl.lsp.ServerClient]: boolean }?, extra_installed: owl.lsp.ServerClient[]? }?
-    ---mason behavioral adjustments
-    ---@field format { on_write: boolean?, format_opts: table?, blacklist: { [owl.lsp.ServerClient]: boolean? }? }?
-    ---formatting configuration specification. Generally overridden by conform.
-    ---@field capabilities lsp.ClientCapabilities? globally available
-    ---capabilities that should be added to all servers.
-    ---@field log_level vim.log.levels? target log level for the lsp system.
-
+    ---@param _ LazyPlugin
     ---@param opts owl.lsp.LSPConfigSpec
     config = function(_, opts)
       -- unlike LazyVim, we are using the lsp-zero plugin as the underlying glue
@@ -321,25 +375,36 @@ return {
       -- order to prevent weird startup issues and not great warning messages.
       -- More accurately, this is simply needed to be set up before we configure
       -- the rest of the LSP, even lsp-zero (which is typically first)
-      if has("neoconf.nvim") then
+      if lz.has("neoconf.nvim") then
         local plugin = require("lazy.core.config").spec.plugins["neoconf.nvim"]
         require("neoconf").setup(
           require("lazy.core.plugin").values(plugin, "opts", false)
         )
       end
 
+      local vtypes_opts, status_opts, hint_opts
+      if lz.has("virtual-types.nvim") then
+        vtypes_opts = lz.opts("virtual-types.nvim") or {}
+      end
+      if lz.has("lsp-status.nvim") then
+        status_opts = lz.opts("lsp-status.nvim") or {}
+      end
+      hint_opts = (vim.fn.has("nvim-0.10.0") and opts.inlay_hints)
+        or (lz.has("lsp-inlayhints.nvim") and lz.opts("lsp-inlayhints.nvim"))
+        or {}
+
       -- optional enhancement submodules
       -- ===============================
       -- this is to allow conditional configuration of the following features
       -- without failure if the corresponding plugin doesn't exist.
-      local enhance = opts.enhancements
-        or {
-          status = true,
-          virtual_types = true,
-          zero_keymaps = true,
-          null_ls = true,
-          inlay_hints = true,
-        }
+      local enhance = {
+        status = status_opts.enabled ~= nil and status_opts.enabled
+          or status_opts,
+        virtual_types = vtypes_opts.enabled ~= nil and vtypes_opts.enabled
+          or vtypes_opts,
+        inlay_hint = hint_opts.enabled ~= nil and hint_opts.enabled
+          or hint_opts,
+      }
 
       if enhance.status then
         -- lsp-status.nvim
@@ -386,7 +451,7 @@ return {
         hint = env.icons.diagnostic.Hint,
         info = env.icons.diagnostic.Info,
       })
-      local zkm, lspk = generate_keymappers(enhance)
+      local zkm, lspk = generate_keymappers()
       zero.on_attach(function(client, bufnr)
         if zkm then
           zkm(client, bufnr)
@@ -432,9 +497,15 @@ return {
       local function basic_handler(srv, o)
         return function()
           o = vim.is_callable(o) and o() or o
-          o = vim.tbl_deep_extend("force", o, {
-            capabilities = vim.deepcopy(opts.capabilities) or nil,
-          })
+          o = vim.tbl_deep_extend(
+            "force",
+            o,
+            {
+              capabilities = vim.deepcopy(opts.capabilities) or nil,
+            },
+            lz.has("lsp-status.nvim") and require("lsp-status").capabilities
+              or {}
+          )
           require("lspconfig")[srv].setup(o)
         end
       end
@@ -545,47 +616,43 @@ return {
       -- null-ls tools and sources automagically.
       local has_nullls, null = pcall(require, "null-ls")
       local has_mnull, mnull = pcall(require, "mason-null-ls")
-      if has_mnull then
+      if has_nullls and has_mnull then
         mnull.setup({
           ensure_installed = {},
           automatic_installation = true,
           handlers = {},
         })
-      end
-
-      if has_nullls then
-        local null_opts = lz.opts("null-ls")
-        null.setup(vim.tbl_deep_extend("force", { sources = {} }, null_opts))
+        local null_opts = lz.opts("none-ls.nvim")
+        local edspec =
+          require("funsak.table").strip(null_opts, { "enabled", "disabled" })
+        ---@cast edspec owl.NullLSActiveOpts
+        local enable_spec = edspec.enabled
+        local disable_spec = edspec.disabled
+        null.setup(null_opts)
+        if disable_spec.by_default then
+          null.disable({})
+        end
       end
 
       vim.diagnostic.config(opts.diagnostics or {})
 
-      -- lsp-zero.nvim formatting options
-      -- ================================
-      -- this too is loosely mimicked from the implementations provided in
-      -- lazyvim. But, we make some modifications to integrate lsp-zero
-      -- appropriately.
-      local fmtopt = opts.format or {}
-      local ftfmt = require("funsak.table").strip(fmtopt, {
-        "formatters_by_ftype",
-      })
-
-      vim.lsp.set_log_level(opts.log_level or vim.log.levels.INFO)
+      ---@diagnostic disable-next-line: param-type-mismatch
+      vim.lsp.set_log_level(opts.log_level or vim.log.levels.WARN)
     end,
     opts = function(_, opts)
-      opts.inlay_hints = mopts(opts.inlay_hints or {}, { enabled = true })
+      opts.inlay_hints =
+        vim.tbl_deep_extend("force", opts.inlay_hints or {}, { enabled = true })
       opts.format_notify = opts.format_notify ~= nil or true
-      opts.format = mopts(
+      opts.format = vim.tbl_deep_extend(
+        "force",
         opts.format or {},
         { formatting_options = nil, timeout_ms = 10000 }
       )
-
-      opts.enhancements =
-        vim.tbl_deep_extend("force", opts.enhancements or {}, {
-          null_ls = false,
-        })
     end,
   },
+  ---@class owl.NullLSActiveOpts
+  ---@field enabled { filetypes: owl.FType[]?, names: string[]?, methods: fun()[]? }
+  ---@field disabled { filetypes: owl.FType[]?, names: string[]?, methods: fun()[]?, by_default: boolean? }
   {
     "nvimtools/none-ls.nvim",
     optional = true,
@@ -594,14 +661,24 @@ return {
       "neovim/nvim-lspconfig",
       { "jay-babu/mason-null-ls.nvim", enabled = opt.lsp.null_ls },
     },
-    config = function(_, opts)
-      -- require("null-ls").setup(opts)
-    end,
+    config = function(_, opts) end,
+    ---@class owl.NullLSPluginSpecOpts: owl.NullLSActiveOpts
+    ---@field border owl.UIDefBorder
+    ---@field debounce integer
     opts = {
       border = env.borders.main,
-      should_attach = function(bufnr)
-        return false
-      end,
+      debounce = 500,
+      enabled = {
+        filetypes = {},
+        methods = {},
+        names = {},
+      },
+      disabled = {
+        by_default = true,
+        filetypes = {},
+        methods = {},
+        names = {},
+      },
     },
   },
   {
@@ -611,8 +688,26 @@ return {
       { "nvimtools/none-ls.nvim", optional = true },
     },
     optional = true,
+    config = false,
   },
-  { "jubnzv/virtual-types.nvim", event = "LspAttach" },
-  { "lvimuser/lsp-inlayhints.nvim", event = "LspAttach" },
-  { "nvim-lua/lsp-status.nvim", event = "LspAttach" },
+  {
+    "jubnzv/virtual-types.nvim",
+    config = function(_, opts) end,
+    opts = { enabled = true },
+    vent = "LspAttach",
+  },
+  {
+    "lvimuser/lsp-inlayhints.nvim",
+    config = function(_, opts)
+      require("lsp-inlayhints").setup()
+    end,
+    opts = { enabled = true },
+    event = "LspAttach",
+  },
+  {
+    "nvim-lua/lsp-status.nvim",
+    config = function(_, opts) end,
+    opts = { enabled = true },
+    event = "LspAttach",
+  },
 }
