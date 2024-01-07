@@ -50,7 +50,7 @@ env.enabled = env.enablements({
   ollero = { env = true, fallback = false },
   gen = { env = true, fallback = false },
   dante = { env = true, fallback = false },
-  text_to_colorscheme = { env = true, fallback = true },
+  text_to_colorscheme = { env = true, fallback = false },
 })
 env.status_notify_on_startup = false
 

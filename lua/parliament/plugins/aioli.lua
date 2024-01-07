@@ -1,5 +1,5 @@
-local env = require("environment.ui")
 local aienv = require("environment.ai")
+local env = require("environment.ui")
 local enb = aienv.enabled
 local notify_on_startup = aienv.status_notify_on_startup
 
@@ -309,14 +309,11 @@ return {
       "nvim-lua/plenary.nvim",
     },
     opts = {
-      max_lines = 100,
-      provider = "Ollama",
-      provider_options = {
-        model = "codellama:7b-code",
-      },
+      max_lines = 1000,
+      provider = "HF",
       run_on_every_keystroke = false,
       ignored_file_types = env.ft_ignore_list_alt,
-      notify = true,
+      notify = false,
     },
     config = function(_, opts)
       require("cmp_ai.config"):setup(opts)
@@ -324,6 +321,7 @@ return {
   },
   {
     "vibovenkat123/rgpt.nvim",
+    cmd = { "ReviewGPT" },
     enabled = enb.rgpt.enable,
     opts = {
       model = "text-davinci-003",
@@ -404,7 +402,7 @@ return {
     dependencies = {
       {
         "tzachar/cmp-tabnine",
-        enabled = require('funsak.lazy').has("tabnine-nvim"),
+        enabled = require("funsak.lazy").has("tabnine-nvim"),
         build = "./install.sh",
         dependencies = {
           "codota/tabnine-nvim",
@@ -1090,6 +1088,7 @@ return {
   {
     "David-Kunz/gen.nvim",
     enabled = enb.gen.enable,
+    cmd = { "Gen" },
     config = function(_, opts)
       require("gen").setup(opts)
     end,
@@ -1197,4 +1196,5 @@ return {
       },
     },
   },
+  {},
 }
