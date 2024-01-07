@@ -73,9 +73,12 @@ return {
       { "tamton-aquib/neorg-jupyter", optional = true },
       { "laher/neorg-exec", optional = true },
     },
-    build = ":Neorg sync-parsers",
     cmd = "Neorg",
     ft = { "norg" },
+    config = function(_, opts)
+      require("neorg").setup(opts)
+      vim.cmd([[Neorg sync-parsers]])
+    end,
     opts = {
       load = {
         ["core.defaults"] = {},
