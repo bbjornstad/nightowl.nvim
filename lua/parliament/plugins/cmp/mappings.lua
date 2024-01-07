@@ -18,7 +18,7 @@ local function fowl(module)
           and (vim.is_callable(f) and f(...) or vim.tbl_map(function(val)
             return f[val]
           end, { ... }))
-          or f
+        or f
     end
   end
 end
@@ -202,8 +202,7 @@ return {
 
         [kenv_cmp.docs.backward] = cmp.mapping.scroll_docs(-4),
         [kenv_cmp.docs.forward] = cmp.mapping.scroll_docs(4),
-        [kenv_cmp.external.complete_common_string] = cmp.mapping
-            .complete_common_string(),
+        [kenv_cmp.external.complete_common_string] = cmp.mapping.complete_common_string(),
         [kenv_cmp:accept()] = cmp.mapping({
           i = function(fallback)
             if cmp.visible() and cmp.get_active_entry() then
@@ -243,118 +242,118 @@ return {
         -- options specifically (C+o+f).
         [kenv_cmp.submenus.ai.libre] = cmp.mapping(function(fallback)
           if
-              not cmp.complete({
-                config = {
-                  sources = cmp.config.sources({
-                    { name = "codeium" },
-                    { name = "cmp_tabnine" },
-                  }),
-                },
-              })
+            not cmp.complete({
+              config = {
+                sources = cmp.config.sources({
+                  { name = "codeium" },
+                  { name = "cmp_tabnine" },
+                }),
+              },
+            })
           then
             fallback()
           end
         end, { "i", "s" }),
         [kenv_cmp.submenus.git] = cmp.mapping(function(fallback)
           if
-              not cmp.complete({
-                config = {
-                  sources = cmp.config.sources({
-                    { name = "git" },
-                    { name = "conventionalcommits" },
-                    { name = "commit" },
-                  }),
-                },
-              })
+            not cmp.complete({
+              config = {
+                sources = cmp.config.sources({
+                  { name = "git" },
+                  { name = "conventionalcommits" },
+                  { name = "commit" },
+                }),
+              },
+            })
           then
             fallback()
           end
         end, { "i", "s" }),
         [kenv_cmp.submenus.shell] = cmp.mapping(function(fallback)
           if
-              not cmp.complete({
-                config = {
-                  sources = cmp.config.sources({
-                    { name = "zsh" },
-                    { name = "fish" },
-                  }, {
-                    { name = "buffer" },
-                    { name = "rg" },
-                  }),
-                },
-              })
+            not cmp.complete({
+              config = {
+                sources = cmp.config.sources({
+                  { name = "zsh" },
+                  { name = "fish" },
+                }, {
+                  { name = "buffer" },
+                  { name = "rg" },
+                }),
+              },
+            })
           then
             fallback()
           end
         end, { "i", "s" }),
         [kenv_cmp.submenus.glyph] = cmp.mapping(function(fallback)
           if
-              not cmp.complete({
-                config = {
-                  sources = cmp.config.sources({
-                    { name = "fonts",   option = { space_filter = "-" } },
-                    { name = "nerdfont" },
-                    { name = "emoji" },
-                  }),
-                },
-              })
+            not cmp.complete({
+              config = {
+                sources = cmp.config.sources({
+                  { name = "fonts", option = { space_filter = "-" } },
+                  { name = "nerdfont" },
+                  { name = "emoji" },
+                }),
+              },
+            })
           then
             fallback()
           end
         end, { "i", "s" }),
         [kenv_cmp.submenus.lsp] = cmp.mapping(function(fallback)
           if
-              not cmp.complete({
-                config = {
-                  sources = cmp.config.sources({
-                    { name = "nvim_lsp" },
-                    { name = "nvim_lsp_signature_help" },
-                    { name = "nvim_lsp_document_symbol" },
-                    { name = "luasnip" },
-                    { name = "dap" },
-                    { name = "diag-codes" },
-                  }),
-                },
-              })
+            not cmp.complete({
+              config = {
+                sources = cmp.config.sources({
+                  { name = "nvim_lsp" },
+                  { name = "nvim_lsp_signature_help" },
+                  { name = "nvim_lsp_document_symbol" },
+                  { name = "luasnip" },
+                  { name = "dap" },
+                  { name = "diag-codes" },
+                }),
+              },
+            })
           then
             fallback()
           end
         end, { "i", "s" }),
         [kenv_cmp.submenus.location] = cmp.mapping(function(fallback)
           if
-              not cmp.complete({
-                config = {
-                  sources = cmp.config.sources({
-                    { name = "git" },
-                    { name = "path" },
-                    { name = "cmdline" },
-                    { name = "look" },
-                  }, {
-                    { name = "rg" },
-                    { name = "env" },
-                    { name = "buffer" },
-                  }),
-                },
-              })
+            not cmp.complete({
+              config = {
+                sources = cmp.config.sources({
+                  { name = "git" },
+                  { name = "path" },
+                  { name = "cmdline" },
+                  { name = "look" },
+                }, {
+                  { name = "rg" },
+                  { name = "env" },
+                  { name = "buffer" },
+                }),
+              },
+            })
           then
             fallback()
           end
         end, { "i", "s" }),
         [kenv_cmp.submenus.ai.langfull] = cmp.mapping(function(fallback)
           if
-              not cmp.complete({
-                config = {
-                  sources = cmp.config.sources({
-                    { name = "copilot" },
-                    { name = "codeium" },
-                    { name = "cmp_tabnine" },
-                    { name = "cmp_ai" },
-                    { name = "nvim_lsp" },
-                    { name = "nvim_lsp_signature_help" },
-                    { name = "nvim_lsp_document_symbol" },
-                  }),
-                },
-              })
+            not cmp.complete({
+              config = {
+                sources = cmp.config.sources({
+                  { name = "copilot" },
+                  { name = "codeium" },
+                  { name = "cmp_tabnine" },
+                  { name = "cmp_ai" },
+                  { name = "nvim_lsp" },
+                  { name = "nvim_lsp_signature_help" },
+                  { name = "nvim_lsp_document_symbol" },
+                }),
+              },
+            })
           then
             fallback()
           end

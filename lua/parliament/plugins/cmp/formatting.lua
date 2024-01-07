@@ -34,7 +34,7 @@ return {
           look = "⟪ look ⟫",
           ["diag-codes"] = "⟪ diag ⟫",
           treesitter = "⟪ tree ⟫",
-          nerdfonts = "⟪ nerd ⟫",
+          nerdfonts = "⟪ nerds ⟫",
           nerdfont = "⟪ nerd ⟫",
           AI = "⟪ aiml ⟫",
           spell = "⟪ spell ⟫",

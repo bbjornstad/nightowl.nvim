@@ -11,142 +11,136 @@ local default_sources = {
       end
       return true
     end,
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "nvim_lsp_signature_help",
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "nvim_lsp_document_symbol",
-    group_index = 1,
+    -- group_index = 1,
   },
-  {
-    name = "treesitter",
-    keyword_length = 4,
-    group_index = 1,
-  },
+  -- {
+  --   name = "treesitter",
+  --   keyword_length = 4,
+  --   -- group_index = 1,
+  -- },
   {
     name = "luasnip",
-    group_index = 1,
+    keyword_length = 3,
+    -- group_index = 1,
   },
   {
     name = "dap",
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "ctags",
-    group_index = 1,
+    -- group_index = 1,
   },
-  -- {
-  --   name = "dynamic",
-  --   group_index = 1,
-  -- },
   {
     name = "look",
     option = {
       convert_case = true,
       loud = true,
     },
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "omni",
     option = {
       disable_omnifuncs = { "v:lua.vim.lsp.omnifunc" },
     },
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "rg",
     keyword_length = 4,
-    group_index = 2,
+    -- group_index = 2,
   },
   {
     name = "env",
     trigger_characters = { "$" },
-    group_index = 3,
+    -- group_index = 2,
+  },
+  {
+    name = "dotenv",
+    option = {
+      path = ".",
+      load_shell = true,
+      item_kind = require("cmp").lsp.CompletionItemKind.Variable,
+      eval_on_confirm = false,
+      show_documentation = true,
+      show_content_on_docs = true,
+      documentation_kind = "markdown",
+      dotenv_environment = ".*",
+      file_priority = function(a, b)
+        return a.upper() < b.upper()
+      end,
+    },
+    -- group_index = 1,
   },
   {
     name = "buffer",
     keyword_length = 5,
-    group_index = 3,
-  },
-  {
-    name = "spell",
-    group_index = 2,
+    -- group_index = 3,
   },
   {
     name = "fuzzy_path",
     keyword_length = 3,
     trigger_characters = { "/" },
-    group_index = 2,
+    -- group_index = 2,
   },
   {
     name = "gitlog",
     max_item_count = 5,
-    group_index = 2,
+    -- group_index = 2,
   },
   {
     name = "calc",
-    group_index = 1,
-  },
-  {
-    name = "digraphs",
-    option = {
-      cache_digraphs_on_start = true,
-    },
-    group_index = 2,
+    -- group_index = 1,
   },
   {
     name = "emoji",
     trigger_characters = { ":" },
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "nerdfont",
     trigger_characters = { ":" },
-    group_index = 1,
-  },
-  {
-    name = "nerdfonts",
-    trigger_characters = { "nf" },
-    group_index = 1,
-  },
-  {
-    name = "color_names",
-    group_index = 2,
+    -- group_index = 1,
   },
   {
     name = "fonts",
-    group_index = 2,
+    -- group_index = 2,
     keyword_length = 3,
     option = { space_filter = "-" },
   },
   {
     name = "diag-codes",
     option = { in_comment = false },
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "natdat",
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "codeium",
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "tabnine",
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "copilot",
-    group_index = 1,
+    -- group_index = 1,
   },
   {
     name = "cmp_ai",
-    group_index = 1,
+    -- group_index = 1,
   },
 }
 
@@ -157,39 +151,28 @@ return {
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
       "tzachar/cmp-fuzzy-path",
       "hrsh7th/cmp-cmdline",
-      "hrsh7th/cmp-nvim-lua",
       "hrsh7th/cmp-nvim-lsp-signature-help",
       "hrsh7th/cmp-nvim-lsp-document-symbol",
       "hrsh7th/cmp-emoji",
-      "petertriho/cmp-git",
       "lukas-reineke/cmp-rg",
-      "tamago324/cmp-zsh",
       "delphinus/cmp-ctags",
       "rcarriga/cmp-dap",
       "hrsh7th/cmp-calc",
-      "ray-x/cmp-treesitter",
-      "Saecki/crates.nvim",
       "bydlw98/cmp-env",
-      "nat-418/cmp-color-names.nvim",
-      "jc-doyle/cmp-pandoc-references",
+      "SergioRibera/cmp-dotenv",
       "amarakon/nvim-cmp-fonts",
-      "davidmh/cmp-nerdfonts",
       "chrisgrieser/cmp-nerdfont",
       "saadparwaiz1/cmp_luasnip",
-      "KadoBOT/cmp-plugins",
       "JMarkin/cmp-diag-codes",
-      "uga-rosa/cmp-dictionary",
-      "f3fora/cmp-spell",
-      "jcha0713/cmp-tw2css",
-      "barklan/cmp-gitlog",
-      "uga-rosa/cmp-latex-symbol",
       "Gelio/cmp-natdat",
-      "dmitmel/cmp-digraphs",
       "hrsh7th/cmp-omni",
       "octaltree/cmp-look",
+      { "tzachar/cmp-tabnine", optional = true },
+      { "tzachar/cmp-ai", optional = true },
+      { "Exafunction/codeium.nvim", optional = true },
+      { "zbirenbaum/copilot-cmp", optional = true },
     },
     opts = function(_, opts)
       local cmp = require("cmp")
@@ -208,7 +191,12 @@ return {
       cmp.setup.cmdline(":", {
         mapping = cmp.mapping.preset.cmdline(),
         sources = cmp.config.sources({
-          { name = "cmdline" },
+          {
+            name = "cmdline",
+            option = {
+              ignore_cmds = { "Man", "!" },
+            },
+          },
           { name = "fuzzy_path" },
           { name = "rg" },
           { name = "env" },
@@ -219,22 +207,37 @@ return {
 
       -- Next we have filetype specific completion sources, these should be
       -- added only when needed.
-      cmp.setup.filetype({ "rust" }, {
+      cmp.setup.filetype({ "rust", "cargo" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
-          { name = "crates", group_index = 1 },
+          {
+            name = "crates",
+            -- group_index = 1,
+          },
         }),
       })
       cmp.setup.filetype(
         { "gitconfig", "gitcommit", "gitattributes", "gitignore", "gitrebase" },
         {
           sources = vim.list_extend(vim.deepcopy(default_sources), {
-            { name = "git", group_index = 1 },
-            { name = "conventionalcommits", group_index = 1 },
-            { name = "commit", group_index = 1 },
-            { name = "gitcommit", group_index = 1 },
+            {
+              name = "git",
+              -- group_index = 1,
+            },
+            {
+              name = "conventionalcommits",
+              -- group_index = 1,
+            },
+            {
+              name = "commit",
+              -- group_index = 1,
+            },
+            {
+              name = "gitcommit",
+              -- group_index = 1,
+            },
             {
               name = "gitlog",
-              group_index = 1,
+              -- group_index = 1,
               max_item_count = 5,
             },
           }),
@@ -242,52 +245,111 @@ return {
       )
       cmp.setup.filetype({ "css" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
-          { name = "cmp-tw2css", group_index = 1 },
+          {
+            name = "cmp-tw2css",
+            -- group_index = 1,
+          },
         }),
       })
       cmp.setup.filetype({ "sass", "scss" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
-          { name = "sass-variables", group_index = 1 },
-          { name = "cmp-tw2css", group_index = 1 },
+          {
+            name = "sass-variables",
+            -- group_index = 1,
+          },
+          {
+            name = "cmp-tw2css",
+            -- group_index = 1,
+          },
         }),
       })
       cmp.setup.filetype({ "lua" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
-          { name = "nvim_lua", group_index = 1 },
-          { name = "plugins", group_index = 1 },
+          {
+            name = "nvim_lua",
+            -- group_index = 1,
+          },
+          {
+            name = "plugins",
+            -- group_index = 1,
+          },
         }),
       })
       cmp.setup.filetype({ "clojure", "fennel", "python" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
-          { name = "conjure", group_index = 1 },
+          {
+            name = "conjure",
+            -- group_index = 1,
+          },
+        }),
+      })
+
+      cmp.setup.filetype({
+        "html",
+        "css",
+        "js",
+        "md",
+        "org",
+        "norg",
+        "scss",
+        "sass",
+      }, {
+        sources = vim.list_extend(vim.deepcopy(default_sources), {
+          {
+            name = "color_names",
+          },
         }),
       })
 
       cmp.setup.filetype(
-        { "markdown", "quarto", "org", "norg", "latex", "tex" },
+        { "markdown", "rmd", "quarto", "org", "norg", "latex", "tex", "bibtex" },
         {
           sources = vim.list_extend(vim.deepcopy(default_sources), {
-            { name = "otter", group_index = 1 },
-            { name = "pandoc-references", group_index = 1 },
-            { name = "dictionary", group_index = 1 },
-            { name = "spell", group_index = 1 },
-            { name = "latex_symbol", group_index = 1 },
+            {
+              name = "otter",
+              -- group_index = 1,
+            },
+            {
+              name = "pandoc-references",
+              -- group_index = 1,
+            },
+            {
+              name = "dictionary",
+              -- group_index = 1,
+            },
+            {
+              name = "spell",
+              -- group_index = 1,
+            },
+            {
+              name = "latex_symbols",
+              -- group_index = 1,
+            },
           }),
         }
       )
       cmp.setup.filetype({ "latex", "tex", "bibtex" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
-          { name = "vimtex", group_index = 1 },
+          {
+            name = "vimtex",
+            -- group_index = 1,
+          },
         }),
       })
       cmp.setup.filetype({ "neorg", "norg" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
-          { name = "neorg", group_index = 1 },
+          {
+            name = "neorg",
+            -- group_index = 1,
+          },
         }),
       })
       cmp.setup.filetype({ "orgmode", "org" }, {
         sources = vim.list_extend(vim.deepcopy(default_sources), {
-          { name = "orgmode", group_index = 1 },
+          {
+            name = "orgmode",
+            -- group_index = 1,
+          },
         }),
       })
     end,
@@ -299,7 +361,7 @@ return {
   -- First Up: Core
   -- ==============
   { "hrsh7th/cmp-buffer", dependencies = { ncmp } },
-  { "hrsh7th/cmp-path", dependencies = { ncmp } },
+  { "hrsh7th/cmp-path", optional = true, dependencies = { ncmp } },
   {
     "tzachar/cmp-fuzzy-path",
     dependencies = { ncmp, "tzachar/fuzzy.nvim" },
@@ -315,17 +377,30 @@ return {
   { "lukas-reineke/cmp-rg", dependencies = { ncmp } },
   { "rcarriga/cmp-dap", dependencies = { ncmp } },
   { "hrsh7th/cmp-calc", dependencies = { ncmp } },
-  { "ray-x/cmp-treesitter", dependencies = { ncmp } },
+  { "ray-x/cmp-treesitter", optional = true, dependencies = { ncmp } },
   { "bydlw98/cmp-env", dependencies = { ncmp } },
+  { "SergioRibera/cmp-dotenv", dependencies = { ncmp } },
   { "saadparwaiz1/cmp_luasnip", dependencies = { ncmp } },
   { "JMarkin/cmp-diag-codes", dependencies = { ncmp } },
   { "octaltree/cmp-look", dependencies = { ncmp } },
-  { "uga-rosa/cmp-dictionary", dependencies = { ncmp } },
-  { "barklan/cmp-gitlog", dependencies = { ncmp } },
+  {
+    "uga-rosa/cmp-dictionary",
+    ft = {
+      "markdown",
+      "rmd",
+      "quarto",
+      "org",
+      "norg",
+      "latex",
+      "tex",
+      "bibtex",
+    },
+    dependencies = { ncmp },
+  },
   { "hrsh7th/cmp-omni", dependencies = { ncmp } },
 
   -- Next Up: Filetype Specific
-  -- -- git
+  -- git
   {
     "petertriho/cmp-git",
     ft = { "gitrebase", "gitcommit", "gitattributes", "gitconfig", "gitignore" },
@@ -362,14 +437,31 @@ return {
   },
   {
     "jc-doyle/cmp-pandoc-references",
-    ft = { "markdown", "quarto", "org", "norg", "latex", "tex" },
+    ft = {
+      "markdown",
+      "rmd",
+      "quarto",
+      "org",
+      "norg",
+      "latex",
+      "tex",
+      "bibtex",
+    },
     dependencies = { ncmp },
   },
-  { "Saecki/crates.nvim", dependencies = { ncmp }, ft = "rust" },
   { "KadoBOT/cmp-plugins", ft = { "lua" }, dependencies = { ncmp } },
   {
-    "uga-rosa/cmp-latex-symbol",
-    ft = { "markdown", "quarto", "org", "norg", "latex", "tex" },
+    "kdheepak/cmp-latex-symbols",
+    ft = {
+      "markdown",
+      "rmd",
+      "quarto",
+      "org",
+      "norg",
+      "latex",
+      "tex",
+      "bibtex",
+    },
     dependencies = { ncmp },
   },
 
@@ -377,7 +469,7 @@ return {
     "micangl/cmp-vimtex",
     optional = true,
     dependencies = { ncmp },
-    ft = { "latex" },
+    ft = { "latex", "tex", "bibtex" },
   },
 
   -- AI tooling
@@ -394,15 +486,30 @@ return {
     "nat-418/cmp-color-names.nvim",
     dependencies = { ncmp },
     config = true,
-    ft = { "html", "css", "js", "md", "org", "norg" },
+    ft = { "html", "css", "js", "md", "org", "norg", "scss", "sass" },
   },
   { "hrsh7th/cmp-emoji", dependencies = { ncmp } },
-  { "dmitmel/cmp-digraphs", dependencies = { ncmp } },
   { "chrisgrieser/cmp-nerdfont", dependencies = { ncmp } },
-  { "davidmh/cmp-nerdfonts", dependencies = { ncmp } },
   { "amarakon/nvim-cmp-fonts", dependencies = { ncmp } },
-  { "f3fora/cmp-spell", dependencies = { ncmp } },
-  { "jcha0713/cmp-tw2css", dependencies = { ncmp } },
+  {
+    "f3fora/cmp-spell",
+    ft = {
+      "markdown",
+      "rmd",
+      "quarto",
+      "org",
+      "norg",
+      "latex",
+      "tex",
+      "bibtex",
+    },
+    dependencies = { ncmp },
+  },
+  {
+    "jcha0713/cmp-tw2css",
+    ft = { "sass", "scss", "css" },
+    dependencies = { ncmp },
+  },
   { "delphinus/cmp-ctags", dependencies = { ncmp } },
   {
     "Gelio/cmp-natdat",
