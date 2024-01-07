@@ -256,7 +256,7 @@ end
 --- before being reinserted into the original function arguments during
 --- evaluation of the wrapping.
 ---@param fn fun(...): any? a function, whose last argument is the `opts` field.
----@param handler fun(opts: T_Opts): any? function to "handle" the extra opts
+---@param handler fun(opts: owl.GenericOpts): any? function to "handle" the extra opts
 ---that are passed through the `opts` argument of the original function
 ---@param consume_optarg boolean? whether or not the opts field that is held in
 ---the last argument position should be removed for processing, or simply read
@@ -362,11 +362,11 @@ function M.extermiwrap(fn)
   end
 end
 
----@alias EvaluatedExpression fun(...): 
+---@alias EvaluatedExpression fun(...): any
 --- creates and returns an anonynous function based on the input expression
 --- representation as a string in the form: `"arg1,arg2,...argn |="`
 ---@param expr string expression of form `"arg1,arg2...argn |=> ~expr~"`
----@return EvaluatedExpression<fun> fun(...): EvaluatedExpression
+---@return EvaluatedExpression fun
 function M.lambda(expr) end
 
 return M

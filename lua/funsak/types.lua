@@ -42,11 +42,12 @@
 --- naturally derived a plan for the keymap system. Let's start with a
 --- definition of the domain of our space, which I guess maybe we will call
 --- Aut, the automorphism group designation in typical mathematics.
----@class Aut<T>: { [Ix<T>]: T }
+---@class Aut<T>: { [Ix<`T`>]: `T` }
 
 ---@generic T
+
 ---@alias FnAutomorphism<T>
----| fun(t_dom: Aut<T>): Aut<T> # by definition, an automorphism is an
+---| fun(t_dom: Aut<`T`>): Aut<`T`> # by definition, an automorphism is an
 ---isomorphic endomorphism, which is to say a map from the space composing a
 ---class of mathematical structures onto itself that is isomorphic. Isomorphic
 ---generally refers to the features of certain special transoformative
@@ -85,5 +86,8 @@
 ---| fun(...): `T`? # function accepting any arguments and returning data of
 ---generic captured type `T`
 
----@alias owl.FType 
----|  ffcm
+---@alias owl.FType
+---| string # filetype name known to neovim
+
+---@alias owl.PathComponent
+---| string # a string which would be valid as a portion of a full path
