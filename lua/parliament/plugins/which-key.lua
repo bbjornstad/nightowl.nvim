@@ -118,6 +118,8 @@ return {
         [stems.yank:leader()] = { name = "::| yank |::" },
         [stems.lsp.workspace:leader()] = { name = "::| workspace |::" },
         [stems.diagnostic:leader()] = { name = "::| diag/trouble |::" },
+        [stems.lists:leader()] = { name = "::| loc/qf lists |::" },
+        [stems.newts:leader()] = { name = "::| notice |::" },
       },
     },
     keys = {

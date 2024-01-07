@@ -99,7 +99,7 @@ return {
     opts = {},
     config = function(_, opts) end,
     init = function()
-      vim.g.broot_replace_netrw = 1
+      vim.g.broot_replace_netrw = 0
     end,
     keys = {
       {
@@ -156,7 +156,7 @@ return {
         },
         split = {
           direction = "topleft",
-          size = 32,
+          size = 24,
         },
       },
       mappings = {
@@ -304,7 +304,7 @@ return {
       opts.replace_netrw = opts.replace_netrw or nil
       opts.quitcd = opts.quitcd or "tcd"
       opts.explorer = vim.tbl_deep_extend("force", {
-        width = 10,
+        width = 24,
         side = "topleft",
         session = "shared",
         tabs = true,
@@ -361,7 +361,7 @@ return {
     "m-demare/attempt.nvim",
     enabled = opt.file_managers.attempt,
     opts = {
-      dir = vim.fs.normalize(vim.fn.stdpath("data") .. "attempt.nvim"),
+      dir = vim.fs.joinpath(vim.fn.stdpath("data"), "attempt.nvim"),
       autosave = false,
       list_buffers = false, -- This will make them show on other pickers (like :Telescope buffers)
       ext_options = {

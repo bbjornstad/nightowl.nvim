@@ -61,7 +61,7 @@ return {
   {
     "rebelot/kanagawa.nvim",
     lazy = false,
-    priority = 999,
+    priority = 1000,
     opts = {
       globalStatus = true,
       dimInactive = true,
@@ -124,12 +124,16 @@ return {
           IndentBlanklineWhitespace = { link = "@comment" },
           IndentBlanklineScope = { link = "@comment" },
           IndentBlanklineIndent = { link = "@comment" },
+          Headlines = {
+            fg = pcol.sumiInk0,
+            bg = pcol.sumiInk0,
+          },
         }
       end,
     },
     config = function(_, opts)
       require("kanagawa").setup(opts)
-      require("kanagawa").load("wave")
+      -- require("kanagawa").load("wave")
     end,
   },
   {
@@ -235,6 +239,7 @@ return {
       defhl({ "TreesitterContextBottom" }, { fg = dw_accent, underline = true })
       defhl({ "NightowlContextHints" }, { italic = true, fg = dw_accent })
       defhl({ "WinSeparator" }, { fg = dw_accent })
+      defhl({ "Headlines" }, { fg = dw_accent, bg = dw_accent })
       require("deepwhite").setup(opts)
     end,
     opts = {
@@ -350,10 +355,12 @@ return {
   {
     "linrongbin16/colorbox.nvim",
     lazy = false,
-    priority = 1000,
+    priority = 700,
     cmd = { "Colorbox" },
     dependencies = {
       "rktjmp/lush.nvim",
+      "rebelot/kanagawa.nvim",
+      "yorik1984/newpaper.nvim",
     },
     opts = {
       policy = "single",
@@ -364,8 +371,10 @@ return {
       require("colorbox").update()
     end,
     config = function(_, opts)
-      require("colorbox").setup()
-      vim.cmd([[colorscheme kanagawa]])
+      require("colorbox").setup(opts)
+      local bg = opts.background or "dark"
+      local cs = env.colorscheme[bg]
+      vim.cmd([[colorscheme ]] .. cs)
     end,
   },
   -- {

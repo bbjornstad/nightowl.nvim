@@ -60,7 +60,7 @@ return {
             {
               icon = "󱈇",
               text = "fzf::grep",
-              shortcut = "g",
+              shortcut = "S",
               callback = function()
                 require("fzf-lua").live_grep()
               end,
@@ -68,7 +68,7 @@ return {
             {
               icon = "󱝪",
               text = "fzf::deadgrep",
-              shortcut = "G",
+              shortcut = "D",
               callback = function()
                 require("fzf-lua").grep()
               end,
@@ -88,8 +88,9 @@ return {
               text = "edit::home",
               shortcut = "~",
               callback = function()
-                vim.cmd([[tcd ~]])
-                vim.cmd([[edit .]])
+                require("oil").open({ cwd = vim.fn.expand("") })
+                -- vim.cmd([[tcd ~]])
+                -- vim.cmd([[edit .]])
               end,
             },
             {

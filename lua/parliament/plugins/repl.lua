@@ -146,7 +146,7 @@ return {
           enabled = true,
           default_method = "molten",
           ft_runners = {},
-          never_run = { "yaml" },
+          never_run = { "yaml" }
         },
         keymap = {
           hover = "K",

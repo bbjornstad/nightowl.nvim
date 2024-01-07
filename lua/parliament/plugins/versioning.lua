@@ -1,6 +1,6 @@
 local env = require("environment.ui")
-local opt = require("environment.optional")
 local kenv = require("environment.keys")
+local opt = require("environment.optional")
 local key_view = kenv.view
 local key_git = kenv.git
 local key_session = kenv.session
@@ -110,14 +110,6 @@ return {
         desc = "::git.diff=> compare",
       },
     },
-  },
-  {
-    "tanvirtin/vgit.nvim",
-    opts = {},
-    config = function(_, opts)
-      require("vgit").setup(opts)
-    end,
-    event = "VeryLazy",
   },
   {
     "f-person/git-blame.nvim",
@@ -378,5 +370,45 @@ return {
     opts = {},
     keys = {},
     event = "VeryLazy",
+  },
+  {
+    "lewis6991/gitsigns.nvim",
+    config = function(_, opts)
+      require("gitsigns").setup(opts)
+    end,
+    event = "VeryLazy",
+    opts = {
+      signs = {},
+      signcolumn = true,
+      numhl = true,
+      linehl = true,
+      word_diff = true,
+      watch_gitdir = {
+        follow_files = true,
+      },
+      auto_attach = true,
+      attach_to_untracked = true,
+      current_line_blame = opt.prefer.gitblame == "gitsigns",
+      current_line_blame_opts = {
+        virt_text = true,
+        virt_text_pos = "eol",
+        delay = 1000,
+        ignore_whitespace = false,
+        virt_text_priority = 100,
+      },
+      current_line_blame_formatter = "   <author>: [<author_time:%Y-%m-%d %H:%M>] 󱛠 <summary>",
+      sign_priority = 5,
+      update_debounce = 200,
+      status_formatter = nil,
+      max_file_length = 100000,
+      preview_config = {
+        border = env.borders.main,
+        style = "minimal",
+        relative = "cursor",
+        row = 0,
+        col = 1,
+      },
+      yadm = { enable = false },
+    },
   },
 }

@@ -178,7 +178,7 @@ return {
         scroll_strategy = "cycle",
         border = true,
         borderchars = env.borders.telescope,
-        path_display = "smart",
+        path_display = { "smart" },
       },
       -- pickers = pickspec,
     },

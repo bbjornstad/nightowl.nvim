@@ -211,23 +211,41 @@ return {
     end,
   },
   {
-    "ellisonleao/weather.nvim",
-    config = function(_, opts)
-      require("weather").setup(opts)
-    end,
-    opts = {
-      city = "Denver",
-      win_height = 32,
-      win_width = 80,
+    "lazymaniac/wttr.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
     },
-    cmd = { "Weather" },
+    config = function(_, opts)
+      require("wttr").setup(opts)
+    end,
+    event = "VeryLazy",
+    opts = {
+      location = "Denver",
+      -- format = 4,
+      custom_format = "%C+%cP:%p+T:%t+F:%f+%w+%m+%P+UV:%u+Hum:%h",
+    },
     keys = {
       {
         key_sc.weather.open,
-        "<CMD>Weather<CR>",
+        function()
+          require("wttr").get_forecast()
+        end,
         mode = "n",
-        desc = "weather=> current conditions",
+        desc = "wttr |=> conditions",
       },
     },
+  },
+  {
+    "nvim-lualine/lualine.nvim",
+    dependencies = {
+      "lazymaniac/wttr.nvim",
+    },
+    opts = function(_, opts)
+      opts.sections = opts.sections or {}
+      opts.sections.lualine_z = vim.list_extend(opts.sections.lualine_z or {}, {
+        "require'wttr'.text",
+      })
+    end,
   },
 }

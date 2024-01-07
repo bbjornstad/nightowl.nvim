@@ -17,9 +17,11 @@ return {
     keys = {
       {
         key_editor.template.buffet,
-        "<CMD>Template<CR>",
+        function()
+          require("telescope").extensions.find_template.find_template()
+        end,
         mode = "n",
-        desc = "template=> buffet",
+        desc = "template:| |=> buffet",
       },
       {
         key_editor.template.select,
@@ -29,13 +31,13 @@ return {
           end)
         end,
         mode = "n",
-        desc = "template=> select and serve",
+        desc = "template:| |=> select and serve",
       },
       {
         key_editor.template.edit,
         ("<CMD>edit %s<CR>"):format(tempath),
         mode = "n",
-        desc = "template=> edit",
+        desc = "template:| |=> edit",
       },
     },
   },

@@ -41,7 +41,6 @@ return { -- add folding range to capabilities
     "kevinhwang91/nvim-ufo",
     dependencies = {
       "kevinhwang91/promise-async",
-      "anuvyklack/pretty-fold.nvim",
       "VonHeikemen/lsp-zero.nvim",
     },
     config = function(_, opts)
@@ -165,7 +164,7 @@ return { -- add folding range to capabilities
       -- "delete" : Delete all comment signs from the fold string.
       -- "spaces" : Replace all comment signs with equal number of spaces.
       -- false    : Do nothing with comment signs.
-      process_comment_signs = "spaces",
+      process_comment_signs = false,
 
       -- Comment signs additional to the value of `&commentstring` option.
       comment_signs = {},
@@ -183,7 +182,8 @@ return { -- add folding range to capabilities
         { "%[", "]" }, -- % to escape lua pattern char
       },
 
-      ft_ignore = mopts({ "neorg" }, env.ft_ignore_list, "suppress"),
+      ft_ignore = {},
+      -- ft_ignore = mopts({ "neorg" }, env.ft_ignore_list, "suppress"),
     },
   },
   {
@@ -201,10 +201,10 @@ return { -- add folding range to capabilities
     event = "CursorHold",
     config = true,
     opts = {
-      offset = 2,
+      offset = -3,
       foldsigns = {
-        close = "⌐",
-        open = "⌙",
+        open = "⌐",
+        close = "⌙",
         seps = { "│", "┃" },
       },
     },

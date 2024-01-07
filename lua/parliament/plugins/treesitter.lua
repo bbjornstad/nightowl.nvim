@@ -47,7 +47,7 @@ return {
       },
     },
     config = function(_, opts)
-      require('nvim-treesitter.configs').setup(opts)
+      require("nvim-treesitter.configs").setup(opts)
     end,
     build = ":TSUpdateSync",
     event = "VeryLazy",
@@ -64,7 +64,7 @@ return {
   },
   {
     "RRethy/nvim-treesitter-endwise",
-    event = "VeryLazy",
+    ft = { "ruby", "lua", "vim", "bash", "elixir", "fish", "julia" },
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
@@ -154,7 +154,7 @@ return {
   },
   {
     "code-biscuits/nvim-biscuits",
-    enabled = false,
+    enabled = true,
     event = "LspAttach",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
