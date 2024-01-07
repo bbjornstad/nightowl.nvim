@@ -2,20 +2,6 @@ local env = {}
 local has = require("funsak.lazy").has
 local conv = require("funsak.convert").booleanize
 
-local function arglax(fn, ranking_priority)
-  ranking_priority = ranking_priority or { "both", "none", "only" }
-  return function(props, opts)
-    local ok, status = {}, {}
-    ok.none, status.none = pcall(fn)
-    ok.both, status.both = pcall(fn, props, opts)
-    ok.opts, status.opts = pcall(fn, opts)
-
-    return vim.tbl_map(function(sel)
-      return ok[sel] and status[sel] or nil
-    end, ranking_priority)[1]
-  end
-end
-
 local function searchcount(props, opts)
   props = props or {}
   props.buf = props.buf or nil
@@ -218,10 +204,12 @@ function env.wpm(props, opts)
   return "󰗗 " .. words
 end
 
+---@class owl.InfoOpts: owl.GenericOpts,{ formatter: string? }
+
 --- collects metadata information about the currently open file for display in a
 --- component. used in incline.
 ---@param props table buffer id number
----@param opts pts
+---@param opts owl.InfoOpts
 ---@return string
 local function fileinfo(props, opts)
   props = props or {}

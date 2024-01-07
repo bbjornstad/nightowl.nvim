@@ -381,6 +381,7 @@ kenv.color = keygroup({
 
 -- TODO: fix this mapping...generally maybe just rework this again.
 kenv.completion = keygroup({
+  trigger = "<C-Space><C-Space>",
   toggle = {
     [LEADER_ID] = { append = leader_code .. "x" },
     enabled = "e",
@@ -929,6 +930,7 @@ kenv.tool = keygroup({
     open = "o",
     preview = "p",
     last = "l",
+    log = "g",
   },
 }, leader_tool, {})
 
@@ -1076,6 +1078,9 @@ kenv.editor = keygroup({
     fetch = "f",
     update = "u",
     write = "w",
+    select_insert = "I",
+    select_fetch = "F",
+    select_write = "W",
   },
   glyph = {
     [LEADER_ID] = { append = "y" },

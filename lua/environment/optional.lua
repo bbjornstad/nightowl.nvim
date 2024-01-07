@@ -62,7 +62,7 @@ env.sessions = {
 --- performance consideration.
 env.prefer = {
   focus_windows = "windows",
-  gitblame = "f-person",
+  gitblame = "gitsigns",
   symbol_outline = "outline",
   timers = {
     pomodoro = "pulse.nvim",
