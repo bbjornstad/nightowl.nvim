@@ -112,6 +112,7 @@ require("lazy").setup({
         -- ocaml
         "/home/ursa-major/.opam/default/share/ocp-indent/vim",
         vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "lazyflex.nvim"),
+        vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "fzf"),
       },
       disabled_plugins = {
         -- these are disabled based on the fact that we are including other,
