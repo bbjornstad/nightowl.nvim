@@ -5,7 +5,7 @@ local slow_format_filetypes = {}
 return {
   {
     "mfussenegger/nvim-lint",
-    opts = { linters_by_ft = { text = {} } },
+    opts = { linters_by_ft = { text = { "vale" } } },
     config = function(_, opts)
       local custom = require("funsak.table").strip(opts, { "custom" })
       local lint = require("lint")

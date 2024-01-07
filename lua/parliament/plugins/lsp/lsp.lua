@@ -48,6 +48,8 @@ local lz = require("funsak.lazy")
 ---@field format { on_write: boolean?, format_opts: table?, blacklist: { [owl.lsp.ServerClient]: boolean? }? }?
 --- globally available capabilities that should be added to all servers.
 ---@field capabilities lsp.ClientCapabilities?
+--- whether or not to enable inlay hints or additional config options for hints
+---@field inlay_hints owl.lsp.EnhancementSpec?
 --- target log level for the lsp system.
 ---@field log_level vim.log.levels?
 
@@ -171,18 +173,6 @@ end
 ---@param enhancements owl.lsp.Enhancements
 ---@return fun(client: lsp.Client, bufnr: integer) handler
 local function generate_attach_handler(enhancements)
-  local null_enabled
-  if lz.has("none-ls.nvim") then
-    local null_opts = vim.deepcopy(lz.opts("none-ls.nvim"))
-    ---@cast null_opts +owl.NullLSPluginSpecOpts
-    null_enabled =
-      require("funsak.table").strip(null_opts, { "disabled", "enabled" })
-    ---@cast null_enabled +owl.NullLSActiveOpts
-    if null_enabled.disabled.by_default or not null_enabled.enabled then
-      require("null-ls").disable({})
-    end
-  end
-
   local status = enhancements.status ~= nil and enhancements.status or true
   status = not vim.tbl_contains({ "table", "boolean" }, type(status))
       and { status }
@@ -201,47 +191,6 @@ local function generate_attach_handler(enhancements)
 
   ---@param client lsp.Client
   local function attach_handler(client, bufnr)
-    if lz.has("none-ls.nvim") then
-      local ftype = vim.api.nvim_buf_get_option(bufnr, "filetype")
-      local name = client.name
-      local null_disabled = null_enabled.disabled
-      local startup_disable = null_disabled.by_default
-      if startup_disable then
-        require("null-ls").disable({ name = name, filetype = ftype })
-      end
-      null_enabled = null_enabled.enabled
-      if null_enabled then
-        if vim.tbl_contains(null_enabled.filetypes, ftype) then
-          require("null-ls").enable({ filetype = ftype })
-        end
-        if vim.tbl_contains(null_enabled.names, name) then
-          require("null-ls").enable({ name = name })
-        end
-        if
-          vim.tbl_contains(null_enabled.methods, function(method)
-            return client.supports_method(method)
-          end, { predicate = true })
-        then
-          require("null-ls").enable({ method = null_enabled.methods })
-        end
-      end
-      if null_disabled then
-        if vim.tbl_contains(null_disabled.filetypes, ftype) then
-          require("null-ls").disable({ filetype = ftype })
-        end
-        if vim.tbl_contains(null_disabled.names, name) then
-          require("null-ls").disable({ name = name })
-        end
-        if
-          vim.tbl_contains(null_disabled.methods, function(method)
-            return client.supports_method(method)
-          end, { predicate = true })
-        then
-          require("null-ls").disable({ method = null_disabled.methods })
-        end
-      end
-    end
-
     if status and lz.has("lsp-status.nvim") then
       require("lsp-status").on_attach(client)
     end
@@ -356,7 +305,6 @@ return {
       -- enhancement controlled
       { "jubnzv/virtual-types.nvim", optional = true },
       { "nvim-lua/lsp-status.nvim", optional = true },
-      { "nvimtools/none-ls.nvim", optional = true },
     },
 
     ---@param _ LazyPlugin
@@ -606,34 +554,6 @@ return {
         srvsetup()
       end
 
-      -- these are technically not required, I still use them both due to the
-      -- fact that nushell's main LSP implementation requires using null-ls as a
-      -- plugin and provides a corresponding source for null-ls. However, they
-      -- are wrapped in a guard to prevent issues in case these are not desired
-      -- or needed.
-      -- Moreover, consult with the documentation on `mason-null-ls` for more
-      -- information on installation and setup using mason-null-ls to configure
-      -- null-ls tools and sources automagically.
-      local has_nullls, null = pcall(require, "null-ls")
-      local has_mnull, mnull = pcall(require, "mason-null-ls")
-      if has_nullls and has_mnull then
-        mnull.setup({
-          ensure_installed = {},
-          automatic_installation = true,
-          handlers = {},
-        })
-        local null_opts = lz.opts("none-ls.nvim")
-        local edspec =
-          require("funsak.table").strip(null_opts, { "enabled", "disabled" })
-        ---@cast edspec owl.NullLSActiveOpts
-        local enable_spec = edspec.enabled
-        local disable_spec = edspec.disabled
-        null.setup(null_opts)
-        if disable_spec.by_default then
-          null.disable({})
-        end
-      end
-
       vim.diagnostic.config(opts.diagnostics or {})
 
       ---@diagnostic disable-next-line: param-type-mismatch
@@ -650,51 +570,11 @@ return {
       )
     end,
   },
-  ---@class owl.NullLSActiveOpts
-  ---@field enabled { filetypes: owl.FType[]?, names: string[]?, methods: fun()[]? }
-  ---@field disabled { filetypes: owl.FType[]?, names: string[]?, methods: fun()[]?, by_default: boolean? }
-  {
-    "nvimtools/none-ls.nvim",
-    optional = true,
-    enabled = opt.lsp.null_ls,
-    dependencies = {
-      "neovim/nvim-lspconfig",
-      { "jay-babu/mason-null-ls.nvim", enabled = opt.lsp.null_ls },
-    },
-    config = function(_, opts) end,
-    ---@class owl.NullLSPluginSpecOpts: owl.NullLSActiveOpts
-    ---@field border owl.UIDefBorder
-    ---@field debounce integer
-    opts = {
-      border = env.borders.main,
-      debounce = 500,
-      enabled = {
-        filetypes = {},
-        methods = {},
-        names = {},
-      },
-      disabled = {
-        by_default = true,
-        filetypes = {},
-        methods = {},
-        names = {},
-      },
-    },
-  },
-  {
-    "jay-babu/mason-null-ls.nvim",
-    dependencies = {
-      "williamboman/mason.nvim",
-      { "nvimtools/none-ls.nvim", optional = true },
-    },
-    optional = true,
-    config = false,
-  },
   {
     "jubnzv/virtual-types.nvim",
     config = function(_, opts) end,
     opts = { enabled = true },
-    vent = "LspAttach",
+    event = "LspAttach",
   },
   {
     "lvimuser/lsp-inlayhints.nvim",

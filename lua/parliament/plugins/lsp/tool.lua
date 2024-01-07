@@ -467,92 +467,25 @@ return {
     },
   },
   {
-    "patrickpichler/hovercraft.nvim",
+    "bbjornstad/hovercraft.nvim",
+    dev = true,
     opts = function(_, opts)
-      -- local prov = require("hovercraft.provider")
-      opts = opts or {}
-      -- opts.providers = opts.providers or {}
-      -- opts.providers.providers =
-      --   vim.tbl_extend("force", opts.providers.providers or {}, {
-      --     {
-      --       "LSP",
-      --       prov.Lsp.Hover.new(),
-      --     },
-      --     {
-      --       "Diag",
-      --       prov.Diagnostics.new(),
-      --     },
-      --     {
-      --       "Man",
-      --       prov.Man.new(),
-      --     },
-      --     {
-      --       "Dictionary",
-      --       prov.Dictionary.new(),
-      --     },
-      --     {
-      --       "Issues",
-      --       prov.Github.Issue.new(),
-      --     },
-      --     {
-      --       "Repo",
-      --       prov.Github.Repo.new(),
-      --     },
-      --     {
-      --       "User",
-      --       prov.Github.User.new(),
-      --     },
-      --     {
-      --       "Blame",
-      --       prov.Git.Blame.new(),
-      --     },
-      --   })
+      local Provider = require("hovercraft.provider")
+      opts.providers = vim.tbl_deep_extend("force", opts.providers or {}, {
+        providers = {
+          { "LSP", Provider.Lsp.Hover.new() },
+          { "Man", Provider.Man.new() },
+          { "Dictionary", Provider.Dictionary.new() },
+          { "Github Issue", Provider.Github.Issue.new() },
+          { "Github Repo", Provider.Github.Repo.new() },
+          { "Github User", Provider.Github.User.new() },
+          { "Diagnostics", Provider.Diagnostics.new() },
+          { "Git Blame", Provider.Git.Blame.new() },
+        },
+      })
       opts.window = vim.tbl_deep_extend("force", opts.window or {}, {
         border = env.borders.main,
       })
-      -- opts.keys = vim.tbl_deep_extend("force", opts.keys or {}, {
-      --   {
-      --     "<C-u>",
-      --     function()
-      --       require("hovercraft").scroll({ delta = -4 })
-      --     end,
-      --     desc = "lsp:| hover => scroll up",
-      --   },
-      --   {
-      --     "<C-d>",
-      --     function()
-      --       require("hovercraft").scroll({ delta = 4 })
-      --     end,
-      --     desc = "lsp:| hover => scroll down",
-      --   },
-      --   {
-      --     "<TAB>",
-      --     function()
-      --       require("hovercraft").hover_next()
-      --     end,
-      --     desc = "lsp:| hover => next source",
-      --   },
-      --   {
-      --     "<S-TAB>",
-      --     function()
-      --       require("hovercraft").hover_next({ step = -1 })
-      --     end,
-      --     desc = "lsp:| hover => previous source",
-      --   },
-      --   {
-      --     key_lsp.hover,
-      --     function()
-      --       local hc = require("hovercraft")
-      --       if hc.is_visible() then
-      --         hc.enter_popup()
-      --       else
-      --         hc.hover()
-      --       end
-      --     end,
-      --     mode = "n",
-      --     desc = "lsp:| hover |=> focus/open",
-      --   },
-      -- })
     end,
     keys = {
       {
@@ -562,7 +495,7 @@ return {
           if hc.is_visible() then
             hc.enter_popup()
           else
-            hc.hover_select()
+            hc.hover({ current_provider = "LSP" })
           end
         end,
         mode = "n",
