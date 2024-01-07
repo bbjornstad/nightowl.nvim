@@ -638,7 +638,7 @@ end, { desc = "ui:| ts |=> toggle highlight" })
 
 local scrollval = vim.o.scrolloff
 mapx("n", "<leader>uR", function()
-  toggle("scrolloff", false, { 999 - scrollval, scrollval })
+  toggle("scrolloff", false, { 200 - scrollval, scrollval })
 end, { desc = "ui.scroll:| vertical |=> toggle centered cursor" })
 
 mapx("n", "g`", "`", { desc = "vim:| |=> marks", remap = true })

@@ -72,7 +72,7 @@ vim.opt.hidden = true
 vim.opt.wrapscan = true
 
 -- scrolling behavior.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 190
 
 -- sign column and number column configuration
 vim.opt.ruler = true
