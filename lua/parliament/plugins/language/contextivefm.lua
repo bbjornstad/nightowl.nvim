@@ -5,16 +5,22 @@ local function efmconfig(opts)
   local efmls_config = vim.tbl_deep_extend("force", {
     filetypes = vim.tbl_keys(languages),
     settings = {
-      rootMarkers = { ".git/" },
-      languages = vim.tbl_extend("force", languages, {
-        lua = {
-          require("efmls-configs.linters.selene"),
-        },
-      }),
+      rootMarkers = {
+        ".neoconf.json",
+        ".git/",
+        ".contextive/",
+        "/prj/*",
+        "/prsc/*",
+      },
+      languages = languages,
     },
     init_options = {
       documentFormatting = true,
       documentRangeFormatting = true,
+      hover = true,
+      documentSymbol = true,
+      codeAction = true,
+      completion = true,
     },
   }, opts or {})
   return efmls_config
@@ -32,13 +38,22 @@ local function contextiveconfig(opts)
 end
 
 return {
-  lsp.server("efm", { server = function(_, opts) return efmconfig(opts) end }),
-  lsp.server("contextive",
-    { server = function(_, opts) return contextiveconfig(opts) end }),
+  lsp.server("efm", {
+    server = function(_, opts)
+      return efmconfig(opts)
+    end,
+    dependencies = {
+      "creativenull/efmls-configs-nvim",
+    },
+  }),
+  lsp.server("contextive", {
+    server = function(_, opts)
+      return contextiveconfig(opts)
+    end,
+  }),
   {
     "creativenull/efmls-configs-nvim",
     dependencies = { "neovim/nvim-lspconfig" },
-    event = "VeryLazy",
-    version = "v1.x.x",
+    event = "LspAttach",
   },
 }

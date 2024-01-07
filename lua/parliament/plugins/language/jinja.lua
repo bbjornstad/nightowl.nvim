@@ -7,12 +7,7 @@ return {
   },
   {
     "HiPhish/jinja.vim",
-    config = function(_, opts)
-      -- vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-      --   pattern = "*.html",
-      --   command = "jinja#AdjustFiletype()",
-      -- })
-    end,
+    config = function(_, opts) end,
     ft = { "jinja", "jinja2" },
   },
   lsp.linters(lsp.per_ft("curlylint", { "liquid" })),

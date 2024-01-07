@@ -2,6 +2,7 @@ local kenv = require("environment.keys")
 local key_norg = kenv.time.neorg
 local key_scope = kenv.scope
 local inp = require("parliament.utils.input")
+local lsp = require("funsak.lsp")
 
 local function norgbinder(norgbind, op)
   op = op or {}
@@ -87,14 +88,16 @@ return {
         ["core.dirman"] = {
           config = {
             workspaces = {
-              journal = "~/.notes/journal",
-              tasks = "~/.notes/tasks",
               prj = "~/prj",
-              life = "~/.notes",
-              prosaic = "~/prsc",
+              org = "~/org",
+              journal = "~/org/journal",
+              tasks = "~/org/tasks",
+              prosaic = "~/org/prsc",
+              nvim = "~/.config/nvim",
+              nushell = "~/.config/nushell",
             },
             index = "note-index.norg",
-            default_workspace = "life",
+            default_workspace = "org",
           },
         },
         ["core.completion"] = {
@@ -299,4 +302,25 @@ return {
   { "pysan3/neorg-templates", ft = "norg" },
   { "tamton-aquib/neorg-jupyter", ft = "norg" },
   { "laher/neorg-exec", ft = "norg" },
+  lsp.server("efm", {
+    server = function(_)
+      local function cfg(_)
+        local langs = require("efmls-configs.defaults").languages()
+        langs = vim.tbl_extend("force", langs, {
+          norg = {
+            require("efmls-configs.linters.vale"),
+          },
+        })
+        return {
+          filetypes = { "norg" },
+          settings = {
+            languages = langs,
+          },
+        }
+      end
+    end,
+    dependencies = {
+      "creativenull/efmls-configs-nvim",
+    },
+  }),
 }

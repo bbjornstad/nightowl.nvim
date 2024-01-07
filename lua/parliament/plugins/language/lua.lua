@@ -13,6 +13,36 @@ return {
       },
     }),
   }),
+  lsp.server("efm", {
+    server = function(_)
+      local function cfg(_)
+        local languages = require("efmls-configs.defaults").languages()
+        return {
+          filetypes = vim.tbl_keys(languages),
+          settings = {
+            languages = vim.tbl_extend("force", languages, {
+              lua = {
+                lsp.util.efmls({ "linters.selene", "formatters.stylua" }, {
+                  rootMarkers = {
+                    ".luarc.json",
+                    ".luarc.jsonc",
+                    ".luacheckrc",
+                    ".stylua.toml",
+                    "stylua.toml",
+                    "selene.toml",
+                    "selene.yml",
+                    ".git",
+                  },
+                }),
+              },
+            }),
+          },
+        }
+      end
+      return cfg(_)
+    end,
+    dependencies = { "creativenull/efmls-configs-nvim" },
+  }),
   lsp.linters({ lua = { "selene" } }),
   lsp.formatters({ lua = { "stylua" } }),
   {
@@ -25,14 +55,5 @@ return {
         },
       },
     },
-  },
-  {
-    "nvimtools/none-ls.nvim",
-    opts = function(_, opts)
-      opts.disabled = vim.tbl_deep_extend("force", opts.disabled or {}, {
-        filetypes = { "lua" },
-        names = { "luacheck", "editorconfig-checker" },
-      })
-    end,
   },
 }

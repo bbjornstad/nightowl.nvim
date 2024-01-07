@@ -56,19 +56,25 @@ return {
         key_rest.open,
         "<Plug>RestNvim",
         mode = "n",
-        desc = "rest=> open rest client",
+        desc = "rest:| client |=> open",
       },
       {
         key_rest.preview,
         "<Plug>RestNvimPreview",
         mode = "n",
-        desc = "rest=> open rest preview",
+        desc = "rest:| preview |=> open",
       },
       {
         key_rest.last,
         "<Plug>RestNvimLast",
         mode = "n",
-        desc = "rest=> open last used rest client",
+        desc = "rest:| last |=> open",
+      },
+      {
+        key_rest.log,
+        "<CMD>RestLog<CR>",
+        mode = "n",
+        desc = "rest:| log |=> open",
       },
     },
   },
@@ -77,7 +83,7 @@ return {
     opts = {
       copyright_holder = "Bailey Bjornstad | ursa-major",
       email = "bailey@bjornstad.dev",
-      license = "MIT",
+      license = "GPL-3.0-only",
     },
     config = true,
     cmd = { "LicenseInsert", "LicenseFetch", "LicenseUpdate", "LicenseWrite" },
@@ -105,6 +111,18 @@ return {
         "<CMD>LicenseWrite<CR>",
         mode = "n",
         desc = "license=> write",
+      },
+      {
+        key_licenses.select_insert,
+        function()
+          vim.ui.select(require("licenses.util").get_available_licenses(), {
+            prompt = "License Type",
+            nil,
+            "Code License",
+          }, function(input) end)
+        end,
+        mode = "n",
+        desc = "license=> select > insert",
       },
     },
   },
