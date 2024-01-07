@@ -208,260 +208,258 @@ return {
       "Lamby777/timewasted.nvim",
     },
     event = "VeryLazy",
-    opts = {
-      options = {
-        theme = "auto",
-        icons_enabled = true,
-        globalstatus = true,
-        component_separators = { left = "", right = "" },
-        section_separators = { left = "", right = "" },
-        refresh = {
-          statusline = 1000,
-          tabline = 1000,
-          winbar = 1000,
-        },
-        disabled_filetypes = {
-          statusline = vim.tbl_filter(function(it)
-            if it == "outline" or it == "Outline" then
-              return false
-            else
-              return true
-            end
-          end, env.ft_ignore_list),
-          winbar = lubar(),
-        },
-      },
-      sections = {
-        lualine_a = {
-          {
-            "mode",
-            fmt = function(mode, _)
-              local res
-              for k, v in pairs(env.icons.lualine.mode) do
-                if string.gmatch(mode, k) then
-                  res = env.icons.lualine.mode[mode]
-                  break
-                end
-              end
-              return string.format("󰩀 %s%s 󰨿", res or "", mode)
-            end,
+    opts = function()
+      return {
+        options = {
+          theme = "auto",
+          icons_enabled = true,
+          globalstatus = true,
+          component_separators = { left = "", right = "" },
+          section_separators = { left = "", right = "" },
+          refresh = {
+            statusline = 1000,
+            tabline = 1000,
+            winbar = 1000,
           },
-        },
-        lualine_b = {
-          {
-            "b:gitsigns_head",
-            icon = " ",
-            separator = "┊",
-          },
-          {
-            "diff",
-            colored = true,
-            symbols = env.icons.gitdiff,
-            source = sts.diff_source,
-          },
-        },
-        lualine_c = {
-          {
-            function()
-              local res = require("timewasted").get_fmt()
-              return res
-            end,
-            icon = "󱪑",
-            separator = "┊",
-          },
-          {
-            function()
-              return sts.wpm()
-            end,
-            cond = function()
-              local status, wpm = pcall(require, "wpm")
-              return wpm.wpm() >= 10 and status
-            end,
-            separator = "┊",
-          },
-        },
-        lualine_x = {
-          {
-            function()
-              return require("noice").api.status.command.get()
-            end,
-            icon = " ",
-            separator = "┊",
-          },
-        },
-        lualine_y = {
-          {
-            "filetype",
-            icon_only = false,
-            padding = { left = 1, right = 1 },
-          },
-          {
-            function()
-              local clients = vim.lsp.get_clients({ bufnr = 0 })
-              clients = vim.tbl_map(function(t)
-                return t.name
-              end, clients)
-              return table.concat(
-                vim.tbl_filter(function(t)
-                  return not vim.tbl_contains({
-                    "null-ls",
-                    "diagnosticls",
-                    "efm",
-                  }, t)
-                end, clients),
-                ":"
-              )
-            end,
-            icon = "󰇗 ",
-          },
-        },
-        lualine_z = {
-          {
-            "datetime",
-            style = "%H:%M [ %y-%m-%d ]",
-            icon = "󱇼 ",
-          },
-        },
-      },
-      tabline = {
-        lualine_a = {
-          {
-            "buffers",
-            show_filename_only = false,
-            mode = 4,
-            use_mode_colors = true,
-            icon = "󱏒 ",
-          },
-        },
-        lualine_x = {
-          {
-            function()
-              return require("noice").api.status.mode.get()
-            end,
-            cond = function()
-              return require("noice").api.status.mode.has()
-            end,
-            -- color = require('funsak.colors').component("DiagnosticError", "fg").fg,
-            color = "DiagnosticError",
-            icon = "󰻃 ",
-          },
-          {
-            function()
-              return sts.cust_fname()
-            end,
-            path = 0,
-            symbols = env.icons.modifications,
-          },
-        },
-        lualine_y = {
-          {
-            function()
-              return sts.pulse_status()
-            end,
-            cond = function()
-              if not has("pulse.nvim") or not sts.pulse_status() then
+          disabled_filetypes = {
+            statusline = vim.tbl_filter(function(it)
+              if it == "outline" or it == "Outline" then
                 return false
+              else
+                return true
               end
-              return true
-            end,
-          },
-          {
-            function()
-              return sts.memory_use()
-            end,
-            separator = "┊",
+            end, env.ft_ignore_list),
+            winbar = lubar(),
           },
         },
-        lualine_z = {
-          {
-            "tabs",
-            mode = 2,
-            use_mode_colors = true,
-            max_length = vim.o.columns / 6,
-            symbols = {
-              modified = " 󰰾",
+        sections = {
+          lualine_a = {
+            {
+              "mode",
+              fmt = function(mode, _)
+                local res
+                for k, v in pairs(env.icons.lualine.mode) do
+                  if string.gmatch(mode, k) then
+                    res = env.icons.lualine.mode[mode]
+                    break
+                  end
+                end
+                return string.format("󰩀 %s%s 󰨿", res or "", mode)
+              end,
             },
-            fmt = function(name, context)
-              local buflist = vim.fn.tabpagebuflist(context.tabnr)
-              local winnr = vim.fn.tabpagewinnr(context.tabnr)
-              local bufnr = buflist[winnr]
-              local mod = vim.fn.getbufvar(bufnr, "&mod")
-              local thisdir = vim.fn.getcwd(winnr, context.tabnr)
-              local dirtail = vim.fn.fnamemodify(thisdir, ":t")
+          },
+          lualine_b = {
+            {
+              "b:gitsigns_head",
+              icon = " ",
+              separator = "┊",
+            },
+            {
+              "diff",
+              colored = true,
+              symbols = env.icons.gitdiff,
+              source = sts.diff_source,
+            },
+          },
+          lualine_c = {
+            {
+              function()
+                local res = require("timewasted").get_fmt()
+                return res
+              end,
+              icon = "󱪑",
+              separator = "┊",
+            },
+            {
+              function()
+                return sts.wpm()
+              end,
+              cond = function()
+                local status, wpm = pcall(require, "wpm")
+                return wpm.wpm() >= 10 and status
+              end,
+              separator = "┊",
+            },
+          },
+          lualine_x = {
+            {
+              function()
+                return require("noice").api.status.command.get()
+              end,
+              icon = " ",
+              separator = "┊",
+            },
+          },
+          lualine_y = {
+            {
+              "filetype",
+              icon_only = false,
+              padding = { left = 1, right = 1 },
+            },
+            {
+              function()
+                local clients = vim.lsp.get_clients({ bufnr = 0 })
+                clients = vim.tbl_map(function(t)
+                  return t.name
+                end, clients)
+                return table.concat(
+                  vim.tbl_filter(function(t)
+                    return not vim.tbl_contains({}, t)
+                  end, clients),
+                  ":"
+                )
+              end,
+              icon = "󰇗 ",
+            },
+          },
+          lualine_z = {
+            {
+              "datetime",
+              style = "%H:%M [ %y-%m-%d ]",
+              icon = "󱇼 ",
+            },
+          },
+        },
+        tabline = {
+          lualine_a = {
+            {
+              "buffers",
+              show_filename_only = false,
+              mode = 4,
+              use_mode_colors = true,
+              icon = "󱏒 ",
+            },
+          },
+          lualine_x = {
+            {
+              function()
+                return require("noice").api.status.mode.get()
+              end,
+              cond = function()
+                return require("noice").api.status.mode.has()
+              end,
+              -- color = require('funsak.colors').component("DiagnosticError", "fg").fg,
+              color = "DiagnosticError",
+              icon = "󰻃 ",
+            },
+            {
+              function()
+                return sts.cust_fname()
+              end,
+              path = 0,
+              symbols = env.icons.modifications,
+            },
+          },
+          lualine_y = {
+            {
+              function()
+                return sts.pulse_status()
+              end,
+              cond = function()
+                if not has("pulse.nvim") or not sts.pulse_status() then
+                  return false
+                end
+                return true
+              end,
+            },
+            {
+              function()
+                return sts.memory_use()
+              end,
+              separator = "┊",
+            },
+          },
+          lualine_z = {
+            {
+              "tabs",
+              mode = 2,
+              use_mode_colors = true,
+              max_length = vim.o.columns / 6,
+              symbols = {
+                modified = " 󰰾",
+              },
+              fmt = function(name, context)
+                local buflist = vim.fn.tabpagebuflist(context.tabnr)
+                local winnr = vim.fn.tabpagewinnr(context.tabnr)
+                local bufnr = buflist[winnr]
+                local mod = vim.fn.getbufvar(bufnr, "&mod")
+                local thisdir = vim.fn.getcwd(winnr, context.tabnr)
+                local dirtail = vim.fn.fnamemodify(thisdir, ":t")
 
-              dirtail = (mod == 1 and "⦗ " or "⦋ ")
-                .. dirtail
-                .. (mod == 1 and " ⦘" or " ⦌")
+                dirtail = (mod == 1 and "⦗ " or "⦋ ")
+                  .. dirtail
+                  .. (mod == 1 and " ⦘" or " ⦌")
 
-              return dirtail
-            end,
-          },
-        },
-      },
-      winbar = {
-        lualine_a = {},
-        lualine_b = {},
-        lualine_c = { "%{%v:lua.dropbar.get_dropbar_str()%}" },
-        lualine_x = {
-          {
-            "diagnostics",
-            sources = {
-              "nvim_lsp",
-              "nvim_diagnostic",
-              -- "nvim_workspace_diagnostic",
-            },
-            sections = { "error", "warn", "info", "hint" },
-            symbols = {
-              error = env.icons.diagnostic.Error,
-              warn = env.icons.diagnostic.Warn,
-              info = env.icons.diagnostic.Info,
-              hint = env.icons.diagnostic.Hint,
-            },
-            separator = "⦙",
-          },
-          {
-            "diagnostics",
-            sources = {
-              -- "nvim_lsp",
-              -- "nvim_diagnostic",
-              "nvim_workspace_diagnostic",
-            },
-            sections = { "error", "warn", "info", "hint" },
-            symbols = {
-              error = env.icons.diagnostic.Error,
-              warn = env.icons.diagnostic.Warn,
-              info = env.icons.diagnostic.Info,
-              hint = env.icons.diagnostic.Hint,
+                return dirtail
+              end,
             },
           },
         },
-        lualine_y = {},
-        lualine_z = {},
-      },
-      inactive_winbar = {
-        lualine_a = {},
-        lualine_b = {},
-        lualine_c = { "%{%v:lua.dropbar.get_dropbar_str()%}" },
-        lualine_x = {},
-        lualine_y = {},
-        lualine_z = {},
-      },
-      extensions = {
-        "quickfix",
-        "aerial",
-        "fzf",
-        "lazy",
-        "man",
-        "neo-tree",
-        "nerdtree",
-        "nvim-tree",
-        "nvim-dap-ui",
-        "overseer",
-        "symbols-outline",
-        "toggleterm",
-        "trouble",
-      },
-    },
+        winbar = {
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = { "%{%v:lua.dropbar.get_dropbar_str()%}" },
+          lualine_x = {
+            {
+              "diagnostics",
+              sources = {
+                "nvim_lsp",
+                "nvim_diagnostic",
+                -- "nvim_workspace_diagnostic",
+              },
+              sections = { "error", "warn", "info", "hint" },
+              symbols = {
+                error = env.icons.diagnostic.Error,
+                warn = env.icons.diagnostic.Warn,
+                info = env.icons.diagnostic.Info,
+                hint = env.icons.diagnostic.Hint,
+              },
+              separator = "⦙",
+            },
+            {
+              "diagnostics",
+              sources = {
+                -- "nvim_lsp",
+                -- "nvim_diagnostic",
+                "nvim_workspace_diagnostic",
+              },
+              sections = { "error", "warn", "info", "hint" },
+              symbols = {
+                error = env.icons.diagnostic.Error,
+                warn = env.icons.diagnostic.Warn,
+                info = env.icons.diagnostic.Info,
+                hint = env.icons.diagnostic.Hint,
+              },
+            },
+          },
+          lualine_y = {},
+          lualine_z = {},
+        },
+        inactive_winbar = {
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = { "%{%v:lua.dropbar.get_dropbar_str()%}" },
+          lualine_x = {},
+          lualine_y = {},
+          lualine_z = {},
+        },
+        extensions = {
+          "quickfix",
+          "aerial",
+          "fzf",
+          "lazy",
+          "man",
+          "neo-tree",
+          "nerdtree",
+          "nvim-tree",
+          "nvim-dap-ui",
+          "overseer",
+          "symbols-outline",
+          "toggleterm",
+          "trouble",
+        },
+      }
+    end,
   },
   {
     "Bekaboo/dropbar.nvim",

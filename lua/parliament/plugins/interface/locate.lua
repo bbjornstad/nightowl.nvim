@@ -59,7 +59,7 @@ return {
         lualine = {
           enabled = true,
           highlight = "bg",
-        }
+        },
       },
     },
   },
@@ -159,6 +159,8 @@ return {
         { "[", "]" },
         { "<", ">" },
       },
+      delay = 50,
+      limit = 60,
     },
     init = function()
       -- `matchparen.vim` needs to be disabled manually in case of lazy loading
@@ -183,11 +185,12 @@ return {
   {
     "monkoose/matchparen.nvim",
     cmd = "MatchParenEnable",
+    enabled = false,
     opts = {
       on_startup = true,
       hl_group = "MatchParen",
       augroup_name = "matchparen",
-      debounce_time = 100,
+      debounce_time = 300,
     },
     config = function(_, opts)
       require("matchparen").setup(opts)

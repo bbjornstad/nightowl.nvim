@@ -45,7 +45,7 @@ return {
           require("mini.bufremove").delete(0, true)
         end,
         mode = "n",
-        desc = "buf:| |=> [!] delete",
+        desc = "buf:| [!] |=> delete",
       },
       {
         key_buffer.wipeout,
@@ -61,7 +61,7 @@ return {
           require("mini.bufremove").wipeout(0, true)
         end,
         mode = "n",
-        desc = "buf:| |=> wipeout",
+        desc = "buf:| [!] |=> wipeout",
       },
     },
   },
@@ -197,8 +197,6 @@ return {
       vim.opt.splitkeep = "screen"
     end,
     keys = {
-      { "<leader>ue", false },
-      { "<leader>uE", false },
       {
         key_view.edgy.toggle,
         function()
@@ -217,7 +215,7 @@ return {
       },
     },
     opts = function()
-      local opts = {
+      local op = {
         options = {
           left = { size = 28 },
           right = { size = 30 },
@@ -267,7 +265,7 @@ return {
       }
 
       if has("outline.nvim") then
-        opts.left = vim.list_extend(opts.left, {
+        op.left = vim.list_extend(op.left, {
           title = "symb::outline",
           ft = "Outline",
           size = { height = 0.5 },
@@ -288,8 +286,8 @@ return {
           end
         end
         table.insert(
-          opts[edgy_loc],
-          #opts[edgy_loc],
+          op[edgy_loc],
+          #op[edgy_loc],
           opts_mapper(condition_to, values)
         )
       end
@@ -327,7 +325,7 @@ return {
       get_auto_pin = function(bufnr)
         -- do any required filtration prior to using default settings.
         local bufft = vim.api.nvim_buf_get_option(bufnr, "filetype")
-        if vim.list_contains({ "Outline", "oil", "nnn" }, bufft) then
+        if vim.list_contains({ "nnn" }, bufft) then
           return "filetype"
         end
         return require("stickybuf").should_auto_pin(bufnr)
@@ -427,6 +425,7 @@ return {
   {
     "tiagovla/scope.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },
+    event = "VeryLazy",
     config = function(_, opts)
       require("scope").setup(opts)
       require("telescope").load_extension("scope")

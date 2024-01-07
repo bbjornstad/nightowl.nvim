@@ -395,7 +395,7 @@ return {
     "folke/flash.nvim",
     ---@type Flash.Config
     opts = {
-      label = { rainbow = { enabled = true, shade = 8 }, style = "overlay" },
+      label = { rainbow = { enabled = true, shade = 7 }, style = "overlay" },
       modes = { char = { keys = { "f", "F", "t", "T", "," } } },
       jump = { autojump = true },
     },

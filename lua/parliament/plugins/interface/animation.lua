@@ -27,7 +27,7 @@ return {
   },
   {
     "gen740/SmoothCursor.nvim",
-    lazy = false,
+    event = "BufWinEnter",
     config = function(_, opts)
       require("smoothcursor").setup(opts)
       local autocmd = vim.api.nvim_create_autocmd
@@ -60,9 +60,9 @@ return {
       type = "matrix",
       autostart = true,
       texthl = "SmoothCursor",
-      speed = 28,
-      threshold = 4,
-      intervals = 20,
+      speed = 24,
+      threshold = 3,
+      intervals = 8,
       priority = 5,
       flyin_effect = "bottom",
       matrix = {
@@ -72,7 +72,7 @@ return {
         },
         body = {
           cursor = signs.body,
-          length = 8,
+          length = 7,
           texthl = { "SmoothCursor" },
         },
         tail = {
