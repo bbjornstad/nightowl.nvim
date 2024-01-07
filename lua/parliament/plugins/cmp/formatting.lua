@@ -11,7 +11,6 @@ return {
       local has = require("funsak.lazy").has
       local cmp_format = require("lspkind").cmp_format({
         mode = "symbol_text",
-        -- preset = "codicons",
         maxwidth = 80,
         menu = {
           nvim_lsp = "⟪ lsp ⟫",
@@ -38,7 +37,7 @@ return {
           nerdfont = "⟪ nerd ⟫",
           AI = "⟪ aiml ⟫",
           spell = "⟪ spell ⟫",
-          ["cmp-dap"] = "⟪dap ⟫",
+          ["cmp-dap"] = "⟪ dap ⟫",
           omni = "⟪ omni ⟫",
           latex_symbol = "⟪ tex ⟫",
           ["cmp-tw2css"] = "⟪ tw ⟫",

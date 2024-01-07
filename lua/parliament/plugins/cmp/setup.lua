@@ -60,6 +60,7 @@ return {
       local cmp = require("cmp")
       cmp.setup(opts)
     end,
+    events = { "InsertEnter", "CmdlineEnter" },
     opts = function(_, opts)
       local has = require("funsak.lazy").has
       opts.enabled = opts.enabled
