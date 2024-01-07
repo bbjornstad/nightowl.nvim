@@ -3,7 +3,6 @@
 ---also controls some other formatting behavior as well.
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
-local api = vim.api
 local inp = require("parliament.utils.input")
 
 ---@class parliament.utils.text
@@ -41,10 +40,6 @@ function M.compute_remaining_width(offset, target)
   return target and (target - offset) or (res - offset)
 end
 
----@alias t_ftype
----| vim.opt.filetype # a filetype designation string used in neovim, e.g. "rust" or
----"markdown".
-
 -- TODO: update the below function so that the mechanism of handling specific
 -- filetypes is configurable to the end user
 function M.ftype_break_character(ftype)
@@ -63,18 +58,18 @@ end
 ---@param colstop number? if desired, an alternative width can be specified
 ---using the colstop ("column stop") parameter, an integer representing the end
 ---of the dash line (default first valid choice from colorcolumn | textwidth | 80)
----@param character (string|fun(ft: t_ftype): string)? the pattern of characters
+---@param character (string|fun(ft: owl.FType): string)? the pattern of characters
 ---that should be repeated to create the text to insert after the cursor.
----(default fun(ft: t_ftype): string)
+---(default fun(ft: owl.FType): string)
 function M.InsertDashBreak(colstop, character)
   colstop = tonumber(colstop) or 0
   if character == nil then
     character = M.ftype_break_character
   end
   local dashchar = (vim.is_callable(character) and character(vim.bo.filetype))
-      or (tostring(character) or "-")
+    or (tostring(character) or "-")
 
-  local row, col = unpack(api.nvim_win_get_cursor(0))
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
   local dashtil
   if colstop == 0 then
     dashtil = M.compute_remaining_width()
@@ -87,15 +82,15 @@ function M.InsertDashBreak(colstop, character)
   -- dashchar pattern. This gives the number of times to repeat dashchar between
   -- the cursor and the end of the line.
   local dashn = ((tonumber(dashtil) or 0) - (tonumber(col) or 0) - 1)
-      / string.len(tostring(dashchar))
+    / string.len(tostring(dashchar))
 
   local dashes = string.rep(
     type(dashchar) == "table" and table.concat(dashchar, "")
-    or tostring(dashchar),
+      or tostring(dashchar),
     dashn
   )
 
-  api.nvim_buf_set_text(
+  vim.api.nvim_buf_set_text(
     0,
     math.max(0, row - 1),
     col + 1,
@@ -105,13 +100,71 @@ function M.InsertDashBreak(colstop, character)
   )
 end
 
+---@alias DashSpec string | string[]
+
+---@generic IntLike: integer coercable to an integer value with `tonumber`
+--- computes a string which is a specified character or character pattern
+--- repeated for a certain number of glyphs. Typically would be used to
+--- construct a horizontal break made of specifiable characters.
+---@param width IntLike target width of the final string--*not* the number of
+---times to repeat.
+---@param char owl.Fowl<DashSpec>
+---@return string breakstr
+function M.compute_breakstr(char, width)
+  width = width ~= nil and tonumber(width) or 0
+  if char == nil then
+    char = M.ftype_break_character
+  end
+  char = vim.is_callable(char) and char(vim.bo.filetype)
+    or tostring(char)
+    or "-"
+  ---@diagnostic disable-next-line: param-type-mismatch
+  local dashn = math.floor(width / string.len(char))
+
+  return string.rep(
+    (type(char) == "table" and vim.tbl_islist(char)) and table.concat(char, "")
+      or tostring(char),
+    dashn
+  )
+end
+
+function M.cursor_breakstr(char, stopcol, winnr)
+  stopcol = stopcol ~= nil and tonumber(stopcol) or 0
+
+  winnr = winnr or vim.api.nvim_get_current_win()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(winnr))
+  local width = math.max(stopcol - col, 0)
+
+  return M.compute_breakstr(char, width)
+end
+
+---@class parliament.utils.BreakOptions
+---@field comment_string string | boolean?
+---@field width integer?
+---@field offset integer?
+---@field window integer?
+---@field trimming { allow_partial: boolean?, alternative: DashSpec }?
+
+--- computes the repeated string pattern that will form a break and then inserts
+--- it into the text.
+---@param char owl.Fowl<DashSpec>
+---@param opts parliament.utils.BreakOptions
+function M.breaker(char, opts)
+  opts = opts or {}
+
+  local width = opts.width or M.compute_remaining_width()
+  local comment = opts.comment_string ~= nil and opts.comment_string or true
+  comment = comment == true and vim.opt.commentstring:get() or comment or "%s"
+
+  local breakstr = M.cursor_breakstr(char, width)
+end
 --- inserts a line of repeated characters after the cursor, prepending the
 --- appropriate form of comment delimiter based on the filetype/configuration
 --- specifications. ideally, with nvim-ts-context-commentstring installed, this
 --- is automatically handled in the background.
 ---@param colstop number? if desired, an alternative width can be specified here
 ---as an integer, which will be the end column of the inserted text.
----@param dashchar (string|(fun(ft: t_ftype): string))? a pattern of characters
+---@param dashchar (string|(fun(ft: owl.FType): string))? a pattern of characters
 ---that will be repeated to create the inserted text. (defaults to `"-"`)
 ---@param include_space boolean? whether or not to include a space following the
 ---comment delimiting characters for the file, e.g. "#{text}" vs "# {text}"
@@ -121,14 +174,14 @@ function M.InsertCommentBreak(colstop, dashchar, include_space)
   local comment_string = vim.opt.commentstring:get()
   local comment_linestart = comment_string
 
-  local row, _ = unpack(api.nvim_win_get_cursor(0))
+  local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
   local printstr
   if include_space then
     printstr = comment_linestart .. " "
   else
     printstr = comment_linestart
   end
-  api.nvim_buf_set_text(0, row - 1, 0, row - 1, 0, { printstr })
+  vim.api.nvim_buf_set_text(0, row - 1, 0, row - 1, 0, { printstr })
   return M.InsertDashBreak(colstop, dashchar)
 end
 
@@ -149,7 +202,7 @@ function M.SelectedCommentBreak(colstop, include_space)
 end
 
 function M.get_previous_linelen()
-  local row = api.nvim_win_get_cursor(0)[1]
+  local row = vim.api.nvim_win_get_cursor(0)[1]
 
   -- the following is required since we are not using the form including the
   -- `end` argument.
