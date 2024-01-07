@@ -146,7 +146,7 @@ local FDNAME_LEADER_AUTOMORPHISM = "${[ leader ]}"
 ---@param opts { fd_automorphism: string?, special: SpecialMethodSpec? }
 local function setup(opts)
   FDNAME_LEADER_AUTOMORPHISM = opts.fd_automorphism
-      or FDNAME_LEADER_AUTOMORPHISM
+    or FDNAME_LEADER_AUTOMORPHISM
   DefaultSpecialMethods = mopts({}, DefaultSpecialMethods, opts.special)
 end
 
@@ -155,7 +155,7 @@ end
 --- specification. The contents of this field determine the manner in which new
 --- modifications to an existing leader hierarchy are added.
 ---@param leaders string?
----@param opts T_Opts?
+---@param opts LeaderSpec?
 ---@return string ldr the parsed leader with new modifications added.
 local function parse_leaders(maps, leaders, opts)
   opts = opts or {}
@@ -227,7 +227,7 @@ end
 ---methods.
 local function attach_special_methods(maps, leaders, special)
   special = special and mopts(DefaultSpecialMethods, special)
-      or DefaultSpecialMethods
+    or DefaultSpecialMethods
   local special_mt = {}
   special_mt.__index = special_mt
 
@@ -238,15 +238,15 @@ local function attach_special_methods(maps, leaders, special)
       return leaders(maps)
     end
   ) or function(cls)
-    return leaders or ""
-  end
+      return leaders or ""
+    end
 
   for k, v in pairs(special) do
     local this_fn = (
       vim.is_callable(v)
-      and function(cls, ...)
-        return v(...)
-      end
+        and function(cls, ...)
+          return v(...)
+        end
       or function(cls, ...)
         return v
       end
@@ -315,7 +315,7 @@ end
 ---@param action VimCmd | fun(): any action that is mapped on the right-hand
 ---side of the keybinding, either as vim command representation or as a lua
 ---function accepting 0 arguments.
----@param opts T_Opts additional options that are passed to the underlying call
+---@param opts owl.GenericOpts additional options that are passed to the underlying call
 ---to the internal keymap engine, e.g. `silent = true` or `buffer = 0`. These
 ---are used directly in the case of `vim.keymap.set` and are unpacked directly in
 ---the case of `lazy.nvim` style.
@@ -357,7 +357,7 @@ end
 --- specifications for more info.
 ---@param maps Keybindings
 ---@param leader string?
----@param opts T_Opts?
+---@param opts LeaderSpec?
 ---@return Keybindings mapped
 local function recursive_wrap_keymaps(maps, leader, opts)
   opts = opts or {}

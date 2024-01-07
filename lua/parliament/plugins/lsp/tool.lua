@@ -514,7 +514,7 @@ return {
       exclude_filetypes = env.ft_ignore_list,
       command = { name = "GenTags", desc = "generate tags" },
       debug = {
-        enable = false,
+        enable = true,
         console_log = true,
       },
     },

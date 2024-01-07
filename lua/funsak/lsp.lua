@@ -70,13 +70,20 @@ function M.noop()
   return require("lsp-zero").noop
 end
 
+---@class owl.lsp.LangServerConfig
+---@field server owl.Fowl<owl.lsp.ClientConfig>?
+---@field setup owl.lsp.SetupConfig?
+---@field mason owl.lsp.MasonConfig?
+---@field dependencies owl.Fowl<owl.lsp.DependencyConfig>?
+---@field roots owl.Fowl<owl.PathComponent>?
+
 --- adds a specification component which sets up a language server within the
 --- lsp support in neovim; essentially just a reduction of boilerplate when
 --- writing the configuration for languages separately--we now can simply know a
 --- target "conceptual schema" for language setup and skip writing in all the
 --- superfluous table elements.
 ---@param name owl.lsp.ServerClient language server name, e.g. "lua_ls"
----@param opts { server: owl.Fowl<owl.lsp.ClientConfig>?, setup: owl.lsp.SetupConfig?, mason: owl.lsp.MasonConfig?, dependencies: owl.Fowl<owl.lsp.DependencyConfig>? }?
+---@param opts owl.lsp.LangServerConfig?
 ---@return LazyPluginSpec
 local function server(name, opts)
   opts = opts or {}
@@ -251,6 +258,23 @@ function M.per_ft(items, ftypes, opts)
   items = type(items) ~= "table" and { items } or items
   opts = opts or {}
   return per(ftypes, items, opts.box ~= nil and opts.box or false)
+end
+
+M.util = {}
+
+local function util_efmls(config_id, override)
+  local cfg = require("efmls-configs." .. config_id)
+  return vim.tbl_deep_extend("force", cfg, override)
+end
+
+function M.util.efmls(config_ids, override)
+  local f = recurser(util_efmls)
+  return unpack(f(config_ids, override))
+end
+
+function M.util.roots(rts, opts)
+  opts = opts or {}
+  require("lspconfig.util").root_pattern(unpack(rts))
 end
 
 return M
