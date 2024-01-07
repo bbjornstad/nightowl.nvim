@@ -1,6 +1,10 @@
 local M = {}
 
 M.presets = {
+  animation = {
+    "SmoothCursor.nvim",
+    "cinnamon.nvim",
+  },
   alpha = {
     "dashboard.nvim",
     "veil.nvim",
@@ -18,7 +22,8 @@ M.presets = {
   },
   pairs = {
     "mini.pairs",
-    "nvim-autopairs"
+    "nvim-autopairs",
+    "sentiment.nvim",
   },
   organization = {
     "neorg",
@@ -29,13 +34,13 @@ M.presets = {
     "headlines.nvim",
     "org-modern.nvim",
     "org-bullets.nvim",
-    "telescope-orgmode.nvim"
+    "telescope-orgmode.nvim",
   },
   neorg_extras = {
     "neorg-figlet-module",
     "neorg-templates",
     "neorg-jupyter",
-    "neorg-exec"
+    "neorg-exec",
   },
   time = {
     "due.nvim",
@@ -80,7 +85,7 @@ M.presets = {
   },
   autoclose = {
     "nvim-early-retirement",
-    "hbac.nvim"
+    "hbac.nvim",
   },
   windows = {
     "focus.nvim",
@@ -102,7 +107,6 @@ M.presets = {
     "neodev",
     "mason.nvim",
     "mason-lspconfig.nvim",
-    "none-ls.nvim",
   },
   lsp_extras = {
     "outline.nvim",
@@ -111,10 +115,6 @@ M.presets = {
     "lsp-toggle.nvim",
     "clear-action.nvim",
     "glance.nvim",
-  },
-  null_ls = {
-    "none-ls.nvim",
-    "mason-null-ls.nvim"
   },
   lint = {
     "nvim-lint",
@@ -130,7 +130,7 @@ M.presets = {
   cmp = {
     "nvim-cmp",
     "LuaSnip",
-    ""
+    "lsp-zero.nvim",
   },
   cmp_sources = {
     "cmp-nvim-lsp",
@@ -175,7 +175,7 @@ M.presets = {
   snippet_sources = {
     "vim-snippets",
     "friendly-snippets",
-    "telescope-luasnip.nvim"
+    "telescope-luasnip.nvim",
   },
   build = {
     "executor.nvim",
@@ -199,7 +199,7 @@ M.presets = {
   },
   quickfix = {
     "nvim-bqf",
-    "trouble.nvim"
+    "trouble.nvim",
   },
   debug = {
     "nvim-dap",
@@ -207,14 +207,14 @@ M.presets = {
     "mason-nvim-dap",
     "debugprint.nvim",
     "nvim-coverage",
-    "printer.nvim"
+    "printer.nvim",
   },
   dap_extras = {
     "nvim-dap-virtual-text",
     "nvim-dap-repl-highlights",
     "dap-utils.nvim",
     "dap-helper.nvim",
-    "goto-breakpoints.nvim"
+    "goto-breakpoints.nvim",
   },
   terminal = {
     "toggleterm.nvim",
@@ -297,6 +297,17 @@ M.presets = {
   },
   miscellaneous = {
     "code-shot.nvim",
+  },
+  filesystem = {
+    "neo-tree.nvim",
+    "broot.nvim",
+    "fm-nvim",
+    "oil.nvim",
+    "nnn.nvim",
+    "attempt.nvim",
+    "memento.nvim",
+    "arena.nvim",
+    "tfm.nvim",
   },
 }
 
