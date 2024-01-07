@@ -13,10 +13,8 @@ contexts:
           conceptually, an item which represents both a sequence of keystrokes
           entered on a keyboard in a Neovim window, together with the associated
           triggered action (plus any metadata such as description, etc.)
-        examples: |
-          - The Keybind { "<leader>fr", function()
-          require('telescope.builtin').oldfiles() end, mode = "n", desc =
-          "recent files" } is a representation in lazy.nvim spec style
+        examples:
+          - "{ '<leader>fr', function() require('telescope.builtin').oldfiles() end, mode = 'n', desc = 'recent files' }"
       - name: Leader
         definition: |
           Typically, a specific key can be defined as a vim-option to be the
@@ -69,7 +67,7 @@ contexts:
           a plugin component or other user-defined functionality which modulates
           the typical LSP behavior with extra features like virtual-types
   - name: CodeFacets
-    domainVisionStatemenet: |
+    domainVisionStatement: |
       Aspects of the code and implementation details that are relevant for user
       configurability and utilizing the functionality of the parliament system
     terms:

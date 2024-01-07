@@ -4,7 +4,7 @@ description:
 authors: ursa-major
 categories:
 created: 2023-11-25T16:47:04-0700
-updated: 2024-01-02T15:35:38-0700
+updated: 2024-01-07T14:01:28-0700
 version: 1.1.1
 @end
 
@@ -74,19 +74,19 @@ version: 1.1.1
     the entire sheet.
     - ( ) figure out what is happening
     - ( ) fix what is happening
-*** (-) Website Requirements: zola.nvim and jinja templating.
+*** (x) Website Requirements: zola.nvim and jinja templating.
     For some strange reason, it seems as though I have some additional trouble
     loading zola.nvim in certain contexts. These seem to be during load of
     markdown plugins in cases where there is a notification which is
     reinterpreted by noice.nvim into markdown-styled text for hierarchy of
     information purposes.
-    - (-) figure out what seems to be occurring with zola.
+    - (x) figure out what seems to be occurring with zola.
 
     Jinja is having separate troubles, namely it seems like the syntax file
     fails to load in every case. This obviously needs to be fixed. Something
     seems to be happening with the dotted filetype syntax, idk why it fails to
     register "html.jinja" as both a jinja and html file, as it should.
-    - (-) figure out why the syntax isn't loading appropriately
+    - (x) figure out why the syntax isn't loading appropriately
 *** Update 2023-12-31
     I don't really think that this is fixed, per-se but maybe more like
     superceded? The transition to Kickstart instead of LazyVim has proven that
@@ -164,7 +164,7 @@ version: 1.1.1
      - ( ) Reason
      - ( ) Nix
      - ( ) Robotframework
-     - (-) CSS, SCSS, tailwindcss
+     - (x) CSS, SCSS, tailwindcss
      - ( ) prosemd
      - ( ) arduino
      - ( ) antlers
@@ -193,9 +193,9 @@ version: 1.1.1
     configuration which handles all interaction with external LLM or
     chatgpt-like interfaces. Presently, there are some issues it seems with the
     way that components of this submodule are being configured and used.
-    - ( ) test each plugin in the submodule to see if there are configuration
+    - (x) test each plugin in the submodule to see if there are configuration
           issues.
-    - ( ) Remove any plugins that are strong offenders in the useless category.
+    - (-) Remove any plugins that are strong offenders in the useless category.
 *** `funsak` implementations
     This, of course, refers to the tools that I have written that are
     functional swiss army-knife attachments for working with lazy.nvim

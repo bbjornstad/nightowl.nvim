@@ -1,39 +1,39 @@
 {
-  "neodev": {
-    "library": {
-      "enabled": true,
-      "plugins": true
-    }
-  },
-  "neoconf": {
-    "plugins": {
-      "lua_ls": {
-        "enabled": true
-      }
-    }
-  },
-  "lspconfig": {
-    "lua_ls": {
-      "Lua.hint": {
-        "enabled": true,
-        "setType": true,
-        "arrayIndex": "Enable",
-        "paramType": true,
-        "await": true,
-        "paramName": "All",
-        "semicolon": "SameLine"
-      },
-      "Lua.codeLens.enable": true,
-      "Lua.workspace.checkThirdParty": false,
-      "Lua.completion": {
-        "callSnippet": "Both",
-        "displayContext": "Both"
-      },
-      "Lua.diagnostics": {
-        "workspaceDelay": 500,
-        "globals": ["vim"]
-      },
-      "Lua.runtime.version": "LuaJIT"
-    }
-  }
+	"neodev": {
+		"library": {
+			"enabled": true,
+			"plugins": true
+		}
+	},
+	"neoconf": {
+		"plugins": {
+			"lua_ls": {
+				"enabled": true
+			}
+		}
+	},
+	"lspconfig": {
+		"lua_ls": {
+			"Lua.hint": {
+				"enabled": true,
+				"setType": true,
+				"arrayIndex": "Enable",
+				"paramType": true,
+				"await": true,
+				"paramName": "All",
+				"semicolon": "SameLine"
+			},
+			"Lua.codeLens.enable": true,
+			"Lua.workspace.checkThirdParty": false,
+			"Lua.completion": {
+				"callSnippet": "Both",
+				"displayContext": "Both"
+			},
+			"Lua.diagnostics": {
+				"workspaceDelay": 500,
+				"globals": ["vim"]
+			},
+			"Lua.runtime.version": "LuaJIT"
+		}
+	}
 }
