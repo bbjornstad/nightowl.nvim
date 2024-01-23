@@ -21,6 +21,12 @@ return {
         extension = {
           nu = "nu",
         },
+        pattern = {
+          ["*.nu"] = "nu",
+          ["~/.config/nushell/core/*"] = "nu",
+          ["~/.config/nushell/util/*"] = "nu",
+          ["~/.config/nushell/completions/"] = "nu",
+        },
       })
       vim.filetype.add({
         pattern = {

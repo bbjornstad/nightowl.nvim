@@ -119,7 +119,9 @@ return {
             prompt = "License Type",
             nil,
             "Code License",
-          }, function(input) end)
+          }, function(input)
+            vim.cmd(string.format([[LicenseInsert %s]], input))
+          end)
         end,
         mode = "n",
         desc = "license=> select > insert",

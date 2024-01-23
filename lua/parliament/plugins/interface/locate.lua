@@ -46,7 +46,7 @@ return {
       -- main options file, but this is helpful for modularity.
       vim.o.cursorline = true
       vim.o.number = true
-      vim.o.termguicolors = true
+      -- vim.o.termguicolors = true
     end,
     opts = {
       show_warnings = true,
@@ -67,7 +67,7 @@ return {
     "lukas-reineke/indent-blankline.nvim",
     event = "VeryLazy",
     config = function(_, opts)
-      local defhl = require("funsak.colors").initialize_custom_highlights
+      local defhl = require("funsak.colors").set_hl_multi
       defhl({
         "IndentBlanklineWhitespace",
         "IndentBlanklineScope",
@@ -83,7 +83,7 @@ return {
       vim.opt.showbreak = "⊧ "
     end,
     opts = {
-      enabled = true,
+      enabled = false,
       debounce = 400,
       indent = {
         char = "┆",
@@ -137,6 +137,7 @@ return {
       local cw = require("codewindow")
       cw.setup(opts)
       cw.apply_default_keybinds()
+      vim.api.nvim_set_hl(0, "CodewindowBackground", { blend = 50 })
     end,
     opts = {
       auto_enable = true,
@@ -145,6 +146,7 @@ return {
         { "mail", "himalaya-email-listing" }
       ),
       minimap_width = 8,
+      screen_bounds = "background",
       window_border = env.borders.alt,
     },
   },
@@ -176,41 +178,61 @@ return {
     opts = {
       enabled = true,
       char = "╵",
-      virtcolumn = "+1",
+      virtcolumn = table.concat(env.column_rulers or { "+1" }, ","),
       exclude = {
         filetypes = env.ft_ignore_list,
       },
     },
   },
   {
-    "monkoose/matchparen.nvim",
-    cmd = "MatchParenEnable",
-    enabled = false,
-    opts = {
-      on_startup = true,
-      hl_group = "MatchParen",
-      augroup_name = "matchparen",
-      debounce_time = 300,
-    },
+    "shellRaining/hlchunk.nvim",
+    event = "UIEnter",
     config = function(_, opts)
-      require("matchparen").setup(opts)
+      local chunk_ft = require("hlchunk.utils.filetype")
+      opts.chunk.support_filetypes = vim.list_extend(
+        opts.chunk.support_filetypes,
+        chunk_ft.support_filetypes
+      )
+      opts.chunk.exclude_filetypes = vim.list_extend(
+        opts.chunk.exclude_filetypes,
+        chunk_ft.exclude_filetypes
+      )
+      require("hlchunk").setup(opts)
     end,
-    event = "VeryLazy",
-    init = function()
-      vim.g.loaded_matchparen = 1
-    end,
-    keys = {
-      {
-        key_ui.matchparen.enable,
-        "<CMD>MatchParenEnable<CR>",
-        mode = "n",
-        desc = "matchparen=> enable",
+    opts = {
+      indent = {
+        enable = true,
+        chars = { "┆", "┊" },
+        style = require("funsak.colors").dvalue("@comment", "fg"),
       },
-      {
-        key_ui.matchparen.disable,
-        "<CMD>MatchParenDisable<CR>",
-        mode = "n",
-        desc = "matchparen=> disable",
+      line_num = {
+        enable = true,
+        use_treesitter = true,
+        style = require("funsak.colors").dvalue("@text.environment", "fg"),
+      },
+      blank = {
+        enable = false,
+        chars = {
+          "․",
+        },
+      },
+      chunk = {
+        enable = true,
+        notify = true,
+        use_treesitter = true,
+        support_filetypes = {},
+        exclude_filetypes = {},
+        chars = {
+          horizontal_line = "-",
+          vertical_line = "|",
+          left_top = "-",
+          left_bottom = "-",
+          right_arrow = ">",
+        },
+        style = {
+          { fg = require("funsak.colors").dvalue("DiagnosticInfo", "fg") },
+          { fg = require("funsak.colors").dvalue("DiagnosticError", "fg") },
+        },
       },
     },
   },

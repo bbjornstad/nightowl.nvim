@@ -27,14 +27,6 @@ local organization_tools = {
     dependencies = { "nvim-telescope/telescope.nvim" },
   },
   {
-    "lukas-reineke/headlines.nvim",
-    ft = { "markdown", "rmd", "org", "norg" },
-    config = function(_, opts)
-      require("headlines").setup(opts)
-    end,
-    opts = {},
-  },
-  {
     "nvim-orgmode/orgmode",
     dependencies = {
       {
@@ -46,9 +38,9 @@ local organization_tools = {
           }, opts.highlight or {})
         end,
       },
-      { "akinsho/org-bullets.nvim",       ft = { "org" } },
+      { "akinsho/org-bullets.nvim", ft = { "org" } },
       { "joaomsa/telescope-orgmode.nvim", ft = { "org" } },
-      { "danilshvalov/org-modern.nvim",   ft = { "org" } },
+      { "danilshvalov/org-modern.nvim", ft = { "org" } },
       { "lukas-reineke/headlines.nvim" },
     },
     ft = { "org" },
@@ -67,14 +59,12 @@ local organization_tools = {
       org_todo_keywords = {
         "TODO(t)",
         "URGENT",
-        "SUPER",
-        "AWAIT",
-        "PROGRESSING",
+        "CODE",
+        "WAITING",
+        "HELD",
         "CHECK",
         "|",
         "DONE",
-        "REPEATED",
-        "GOTITALL",
         "NIXED",
       },
       org_todo_keyword_faces = {
@@ -88,19 +78,14 @@ local organization_tools = {
           underline = "on",
           weight = "bold",
         }),
-        SUPER = colorize(colors.sumiInk4, colors.autumnRed, {
+        CODE = colorize(colors.sumiInk4, colors.autumnRed, {
           slant = "italic",
           underline = "on",
         }),
-        AWAIT = colorize(colors.sumiInk4, colors.dragonPink, {
+        WAITING = colorize(colors.sumiInk4, colors.dragonPink, {
           slant = "italic",
         }),
-        REPEATED = colorize(
-          colors.sumiInk4,
-          colors.lotusGreen3,
-          { underline = "on" }
-        ),
-        PROGRESSING = colorize(
+        HELD = colorize(
           colors.sumiInk4,
           colors.dragonPink,
           { slant = "italic" }
@@ -109,11 +94,6 @@ local organization_tools = {
           colors.sumiInk4,
           colors.lotusBlue4,
           { slant = "italic" }
-        ),
-        GOTITALL = colorize(
-          colors.sumiInk4,
-          colors.sumiInk0,
-          { underline = "on" }
         ),
         NIXED = colorize(
           colors.sumiInk4,
@@ -137,8 +117,7 @@ local organization_tools = {
         },
         [key_org.task.full] = {
           description = "Full",
-          template =
-          "* TODO %? | [%]\n  SCHEDULED: <%^{Start: |%<%Y-%m-%d %a>}> DEADLINE: <%^{End: |%<%Y-%m-%d %a>}>",
+          template = "* TODO %? | [%]\n  SCHEDULED: <%^{Start: |%<%Y-%m-%d %a>}> DEADLINE: <%^{End: |%<%Y-%m-%d %a>}>",
         },
         [key_org.event:leader()] = "Event",
         [key_org.event._until] = {
@@ -147,12 +126,13 @@ local organization_tools = {
         },
         [key_org.event.single] = {
           description = "Single",
-          template = "* TODO %? | [%]\n  <%^{Date: |%<%Y-%m-%d %a>}>",
+          template = [[* TODO %? | [%]
+              <%^{Date: |%<%Y-%m-%d %a>}>]],
         },
         [key_org.event.range] = {
           description = "Range",
-          template =
-          "* TODO %? | [%]\n  <%^{Start: |%<%Y-%m-%d %a>}>--<%^{End: |%<%Y-%m-%d %a>}>",
+          template = [[* TODO %? | [%]\n
+            <%^{Start: |%<%Y-%m-%d %a>}>--<%^{End: |%<%Y-%m-%d %a>}>"]],
         },
       },
       mappings = {
@@ -190,14 +170,6 @@ local organization_tools = {
         },
       })
     end,
-  },
-  {
-    "lukas-reineke/headlines.nvim",
-    ft = { "org", "norg", "markdown", "md", "rmd", "quarto" },
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-    },
-    config = true,
   },
 }
 

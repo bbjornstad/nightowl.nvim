@@ -1,7 +1,6 @@
-local lsp = require('funsak.lsp')
+local lsp = require("funsak.lsp")
 
 return {
-  lsp.server("metals", { handler = lsp.noop }),
   lsp.formatters(lsp.per_ft("scalafmt", { "scala", "scl" })),
   {
     "scalameta/nvim-metals",
@@ -14,6 +13,7 @@ return {
     ft = { "scala", "scl" },
     config = function(_, opts)
       local metalscfg = require("metals").bare_config()
+      metalscfg.init_options.statusBarProvider = "on"
       metalscfg.capabilities = require("lsp-zero").get_capabilities()
       local metals_augroup =
         vim.api.nvim_create_augroup("nvim-metals", { clear = true })

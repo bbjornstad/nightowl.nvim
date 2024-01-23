@@ -2,7 +2,7 @@ local env = require("environment.ui")
 local lsp = require("funsak.lsp")
 
 return {
-  lsp.server("rust_analyzer", { handler = lsp.noop }),
+  lsp.server("rust_analyzer", { setup = { handler = lsp.noop } }),
   lsp.formatters(lsp.per_ft("rustfmt", { "rust", "rs" })),
   {
     "Saecki/crates.nvim",

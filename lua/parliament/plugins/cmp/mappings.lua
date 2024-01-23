@@ -1,4 +1,4 @@
----@module cmp.mappings" main mappings for nvim-cmp, defining standard behavior
+---@module "cmp.mappings" main mappings for nvim-cmp, defining standard behavior
 ---for default popup completion menus and ideally a component to allow for the
 ---creation of cmp-submenus which hold a subset of sources or features.
 ---@author Bailey Bjornstad | ursa-major
@@ -258,10 +258,6 @@ return {
                   { name = "path" },
                   { name = "cmdline" },
                   { name = "look" },
-                }, {
-                  { name = "rg" },
-                  { name = "env" },
-                  { name = "buffer" },
                 }),
               },
             })

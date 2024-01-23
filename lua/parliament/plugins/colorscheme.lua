@@ -1,13 +1,93 @@
+-- SPDX-FileCopyrightText: 2025 Bailey Bjornstad | ursa-major <bailey@bjornstad.dev>
+-- SPDX-License-Identifier: MIT
+
+-- MIT License
+
+--  Copyright (c) 2024 Bailey Bjornstad | ursa-major bailey@bjornstad.dev
+
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+
+-- The above copyright notice and this permission notice (including the next
+-- paragraph) shall be included in all copies or substantial portions of the
+-- Software.
+
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+
+---@module "parliament.plugins.colorscheme" colorscheme setup for parliamentary
+---neovim configurations
+---@author Bailey Bjornstad | ursa-major
+---@license MIT
+
 local env = require("environment.ui")
 local default_colorizer = require("funsak.colors").identify_highlight
 local comp = require("funsak.colors").component
-local bg_style = vim.env.NIGHTOWL_BACKGROUND_STYLE
+local conv = require("funsak.convert")
+local lz = require("funsak.lazy")
+local bg_style = os.getenv("NIGHTOWL_BACKGROUND")
+local scheme_sel = os.getenv("NIGHTOWL_COLORSCHEME")
 
-if vim.fn.has("termguicolors") then
-  vim.cmd([[set termguicolors]])
+if conv.bool_from_env("NIGHTOWL_DEBUG") then
+  lz.info("Selected Background " .. bg_style)
+  lz.info("Selected Colorscheme " .. scheme_sel)
+end
+-- if vim.fn.has("termguicolors") then
+--   vim.cmd([[set termguicolors]])
+-- end
+
+-- warn if there is not a background designation set in the corresponding
+-- environment variable.
+if not bg_style then
+  vim.notify(
+    [[This configuration is missing a background specification in the environment.
+    You can set the background using the NIGHTOWL_BACKGROUND environment variable,
+    which accepts two possible values: "light" or "dark". Without setting this variable,
+    defaults to "dark"]]
+  )
 end
 
-local defhl = require("funsak.colors").initialize_custom_highlights
+local defhl = require("funsak.colors").set_hl_multi
+
+local function load_scheme(scheme, opts)
+  opts = opts or {}
+  local cs_has_lua, csmod = pcall(require, scheme)
+  local load_ok, load_res
+  if cs_has_lua then
+    load_ok, load_res = pcall(csmod.load)
+  end
+  if not load_ok then
+    if not opts.suppress_warning then
+      require("funsak.lazy").warn(
+        ("Could not load scheme using lua: %s\nmsg: %s\nAttempting to load using vim"):format(
+          scheme,
+          load_res
+        )
+      )
+    end
+    local vload_ok, vload_res =
+      pcall(vim.cmd, ("colorscheme %s"):format(scheme))
+    if not vload_ok then
+      if not opts.suppress_warning then
+        require("funsak.lazy").warn(
+          ("Could not load scheme using vim fallback: %s\nmsg: %s\nAttempting to load using vim"):format(
+            scheme,
+            vload_res
+          )
+        )
+      end
+    end
+  end
+end
 
 local REQUIRED_HLS = {
   telescope = {
@@ -47,26 +127,53 @@ local REQUIRED_HLS = {
   },
 }
 
-local function hl_scheme_segments(scheme)
-  return function(colors)
-    colors = type(colors) == "function" and colors() or colors
+-- set up an autocommand to make sure that on change of colorscheme, we actually
+-- go forward and apply the highlights that are necessary for functioning
+-- without erroring all over the map.
+
+local function autocmdr(group_name, group_opts)
+  group_opts = group_opts or {}
+  local augroup_opts = group_opts.augroup or {}
+  augroup_opts = vim.tbl_deep_extend("force", { clear = true }, augroup_opts)
+  return function(events, handler, specopts)
+    specopts = specopts or {}
+    vim.api.nvim_create_autocmd(
+      events,
+      vim.tbl_deep_extend("force", vim.is_callable(handler) and {
+        group = vim.api.nvim_create_augroup(group_name, augroup_opts),
+        callback = handler,
+      } or {
+        group = vim.api.nvim_create_augroup(group_name, augroup_opts),
+        command = handler,
+      }, specopts)
+    )
   end
 end
 
-local function initialize_required_hl_defaults(skip)
-  skip = skip or {}
-end
+local cs_autocmd =
+  autocmdr("ColorScheme-HLRequired", { augroup = { clear = true } })
+cs_autocmd({ "ColorSchemePre" }, function(ev)
+  vim.api.nvim_set_hl(0, "Headline", { link = "NormalFloat" })
+  vim.api.nvim_set_hl(0, "IndentBlanklineIndent", { link = "@comment" })
+  vim.api.nvim_set_hl(0, "IndentBlanklineWhitespace", { link = "@comment" })
+  vim.api.nvim_set_hl(0, "IndentBlanklineScope", { link = "@comment" })
+  vim.api.nvim_set_hl(0, "NightowlContextHints", { link = "@comment" })
+  vim.api.nvim_set_hl(0, "NightowlContextHintsBright", { link = "@comment" })
+  vim.api.nvim_set_hl(0, "NightowlStartupHeader", { link = "@comment" })
+  vim.api.nvim_set_hl(0, "NightowlStartupEntry", { link = "@" })
+  vim.api.nvim_set_hl(0, "NightowlStartupConvenience", { link = "@function" })
+end)
 
 return {
   {
     "rebelot/kanagawa.nvim",
     lazy = false,
-    priority = 1000,
+    priority = 990,
     opts = {
       globalStatus = true,
       dimInactive = true,
       commentStyle = { italic = true },
-      keywordStyle = { italic = false },
+      keywordStyle = { italic = false, bold = true },
       statementStyle = { bold = true },
       typeStyle = { italic = true },
       background = { dark = "wave", light = "lotus" },
@@ -124,7 +231,7 @@ return {
           IndentBlanklineWhitespace = { link = "@comment" },
           IndentBlanklineScope = { link = "@comment" },
           IndentBlanklineIndent = { link = "@comment" },
-          Headlines = {
+          Headline = {
             fg = pcol.sumiInk0,
             bg = pcol.sumiInk0,
           },
@@ -138,9 +245,10 @@ return {
   },
   {
     "cryptomilk/nightcity.nvim",
-    priority = 950,
+    priority = 920,
     enabled = true,
     version = false,
+    lazy = false,
     opts = {
       style = "afterlife",
       terminal_colors = true,
@@ -195,16 +303,18 @@ return {
       opts.variant = "auto" or opts.variant
       opts.dark_variant = "moon" or opts.dark_variant
       opts.highlight_groups = vim.tbl_deep_extend("force", {
-        TelescopeTitle = { fg = rppal.text, bold = true },
-        TelescopePromptNormal = { bg = rppal.surface },
-        TelescopePromptBorder = { fg = rppal.base, bg = rppal.base },
-        TelescopeResultsNormal = { fg = rppal.text, bg = rppal.nc },
-        TelescopeResultsBorder = { fg = rppal.base, bg = rppal.base },
-        TelescopePreviewNormal = { bg = rppal.nc },
-        TelescopePreviewBorder = {
-          bg = rppal.base,
-          fg = rppal.base,
-        },
+        TelescopeBorder = { fg = "overlay", bg = "overlay" },
+        TelescopeNormal = { fg = "subtle", bg = "overlay" },
+        TelescopeSelection = { fg = "text", bg = "highlight_med" },
+        TelescopeSelectionCaret = { fg = "love", bg = "highlight_med" },
+        TelescopeMultiSelection = { fg = "text", bg = "highlight_high" },
+
+        TelescopeTitle = { fg = "base", bg = "love" },
+        TelescopePromptTitle = { fg = "base", bg = "pine" },
+        TelescopePreviewTitle = { fg = "base", bg = "iris" },
+
+        TelescopePromptNormal = { fg = "text", bg = "surface" },
+        TelescopePromptBorder = { fg = "surface", bg = "surface" },
         Pmenu = { fg = rppal.rose, bg = rppal.base },
         PmenuSel = { fg = "NONE", bg = rppal.surface },
         PmenuSbar = { bg = rppal.muted },
@@ -226,54 +336,52 @@ return {
         IndentBlanklineWhitespace = { link = "@comment" },
         IndentBlanklineScope = { link = "@comment" },
         IndentBlanklineIndent = { link = "@comment" },
+
+        Headline = { fg = rppal.base },
       }, opts.highlight_groups or {})
     end,
     config = true,
+    lazy = false,
     priority = 960,
   },
   {
     "Verf/deepwhite.nvim",
-    priority = 990,
+    priority = 980,
     config = function(_, opts)
       local dw_accent = "#E5E5E5"
+      -- defhl({ "TelescopeBorder" }, { fg = "overlay", bg = "overlay" })
+      -- defhl({ "TelescopeNormal" }, { fg = "subtle", bg = "overlay" })
+      -- defhl({ "TelescopeSelection" }, { fg = "text", bg = "highlight_med" })
+      -- defhl(
+      --   { "TelescopeSelectionCaret" },
+      --   { fg = "love", bg = "highlight_med" }
+      -- )
+      -- defhl(
+      --   { "TelescopeMultiSelection" },
+      --   { fg = "text", bg = "highlight_high" }
+      -- )
+      --
+      -- defhl({ "TelescopeTitle" }, { fg = "base", bg = "love" })
+      -- defhl({ "TelescopePromptTitle" }, { fg = "base", bg = "pine" })
+      -- defhl({ "TelescopePreviewTitle" }, { fg = "base", bg = "iris" })
+      --
+      -- defhl({ "TelescopePromptNormal" }, { fg = "text", bg = "surface" })
+      -- defhl({ "TelescopePromptBorder" }, { fg = "surface", bg = "surface" })
+
       defhl({ "TreesitterContextBottom" }, { fg = dw_accent, underline = true })
       defhl({ "NightowlContextHints" }, { italic = true, fg = dw_accent })
       defhl({ "WinSeparator" }, { fg = dw_accent })
-      defhl({ "Headlines" }, { fg = dw_accent, bg = dw_accent })
+      defhl({ "Headline" }, { fg = dw_accent, bg = dw_accent })
       require("deepwhite").setup(opts)
     end,
     opts = {
       low_blue_light = true,
     },
-  },
-  {
-    "roobert/palette.nvim",
-    priority = 980,
-    config = function(_, opts)
-      require("palette").setup(opts)
-    end,
-    opts = {
-      palettes = {},
-      custom_palettes = {
-        main = {
-          ["kanagawa-wave"] = {},
-          ["kanagawa-lotus"] = {},
-          ["deepwhite"] = {},
-          ["nano"] = {},
-          -- TODO: Add an implementation for the "hagoromo" colorscheme.
-          ["hagoromo"] = {},
-        },
-      },
-      caching = true,
-      cache_dir = {
-        vim.fn.stdpath("cache") .. "/palette",
-      },
-    },
-    event = "VeryLazy",
+    lazy = false,
   },
   {
     "ronisbr/nano-theme.nvim",
-    priority = 970,
+    priority = 930,
     config = function(_, opts) end,
     opts = {
       background = {
@@ -281,32 +389,7 @@ return {
         style = "light",
       },
     },
-  },
-  {
-    "neanias/everforest-nvim",
-    version = false,
-    lazy = true,
-    priority = 950,
-    config = function(_, opts)
-      require("everforest").setup(opts)
-    end,
-    opts = {
-      background = "soft",
-      sign_column_background = "grey",
-      ui_contrast = "low",
-      float_style = "dim",
-      on_highlights = function(hl, palette) end,
-    },
-  },
-  {
-    "bbjornstad/hagoromo.nvim",
-    dev = true,
-    enabled = false,
-    priority = 1001,
-    opts = {},
-    config = function(_, opts)
-      require("hagoromo").setup(opts)
-    end,
+    lazy = false,
   },
   {
     "EdenEast/nightfox.nvim",
@@ -314,23 +397,25 @@ return {
       require("nightfox").setup(opts)
     end,
     opts = {
-      styles = {
-        comments = "italic",
-        functions = "bold",
-        constants = "bold",
-        keywords = "bold",
+      options = {
+        styles = {
+          comments = "italic",
+          functions = "bold",
+          constants = "bold",
+          keywords = "bold",
+        },
+        module_default = true,
       },
-      module_default = true,
     },
-    priority = 800,
-    lazy = true,
+    priority = 970,
+    lazy = false,
   },
   {
     "yorik1984/newpaper.nvim",
     config = function(_, opts)
       require("newpaper").setup(opts)
     end,
-    priority = 790,
+    priority = 950,
     opts = {
       style = bg_style ~= nil and bg_style or "dark",
       editor_better_view = true,
@@ -345,22 +430,23 @@ return {
       italic_variables = false,
       borders = true,
     },
-    lazy = true,
-  },
-  {
-    "katawful/kat.nvim",
-    tag = "3.1",
-    config = false,
+    lazy = false,
   },
   {
     "linrongbin16/colorbox.nvim",
     lazy = false,
-    priority = 700,
+    priority = 1000,
     cmd = { "Colorbox" },
     dependencies = {
       "rktjmp/lush.nvim",
       "rebelot/kanagawa.nvim",
       "yorik1984/newpaper.nvim",
+      "Verf/deepwhite.nvim",
+      "EdenEast/nightfox.nvim",
+      "ronisbr/nano-theme.nvim",
+      "cryptomilk/nightcity.nvim",
+      "rose-pine/neovim",
+      "katawful/kat.nvim",
     },
     opts = {
       policy = "single",
@@ -373,39 +459,9 @@ return {
     config = function(_, opts)
       require("colorbox").setup(opts)
       local bg = opts.background or "dark"
+      vim.opt.background = bg
       local cs = env.colorscheme[bg]
-      vim.cmd([[colorscheme ]] .. cs)
+      load_scheme(cs)
     end,
   },
-  -- {
-  --   "LazyVim/LazyVim",
-  --   opts = {
-  --     colorscheme = function()
-  --       local bg = bg_style or "dark"
-  --       if bg == "light" then
-  --         local has, pkg = pcall(require, env.colorscheme.light)
-  --         local ok, res
-  --         if has then
-  --           ok, res = pcall(pkg.load)
-  --         else
-  --           ok, res = false, nil
-  --         end
-  --         if not ok then
-  --           vim.cmd.colorscheme(env.colorscheme.light)
-  --         end
-  --       else
-  --         local has, pkg = pcall(require, env.colorscheme.dark)
-  --         local ok, res
-  --         if has then
-  --           ok, res = pcall(pkg.load)
-  --         else
-  --           ok, res = pcall(require(env.colorscheme.dark).load)
-  --         end
-  --         if not ok then
-  --           vim.cmd.colorscheme(env.colorscheme.dark)
-  --         end
-  --       end
-  --     end,
-  --   },
-  -- },
 }

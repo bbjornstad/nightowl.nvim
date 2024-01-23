@@ -1,3 +1,7 @@
+---@module "parliament.plugins.cmp"
+---@author Bailey Bjornstad | ursa-major
+---@
+
 ---@diagnostic disable: missing-fields
 local ncmp = "hrsh7th/nvim-cmp"
 local kenv = require("environment.keys").completion
@@ -20,7 +24,7 @@ local function toggle_cmp_autocompletion()
         autocomplete = {
           require("cmp").TriggerEvent.InsertEnter,
           require("cmp").TriggerEvent.TextChanged,
-        },
+       },
       },
     })
   else
@@ -63,21 +67,25 @@ return {
     events = { "InsertEnter", "CmdlineEnter" },
     opts = function(_, opts)
       local has = require("funsak.lazy").has
+      -- dynamic enablements of cmp
       opts.enabled = opts.enabled
         or function()
           return vim.b.enable_cmp_completion or vim.g.enable_cmp_completion
         end
+      -- sets the correct snippet invocation based on the plugin choice that we
+      -- have made regarding completion.
       opts.snippet = vim.tbl_deep_extend("force", {
         expand = function(args)
           require("luasnip").lsp_expand(args)
         end,
       }, opts.snippet or {})
+      -- performance improvements
       opts.performance = vim.tbl_deep_extend("force", {
         debounce = 600,
-        max_view_eneries = 200,
-        throttle = 200,
+        max_view_eneries = 500,
+        throttle = 100,
       }, opts.performance or {})
-
+      -- completeopt/general completion behavior
       opts.completion = vim.tbl_deep_extend("force", {
         autocomplete = initialize_autocompletion(),
         completeopt = "menu,menuone,noinsert",

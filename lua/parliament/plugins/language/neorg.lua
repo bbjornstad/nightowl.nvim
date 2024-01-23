@@ -1,3 +1,4 @@
+local env = require("environment.ui")
 local kenv = require("environment.keys")
 local key_norg = kenv.time.neorg
 local key_scope = kenv.scope
@@ -44,6 +45,7 @@ local function norgbinder(norgbind, op)
 end
 
 return {
+  lsp.linters({ norg = { "proselint", "vale" } }),
   {
     "nvim-neorg/neorg",
     dependencies = {
@@ -86,21 +88,32 @@ return {
           config = {
             folds = true,
             icon_preset = "diamond",
+            icons = {
+              todo = require("environment.ui").icons.norg.todo,
+            },
           },
         },
         ["core.dirman"] = {
           config = {
-            workspaces = {
-              prj = "~/prj",
-              org = "~/org",
-              journal = "~/org/journal",
-              tasks = "~/org/tasks",
-              prosaic = "~/org/prsc",
-              nvim = "~/.config/nvim",
-              nushell = "~/.config/nushell",
-            },
+            workspaces = require("environment.paths").neorg_workspaces,
             index = "note-index.norg",
             default_workspace = "org",
+          },
+        },
+        ["core.qol.todo_items"] = {
+          config = {
+            create_todo_items = true,
+            create_todo_parents = true,
+            order = {
+              { "undone", " " },
+              { "pending", "-" },
+              { "done", "x" },
+            },
+            order_with_children = {
+              { "undone", " " },
+              { "pending", "-" },
+              { "done", "x" },
+            },
           },
         },
         ["core.completion"] = {
@@ -125,7 +138,7 @@ return {
         },
         ["core.export"] = {
           config = {
-            export_dir = "<export-dir>/<language>",
+            export_dir = "<export-dir>/<language>=export ",
           },
         },
         ["core.export.markdown"] = {
@@ -152,27 +165,41 @@ return {
                 "n",
                 "<C-Space>",
                 "cc",
-                { buffer = true, desc = "neorg=> cycle task status" }
+                { buffer = true, desc = "norg:| task |=> cycle status" }
               )
-              binder.remap_key(
+              binds.remap_key(
+                "norg",
+                "n",
                 key_norg.notes.new,
                 "gnn",
-                { desc = "neorg=> new note" }
+                { desc = "norg:| note |=> new" }
+              )
+              binds.remap_key(
+                "norg",
+                "n",
+                "<localleader>id",
+                key_norg.dt.insert,
+                { desc = "norg:| dt |=> insert" }
+              )
+              binder.map(
+                "<C-d><C-t>",
+                "core.tempus.insert-date-insert-mode",
+                { mode = "i", desc = "norg:| dt |=> insert" }
               )
               binder.map(
                 key_norg.linkable.find,
                 "core.integrations.telescope.find_linkable",
-                { desc = "neorg=> find linkables" }
+                { desc = "norg:| link |=> find" }
               )
               binder.map(
                 key_norg.linkable.insert,
                 "core.integrations.telescope.insert_link",
-                { desc = "neorg=> insert linkable" }
+                { desc = "norg:| link |=> insert" }
               )
               binder.map(
                 key_norg.linkable.file,
                 "core.integrations.telescope.insert_file_link",
-                { desc = "neorg=> insert file linkable" }
+                { desc = "norg:| link |=> insert file" }
               )
               binder.map(
                 "<C-${ leader }><C-f>",
@@ -181,7 +208,7 @@ return {
                   leader = {
                     substitute_existing = false,
                   },
-                  desc = "neorg=> insert file linkable",
+                  desc = "norg:| link |=> insert file",
                 }
               )
               binder.map(
@@ -191,46 +218,46 @@ return {
                   leader = {
                     substitute_existing = false,
                   },
-                  desc = "neorg=> insert linkable",
+                  desc = "norg:| link |=> insert",
                 }
               )
               binder.map(
                 key_norg.metagen.inject,
                 "core.esupports.metagen.inject_metadata",
-                { desc = "neorg=> insert metadata" }
+                { desc = "norg:| meta |=> insert" }
               )
               binder.map(
                 key_norg.metagen.update,
                 "core.esupports.metagen.update_metadata",
-                { desc = "neorg=> update metadata" }
+                { desc = "norg:| meta |=> update" }
               )
               binder.map(key_norg.workspace.default, function()
                 vim.cmd([[Neorg workspace default]])
               end, {
-                desc = "neorg=> default workspace",
+                desc = "norg:| ws |=> default",
               })
               binder.map(key_norg.workspace.switch, function()
                 inp.workspace([[Neorg workspace %s]])
               end, {
-                desc = "neorg=> switch to workspace",
+                desc = "norg:| ws |=> select",
               })
               binder.map(key_norg.journal.daily, function()
                 vim.cmd([[Neorg journal today]])
               end, {
-                desc = "neorg.jrnl=> today",
+                desc = "norg:| jrnl |=> today",
               })
               binder.map(key_norg.journal.yesterday, function()
                 vim.cmd([[Neorg journal yesterday]])
-              end, { desc = "neorg.jrnl=> yesterday" })
+              end, { desc = "norg:| jrnl |=> yesterday" })
               binder.map(key_norg.journal.tomorrow, function()
                 vim.cmd([[Neorg journal tomorrow]])
               end, {
-                desc = "neorg.jrnl=> tomorrow",
+                desc = "norg:| jrnl |=> tomorrow",
               })
               binder.map(key_norg.journal.templates, function()
                 vim.cmd([[Neorg journal template]])
               end, {
-                desc = "neorg.jrnl=> templates",
+                desc = "norg:| jrnl |=> templates",
               })
               binder.map(key_norg.journal.toc, function()
                 vim.cmd([[Neorg journal toc]])
@@ -241,11 +268,35 @@ return {
                 key_norg.search_headings,
                 "core.integrations.telescope.search_headings",
                 {
-                  desc = "neorg.search=> headings",
+                  desc = "norg:| search |=> headings",
                 }
               )
+              binder.map(key_norg.export.to_file.md, function()
+                vim.cmd(
+                  [[Neorg export to-file ]]
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    .. vim.fs.normalize(vim.fn.expand("%"))({
+                      desc = "norg:| export |=> file to md",
+                    })
+                )
+              end)
+              binder.map(key_norg.export.to_file.txt, function()
+                vim.cmd([[Neorg export to-file]])
+              end)
             end,
             neorg_leader = key_norg:leader(),
+          },
+        },
+        ["external.templates"] = {
+          config = {
+            snippets_overwrite = {
+              date_format = [[%Y-%m-%d]],
+            },
+            templates_dir = vim.fs.joinpath(
+              vim.fn.stdpath("config"),
+              "templates",
+              "neorg-templates"
+            ),
           },
         },
       },
@@ -257,7 +308,7 @@ return {
           vim.cmd([[Neorg journal today]])
         end,
         mode = "n",
-        desc = "neorg.jrnl=> daily",
+        desc = "norg:| jrnl |=> daily",
       },
       {
         key_norg.journal.yesterday,
@@ -265,7 +316,7 @@ return {
           vim.cmd([[Neorg journal yesterday]])
         end,
         mode = "n",
-        desc = "neorg.jrnl=> yesterday",
+        desc = "norg:| jrnl |=> yesterday",
       },
       {
         key_norg.journal.tomorrow,
@@ -273,7 +324,7 @@ return {
           vim.cmd([[Neorg journal tomorrow]])
         end,
         mode = "n",
-        desc = "neorg.jrnl=> tomorrow",
+        desc = "norg:| jrnl |=> tomorrow",
       },
       {
         key_norg.journal.templates,
@@ -281,7 +332,7 @@ return {
           vim.cmd([[Neorg journal template]])
         end,
         mode = "n",
-        desc = "neorg.jrnl=> contents",
+        desc = "norg:| jrnl |=> contents",
       },
       {
         key_norg.journal.toc,
@@ -289,7 +340,7 @@ return {
           vim.cmd([[Neorg journal toc]])
         end,
         mode = "n",
-        desc = "neorg.jrnl=> contents",
+        desc = "norg:| jrnl |=> contents",
       },
       {
         key_norg.notes.new,
@@ -297,7 +348,7 @@ return {
           vim.cmd([[new ./newscratch.norg]])
         end,
         mode = "n",
-        desc = "neorg.note=> new",
+        desc = "norg:| note |=> new",
       },
     },
   },
@@ -305,25 +356,4 @@ return {
   { "pysan3/neorg-templates", ft = "norg" },
   { "tamton-aquib/neorg-jupyter", ft = "norg" },
   { "laher/neorg-exec", ft = "norg" },
-  lsp.server("efm", {
-    server = function(_)
-      local function cfg(_)
-        local langs = require("efmls-configs.defaults").languages()
-        langs = vim.tbl_extend("force", langs, {
-          norg = {
-            require("efmls-configs.linters.vale"),
-          },
-        })
-        return {
-          filetypes = { "norg" },
-          settings = {
-            languages = langs,
-          },
-        }
-      end
-    end,
-    dependencies = {
-      "creativenull/efmls-configs-nvim",
-    },
-  }),
 }

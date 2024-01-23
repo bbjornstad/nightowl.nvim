@@ -5,9 +5,7 @@ return {
   {
     "oleksiiluchnikov/dates.nvim",
     opts = {},
-    config = function(_, opts)
-      require("dates").setup(opts)
-    end,
+    config = function(_, opts) end,
     dependencies = { "hkupty/impromptu.nvim" },
     keys = {
       {

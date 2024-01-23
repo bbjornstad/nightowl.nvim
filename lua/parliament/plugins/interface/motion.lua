@@ -8,7 +8,22 @@ return {
     "echasnovski/mini.bracketed",
     event = "VeryLazy",
     version = false,
-    opts = {},
+    opts = {
+      buffer = { suffix = "b", options = {} },
+      comment = { suffix = "c", options = {} },
+      conflict = { suffix = "x", options = {} },
+      diagnostic = { suffix = "d", options = {} },
+      file = { suffix = "f", options = {} },
+      indent = { suffix = "i", options = {} },
+      jump = { suffix = "j", options = {} },
+      location = { suffix = "l", options = {} },
+      oldfile = { suffix = "o", options = {} },
+      quickfix = { suffix = "q", options = {} },
+      treesitter = { suffix = "t", options = {} },
+      undo = { suffix = "u", options = {} },
+      window = { suffix = "w", options = {} },
+      yank = { suffix = "y", options = {} },
+    },
     config = function(_, opts)
       require("mini.bracketed").setup(opts)
     end,
@@ -70,7 +85,7 @@ return {
           require("grapple").toggle()
         end,
         mode = "n",
-        desc = "grapple.tag=> toggle",
+        desc = "grapple:| tag |=> toggle",
       },
       {
         kenv.grapple.popup,
@@ -78,7 +93,7 @@ return {
           require("grapple").popup_tags()
         end,
         mode = "n",
-        desc = "grapple.pop=> tags view",
+        desc = "grapple:| pop |=> tags view",
       },
       {
         kenv.grapple.tag,
@@ -86,7 +101,7 @@ return {
           require("grapple").tag()
         end,
         mode = "n",
-        desc = "grapple.tag=> tag (named)",
+        desc = "grapple:| tag |=> named",
       },
       {
         kenv.grapple.untag,
@@ -94,7 +109,7 @@ return {
           require("grapple").untag()
         end,
         mode = "n",
-        desc = "grapple.tag=> untag (named)",
+        desc = "grapple:| untag |=> named",
       },
       {
         kenv.grapple.select,
@@ -102,7 +117,7 @@ return {
           require("grapple").select()
         end,
         mode = "n",
-        desc = "grapple.tag=> select",
+        desc = "grapple:| tag |=> select",
       },
       {
         kenv.grapple.quickfix,
@@ -110,7 +125,7 @@ return {
           require("grapple").quickfix()
         end,
         mode = "n",
-        desc = "grapple.tag=> to quickfix",
+        desc = "grapple:| tag |=> to quickfix",
       },
       {
         kenv.grapple.reset,
@@ -118,7 +133,7 @@ return {
           require("grapple").reset()
         end,
         mode = "n",
-        desc = "grapple.tag=> ~reset~",
+        desc = "grapple:| tag |=> ~reset~",
       },
       {
         kenv.grapple.cycle.backward,
@@ -126,7 +141,7 @@ return {
           require("grapple").cycle_backward()
         end,
         mode = "n",
-        desc = "grapple.tag=> cycle backward",
+        desc = "grapple:| tag |=> cycle backward",
       },
       {
         kenv.grapple.cycle.forward,
@@ -134,7 +149,7 @@ return {
           require("grapple").cycle_forward()
         end,
         mode = "n",
-        desc = "grapple.tag=> cycle forward",
+        desc = "grapple:| tag |=> cycle forward",
       },
       {
         kenv.grapple.list_tags,
@@ -142,7 +157,7 @@ return {
           require("grapple").tags()
         end,
         mode = "n",
-        desc = "grapple.tag=> list tags",
+        desc = "grapple:| tag |=> list tags",
       },
     },
   },
@@ -155,7 +170,7 @@ return {
           require("portal.builtin").changelist.tunnel()
         end,
         mode = "n",
-        desc = "portal.chng=> forward",
+        desc = "portal:| chng |=> forward",
       },
       {
         qenv.changelist.backward,
@@ -163,7 +178,7 @@ return {
           require("portal.builtin").changelist.tunnel_backward()
         end,
         mode = "n",
-        desc = "portal.chng=> backward",
+        desc = "portal:| chng |=> backward",
       },
       {
         qenv.grapple.forward,
@@ -171,7 +186,7 @@ return {
           require("portal.builtin").grapple.tunnel()
         end,
         mode = "n",
-        desc = "portal.grpl=> forward",
+        desc = "portal:| grpl |=> forward",
       },
       {
         qenv.grapple.backward,
@@ -179,7 +194,7 @@ return {
           require("portal.builtin").grapple.tunnel_backward()
         end,
         mode = "n",
-        desc = "portal.grpl=> backward",
+        desc = "portal:| grpl |=> backward",
       },
       {
         qenv.quickfix.forward,
@@ -187,7 +202,7 @@ return {
           require("portal.builtin").quickfix.tunnel()
         end,
         mode = "n",
-        desc = "portal.qf=> forward",
+        desc = "portal:| qf |=> forward",
       },
       {
         qenv.quickfix.backward,
@@ -195,7 +210,7 @@ return {
           require("portal.builtin").quickfix.tunnel_backward()
         end,
         mode = "n",
-        desc = "portal.qf=> backward",
+        desc = "portal:| qf |=> backward",
       },
       {
         qenv.jumplist.forward,
@@ -203,7 +218,7 @@ return {
           require("portal.builtin").jumplist.tunnel()
         end,
         mode = "n",
-        desc = "portal.jump=> backward",
+        desc = "portal:| jump |=> backward",
       },
       {
         qenv.jumplist.backward,
@@ -211,7 +226,7 @@ return {
           require("portal.builtin").jumplist.tunnel_backward()
         end,
         mode = "n",
-        desc = "portal.jump=> forward",
+        desc = "portal:| jump |=> forward",
       },
       {
         qenv.harpoon.forward,
@@ -219,7 +234,7 @@ return {
           require("portal.builtin").harpoon.tunnel()
         end,
         mode = "n",
-        desc = "portal.hrpn=> forward",
+        desc = "portal:| hrpn |=> forward",
       },
       {
         qenv.harpoon.backward,
@@ -227,7 +242,7 @@ return {
           require("portal.builtin").harpoon.tunnel_backward()
         end,
         mode = "n",
-        desc = "portal.hrpn=> forward",
+        desc = "portal:| hrpn |=> forward",
       },
     },
     opts = {
@@ -280,13 +295,79 @@ return {
       save_on_toggle = false,
       save_on_change = true,
       enter_on_sendcmd = false,
-      tabline = false,
+      tabline = true,
+      tabline_prefix = "󰓩   ",
+      tabline_suffix = "╶╶╶╶",
     },
     config = function(_, opts)
       require("harpoon").setup(opts)
       require("telescope").load_extension("harpoon")
     end,
     keys = {
+      {
+        qenv.harpoon.add_file,
+        function()
+          require("harpoon.mark").add_file()
+        end,
+        mode = "n",
+        desc = "harpoon=> add file",
+      },
+      {
+        qenv.harpoon.quick_menu,
+        function()
+          require("harpoon.ui").toggle_quick_menu()
+        end,
+        mode = "n",
+        desc = "harpoon=> quick menu",
+      },
+      {
+        qenv.harpoon.nav.next,
+        function()
+          require("harpoon.ui").nav_next()
+        end,
+        mode = "n",
+        desc = "harpoon=> next mark",
+      },
+      {
+        qenv.harpoon.nav.previous,
+        function()
+          require("harpoon.ui").nav_prev()
+        end,
+        mode = "n",
+        desc = "harpoon=> previous mark",
+      },
+      {
+        qenv.harpoon.nav.file,
+        function()
+          require("harpoon.ui").nav_file()
+        end,
+        mode = "n",
+        desc = "harpoon=> to file",
+      },
+      {
+        qenv.harpoon.term.to,
+        function()
+          require("harpoon.term").gotoTerminal()
+        end,
+        mode = "n",
+        desc = "harpoon=> to terminal",
+      },
+      {
+        qenv.harpoon.term.send,
+        function()
+          require("harpoon.ui").sendCommand()
+        end,
+        mode = "n",
+        desc = "harpoon=> send command",
+      },
+      {
+        kenv.harpoon.term.menu,
+        function()
+          require("harpoon.cmd-ui").toggle_quick_menu()
+        end,
+        mode = "n",
+        desc = "harpoon=> command quick menu",
+      },
       {
         kenv.harpoon.add_file,
         function()
@@ -359,7 +440,7 @@ return {
       require("tabtree").setup(opts)
     end,
     event = "VeryLazy",
-    enabled = opt.tabtree,
+    enabled = false, --opt.tabtree,
     opts = {
       -- print the capture group name when executing next/previous
       debug = true,

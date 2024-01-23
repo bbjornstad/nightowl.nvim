@@ -4,10 +4,7 @@ return {
   lsp.server("clojure_lsp", { server = {} }),
   -- lsp.linters(lsp.per_ft({ "clj-kondo", "joker" }, { "clojure" })),
   lsp.formatters(
-    lsp.per_ft(
-      { "zprint", "zprint-clj", "joker" },
-      { "clojure", "clojurescript" }
-    )
+    lsp.per_ft({ "zprint", "joker" }, { "clojure", "clojurescript" })
   ),
   {
     "clojure-vim/acid.nvim",

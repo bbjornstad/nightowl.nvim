@@ -292,6 +292,14 @@ return {
           },
           lualine_y = {
             {
+              "g:metals_status",
+              icon = "",
+              separator = "┊",
+             cond = function() 
+
+             end
+            },
+            {
               "filetype",
               icon_only = false,
               padding = { left = 1, right = 1 },

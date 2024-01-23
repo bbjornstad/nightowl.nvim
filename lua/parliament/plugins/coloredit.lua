@@ -45,6 +45,7 @@ return {
         highlighter = {
           auto_enable = true,
           update_insert = true,
+          lsp = true,
         },
         bar_len = 60,
         save_on_quit = true,

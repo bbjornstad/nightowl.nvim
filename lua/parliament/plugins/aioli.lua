@@ -113,6 +113,12 @@ return {
         [key_ai.codeium:leader()] = { name = "::ai=> +codeium" },
         [key_ai.model:leader()] = { name = "::ai=> +llms" },
         [key_ai.explain_it:leader()] = { name = "::ai=> +explain it" },
+        [key_ai.wtf:leader()] = { name = "::ai=> +wtf" },
+        [key_ai.ollero:leader()] = { name = "::ai=> +ollero" },
+        [key_ai.aider:leader()] = { name = "::ai=> +aider" },
+        [key_ai.llm:leader()] = { name = "::ai=> +llm-ls" },
+        [key_ai.prompter:leader()] = { name = "::ai=> +prompter" },
+        [key_ai.backseat:leader()] = { name = "::ai=> +backseat" },
         -- TODO: Add a few more of these baseline name mappings
         -- directly onto the which-key configuration here.
       },

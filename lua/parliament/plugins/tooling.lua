@@ -10,10 +10,39 @@ local key_replace = kenv.replace
 local key_notes = kenv.editor.notes
 local key_wrap = kenv.editor.wrapping
 local key_view = kenv.view
+local key_list = kenv.lists
 
 local utiliterm = require("environment.utiliterm")
 
 return {
+  {
+    "gabrielpoca/replacer.nvim",
+    opts = {
+      save_on_write = true,
+      rename_files = true,
+    },
+    config = function(_, opts)
+      require("replacer").setup(opts)
+    end,
+    keys = {
+      {
+        key_replace.replacer,
+        function()
+          require("replacer").run()
+        end,
+        mode = "n",
+        desc = "sx.sub=> in quick fix",
+      },
+      {
+        key_list.replacer,
+        function()
+          require("replacer").run()
+        end,
+        mode = "n",
+        desc = "",
+      },
+    },
+  },
   {
     "smjonas/inc-rename.nvim",
     cmd = { "IncRename" },
@@ -48,7 +77,7 @@ return {
     "akinsho/toggleterm.nvim",
     version = "*",
     config = function(_, opts)
-      require('toggleterm').setup(opts)
+      require("toggleterm").setup(opts)
     end,
     opts = {
       open_mapping = "<F1>",
@@ -254,7 +283,7 @@ return {
       },
     },
     config = function(_, opts)
-      require('bqf').setup(opts)
+      require("bqf").setup(opts)
     end,
   },
   {
@@ -569,7 +598,7 @@ return {
   },
   {
     "krivahtoo/silicon.nvim",
-    enabled = false,
+    enabled = true,
     build = "./install.sh",
     opts = {
       output = {
@@ -639,8 +668,6 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "MunifTanjim/nui.nvim",
-      -- optional
-      "nvim-treesitter/playground",
     },
     config = function()
       require("securitree").setup({

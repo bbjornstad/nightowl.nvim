@@ -529,9 +529,9 @@ return {
       },
       ui = {
         border = env.borders.main,
-        height = 1,
-        width = 1,
-        x = 0.6,
+        height = 0.9,
+        width = 0.32,
+        x = 0,
         y = 0.8,
       },
     },
@@ -570,6 +570,22 @@ return {
         end,
         mode = "n",
         desc = "fm:| tfm |=> new tab",
+      },
+      {
+        key_fm.tfm.change_manager,
+        function()
+          local tfm = require("tfm")
+          vim.ui.select(vim.tbl_keys[tfm.FILE_MANAGERS], {
+            prompt = "Choose TFM Backend: ",
+            kind = "TFM File Manager",
+          }, function(sel)
+            if sel ~= "" and tfm.FILE_MANAGERS[sel] ~= nil then
+              tfm.select_file_manager(sel)
+            end
+          end)
+        end,
+        mode = "n",
+        desc = "fm:| tfm |=> change backend",
       },
     },
   },

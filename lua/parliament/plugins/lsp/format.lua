@@ -4,49 +4,6 @@ local slow_format_filetypes = {}
 
 return {
   {
-    "mfussenegger/nvim-lint",
-    opts = { linters_by_ft = { text = { "vale" } } },
-    config = function(_, opts)
-      local custom = require("funsak.table").strip(opts, { "custom" })
-      local lint = require("lint")
-      for name, cfg in pairs(custom) do
-        lint.linters[name] = cfg
-      end
-      lint.linters_by_ft = opts.linters_by_ft or {}
-      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
-        callback = function(ev)
-          require("lint").try_lint()
-        end,
-        desc = "󰉂 lsp:| lint |=> Buf{Enter,WritePost}",
-      })
-    end,
-    event = { "BufReadPre", "BufNewFile" },
-    keys = {
-      {
-        key_lsp.auxiliary.lint,
-        function()
-          require("lint").try_lint()
-        end,
-        mode = "n",
-        desc = "lsp:| lint |=> try",
-      },
-    },
-  },
-  {
-    "rshkarin/mason-nvim-lint",
-    event = { "BufReadPre", "BufNewFile" },
-    dependencies = {
-      "williamboman/mason.nvim",
-      "mfussenegger/nvim-lint",
-    },
-    opts = {
-      automatic_installation = true,
-    },
-    config = function(_, opts)
-      require("mason-nvim-lint").setup(opts)
-    end,
-  },
-  {
     "stevearc/conform.nvim",
     event = "BufWritePre",
     cmd = "ConformInfo",
@@ -121,6 +78,8 @@ return {
       end, {
         desc = "󱡠 lsp:buf| fmt.auto |=> enable",
       })
+    end,
+    init = function()
       vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
     end,
     keys = {
@@ -145,28 +104,6 @@ return {
         "<CMD>ConformInfo<CR>",
         mode = "n",
         desc = "lsp:| fmt |=> info",
-      },
-    },
-  },
-  {
-    "chrisgrieser/nvim-rulebook",
-    event = "LspAttach",
-    keys = {
-      {
-        key_lsp.auxiliary.rules.ignore,
-        function()
-          require("rulebook").ignoreRule()
-        end,
-        mode = "n",
-        desc = "lsp:| lint |=> ignore rule",
-      },
-      {
-        key_lsp.auxiliary.rules.lookup,
-        function()
-          require("rulebook").lookupRule()
-        end,
-        mode = "n",
-        desc = "lsp:| lint |=> lookup rule",
       },
     },
   },

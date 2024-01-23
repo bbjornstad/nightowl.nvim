@@ -2,7 +2,7 @@ local lsp = require("funsak.lsp")
 local lz = require("funsak.lazy")
 
 return {
-  lsp.server("hls", { server = lsp.noop }),
+  lsp.server("hls", { setup = { handler = lsp.noop } }),
   -- lsp.linters(
   --   lsp.per_ft("hlint", { "haskell", "lhaskell", "cabal", "cabalproject" }),
   --   { mason_nvim_lint = { enable = false } }

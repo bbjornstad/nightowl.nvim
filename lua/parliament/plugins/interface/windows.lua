@@ -334,7 +334,6 @@ return {
   },
   {
     "nvim-focus/focus.nvim",
-    enabled = opt.prefer.focus_windows == "focus",
     version = false,
     event = "BufWinEnter",
     config = function(_, opts)
@@ -372,13 +371,13 @@ return {
       split = { bufnew = true },
       ui = {
         number = false,
-        hybridnumber = true,
-        absolutenumber_unfocussed = true,
-        cursorline = true,
+        hybridnumber = false,
+        absolutenumber_unfocussed = false,
+        cursorline = false,
         winhighlight = false,
         cursorcolumn = false,
-        colorcolumn = { enable = true, list = "+1" },
-        signcolumn = true,
+        colorcolumn = { enable = false, list = "+1" },
+        signcolumn = false,
       },
     },
     keys = {
@@ -711,13 +710,14 @@ return {
   },
   {
     "anuvyklack/windows.nvim",
-    enabled = opt.prefer.focus_windows == "windows",
+    enabled = false,
+    -- enabled = opt.prefer.focus_windows == "windows",
     dependencies = {
       "anuvyklack/middleclass",
     },
     opts = {
       autowidth = {
-        enable = true,
+        enable = false,
         winwidth = 1.2,
       },
       ignore = {

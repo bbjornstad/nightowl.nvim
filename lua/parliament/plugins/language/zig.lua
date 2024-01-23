@@ -1,8 +1,8 @@
-local lsp = require('funsak.lsp')
+local lsp = require("funsak.lsp")
 
 return {
-  lsp.server("zls", { handler = lsp.noop }),
-  lsp.formatters({ zig = { "zigfmt" }} ),
+  lsp.server("zls", { setup = { handler = lsp.noop } }),
+  lsp.formatters({ zig = { "zigfmt" } }),
   {
     "NTBBloodbath/zig-tools.nvim",
     ft = "zig",

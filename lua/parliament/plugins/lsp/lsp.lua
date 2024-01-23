@@ -6,12 +6,15 @@ local key_sc = require("environment.keys").shortcut
 local mopts = require("funsak.table").mopts
 local lz = require("funsak.lazy")
 
--- LSP Configuration
--- =================
+-- ╓─────────────────────────────────────────────────────────────────────╖
+-- ║ LSP Configuration                                                   ║
+-- ╙─────────────────────────────────────────────────────────────────────╜
 -- Main LSP Configuration is in the config and opts fields of the nvim-lspconfig
 -- specification. `config` can only be defined once, while opts can be defined
 -- as many times as needed, but there is some extra functionality that is not
 -- available at the `opts` stage in comparison to the `config` stage.
+
+-- ─[ type definitions ]────────────────────────────────────────────────────────
 
 --- extension of the standard lsp.Client object to hold additional parliament
 --- specific options.
@@ -53,6 +56,7 @@ local lz = require("funsak.lazy")
 --- target log level for the lsp system.
 ---@field log_level vim.log.levels?
 
+-- ─[ LSP setup helpers ]───────────────────────────────────────────────────────
 local function generate_lsp_keymapper(opts)
   local function lsp_keymapper(client, bufnr)
     vim.keymap.set("n", key_lsp.auxiliary.format.zero, function()
@@ -225,8 +229,8 @@ local function generate_attach_handler(enhancements)
 end
 
 return {
-  -- LSP-Zero: Core LSP Glue
-  -- =======================
+  -- ─[ LSP-Zero: Core LSP Glue ]────────────────────────────────────────────
+  -- ============================
   -- The lsp-zero plugin is responsible for providing an interface integrating
   -- various LSP-related components to each other, for instance nvim-lspconfig
   -- and mason-lspconfig are held together with lsp-zero in that the lsp-zero
@@ -249,8 +253,8 @@ return {
       },
     },
   },
-  -- Mason.nvim
-  -- ==========
+  -- ─[ mason.nvim ]─────────────────────────────────────────────────────────
+  -- ===============
   -- Installs and manages local language server installations.
   {
     "williamboman/mason.nvim",
@@ -259,8 +263,11 @@ return {
       require("mason").setup(opts)
     end,
     opts = {
-      log_level = vim.log.levels.DEBUG,
-      ui = { border = env.borders.main },
+      max_concurrent_installers = 10,
+      ui = {
+        border = env.borders.main,
+        icons = env.icons.mason.package,
+      },
     },
     keys = {
       {
@@ -271,8 +278,8 @@ return {
       },
     },
   },
-  -- nvim-lspconfig: Core Plugin to Manage LSP Behavior and Modifications
-  -- ====================================================================
+  -- ─[ nvim-lspconfig ]─────────────────────────────────────────────────────
+  -- ===================
   -- the nvim-lspconfig plugin is not technically the only way to initialize and
   -- setup the LSP and associated servers and language configurations. It is,
   -- however a very useful plugin that is hosted on neovim's github, so it
@@ -317,8 +324,8 @@ return {
       local zero = require("lsp-zero")
       zero.extend_lspconfig()
 
-      -- neoconf.nvim
-      -- ============
+      -- ─[ neoconf.nvim ]──────────────────────────────────────────────────────
+      -- =================
       -- for project local plugin and LSP settings. This must be loaded first in
       -- order to prevent weird startup issues and not great warning messages.
       -- More accurately, this is simply needed to be set up before we configure
@@ -341,8 +348,8 @@ return {
         or (lz.has("lsp-inlayhints.nvim") and lz.opts("lsp-inlayhints.nvim"))
         or {}
 
-      -- optional enhancement submodules
-      -- ===============================
+      -- ─[ optional enhancement submodules ]───────────────────────────────────
+      -- ====================================
       -- this is to allow conditional configuration of the following features
       -- without failure if the corresponding plugin doesn't exist.
       local enhance = {
@@ -355,8 +362,7 @@ return {
       }
 
       if enhance.status then
-        -- lsp-status.nvim
-        -- ===============
+        -- ┌─ lsp-status.nvim ──────────────────────────────────────────────────┐
         -- status and progress messages directly from LSP
         local status = require("lsp-status")
         status.register_progress()
@@ -369,8 +375,8 @@ return {
         })
       end
 
-      -- lsp-zero.nvim, mason.nvim, and mason-lspconfig.nvim
-      -- ===================================================
+      -- ─[ lsp-zero.nvim, mason.nvim, and mason-lspconfig.nvim ]───────────────
+      -- ========================================================
       -- in this configuration, we use lsp-zero as the core language server
       -- glue. This requires a bit of special setup for our purposes here, even
       -- though the plugin is designed to reduce overall boilerplate in setting
@@ -389,8 +395,8 @@ return {
       local user_handlers = setup.handlers or {}
       local hooks = setup.hooks or {}
 
-      -- lsp-zero.nvim main setup
-      -- ========================
+      -- ─[ lsp-zero.nvim main setup ]──────────────────────────────────────────
+      -- =============================
       -- this adds the basic configurations that are necessary for lsp-zero and
       -- integrating with the rest of the nightowl.nvim situation
       zero.set_sign_icons({

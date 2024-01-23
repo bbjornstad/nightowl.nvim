@@ -1,3 +1,34 @@
+-- SPDX-FileCopyrightText: 2024 Bailey Bjornstad | ursa-major <bailey@bjornstad.dev>
+-- SPDX-License-Identifier: MIT
+
+-- MIT License
+
+--  Copyright (c) 2024 Bailey Bjornstad | ursa-major bailey@bjornstad.dev
+
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+
+-- The above copyright notice and this permission notice (including the next
+-- paragraph) shall be included in all copies or substantial portions of the
+-- Software.
+
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+
+---@module "parliament.plugins.ascii" plugins to work with ASCII text and text
+---generation, e.g. box generators, figlet, etc.
+---@author Bailey Bjornstad
+---@license MIT
+
 local env = require("environment.ui").borders
 local key_editor = require("environment.keys").editor
 local key_cbox = key_editor.cbox
@@ -8,25 +39,108 @@ local key_venn = key_editor.venn
 local key_iconpick = key_editor.glyph.picker
 local key_significant = key_editor.significant
 
----@diagnostic disable: inject-field
-
 local mopts = require("funsak.table").mopts
 local inp = require("parliament.utils.input")
-local compute_remaining_width = require("parliament.utils.text").compute_remaining_width
+local compute_remaining_width =
+  require("parliament.utils.text").compute_remaining_width
 
 local function change_figlet_font(fontopts)
   vim.g.figban_fontstyle = fontopts.name or "Impossible"
   require("figlet").Config(mopts({ font = "Impossible" }, fontopts))
 end
 
+local function box_selector(boxid)
+  return function()
+    local fn = require("comment-box")[("%sbox"):format(boxid)]
+    vim.notify(vim.inspect(fn))
+    local mapper = {
+      "rounded",
+      "classic",
+      "classic heavy",
+      "dashed",
+      "dashed heavy",
+      "mix heavy/light",
+      "double",
+      "mix double/single a",
+      "mix double/single b",
+      "ascii",
+      "quote a",
+      "quote b",
+      "quote c",
+      "marked a",
+      "marked b",
+      "marked c",
+      "vertically enclosed a",
+      "vertically enclosed b",
+      "vertically enclosed c",
+      "horizontally enclosed a",
+      "horizontally enclosed b",
+      "horizontally enclosed c",
+    }
+    vim.ui.select(
+      vim.iter(ipairs(mapper)):totable(),
+      { prompt = "󰺫 box type" },
+      function(choice)
+        local num, sel = unpack(choice)
+        return fn(num)
+      end
+    )
+  end
+end
+
+local function line_selector(lineid)
+  return function()
+    local fn = function(num)
+      vim.cmd(([[CB%sline%s]]):format(lineid, num))
+    end
+    local mapper = {
+      "simple",
+      "simple: round down",
+      "simple: round up",
+      "simple: square down",
+      "simple: square up",
+      "simple: squared title",
+      "simple: rounded title",
+      "simple: spiked title",
+      "simple: heavy",
+      "confined",
+      "confined heavy",
+      "simple weighted",
+      "double",
+      "double confined",
+      "ascii a",
+      "ascii b",
+      "ascii c",
+    }
+    vim.ui.select(
+      vim.iter(ipairs(mapper)):totable(),
+      { prompt = "󰘤 line type" },
+      function(choice)
+        local num, sel = unpack(choice)
+        require("funsak.lazy").info(type(num))
+        require("funsak.lazy").info(vim.inspect(sel))
+        return fn(num)
+      end
+    )
+  end
+end
+
 return {
   {
     "LudoPinelli/comment-box.nvim",
     opts = {
-      doc_width = tonumber(vim.opt.textwidth:get()),
-      box_width = (3 / 4) * tonumber(vim.opt.textwidth:get()),
+      doc_width = 80,
+      box_width = 72,
+      line_width = 72,
+      comment_style = "line",
     },
-    keys = {
+    keys = vim.tbl_map(function(subt)
+      return vim.tbl_deep_extend(
+        "force",
+        subt,
+        { remap = false, silent = false }
+      )
+    end, {
       {
         key_cbox.catalog,
         function()
@@ -37,179 +151,131 @@ return {
       },
       {
         key_cbox.pos_left.align_left,
-        function()
-          return require("comment-box").llbox(vim.v.count)
-        end,
+        box_selector("ll"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰉢 󱄽:󰉢",
+        desc = "box:| 󰘷:󰉢 |=> 󱄽:󰉢",
       },
       {
         key_cbox.pos_left.align_center,
-        function()
-          return require("comment-box").lcbox(vim.v.count)
-        end,
+        box_selector("lc"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰉢 󱄽:󰉠",
+        desc = "box:| 󰘷:󰉢 |=> 󱄽:󰉠",
       },
       {
         key_cbox.pos_left.align_right,
-        function()
-          return require("comment-box").lrbox(vim.v.count)
-        end,
+        box_selector("lr"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰉢 󱄽:󰉣",
+        desc = "box:| 󰘷:󰉢 |=> 󱄽:󰉣",
       },
       {
         key_cbox.pos_center.align_left,
-        function()
-          return require("comment-box").clbox(vim.v.count)
-        end,
+        box_selector("cl"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰉠 󱄽:󰉢",
+        desc = "box:| 󰘷:󰉠 |=> 󱄽:󰉢",
       },
       {
         key_cbox.pos_center.align_center,
-        function()
-          return require("comment-box").ccbox(vim.v.count)
-        end,
+        box_selector("cc"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰉠 󱄽:󰉠",
+        desc = "box:| 󰘷:󰉠 |=> 󱄽:󰉠",
       },
       {
         key_cbox.pos_center.align_right,
-        function()
-          return require("comment-box").crbox(vim.v.count)
-        end,
+        box_selector("cr"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰉠 󱄽:󰉣",
+        desc = "box:| 󰘷:󰉠 |=> 󱄽:󰉣",
       },
       {
         key_cbox.pos_right.align_left,
-        function()
-          return require("comment-box").rlbox(vim.v.count)
-        end,
+        box_selector("rl"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰉣 󱄽:󰉢",
+        desc = "box:| 󰘷:󰉣 |=> 󱄽:󰉢",
       },
       {
         key_cbox.pos_right.align_center,
-        function()
-          return require("comment-box").rcbox(vim.v.count)
-        end,
+        box_selector("rc"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰉣 󱄽:󰉠",
+        desc = "box:| 󰘷:󰉣 |=> 󱄽:󰉠",
       },
       {
         key_cbox.pos_right.align_right,
-        function()
-          return require("comment-box").rrbox(vim.v.count)
-        end,
+        box_selector("rr"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰉣 󱄽:󰉣",
+        desc = "box:| 󰘷:󰉣 |=> 󱄽:󰉣",
       },
       {
         key_cbox.adaptive.align_left,
-        function()
-          return require("comment-box").albox(vim.v.count)
-        end,
+        box_selector("la"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰡎 󱄽:󰉢",
+        desc = "box:| 󰘷:󰡎 |=> 󱄽:󰉢",
       },
       {
         key_cbox.adaptive.align_center,
-        function()
-          return require("comment-box").acbox(vim.v.count)
-        end,
+        box_selector("ca"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰡎 󱄽:󰉠",
+        desc = "box:| 󰘷:󰡎 |=> 󱄽:󰉠",
       },
       {
         key_cbox.adaptive.align_right,
-        function()
-          return require("comment-box").arbox(vim.v.count)
-        end,
+        box_selector("ra"),
         mode = { "n", "v" },
-        desc = "box=> 󰘷:󰡎 󱄽:󰉣",
+        desc = "box:| 󰘷:󰡎 |=> 󱄽:󰉣",
       },
       {
-        key_cline.align_left,
-        function()
-          return require("comment-box").line(vim.v.count)
-        end,
+        key_cline.align_left.text_left,
+        line_selector("ll"),
         mode = { "n", "v" },
-        desc = "line=> 󰘷:󰡎 󱄽:󰉢",
+        desc = "line:| 󰘷:󰉢 |=> 󱄽:󰉢",
       },
       {
-        key_cline.align_center,
-        function()
-          return require("comment-box").cline(vim.v.count)
-        end,
+        key_cline.align_left.text_center,
+        line_selector("lc"),
         mode = { "n", "v" },
-        desc = "line=> 󰘷:󰡎 󱄽:󰉠",
+        desc = "line:| 󰘷:󰉢 |=> 󱄽:󰉠",
       },
       {
-        key_cline.align_right,
-        function()
-          return require("comment-box").rline(vim.v.count)
-        end,
+        key_cline.align_left.text_right,
+        line_selector("lr"),
         mode = { "n", "v" },
-        desc = "line=> 󰘷:󰡎 󱄽:󰉣",
-      },
-    },
-  },
-  {
-    "s1n7ax/nvim-comment-frame",
-    config = true,
-    keys = {
-      {
-        key_cframe.single_line,
-        function()
-          require("nvim-comment-frame").add_comment()
-        end,
-        mode = "n",
-        desc = "frame=> add comment frame",
+        desc = "line:| 󰘷:󰉢 |=> 󱄽:󰉣",
       },
       {
-        key_cframe.multi_line,
-        function()
-          require("nvim-comment-frame").add_multiline_comment()
-        end,
-        mode = "n",
-        desc = "frame=> multiline frame",
+        key_cline.align_center.text_left,
+        line_selector("cl"),
+        mode = { "n", "v" },
+        desc = "line:| 󰘷:󰉠 |=> 󱄽:󰉢",
       },
-    },
-    opts = {
-      disable_default_keymap = true,
-      -- start the comment with this string
-      start_str = "//",
-
-      -- end the comment line with this string
-      end_str = "//",
-
-      -- fill the comment frame border with this character
-      fill_char = "-",
-
-      -- width of the comment frame
-      frame_width = compute_remaining_width(),
-
-      -- wrap the line after 'n' characters
-      line_wrap_len = 50,
-
-      -- automatically indent the comment frame based on the line
-      auto_indent = true,
-
-      -- add comment above the current line
-      add_comment_above = true,
-
-      -- configurations for individual language goes here
-      languages = {},
-    },
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-    },
-    -- event = {
-    --   "VeryLazy",
-    -- },
+      {
+        key_cline.align_center.text_center,
+        line_selector("cc"),
+        mode = { "n", "v" },
+        desc = "line:| 󰘷:󰉠 |=> 󱄽:󰉠",
+      },
+      {
+        key_cline.align_center.text_right,
+        line_selector("cr"),
+        mode = { "n", "v" },
+        desc = "line:| 󰘷:󰉠 |=> 󱄽:󰉣",
+      },
+      {
+        key_cline.align_right.text_left,
+        line_selector("rl"),
+        mode = { "n", "v" },
+        desc = "line:| 󰘷:󰉣 |=> 󱄽:󰉢",
+      },
+      {
+        key_cline.align_right.text_center,
+        line_selector("rc"),
+        mode = { "n", "v" },
+        desc = "line:| 󰘷:󰉣 |=> 󱄽:󰉠",
+      },
+      {
+        key_cline.align_right.text_right,
+        line_selector("rr"),
+        mode = { "n", "v" },
+        desc = "line:| 󰘷:󰉣 |=> 󱄽:󰉣",
+      },
+    }),
   },
   {
     "thazelart/figban.nvim",
@@ -262,7 +328,7 @@ return {
         key_figlet.change_font,
         change_figlet_font,
         mode = "n",
-        desc = "figlet=> change font",
+        desc = "figlet:| change |=> font",
       },
       {
         key_figlet.ascii_interface,
@@ -272,7 +338,7 @@ return {
           end)
         end,
         mode = { "n" },
-        desc = "figlet=> ascii interface",
+        desc = "figlet:| ascii |=> interface",
       },
       {
         key_figlet.ascii_comment_interface,
@@ -282,19 +348,19 @@ return {
           end)
         end,
         mode = { "n" },
-        desc = "figlet=> ascii comment interface",
+        desc = "figlet:| ascii comment |=> interface",
       },
       {
         key_figlet.ascii_interface,
         ":FigSelect<CR>",
         mode = { "v" },
-        desc = "figlet=> ascii select interface",
+        desc = "figlet:| ascii select |=> interface",
       },
       {
         key_figlet.ascii_comment_interface,
         ":FigSelectComment<CR>",
         mode = { "v" },
-        desc = "figlet=> ascii select comment interface",
+        desc = "figlet:| ascii select comment |=> interface",
       },
     },
   },
@@ -595,8 +661,18 @@ return {
           require("significant").start_animated_sign(10, "dots4", 300)
         end,
         mode = "n",
-        desc = "sgnfcnt=> start animation",
+        desc = "sgnfcnt:| start |=> animation",
       },
     },
+  },
+  {
+    "bbjornstad/ficus.nvim",
+    enabled = true,
+    dev = true,
+    opts = {},
+    config = function(_, opts)
+      -- ultimately do this:
+      -- require('ficus').setup(opts)
+    end,
   },
 }

@@ -112,36 +112,6 @@ return {
     },
   },
   {
-    "f-person/git-blame.nvim",
-    event = "VeryLazy",
-    enabled = opt.prefer.gitblame == "f-person",
-    cmd = { "GitBlameToggle", "GitBlameEnable" },
-    opts = {
-      enabled = true,
-      delay = 5000,
-      message_template = "   <committer>:󱒊:<date> 󱛠 <summary>",
-      date_format = "%r (%c)",
-    },
-    config = function(_, opts)
-      require("gitblame").setup(opts)
-      vim.g.gitblame_virtual_text_column = vim.go.textwidth or 80
-    end,
-    keys = {
-      {
-        key_git.blame.toggle,
-        "<CMD>GitBlameToggle<CR>",
-        mode = { "n" },
-        desc = "::git.blame=> toggle on line",
-      },
-      {
-        key_git.blame.enable,
-        "<CMD>GitBlameEnable<CR>",
-        mode = { "n" },
-        desc = "::git.blame=> force enable on line",
-      },
-    },
-  },
-  {
     "NeogitOrg/neogit",
     dependencies = { "nvim-lua/plenary.nvim" },
     cmd = { "Neogit" },
@@ -381,8 +351,8 @@ return {
       signs = {},
       signcolumn = true,
       numhl = true,
-      linehl = true,
-      word_diff = true,
+      linehl = false,
+      word_diff = false,
       watch_gitdir = {
         follow_files = true,
       },
@@ -391,8 +361,8 @@ return {
       current_line_blame = opt.prefer.gitblame == "gitsigns",
       current_line_blame_opts = {
         virt_text = true,
-        virt_text_pos = "eol",
-        delay = 1000,
+        virt_text_pos = "overlay",
+        delay = 5000,
         ignore_whitespace = false,
         virt_text_priority = 100,
       },
@@ -409,6 +379,88 @@ return {
         col = 1,
       },
       yadm = { enable = false },
+    },
+    keys = {
+      {
+        key_git.gitsigns.toggle.numhl,
+        function()
+          require("gitsigns").toggle_numhl()
+        end,
+        mode = "n",
+        desc = "git:tgl| signs |=> numhl",
+      },
+      {
+        key_git.gitsigns.toggle.linehl,
+        function()
+          require("gitsigns").toggle_linehl()
+        end,
+        mode = "n",
+        desc = "git:tgl| signs |=> linehl",
+      },
+      {
+        key_git.gitsigns.toggle.signs,
+        function()
+          require("gitsigns").toggle_signs()
+        end,
+        mode = "n",
+        desc = "git:tgl| signs |=> signs",
+      },
+      {
+        key_git.gitsigns.toggle.word_diff,
+        function()
+          require("gitsigns").toggle_word_diff()
+        end,
+        mode = "n",
+        desc = "git:tgl| signs |=> word diff",
+      },
+      {
+        key_git.gitsigns.toggle.line_blame,
+        function()
+          require("gitsigns").toggle_current_line_blame()
+        end,
+        mode = "n",
+        desc = "git:tgl| signs |=> line blame",
+      },
+      {
+        key_git.gitsigns.toggle.deleted,
+        function()
+          require("gitsigns").toggle_deleted()
+        end,
+        mode = "n",
+        desc = "git:tgl| signs |=> deleted",
+      },
+      {
+        key_git.gitsigns.preview.hunk,
+        function()
+          require("gitsigns").preview_hunk()
+        end,
+        mode = "n",
+        desc = "git:view| signs |=> hunk",
+      },
+      {
+        key_git.gitsigns.preview.hunk_inline,
+        function()
+          require("gitsigns").preview_hunk_inline()
+        end,
+        mode = "n",
+        desc = "git:view| signs |=> inline hunk",
+      },
+      {
+        key_git.gitsigns.refresh,
+        function()
+          require("gitsigns").refresh()
+        end,
+        mode = "n",
+        desc = "git:view| signs |=> inline hunk",
+      },
+      {
+        key_git.gitsigns.diffthis,
+        function()
+          require("gitsigns").diffthis()
+        end,
+        mode = "n",
+        desc = "git:diff| signs |=> diffthis",
+      },
     },
   },
 }

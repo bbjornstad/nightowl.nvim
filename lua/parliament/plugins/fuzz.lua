@@ -38,6 +38,16 @@ end
 if fenv.directory_switcher.enable_commands == true then
   _G.fzf_dirs = fzf_dirs
   vim.cmd([[command! -nargs=* Directories lua _G.fzf_dirs()]])
+
+  vim.api.nvim_create_user_command(
+    "Directories",
+    ---@param opts vim.api.keyset.cmd
+    function(opts)
+      -- do something with args
+      fzf_dirs({ args = opts.args })
+    end,
+    {}
+  )
 end
 
 local function action(name)
