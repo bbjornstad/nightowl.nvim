@@ -315,7 +315,7 @@ end
 ---@param action VimCmd | fun(): any action that is mapped on the right-hand
 ---side of the keybinding, either as vim command representation or as a lua
 ---function accepting 0 arguments.
----@param opts owl.GenericOpts additional options that are passed to the underlying call
+---@param opts funsak.GenericOpts additional options that are passed to the underlying call
 ---to the internal keymap engine, e.g. `silent = true` or `buffer = 0`. These
 ---are used directly in the case of `vim.keymap.set` and are unpacked directly in
 ---the case of `lazy.nvim` style.

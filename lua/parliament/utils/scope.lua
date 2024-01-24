@@ -10,8 +10,8 @@ local scope_theme = "ivy"
 --- function that does such when called with additional extension setup options
 ---@param name string name/id of the target extension, e.g.
 ---`"telescope-nvim/telescope-fzf-native.nvim"`
----@param opts owl.GenericOpts
----@param extension_setup (boolean | owl.GenericOpts)? specification for additional
+---@param opts funsak.GenericOpts
+---@param extension_setup (boolean | funsak.GenericOpts)? specification for additional
 ---parameters that should be passed directly to the extension's setup field if
 ---it exists. These are not options that are supposed to be passed to the
 ---telescope plugin directly, e.g. as part of its options. Instead, these are

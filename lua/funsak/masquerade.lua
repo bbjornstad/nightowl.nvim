@@ -1,7 +1,37 @@
----@module "funsak.masquerade" tools for improving the general usability of of custom
----modules written for lazy.nvim specifications and configurations.
+-- SPDX-FileCopyrightText: 2024 Bailey Bjornstad | ursa-major <bailey@bjornstad.dev>
+-- SPDX-License-Identifier: MIT
+
+-- MIT License
+
+--  Copyright (c) 2024 Bailey Bjornstad | ursa-major bailey@bjornstad.dev
+
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+
+-- The above copyright notice and this permission notice (including the next
+-- paragraph) shall be included in all copies or substantial portions of the
+-- Software.
+
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+
+---@module "funsak.masquerade" tools for improving the general usability of of
+---custom modules written for lazy.nvim specifications and configurations.
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
+
+-- ╓─────────────────────────────────────────────────────────────────────╖
+-- ║ the masquerade: lets have a ball                                    ║
+-- ╙─────────────────────────────────────────────────────────────────────╜
 ---@class funsak.masquerade
 local M = {}
 
@@ -134,7 +164,7 @@ end
 --- honored unless explicitly asked.
 ---@param mod table module to wrap in masqued behavior.
 ---@param root T_Path? location of the modules in configurable components
----@param opts owl.GenericOpts? additional options that should be passed
+---@param opts funsak.GenericOpts? additional options that should be passed
 function M.masque(mod, root, opts)
   opts = opts or {}
   root = root and root .. "." or ""
@@ -151,8 +181,8 @@ end
 --- this is the main user-facing interface for configuration of the masquerade
 --- behavior.
 ---@param root T_Path root folder of the modules that should be treated
----@param opts owl.GenericOpts?
----@return fun(mod: any, opts: owl.GenericOpts): any |
+---@param opts funsak.GenericOpts?
+---@return fun(mod: any, opts: funsak.GenericOpts): any |
 function M.requisition(root, opts)
   return function(mod, o)
     opts = require("funsak.table").mopts(opts, o)

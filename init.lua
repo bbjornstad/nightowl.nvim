@@ -29,6 +29,9 @@
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 
+-- parliament.nvim: A neovim configuration of the highest order, in fact, the
+-- prestige here is so great that 
+
 -- we have to be very careful what we include here using a require call. This is
 -- an easy place to accidentally create a circular dependency.
 local uienv = require("environment.ui")

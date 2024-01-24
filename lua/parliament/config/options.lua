@@ -9,7 +9,7 @@ local NIGHTOWL_BACKGROUND = vim.env.NIGHTOWL_BACKGROUND_STYLE
 -- respectively. If using a `funsak` KeyModule, these have somewhat more
 -- specific meanings depending on configuration.
 vim.g.mapleader = [[ ]]
-vim.g.maplocalleader = [[']]
+vim.g.maplocalleader = [[\]]
 
 -- Basic interface options that are not handled with specific plugin
 -- configurations set in interface.lua
@@ -72,7 +72,7 @@ vim.opt.hidden = true
 vim.opt.wrapscan = true
 
 -- scrolling behavior.
-vim.opt.scrolloff = 190
+vim.opt.scrolloff = 10
 
 -- sign column and number column configuration
 vim.opt.ruler = true
@@ -123,24 +123,12 @@ vim.opt.fillchars:append({
   verthoriz = "╋",
 })
 
--- warn if there is not a background designation set in the corresponding
--- environment variable.
-if not NIGHTOWL_BACKGROUND then
-  vim.notify(
-    [[This configuration is missing a background specification in the environment.
-    You can set the background using the NIGHTOWL_BACKGROUND_STYLE environment variable,
-    which accepts two possible values: "light" or "dark". Without setting this variable,
-    defaults to "dark"]]
-  )
-end
-vim.opt.background = (NIGHTOWL_BACKGROUND or "dark")
-
 vim.cmd.hi("clear SignColumns")
 
 vim.opt.encoding = "utf-8"
 
 -- turn on fancy colors, requires terminal emulator support
-vim.opt.termguicolors = true
+-- vim.opt.termguicolors = true
 
 vim.opt.filetype = "on"
 

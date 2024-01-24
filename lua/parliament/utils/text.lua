@@ -58,7 +58,7 @@ end
 ---@param colstop number? if desired, an alternative width can be specified
 ---using the colstop ("column stop") parameter, an integer representing the end
 ---of the dash line (default first valid choice from colorcolumn | textwidth | 80)
----@param character (string|fun(ft: owl.FType): string)? the pattern of characters
+---@param character (string|fun(ft: funsak.FType): string)? the pattern of characters
 ---that should be repeated to create the text to insert after the cursor.
 ---(default fun(ft: owl.FType): string)
 function M.InsertDashBreak(colstop, character)
@@ -108,7 +108,7 @@ end
 --- construct a horizontal break made of specifiable characters.
 ---@param width IntLike target width of the final string--*not* the number of
 ---times to repeat.
----@param char owl.Fowl<DashSpec>
+---@param char funsak.Fowl<DashSpec>
 ---@return string breakstr
 function M.compute_breakstr(char, width)
   width = width ~= nil and tonumber(width) or 0
@@ -147,7 +147,7 @@ end
 
 --- computes the repeated string pattern that will form a break and then inserts
 --- it into the text.
----@param char owl.Fowl<DashSpec>
+---@param char funsak.Fowl<DashSpec>
 ---@param opts parliament.utils.BreakOptions
 function M.breaker(char, opts)
   opts = opts or {}
@@ -164,7 +164,7 @@ end
 --- is automatically handled in the background.
 ---@param colstop number? if desired, an alternative width can be specified here
 ---as an integer, which will be the end column of the inserted text.
----@param dashchar (string|(fun(ft: owl.FType): string))? a pattern of characters
+---@param dashchar (string|(fun(ft: funsak.FType): string))? a pattern of characters
 ---that will be repeated to create the inserted text. (defaults to `"-"`)
 ---@param include_space boolean? whether or not to include a space following the
 ---comment delimiting characters for the file, e.g. "#{text}" vs "# {text}"

@@ -1,7 +1,38 @@
+-- SPDX-FileCopyrightText: 2024 Bailey Bjornstad | ursa-major <bailey@bjornstad.dev>
+-- SPDX-License-Identifier: MIT
+
+-- MIT License
+
+--  Copyright (c) 2024 Bailey Bjornstad | ursa-major bailey@bjornstad.dev
+
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+
+-- The above copyright notice and this permission notice (including the next
+-- paragraph) shall be included in all copies or substantial portions of the
+-- Software.
+
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+
 ---@module "environment.keys" definitions of keybindings together in a single
 ---file which is to be used during plugin specification
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
+
+-- environment.keys
+-- Personal keymapping topology explicitly laid out in a format which is indexed
+-- by a semantic description of the behavior
+
 --- the user's keymap customization in an easily accessible and semantically
 --- meaningful form.
 ---@class environment.keys: KeybindGroupSpec
@@ -158,10 +189,35 @@ kenv.motion = keygroup({
       forward = "f",
       backward = "b",
     },
-    grapple = { [LEADER_ID] = { append = "g" }, forward = "f", backward = "b" },
+    grapple = {
+      [LEADER_ID] = { append = "p" },
+      forward = "f",
+      backward = "b",
+      toggle = "t",
+      tag = "g",
+      popup = "p",
+      untag = "u",
+      select = "s",
+      quickfix = "q",
+      reset = "d",
+      cycle = { backward = "C", forward = "c" },
+      list_tags = "T",
+    },
     quickfix = { [LEADER_ID] = { append = "q" }, forward = "f", backward = "b" },
     jumplist = { [LEADER_ID] = { append = "j" }, forward = "f", backward = "b" },
-    harpoon = { [LEADER_ID] = { append = "h" }, forward = "f", backward = "b" },
+    harpoon = {
+      [LEADER_ID] = { append = "h" },
+      forward = "f",
+      backward = "b",
+      nav = {
+        next = "n",
+        previous = "p",
+        file = "e",
+      },
+      add_file = "h",
+      quick_menu = "q",
+      term = { to = "t", send = "s", menu = "M" },
+    },
   },
   standard = {
     [LEADER_ID] = { append = leader_motion },
@@ -257,6 +313,7 @@ kenv.fm = keygroup({
     vsplit = "v",
     hsplit = "h",
     tab = "<tab>",
+    change_manager = "m",
   },
 }, leader_fm, {})
 
@@ -389,7 +446,7 @@ kenv.completion = keygroup({
   },
   external = {
     [LEADER_ID] = { append = "<C-x>" },
-    complete_common_string = "<C-S-c>",
+    complete_common_string = "<C-s>",
     complete_fuzzy_path = "<C-f>",
   },
   submenus = {
@@ -463,7 +520,7 @@ kenv.build = keygroup({
 
 local leader_time = "<localleader>"
 kenv.time = keygroup({
-  weather = "w",
+  weather = "W",
   stand = {
     [LEADER_ID] = { append = "s" },
     now = "n",
@@ -508,6 +565,17 @@ kenv.time = keygroup({
     },
     metagen = { [LEADER_ID] = { append = "m" }, inject = "i", update = "u" },
     workspace = { [LEADER_ID] = { append = "w" }, default = "d", switch = "w" },
+    dt = {
+      [LEADER_ID] = { append = "d" },
+      insert = "t",
+    },
+    export = {
+      [LEADER_ID] = { append = "x" },
+      to_file = {
+        md = "m",
+        txt = "t",
+      },
+    },
   },
   org = {
     task = {
@@ -844,6 +912,30 @@ kenv.git = keygroup({
     stage_buffer = "S",
     undo_stage = "u",
   },
+  gitsigns = {
+    [LEADER_ID] = { append = "s" },
+    toggle = {
+      linehl = "l",
+      numhl = "n",
+      signs = "s",
+      word_diff = "w",
+      line_blame = "b",
+      deleted = "d",
+    },
+    reset = {
+      [LEADER_ID] = "R",
+      buffer = "b",
+      hunk = "h",
+      base = "B",
+    },
+    diffthis = "d",
+    refresh = "r",
+    preview = {
+      [LEADER_ID] = { append = "p" },
+      hunk_inline = "i",
+      hunk = "h",
+    },
+  },
   gh_actions = "a",
   tardis = "t",
 }, leader_git, {})
@@ -885,6 +977,14 @@ kenv.view = keygroup({
     error_lens = { toggle = "e" },
   },
   securitree = { toggle = "s" },
+  treesitter_nav = {
+    [LEADER_ID] = { append = "t" },
+    definition = "d",
+    next_usage = "n",
+    previous_usage = "p",
+    list_definitions = "D",
+    list_definitions_toc = "0",
+  },
 }, leader_view, {})
 
 local leader_docs = "<leader>D"
@@ -904,6 +1004,7 @@ kenv.docs = keygroup({
 
 local leader_tool = "<leader>"
 kenv.tool = keygroup({
+  snippet = { [LEADER_ID] = { append = "N" }, add = "a", edit = "e" },
   regex = { [LEADER_ID] = { append = "R" }, explainer = "r", hypersonic = "h" },
   splitjoin = {
     [LEADER_ID] = { append = "j" },
@@ -979,7 +1080,7 @@ kenv.scope = keygroup({
     media = "m",
     dir = "d",
   },
-  toggleterm = "\\",
+  toggleterm = "<localleader>",
   repo = "r",
   env = "e",
   changes = "u",
@@ -1012,7 +1113,7 @@ kenv.scope = keygroup({
   diagnostic = { [LEADER_ID] = { append = "d" }, error_lens = "l" },
 }, leader_scope, {})
 
-local leader_editor = "\\"
+local leader_editor = "<localleader>"
 kenv.editor = keygroup({
   notes = { [LEADER_ID] = { append = "n" }, eureka = "n" },
   venn = "v",
@@ -1059,9 +1160,24 @@ kenv.editor = keygroup({
   },
   cline = {
     [LEADER_ID] = { append = "l" },
-    align_left = "l",
-    align_center = "c",
-    align_right = "r",
+    align_left = {
+      [LEADER_ID] = { append = "l" },
+      text_left = "l",
+      text_center = "c",
+      text_right = "r",
+    },
+    align_center = {
+      [LEADER_ID] = { append = "c" },
+      text_left = "l",
+      text_center = "c",
+      text_right = "r",
+    },
+    align_right = {
+      [LEADER_ID] = { append = "r" },
+      text_left = "l",
+      text_center = "c",
+      text_right = "r",
+    },
     custom = {
       [LEADER_ID] = { append = "b" },
       comment = { insert = "c", nospace = "C" },
@@ -1074,13 +1190,13 @@ kenv.editor = keygroup({
   modeline = "m",
   licenses = {
     [LEADER_ID] = { append = "c" },
-    insert = "i",
-    fetch = "f",
+    insert = "I",
+    fetch = "F",
     update = "u",
-    write = "w",
-    select_insert = "I",
-    select_fetch = "F",
-    select_write = "W",
+    write = "W",
+    select_insert = "i",
+    select_fetch = "f",
+    select_write = "w",
   },
   glyph = {
     [LEADER_ID] = { append = "y" },
@@ -1172,6 +1288,8 @@ kenv.replace = keygroup({
   },
   inc_rename = "i",
   structural = "s",
+  replacer = "q",
+  treesitter = "e",
 }, leader_replace, {})
 
 local leader_yank = "<leader>y"
@@ -1231,6 +1349,7 @@ kenv.lists = keygroup({
     first = "f",
     last = "e",
   },
+  replacer = "r",
 }, leader_lists, {})
 
 local leader_help = "<leader>h"

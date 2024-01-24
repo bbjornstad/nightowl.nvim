@@ -1,8 +1,13 @@
 local env = {}
 
--- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+local environment_def_scheme = os.getenv("NIGHTOWL_COLORSCHEME")
+env.colorscheme = {
+  light = environment_def_scheme or "dawnfox",
+  dark = environment_def_scheme or "nightfox",
+}
+
 -- UI: Borders
--- >>>>>>>>>>>
+-- ===========
 -- Spec is that the main border should be shadow. We want this to apply to all
 -- borders that are not made by mason or lazy, the package management tools.
 -- Those receive the alt border. An accent border is also reserved for cases
@@ -42,7 +47,7 @@ env.ft_ignore_list = {
   "prompt",
   "broot",
   "gundo",
-  "NvimTree"
+  "NvimTree",
 }
 
 env.ft_ignore_list_alt = vim.iter(env.ft_ignore_list):fold({}, function(t, v)
@@ -59,6 +64,13 @@ env.icons = {
     refactor = "󱐌",
     source = "󰿨",
     combined = "󰴖", -- used when combine is set to true or as a fallback when there is no action kind
+  },
+  mason = {
+    package = {
+      installed = "󱧘",
+      pending = "󰏗",
+      uninstalled = "󱧙",
+    },
   },
   lualine = {
     mode = {
@@ -515,11 +527,6 @@ env.icons.cursorsigns = {
   tail = env.icons.braille,
 }
 
-env.colorscheme = {
-  dark = "kanagawa",
-  light = "newpaper",
-}
-
 env.padding = {
   noice = {
     main = { 2, 3 },
@@ -548,6 +555,35 @@ env.oil = {
       "ctime",
       "size",
     },
+  },
+}
+
+env.column_rulers = { "+1", "+20" }
+
+env.norg = {}
+env.norg.icons = {
+  todo = {
+    cancelled = { icon = "󰜺" },
+    pending = { icon = "󱅤" },
+    on_hold = { icon = "󰵞" },
+    recurring = { icon = "󰑖" },
+    uncertain = { icon = "󱔢" },
+    done = { icon = "󰡕" },
+    undone = { icon = " " },
+    urgent = { icon = "" },
+  },
+}
+
+env.icons.norg = {
+  todo = {
+    cancelled = { icon = "󰜺" },
+    pending = { icon = "󱅤" },
+    on_hold = { icon = "󰵞" },
+    recurring = { icon = "󰑖" },
+    uncertain = { icon = "󱔢" },
+    done = { icon = "󰡕" },
+    undone = { icon = " " },
+    urgent = { icon = "" },
   },
 }
 

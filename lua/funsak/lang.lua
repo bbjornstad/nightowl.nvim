@@ -48,7 +48,7 @@ M.per = require("funsak.table").per
 --- language, as we can define them a single time during initial construction of
 --- the language and then carry the definition through to method-chained further
 --- feature setup.
----@field ftypes owl.FType[]?
+---@field ftypes funsak.FType[]?
 
 --- generic representation for identifying a programming language
 ---@generic Language: string

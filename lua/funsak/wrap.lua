@@ -86,6 +86,13 @@ function M.recurser(fn, is_method)
   return recurse_wrap
 end
 
+function M.pcurser(fn, is_method)
+  is_method = is_method or false
+  local pcurse_wrap
+  if is_method then
+  end
+end
+
 local OSet = require("funsak.orderedset")
 --- a helper function for this module, which helps the helper function
 --- functional.unpacker by doing the "rezipping" of slices out of their
@@ -256,7 +263,7 @@ end
 --- before being reinserted into the original function arguments during
 --- evaluation of the wrapping.
 ---@param fn fun(...): any? a function, whose last argument is the `opts` field.
----@param handler fun(opts: owl.GenericOpts): any? function to "handle" the extra opts
+---@param handler fun(opts: funsak.GenericOpts): any? function to "handle" the extra opts
 ---that are passed through the `opts` argument of the original function
 ---@param consume_optarg boolean? whether or not the opts field that is held in
 ---the last argument position should be removed for processing, or simply read

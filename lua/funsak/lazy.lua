@@ -43,7 +43,7 @@ local _notify_mapper
 ---@param name string plugin name/uri as a part of lazy.nvim specification.
 ---@param field string? name of a lazy.nvim spec field to access, if none is
 ---given the whole specification is returned.
----@return LazyPlugin? | any? spec the plugin's specification within
+---@return LazyPluginSpec? | any? spec the plugin's specification within
 ---lazy.nvim. This can be used to make adjustments.
 function M.spec(name, field)
   local plugin = require("lazy.core.config").plugins[name]
@@ -79,7 +79,7 @@ end
 --- superfluous table elements.
 ---@param name string language server name, e.g. "lua_ls"
 ---@param opts { server: owl.Fowl<owl.lsp.ClientConfig>?, setup: owl.lsp.SetupConfig?, mason: owl.lsp.MasonConfig?, dependencies: owl.Fowl<owl.lsp.DependencyConfig>? }?
----@return LazyPlugin
+---@return LazyPluginSpec
 function M.lspsrv(name, opts)
   opts = opts or {}
 

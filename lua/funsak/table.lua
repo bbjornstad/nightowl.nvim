@@ -87,8 +87,8 @@ function M.tabler(item, enforce_list_input, return_empty)
   return not return_empty and (tbl or {}) or tbl
 end
 
----@alias OptifyHandlersPhase owl.Ix_Options
----@alias OptsFunction fun(plugin: LazyPlugin, opts: owl.GenericOpts)
+---@alias OptifyHandlersPhase funsak.Ix_Options
+---@alias OptsFunction fun(plugin: LazyPlugin, opts: funsak.GenericOpts)
 
 --- turns a table that is specified in an opts field of a LazyPluginSpec into a
 --- function which deeply merges each indexed field of the spec with the _opts
@@ -103,7 +103,7 @@ end
 --- this would allow the user to specify the field in a more standard/readable
 --- format, but still allow for the definition of variables or otherwise enable
 --- more complex behavior.
----@param opts owl.GenericOpts any field specified as a table format, but
+---@param opts funsak.GenericOpts any field specified as a table format, but
 ---generally ones for which the behavioral modifications allowed with this tool
 ---make sense, e.g. `opts`. Rarely `keys` could be used. It is unlikely that
 ---other fields will find all that much utility from this function otherwise.

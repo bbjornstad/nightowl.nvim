@@ -1,6 +1,36 @@
----@module "parliament.config.keymap" main keymapx( for nightowl with kickstarter
----many of these are ripped directly from LazyVim.
+-- SPDX-FileCopyrightText: 2024 Bailey Bjornstad | ursa-major <bailey@bjornstad.dev>
+-- SPDX-License-Identifier: MIT
+
+-- MIT License
+
+--  Copyright (c) 2024 Bailey Bjornstad | ursa-major bailey@bjornstad.dev
+
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+
+-- The above copyright notice and this permission notice (including the next
+-- paragraph) shall be included in all copies or substantial portions of the
+-- Software.
+
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+
+---@module "parliament.config.keymap" main mappings for nightowl with
+---kickstarter many of these are ripped directly from LazyVim.
 -- Keymaps are automatically loaded on the VeryLazy event
+
+-- ╓─────────────────────────────────────────────────────────────────────╖
+-- ║ parliament keymappings:                                             ║
+-- ╙─────────────────────────────────────────────────────────────────────╜
 local edit_tools = require("parliament.utils.text")
 local kenv = require("environment.keys")
 local key_cline = kenv.editor.cline
@@ -10,7 +40,9 @@ local delx = vim.keymap.del
 local has = require("funsak.lazy").has
 local toggle = require("funsak.toggle")
 
---- gets the help in vim documentation for the item under the cursor
+-- ─[ general improvements ]───────────────────────────────────────────────
+
+-- gets the help in vim documentation for the item under the cursor
 local function helpmapper()
   local thishelp = ("help %s"):format(vim.fn.expand("<cword>"))
   vim.cmd(thishelp)
@@ -63,6 +95,8 @@ mapx(
   { desc = "got:| |=> don't get help", remap = false, nowait = false }
 )
 
+-- ─[ lazy.nvim keybindings ]──────────────────────────────────────────────
+
 -- refix of the lazy.nvim keybinds here such that the <leader>l combo of keys is
 -- available for other things.
 mapx({ "n" }, kenv.lazy.open, "<CMD>Lazy<CR>", { desc = "lazy |=> panel" })
@@ -106,6 +140,7 @@ mapx(
 )
 pcall(delx, { "n" }, "<leader>l")
 
+-- ─[ motion keymappings: ]────────────────────────────────────────────────
 -- Move Lines
 mapx("n", "<A-S-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
 mapx("n", "<A-S-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
@@ -127,7 +162,7 @@ mapx("i", "<C-k>", "<C-o><up>", { desc = "buf:| |=> cursor up" })
 mapx("i", "<C-h>", "<C-o><left>", { desc = "buf:| |=> cursor left" })
 mapx("i", "<C-l>", "<C-o><right>", { desc = "buf:| |=> cursor right" })
 
--- Ctrl-Q Quit Bindings
+-- ─[ Ctrl-Q Quit Bindings ]───────────────────────────────────────────────
 mapx("n", "<C-q><C-q>", "<CMD>quit<CR>", { desc = "quit:| |=> terminate" })
 mapx(
   "n",
@@ -179,18 +214,7 @@ mapx(
 -- the q key is prime real estate for other functions.
 mapx("n", "q", "<NOP>", { desc = "macro:| |=> don't record" })
 
--- closing windows without quitting.
-mapx("n", "<C-c>", function()
-  vim.api.nvim_win_close(0, false)
-end, { desc = "win:| |=> close window" })
-mapx("n", "qqq", function()
-  vim.api.nvim_win_close(0, false)
-end, { desc = "win:| |=> close window" })
-
--- remove some default binds to free them up for different entries under the "f"
--- subleader
--- pcall(delx, "n", "<leader>fn")
--- pcall(delx, "n", "<leader>ft")
+-- ─[ buffers, saving, files ]─────────────────────────────────────────────
 mapx("n", kenv.fm.fs.new, function()
   vim.ui.input({ prompt = "󰎝 enter filename: " }, function(input)
     vim.cmd(("edit ./%s"):format(input))
@@ -208,18 +232,6 @@ mapx(
   "<CMD>writeall<CR>",
   { desc = "buf=> [all] write" }
 )
--- mapx(
---   "n",
---   kenv.buffer.wipeout,
---   "<CMD>bwipeout<CR>",
---   { desc = "buf:| |=> wipeout this buffer" }
--- )
--- mapx(
---   "n",
---   kenv.buffer.force_wipeout,
---   "<CMD>bwipeout!<CR>",
---   { desc = "buf=> [!] wipeout this buffer" }
--- )
 mapx("n", kenv.buffer.write, "<CMD>write<CR>", { desc = "buf |=> write" })
 mapx(
   "n",
@@ -229,6 +241,10 @@ mapx(
 )
 
 -- navigating buffers with non-shortcutted keymaps.
+-- NOTE: This should be done most effectively in a wrapping conditional check
+-- for plugins that may interfere with the typical behavior, even though
+-- ultimately they should be overwritten with the plugin regardless.
+-- TODO: maybe we should ditch the check?
 if not has("cybu.nvim") then
   mapx("n", "<C-S-h>", "<cmd>bprevious<cr>", { desc = "buf:| |=> previous" })
   mapx("n", "<C-S-l>", "<cmd>bnext<cr>", { desc = "buf:| |=> next" })
@@ -239,9 +255,16 @@ end
 mapx("n", "<leader>bb", "<cmd>e #<cr>", { desc = "buf:| |=> autocycle" })
 mapx("n", "<leader>`", "<cmd>e #<cr>", { desc = "buf:| |=> autocycle" })
 
--- Windowing adjustment keymaps for things like moving to a window, resizing,
--- reorganizing, etc.
--- * chorded/shortcut bindings
+-- ─[ Window Keymaps ]─────────────────────────────────────────────────────
+-- closing windows without quitting.
+mapx("n", "<C-c>", function()
+  vim.api.nvim_win_close(0, false)
+end, { desc = "win:| |=> close window" })
+mapx("n", "qqq", function()
+  vim.api.nvim_win_close(0, false)
+end, { desc = "win:| |=> close window" })
+
+-- chorded/shortcut bindings
 mapx("n", "<C-h>", "<C-w>h", { desc = "win:| go |=> left", remap = true })
 mapx("n", "<C-j>", "<C-w>j", { desc = "win:| go |=> down", remap = true })
 mapx("n", "<C-k>", "<C-w>k", { desc = "win:| go |=> up", remap = true })
@@ -251,7 +274,7 @@ mapx("n", "<A-j>", "<C-w>j", { desc = "win:| go |=> down", remap = true })
 mapx("n", "<A-k>", "<C-w>k", { desc = "win:| go |=> up", remap = true })
 mapx("n", "<A-l>", "<C-w>l", { desc = "win:| go |=> right", remap = true })
 
--- * resize window using <ctrl> + arrow keys
+-- resize window using <ctrl> + arrow keys
 mapx(
   "n",
   "<C-Up>",
@@ -277,7 +300,11 @@ mapx(
   { desc = "win.sz:| width |=> increase" }
 )
 
--- * leader submenu for window management
+mapx("n", "<leader>wxh", "<C-w>s", { desc = "win:| split => horizontal" })
+mapx("n", "<leader>wxv", "<C-w>v", { desc = "win:| split => vertical" })
+mapx("n", "<leader>wxx", "<C-w>v", { desc = "win:| split => vertical" })
+
+-- leader submenu for window management
 mapx("n", "<leader>wh", "<C-w>h", { desc = "win:| go |=> left", remap = false })
 mapx("n", "<leader>wj", "<C-w>j", { desc = "win:| go |=> down", remap = false })
 mapx(
@@ -419,8 +446,8 @@ mapx(
   { desc = "win:| tab |=> previous" }
 )
 
--- location lists: loclist and quickfix.
--- * quickfix list
+-- ─[ loclist and quickfix ]───────────────────────────────────────────────
+-- quickfix list
 mapx(
   "n",
   key_lists.quickfix.open,
@@ -458,7 +485,7 @@ mapx(
   { desc = "list:| qf |=> open" }
 )
 
--- * location list
+-- location list
 mapx(
   "n",
   key_lists.loclist.open,
@@ -496,7 +523,7 @@ mapx(
   { desc = "list:| loc |=> open" }
 )
 
--- keywordprg
+-- ─[ keywordprg ]─────────────────────────────────────────────────────────
 mapx(
   "n",
   "<leader>K",
@@ -504,10 +531,11 @@ mapx(
   { desc = { "vim:| keywordprg |=> apply" } }
 )
 
--- better indenting
+-- ─[ better indenting ]───────────────────────────────────────────────────
 mapx("v", "<", "<gv", { desc = "vim:| indent |=> decrease" })
 mapx("v", ">", ">gv", { desc = "vim:| indent |=> increase" })
 
+-- ─[ search behavior ]────────────────────────────────────────────────────
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
 mapx(
   "n",
@@ -546,6 +574,7 @@ mapx(
   { expr = true, desc = "Prev search result" }
 )
 
+-- ─[ TextGen ]────────────────────────────────────────────────────────────
 -- Some basic line breaks using comment characters.
 -- There are more advanced text-generation and commented breakline methods
 -- available using the figlet and comment-box plugins (in extras.lua)
@@ -574,6 +603,7 @@ mapx("n", key_cline.custom.following.nospace, function()
   edit_tools.SucceedingCommentBreak(false)
 end, { desc = "break:| following |=> insert (no-space)" })
 
+-- ─[ Fat Finger Helpers ]─────────────────────────────────────────────────
 -- helpers for quitting when accidentally using Shift
 vim.cmd("cnoreabbrev W! w!")
 vim.cmd("cnoreabbrev Q! q!")
@@ -583,12 +613,11 @@ vim.cmd("cnoreabbrev Wa wa")
 vim.cmd("cnoreabbrev wQ wq")
 vim.cmd("cnoreabbrev WQ wq")
 vim.cmd("cnoreabbrev W w")
-vim.cmd("cnoreabbrev Q q")
+vim.cmd("cnoreabbrev q q")
 
--- UI bindings for some basic behavior in controlling things like the
--- notifications, temporary highlighting, treesitter components, etc.
--- * Clear search, diff update and redraw
---   taken from runtime/lua/_editor.lua
+-- ─[ UI bindings ]────────────────────────────────────────────────────────
+-- Clear search, diff update and redraw
+-- taken from runtime/lua/_editor.lua
 mapx(
   "n",
   "<leader>ur",
@@ -596,7 +625,7 @@ mapx(
   { desc = "ui:| hl |=> clupdraw (clear, update, redraw)" }
 )
 
--- * under cursor inspection of highlights and extmarks.
+--  under cursor inspection of highlights and extmarks.
 mapx(
   "n",
   "<leader>ui",
@@ -604,7 +633,7 @@ mapx(
   { desc = "ui:| hl |=> inspect under cursor" }
 )
 
-mapx("n", "<leader>us", function()
+mapx("n", "<leader>uz", function()
   toggle("spell")
 end, { desc = "ui:| spell |=> toggle" })
 mapx("n", "<leader>uw", function()
@@ -629,9 +658,7 @@ if vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint then
   end, { desc = "ui:| lsp |=> toggle inlay-hints" })
 end
 mapx("n", "<leader>uT", function()
-  if vim.b.ts_highlight then
-    vim.treesitter.stop()
-  else
+  if vim.b.ts_highlight then vim.treesitter.stop() else
     vim.treesitter.start()
   end
 end, { desc = "ui:| ts |=> toggle highlight" })
@@ -652,6 +679,19 @@ end, { desc = "vim:| cmd |=> luastart" })
 mapx(
   "n",
   "<localleader>dt",
-  "<CMD>put=strftime('< %Y-%m-%d >')<CR>",
+  "<CMD>put=strftime('%Y-%m-%d')<CR>",
   { desc = "insert date" }
 )
+
+-- ─[ modelines ]──────────────────────────────────────────────────────────
+mapx("n", "\\mf", function()
+  local ft = vim.bo.filetype
+  local cs = vim.bo.commentstring
+  vim.api.nvim_buf_set_lines(
+    0,
+    1,
+    1,
+    false,
+    { cs:format(string.format("vim: set ft=%s:", ft)) }
+  )
+end, { remap = false })

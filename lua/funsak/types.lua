@@ -28,6 +28,10 @@
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 
+-- funsak: types
+-- a module to hold the relevant types for all funsak implementations, other
+-- specific types are generally held within the submodule itself.
+
 ---@meta
 
 ---@generic T
@@ -67,27 +71,44 @@
 ---| '"suppress"' # error on merging of input tables is not propagated
 ---| '"error"' # error on merging of input tables is propagated
 
----@alias owl.OptsField
+---@alias funsak.OptsField
 ---| any value in a `T_Opts` table
 
----@alias owl.Ix_Options
----| Ix<owl.OptsField> # indexing item in a table of configuration options, e.g.
+---@alias funsak.Ix_Options
+---| Ix<funsak.OptsField> # indexing item in a table of configuration options, e.g.
 ---the table structure will depend on the particular calling function's
 ---signature and parameterization.
 
 --- a table of options, representing the `opts` argument to any selected
 --- function, generally. There might be more specific choices which are better
 --- suited given the context.
----@class owl.GenericOpts: { [owl.Ix_Options]: owl.OptsField }
+---@class funsak.GenericOpts: { [funsak.Ix_Options]: funsak.OptsField }
 
 ---@generic T
----@alias owl.Fowl<T>
+---@alias funsak.Fowl<T>
 ---| `T` # data of a generic type
 ---| fun(...): `T`? # function accepting any arguments and returning data of
 ---generic captured type `T`
 
----@alias owl.FType
+---@alias funsak.FType
 ---| string # filetype name known to neovim
 
----@alias owl.PathComponent
+---@alias funsak.PathComponent
 ---| string # a string which would be valid as a portion of a full path
+
+---@alias funsak.Hexadecimal
+---| string # a string consisting of two characters and whose digits represent
+---numbers in base 16. This is obviously constructed such that 0-255 are the
+---possible numerical values represented with the characters between "00" and
+---"FF".
+
+---@alias funsak.RGBColor { red: number, green: number, blue: number, alpha: number? }
+---@alias funsak.HSVColor { hue: number, saturation: number, lightness: number, alpha: number? }
+---@alias funsak.Hexpanded { red: funsak.Hexadecimal, green: funsak.Hexadecimal, blue: funsak.Hexadecimal, alpha: funsak.Hexadecimal? }
+---@alias funsak.HexColor
+---| string # a string of the form "#??????" or "#????????", where each
+---successive pair of hexadecimal digits represents the red, green, and blue
+---channels. If the string has a full 8 characters, the last pair represents the
+---alpha channel.
+---| funsak.Hexpanded # Hex representation in table form with individual components
+---separated but given in hex form

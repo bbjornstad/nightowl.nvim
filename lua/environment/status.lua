@@ -204,7 +204,7 @@ function env.wpm(props, opts)
   return "󰗗 " .. words
 end
 
----@class owl.InfoOpts: owl.GenericOpts,{ formatter: string? }
+---@class owl.InfoOpts: funsak.GenericOpts,{ formatter: string? }
 
 --- collects metadata information about the currently open file for display in a
 --- component. used in incline.

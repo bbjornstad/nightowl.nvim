@@ -23,6 +23,12 @@
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 
+-- funsak.lsp:
+-- a collection of useful tools and utilities that can be used to setup a
+--╭─────────────────────────────────────────────────────────────────────────────╮
+--│             targeted LSP configuration through language units.              │
+--╰─────────────────────────────────────────────────────────────────────────────╯
+
 ---@class funsak.lsp a collection of important utility functions which help to
 ---set up integrated services for language server protocol defined behavior,
 ---including language servers, linters, formatters, etc.
@@ -71,11 +77,11 @@ function M.noop()
 end
 
 ---@class owl.lsp.LangServerConfig
----@field server owl.Fowl<owl.lsp.ClientConfig>?
+---@field server funsak.Fowl<owl.lsp.ClientConfig>?
 ---@field setup owl.lsp.SetupConfig?
 ---@field mason owl.lsp.MasonConfig?
----@field dependencies owl.Fowl<owl.lsp.DependencyConfig>?
----@field roots owl.Fowl<owl.PathComponent>?
+---@field dependencies funsak.Fowl<owl.lsp.DependencyConfig>?
+---@field roots funsak.Fowl<funsak.PathComponent>?
 
 --- adds a specification component which sets up a language server within the
 --- lsp support in neovim; essentially just a reduction of boilerplate when
@@ -139,10 +145,19 @@ end
 ---
 M.server = recurser(server)
 
+---@alias owl.lint.Linter string
+
 ---@class owl.lint.LinterOptions
----@field custom Ix<lint.Linter>?
+---@field custom Ix<owl.lint.Linter>?
 ---@field mason_nvim_lint { enable: boolean? }?
 
+---@class (exact) owl.lint.MasonIntegration: LazyPluginSpec
+---@class (exact) owl.lint.Lintegration: LazyPluginSpec
+
+--- adds linter configurations to nvim-lint's spec table.
+---@param lnts { [funsak.FType]: owl.lint.Linter[] }
+---@param opts owl.lint.LinterOptions?
+---@return owl.lint.Lintegration, owl.lint.MasonIntegration?
 function M.linters(lnts, opts)
   opts = opts or {}
   local custom = require("funsak.table").strip(opts, { "custom" })
@@ -170,7 +185,7 @@ function M.linters(lnts, opts)
       end,
     }
   end
-  return lintercore(), use_masonlint and masonlint() or nil
+  return lintercore(), use_masonlint and masonlint()
 end
 
 ---@class owl.fmt.FormatterOptions
@@ -260,17 +275,8 @@ function M.per_ft(items, ftypes, opts)
   return per(ftypes, items, opts.box ~= nil and opts.box or false)
 end
 
+--- utilities module for the lsp setup
 M.util = {}
-
-local function util_efmls(config_id, override)
-  local cfg = require("efmls-configs." .. config_id)
-  return vim.tbl_deep_extend("force", cfg, override)
-end
-
-function M.util.efmls(config_ids, override)
-  local f = recurser(util_efmls)
-  return unpack(f(config_ids, override))
-end
 
 function M.util.roots(rts, opts)
   opts = opts or {}
