@@ -1,8 +1,9 @@
 local env = require("environment.ui")
-local stems = require("environment.keys").docs
-local key_devdocs = stems.devdocs
-local key_neogen = stems.neogen
-local key_pandoc = stems.auto_pandoc
+local key_docs = require("environment.keys").docs
+local key_devdocs = key_docs.devdocs
+local key_neogen = key_docs.neogen
+local key_pandoc = key_docs.auto_pandoc
+local key_treedocs = key_docs.treedocs
 
 return {
   {
@@ -37,43 +38,43 @@ return {
         key_devdocs.fetch,
         "<CMD>DevdocsFetch<CR>",
         mode = "n",
-        desc = "docs.dev=> fetch",
+        desc = "docs:| dev |=> fetch",
       },
       {
         key_devdocs.install,
         "<CMD>DevdocsInstall<CR>",
         mode = "n",
-        desc = "docs.dev=> install",
+        desc = "docs:| dev |=> install",
       },
       {
         key_devdocs.uninstall,
         "<CMD>DevdocsUninstall<CR>",
         mode = "n",
-        desc = "docs.dev=> uninstall",
+        desc = "docs:| dev |=> uninstall",
       },
       {
         key_devdocs.open_float,
         "<CMD>DevdocsOpenFloat<CR>",
         mode = "n",
-        desc = "docs.dev=> open (float)",
+        desc = "docs:| dev |=> open (float)",
       },
       {
         key_devdocs.buffer_float,
         "<CMD>DevdocsOpenCurrentFloat<CR>",
         mode = "n",
-        desc = "docs.dev=> buffer (float)",
+        desc = "docs:| dev |=> buffer (float)",
       },
       {
         key_devdocs.open,
         "<CMD>DevdocsOpen<CR>",
         mode = "n",
-        desc = "docs.dev=> open",
+        desc = "docs:| dev |=> open",
       },
       {
         key_devdocs.buffer,
         "<CMD>DevdocsOpenCurrent<CR>",
         mode = "n",
-        desc = "docs.dev=> buffer",
+        desc = "docs:| dev |=> buffer",
       },
     },
   },
@@ -90,7 +91,7 @@ return {
           require("auto-pandoc").run_pandoc()
         end,
         mode = "n",
-        desc = "docs.convert=> use pandoc",
+        desc = "docs:| convert |=> use pandoc",
         buffer = 0,
         remap = false,
         silent = true,
@@ -118,7 +119,7 @@ return {
           return require("neogen").generate({ type = "any" })
         end,
         mode = "n",
-        desc = "docs.gen=> generic docstring",
+        desc = "docs:| gen |=> generic docstring",
       },
       {
         key_neogen.class,
@@ -126,7 +127,7 @@ return {
           return require("neogen").generate({ type = "class" })
         end,
         mode = "n",
-        desc = "docs.gen=> class/obj docstring",
+        desc = "docs:| gen |=> class/obj docstring",
       },
       {
         key_neogen.type,
@@ -134,7 +135,7 @@ return {
           return require("neogen").generate({ type = "type" })
         end,
         mode = "n",
-        desc = "docs.gen=> type docstring",
+        desc = "docs:| gen |=> type docstring",
       },
       {
         key_neogen.fn,
@@ -142,14 +143,70 @@ return {
           return require("neogen").generate({ type = "func" })
         end,
         mode = "n",
-        desc = "docs.gen=> function docstring",
+        desc = "docs:| gen |=> function docstring",
       },
     },
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    dependencies = {
+      { "nvim-treesitter/nvim-tree-docs", optional = true },
+    },
+  },
+  {
+    "nvim-treesitter/nvim-tree-docs",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    opts = {
+      enable = true,
+      keymap = {
+        doc_node_at_cusor = key_treedocs.node_at_cursor,
+        doc_all_in_range = key_treedocs.all_in_range,
+      },
+      --spec_config = {
+      --  nu = {
+      --    slots = {
+      --      description = true,
+      --    },
+      --    templates = {
+      --      "doc-start",
+      --      "description",
+      --      "doc-end",
+      --    },
+      --  },
+      --},
+    },
+    config = function(_, opts)
+      require("nvim-treesitter.configs").setup(opts)
+    end,
+    -- keys = {
+    --   {
+    --     key_treedocs.node_at_cursor,
+    --     desc = "docs:| tree |=> node under cursor",
+    --   },
+    --   {
+    --     key_treedocs.all_in_range,
+    --     desc = "docs:| tree |=> all in range",
+    --   },
+    -- },
   },
   {
     "milisims/nvim-luaref",
     event = "VeryLazy",
     opts = {},
     config = function() end,
+  },
+  {
+    "aspeddro/pandoc.nvim",
+    opts = {},
+    config = function(_, opts)
+      require("pandoc").setup(opts)
+    end,
+    event = "VeryLazy",
+  },
+  {
+    "WERDXZ/nvim-dox",
+    opts = {},
+    config = function(_, opts) end,
+    cmd = "Dox",
   },
 }
