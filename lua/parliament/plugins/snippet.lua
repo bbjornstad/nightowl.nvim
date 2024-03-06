@@ -1,6 +1,7 @@
 local env = require("environment.ui")
 local key_scope = require("environment.keys").scope
 local key_snippet = require("environment.keys").tool.snippet
+local key_cmpsnip = require("environment.keys").completion.snippet
 
 return {
   {
@@ -13,14 +14,16 @@ return {
     opts = {
       vscode = true,
       snipmate = true,
-      history = true,
+      custom = true,
       delete_check_events = "TextChanged",
+      enable_autosnippets = true,
+      loaders_store_source = true,
     },
     config = function(_, opts)
       opts = opts or {}
       if opts.custom then
         require("luasnip.loaders.from_vscode").lazy_load({
-          paths = { vim.fn.joinpath(vim.fn.stdpath("config"), "snippets") },
+          paths = { vim.fs.joinpath(vim.fn.stdpath("config"), "snippets") },
         })
       end
       opts.custom = nil
@@ -34,6 +37,17 @@ return {
       opts.snipmate = nil
       require("luasnip").setup(opts)
     end,
+    build = "make install_jsregexp",
+    keys = {
+      {
+        key_cmpsnip.select_choice,
+        function()
+          require("luasnip.extras.select_choice")()
+        end,
+        mode = "i",
+        desc = "snip:| node |=> choose",
+      },
+    },
   },
   { "honza/vim-snippets", config = false, event = "VeryLazy" },
   { "rafamadriz/friendly-snippets", config = false, event = "VeryLazy" },
@@ -86,7 +100,7 @@ return {
           require("scissors").editSnippet()
         end,
         mode = "n",
-        desc = "snip=> add new",
+        desc = "snip=> edit",
       },
     },
   },

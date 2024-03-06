@@ -451,14 +451,21 @@ kenv.completion = keygroup({
   },
   submenus = {
     [LEADER_ID] = { append = "<C-Space>" },
-    ai = { libre = "<C-a>", langfull = "<C-:>" },
+    ai = {
+      libre = "<C-a>",
+      langfull = "<C-:>",
+    },
     git = "<C-g>",
     shell = "<C-s>",
     glyph = "<C-y>",
     lsp = "<C-l>",
     location = "<C-.>",
+    snippet = "<C-s>",
   },
-  docs = { forward = "<C-f>", backward = "<C-b>" },
+  docs = {
+    forward = "<C-f>",
+    backward = "<C-b>",
+  },
   jump = {
     next = "<C-n>",
     previous = "<C-p>",
@@ -476,6 +483,12 @@ kenv.completion = keygroup({
     },
   },
   confirm = "<C-y>",
+  snippet = {
+    [LEADER_ID] = { append = "<C-s>" },
+    edit = "<C-e>",
+    cmp = "<C-s>",
+    select_choice = "<C-i>",
+  },
 }, false, {})
 
 local leader_build = "`"
@@ -999,18 +1012,31 @@ kenv.docs = keygroup({
     open_float = "o",
     uninstall = "u",
   },
+  treedocs = {
+    [LEADER_ID] = { append = "e" },
+    node_at_cusor = "d",
+    all_in_range = "e",
+  },
   auto_pandoc = { run = "p" },
 }, leader_docs, {})
 
 local leader_tool = "<leader>"
 kenv.tool = keygroup({
-  snippet = { [LEADER_ID] = { append = "N" }, add = "a", edit = "e" },
-  regex = { [LEADER_ID] = { append = "R" }, explainer = "r", hypersonic = "h" },
+  snippet = {
+    [LEADER_ID] = { append = "N" },
+    add = "a",
+    edit = "e",
+  },
+  regex = {
+    [LEADER_ID] = { append = "R" },
+    explainer = "r",
+    hypersonic = "h",
+  },
   splitjoin = {
     [LEADER_ID] = { append = "j" },
     split = "s",
-    join = "j",
-    toggle = "p",
+    join = "o",
+    toggle = "j",
   },
   glow = "P",
   preview = "P",
