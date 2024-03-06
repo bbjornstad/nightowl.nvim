@@ -12,7 +12,7 @@
     "callSnippet": "Both"
   },
   "hint": {
-    "enabled": true,
+    "enable": true,
     "setType": true,
     "arrayIndex": "Enable",
     "paramType": true,

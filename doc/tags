@@ -1,3 +1,6 @@
 kickstart-is	kickstart.txt	/*kickstart-is*
+kickstart-is	nightowl-parliament.txt	/*kickstart-is*
 kickstart-is-not	kickstart.txt	/*kickstart-is-not*
+kickstart-is-not	nightowl-parliament.txt	/*kickstart-is-not*
 kickstart.nvim	kickstart.txt	/*kickstart.nvim*
+nightowl-parliament.nvim	nightowl-parliament.txt	/*nightowl-parliament.nvim*
