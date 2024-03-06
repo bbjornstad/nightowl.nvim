@@ -100,17 +100,16 @@ return {
             or nil
           return ret
         end, {
-          { { "⟓∷ " }, cond = true },
-          sts.count.search(props, { icon = "󱈅", separator = "⦙" }),
-          sts.count.selection(props, { icon = "󱊄", separator = "⦙" }),
+          sts.fileinfo(props, { formatter = "╒╡ %s %s ╞╕ " }),
+          sts.count.search(props, { icon = "󱈅", separator = "⌈" }),
+          sts.count.selection(props, { icon = "󱊄", separator = "⌈" }),
           sts.progress(props, {
             icon = { glyph = "󱋫", location = "prefix" },
-            separator = "⦙",
+            separator = "⌈",
           }),
-          sts.grapple(props, { icon = "⨳", separator = "⦙" }),
-          sts.match_local_hl(props, { icon = "󰾹", separator = "⦙" }),
-          sts.wrap_mode(props, { icon = "󰖶", separator = "⦙" }),
-          sts.fileinfo(props, { formatter = "╘╡ %s %s ╞╛" }),
+          sts.grapple(props, { icon = "⨳", separator = "⌈" }),
+          sts.match_local_hl(props, { icon = "󰾹", separator = "⌈" }),
+          sts.wrap_mode(props, { icon = "󰖶", separator = "⌉" }),
         })
 
         -- vim.notify(vim.inspect(retit))
@@ -134,13 +133,13 @@ return {
         },
       },
       window = {
-        margin = { vertical = 1, horizontal = 1 },
+        margin = { vertical = 1, horizontal = 0 },
         padding = 1,
         padding_char = " ",
-        placement = { horizontal = "right", vertical = "top" },
+        placement = { horizontal = "left", vertical = "bottom" },
         width = "fit",
         options = {
-          signcolumn = "no",
+          signcolumn = "yes",
           wrap = false,
         },
         winhighlight = {
@@ -213,7 +212,7 @@ return {
         options = {
           theme = "auto",
           icons_enabled = true,
-          globalstatus = true,
+      globalstatus = true,
           component_separators = { left = "", right = "" },
           section_separators = { left = "", right = "" },
           refresh = {
@@ -295,15 +294,15 @@ return {
               "g:metals_status",
               icon = "",
               separator = "┊",
-             cond = function() 
-
-             end
+              cond = function() end,
             },
             {
               "filetype",
               icon_only = false,
               padding = { left = 1, right = 1 },
             },
+            {},
+            {},
             {
               function()
                 local clients = vim.lsp.get_clients({ bufnr = 0 })
@@ -387,11 +386,13 @@ return {
                 modified = " 󰰾",
               },
               fmt = function(name, context)
-                local buflist = vim.fn.tabpagebuflist(context.tabnr)
                 local winnr = vim.fn.tabpagewinnr(context.tabnr)
-                local bufnr = buflist[winnr]
-                local mod = vim.fn.getbufvar(bufnr, "&mod")
-                local thisdir = vim.fn.getcwd(winnr, context.tabnr)
+                local winid = vim.fn.win_getid(winnr, context.tabnr)
+
+                local bufnr = vim.fn.winbufnr(winid)
+
+                local mod = vim.api.nvim_buf_get_option(bufnr, "modified")
+                local thisdir = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
                 local dirtail = vim.fn.fnamemodify(thisdir, ":t")
 
                 dirtail = (mod == 1 and "⦗ " or "⦋ ")
@@ -515,12 +516,12 @@ return {
         enable = true,
         ui = {
           bar = {
-            separator = " 󰧛 ",
-            extends = "",
+            separator = "  ",
+            extends = "󱎽",
           },
           menu = {
-            separator = " 󰘠 ",
-            indicator = "󱟮 ",
+            separator = "󰘠 ",
+            indicator = "󰌭 ",
           },
         },
         kinds = {
@@ -619,5 +620,16 @@ return {
     },
     config = true,
     event = require("funsak.lazy").spec("lualine.nvim", "event"),
+  },
+  {
+    "ldelossa/buffertag",
+    event = "BufReadPre",
+    config = function(_, opts)
+      require("buffertag").setup(opts)
+    end,
+    opts = {
+      border = env.borders.main,
+      modified_symbol = "󱪘",
+    },
   },
 }

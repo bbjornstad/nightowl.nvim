@@ -178,7 +178,7 @@ local function grapple(props, opts)
   if not grpl.exists then
     return
   end
-  local key = grpl.key()
+  local key = grpl.statusline()
   return key
 end
 
@@ -204,7 +204,7 @@ function env.wpm(props, opts)
   return "󰗗 " .. words
 end
 
----@class owl.InfoOpts: funsak.GenericOpts,{ formatter: string? }
+---@class owl.InfoOpts: owl.GenericOpts,{ formatter: string? }
 
 --- collects metadata information about the currently open file for display in a
 --- component. used in incline.
