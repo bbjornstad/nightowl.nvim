@@ -4,83 +4,54 @@ local key_color = require("environment.keys").color
 
 return {
   {
-    "uga-rosa/ccc.nvim",
-    cmd = {
-      "CccPick",
-      "CccConvert",
-      "CccHighlighterEnable",
-      "CccHighlighterToggle",
-    },
+    "norcalli/nvim-colorizer.lua",
     event = "VeryLazy",
-    opts = function()
-      local ccc = require("ccc")
-      return {
-        inputs = {
-          ccc.input.rgb,
-          ccc.input.hsl,
-          ccc.input.cmyk,
-          ccc.input.hwb,
-          ccc.input.lab,
-          ccc.input.lch,
-          ccc.input.oklab,
-          ccc.input.oklch,
-          ccc.input.hsluv,
-          ccc.input.okhsl,
-          ccc.input.hsv,
-          ccc.input.okhsv,
-          ccc.input.xyz,
-        },
-        win_opts = {
-          style = "minimal",
-          relative = "cursor",
-          border = env.borders.main,
-        },
-        auto_close = true,
-        preserve = true,
-        -- default_color = default_colorizer("Delimiter"),
-        recognize = {
-          input = true,
-          output = true,
-        },
-        highlighter = {
-          auto_enable = true,
-          update_insert = true,
-          lsp = true,
-        },
-        bar_len = 60,
-        save_on_quit = true,
-      }
+    opts = {
+      { "*" },
+      {
+        RGB = true,
+        RRGGBB = true,
+        RRGGBBAA = true,
+        names = true,
+        rgb_fn = true,
+        hsl_fn = true,
+        css = true,
+        css_fn = true,
+        mode = "background",
+      },
+    },
+    cmd = {
+      "ColorizerAttachToBuffer",
+      "ColorizerReloadAllBuffers",
+      "ColorizerToggle",
+    },
+    config = function(_, opts)
+      require("colorizer").setup(unpack(opts))
     end,
     keys = {
       {
-        key_color.pick.ccc,
-        "<CMD>CccPick<CR>",
-        mode = "n",
-        desc = "col.ccc=> pick color interface",
-      },
-      {
         key_color.inline_hl.toggle,
-        "<CMD>CccHighlighterToggle<CR>",
+        "<CMD>ColorizerToggle<CR>",
         mode = "n",
-        desc = "col.ccc=> toggle inline highlighting",
+        desc = "color:| hl |=> toggle",
       },
       {
-        key_color.convert,
-        "<CMD>CccConvert<CR>",
+        key_color.inline_hl.detach,
+        "<CMD>ColorizerDetachFromBuffer<CR>",
         mode = "n",
-        desc = "col.ccc=> convert color",
+        desc = "color:| hl |=> detach",
       },
       {
-        key_color.inline_hl.disable,
-        "<CMD>CccHighlighterDisable<CR>",
+        key_color.inline_hl.attach,
+        "<CMD>ColorizerAttachToBuffer<CR>",
         mode = "n",
-        desc = "col.ccc=> disable inline highlighting",
+        desc = "color:| hl |=> attach",
       },
       {
-        key_color.inline_hl.enable,
-        "<CMD>CccHighlighterEnable<CR>",
+        key_color.inline_hl.reload,
+        "<CMD>ColorizerReloadAllBuffers<CR>",
         mode = "n",
-        desc = "col.ccc=> enable inline highlighting",
+        desc = "color:| hl |=> reload",
       },
     },
   },
@@ -88,6 +59,124 @@ return {
     "echasnovski/mini.colors",
     event = "VeryLazy",
     version = false,
+    keys = {
+      {
+        key_color.convert.hex,
+        function()
+          local row, column = unpack(vim.api.nvim_win_get_cursor(0))
+          local present = vim.api.nvim_buf_get_lines(0, row, column, false)
+          local col = vim.fn.expand("<cword>")
+          local conv = require("mini.colors").convert(col, "hex")
+          present = vim.tbl_map(function(t)
+            return t:gsub(col, conv)
+          end, present)
+        end,
+        mode = "n",
+        desc = "color:| convert |=> hex",
+      },
+      {
+        key_color.convert.rgb,
+        function()
+          local row, column = unpack(vim.api.nvim_win_get_cursor(0))
+          local present = vim.api.nvim_buf_get_lines(0, row, column, false)
+          local col = vim.fn.expand("<cword>")
+          local conv = require("mini.colors").convert(col, "rgb")
+          present = vim.tbl_map(function(t)
+            return t:gsub(col, conv)
+          end, present)
+        end,
+        mode = "n",
+        desc = "color:| convert |=> rgb",
+      },
+      {
+        key_color.convert.eightbit,
+        function()
+          local row, column = unpack(vim.api.nvim_win_get_cursor(0))
+          local present = vim.api.nvim_buf_get_lines(0, row, column, false)
+          local col = vim.fn.expand("<cword>")
+          local conv = require("mini.colors").convert(col, "8-bit")
+          present = vim.tbl_map(function(t)
+            return t:gsub(col, conv)
+          end, present)
+        end,
+        mode = "n",
+        desc = "color:| convert |=> 8-bit",
+      },
+      {
+        key_color.convert.oklab,
+        function()
+          local row, column = unpack(vim.api.nvim_win_get_cursor(0))
+          local present = vim.api.nvim_buf_get_lines(0, row, column, false)
+          local col = vim.fn.expand("<cword>")
+          local conv = require("mini.colors").convert(col, "oklab")
+          present = vim.tbl_map(function(t)
+            return t:gsub(col, conv)
+          end, present)
+        end,
+        mode = "n",
+        desc = "color:| convert |=> oklab",
+      },
+      {
+        key_color.convert.oklch,
+        function()
+          local row, column = unpack(vim.api.nvim_win_get_cursor(0))
+          local present = vim.api.nvim_buf_get_lines(0, row, column, false)
+          local col = vim.fn.expand("<cword>")
+          local conv = require("mini.colors").convert(col, "oklch")
+          present = vim.tbl_map(function(t)
+            return t:gsub(col, conv)
+          end, present)
+        end,
+        mode = "n",
+        desc = "color:| convert |=> oklch",
+      },
+      {
+        key_color.convert.okhsl,
+        function()
+          local row, column = unpack(vim.api.nvim_win_get_cursor(0))
+          local present = vim.api.nvim_buf_get_lines(0, row, column, false)
+          local col = vim.fn.expand("<cword>")
+          local conv = require("mini.colors").convert(col, "okhsl")
+          present = vim.tbl_map(function(t)
+            return t:gsub(col, conv)
+          end, present)
+        end,
+        mode = "n",
+        desc = "color:| convert |=> okhsl",
+      },
+      {
+        key_color.convert.select,
+        function()
+          local col = vim.fn.expand("<cword>")
+          vim.ui.select(
+            { "8-bit", "hex", "rgb", "oklab", "oklch", "okhsl" },
+            { prompt = "colorspace: " },
+            function(sel)
+              local conv = require("mini.colors").convert(col, sel)
+              local row, column = unpack(vim.api.nvim_win_get_cursor(0))
+              vim.api.nvim_buf_set_text(
+                0,
+                row,
+                column,
+                row,
+                column,
+                vim.tbl_flatten({ conv })
+              )
+            end
+          )
+        end,
+        mode = "n",
+        desc = "color:| convert |=> select",
+      },
+      {
+        key_color.interactive,
+        function()
+          require("mini.colors").interactive()
+        end,
+        mode = "n",
+        desc = "color:| play |=> interactive",
+      },
+    },
   },
   {
     "nvim-colortils/colortils.nvim",
@@ -100,34 +189,34 @@ return {
     cmd = "Colortils",
     keys = {
       {
-        key_color.pick.tils,
+        key_color.pick,
         "<CMD>Colortils picker<CR>",
         mode = "n",
-        desc = "col.tils=> pick color",
+        desc = "color:| select |=> pick",
       },
       {
         key_color.lighten,
         "<CMD>Colortils lighten<CR>",
         mode = "n",
-        desc = "col.tils=> lighten",
+        desc = "color:| mod |=> lighten",
       },
       {
         key_color.darken,
         "<CMD>Colortils darken<CR>",
         mode = "n",
-        desc = "col.tils=> darken",
+        desc = "color:| mod |=> darken",
       },
       {
         key_color.greyscale,
         "<CMD>Colortils greyscale<CR>",
         mode = "n",
-        desc = "col.tils=> greyscale",
+        desc = "color:| mod |=> greyscale",
       },
       {
         key_color.list,
         "<CMD>Colortils css list<CR>",
         mode = "n",
-        desc = "col.tils=> css list",
+        desc = "color:| list |=> css",
       },
     },
   },
