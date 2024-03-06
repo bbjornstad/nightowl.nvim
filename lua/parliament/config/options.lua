@@ -2,9 +2,6 @@
 -- configurations to alter any options set here in case of conditional
 -- inclusion, modular implementation details, etc.
 
--- get the background style from the corresponding environment variable.
-local NIGHTOWL_BACKGROUND = vim.env.NIGHTOWL_BACKGROUND_STYLE
-
 -- leader configuration. These are mapped to <leader> and <localleader>
 -- respectively. If using a `funsak` KeyModule, these have somewhat more
 -- specific meanings depending on configuration.
@@ -14,6 +11,7 @@ vim.g.maplocalleader = [[\]]
 -- Basic interface options that are not handled with specific plugin
 -- configurations set in interface.lua
 vim.opt.mouse = "a"
+vim.opt.mousemodel = "extend"
 vim.opt.backspace = "indent,eol,start"
 vim.opt.autoindent = true
 vim.opt.startofline = false
@@ -23,8 +21,9 @@ vim.opt.mousemoveevent = true
 
 -- timeout configuration for neovim mappings, affects WhichKey predominantly
 vim.opt.ttimeout = true
-vim.opt.ttimeoutlen = 75
-vim.opt.timeoutlen = 300
+vim.opt.ttimeoutlen = 10
+vim.opt.timeoutlen = 60
+vim.opt.updatetime = 10
 
 -- set options for nvim completion menu behavior.
 vim.opt.completeopt = "menuone,menu,noinsert"
@@ -34,7 +33,6 @@ vim.opt.completeopt = "menuone,menu,noinsert"
 vim.opt.wrap = true
 vim.opt.whichwrap:append("<,>,h,l")
 
--- turn on breakindent, which shows wrapped lines along the same alignment as
 -- the text that it is a part of
 vim.opt.breakindent = true
 vim.opt.breakindentopt:append("sbr")
@@ -44,7 +42,7 @@ vim.opt.breakindentopt:append("sbr")
 --  See `:help 'clipboard'`
 --  * 2023-12-20: this is the neovim default, kickstart also includes it but it is
 --  now explicitly included in nightowl.
-vim.o.clipboard = "unnamedplus"
+vim.opt.clipboard = "unnamedplus"
 
 -- cmdline behavior.
 -- * NOTE: This is generally going to be completely overhauled with noice.nvim
@@ -73,6 +71,9 @@ vim.opt.wrapscan = true
 
 -- scrolling behavior.
 vim.opt.scrolloff = 10
+
+-- make ~ be an operator
+vim.opt.tildeop = true
 
 -- sign column and number column configuration
 vim.opt.ruler = true
@@ -121,18 +122,24 @@ vim.opt.fillchars:append({
   vertleft = "┨",
   vertright = "┣",
   verthoriz = "╋",
+  eob = "⮽",
 })
 
 vim.cmd.hi("clear SignColumns")
 
 vim.opt.encoding = "utf-8"
 
--- turn on fancy colors, requires terminal emulator support
--- vim.opt.termguicolors = true
-
 vim.opt.filetype = "on"
 
 vim.opt.conceallevel = 3
 
--- disable the perl provider for neovim, I just generally don't use it at all.
--- vim.g.loaded_perl_provider = 0
+-- change the shell invocation used within neovim to launch any system calls or
+-- subprocess spawns. I normally use nushell, which breaks many bash-compatible
+-- commands due to mismatched signature, etc. When already running in neovim, we
+-- prefer the cross-compatibility because some plugins may break depending on
+-- their implementation/functionality
+-- vim.opt.shell = "bash"
+
+-- disable netrw functionality
+-- vim.g.loaded_netrw = 1
+-- vim.g.loaded_netrwPlugin = 1
