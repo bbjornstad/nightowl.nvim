@@ -32,12 +32,31 @@ return {
   },
   {
     "Olical/conjure",
-    ft = { "clojurescript", "clojure", "fennel", "python" },
+    ft = {
+      "clojurescript",
+      "clojure",
+      "fennel",
+      "python",
+      "racket",
+      "scheme",
+      "guile",
+      "julia",
+    },
     dependencies = {
       {
         "PaterJason/cmp-conjure",
         dependencies = { "hrsh7th/nvim-cmp" },
-        ft = { "clojure", "fennel", "python" },
+        ft = {
+          "clojure",
+          "fennel",
+          "python",
+          "clojurescript",
+          "python",
+          "racket",
+          "scheme",
+          "guile",
+          "julia",
+        },
       },
     },
     config = function(_, opts)
@@ -54,6 +73,62 @@ return {
     config = function(_, opts)
       require("nvim-paredit").setup(opts)
     end,
-    ft = { "clojurescript", "clojure", "lisp" },
+    dependencies = {
+      {
+        "julienvincent/nvim-paredit-fennel",
+        optional = true,
+      },
+      {
+        "ekaitz-zarraga/nvim-paredit-scheme",
+        optional = true,
+      },
+    },
+    ft = {
+      "clojurescript",
+      "clojure",
+      "lisp",
+      "scheme",
+      "guile",
+      "fennel",
+      "racket",
+    },
+  },
+  {
+    "julienvincent/nvim-paredit-fennel",
+    ft = { "fennel" },
+  },
+  {
+    "ekaitz-zarraga/nvim-paredit-scheme",
+    ft = { "scheme", "racket" },
+  },
+  {
+    "gpanders/nvim-parinfer",
+    opts = {},
+    config = function(_, opts)
+      require("parinfer").setup(opts)
+    end,
+    ft = {
+      "clojurescript",
+      "clojure",
+      "lisp",
+      "scheme",
+      "guile",
+      "fennel",
+      "racket",
+    },
+  },
+  {
+    "dundalek/parpar.nvim",
+    dependencies = { "gpanders/nvim-parinfer", "julienvincent/nvim-paredit" },
+    ft = {
+      "clojurescript",
+      "clojure",
+      "lisp",
+      "scheme",
+      "guile",
+      "fennel",
+      "racket",
+    },
+    opts = {},
   },
 }

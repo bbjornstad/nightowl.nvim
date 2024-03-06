@@ -5,7 +5,6 @@ return {
   {
     "LhKipp/nvim-nu",
     dependencies = {
-      "zioroboco/nu-ls.nvim",
       "nvim-treesitter/nvim-treesitter",
     },
     build = ":TSUpdateSync nu",

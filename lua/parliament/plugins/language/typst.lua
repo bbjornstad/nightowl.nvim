@@ -11,7 +11,7 @@ return {
         key_preview,
         "<CMD>TypstWatch<CR>",
         mode = "n",
-        desc = "typst=> watch/view PDF",
+        desc = "typst:| view |=> PDF",
       },
     },
   },
