@@ -169,16 +169,17 @@ return {
             end,
           },
         },
-        winblend = 20,
+        winblend = 14,
         prompt_prefix = " ",
         selection_caret = " ",
         initial_mode = "insert",
-        dynamic_preview_window = true,
+        dynamic_preview_title = true,
         prompt_title = "scope::searching...",
         scroll_strategy = "cycle",
         border = true,
         borderchars = env.borders.telescope,
         path_display = { "smart" },
+        wrap_results = true,
       },
       -- pickers = pickspec,
     },
@@ -252,28 +253,6 @@ return {
     },
   },
   {
-    "nvim-telescope/telescope-file-browser.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("telescope").load_extension("file_browser")
-      require("telescope").setup({
-        extensions = {
-          file_browser = {},
-        },
-      })
-    end,
-    keys = {
-      {
-        key_scope.files.find,
-        function()
-          require("telescope").extensions.file_browser.file_browser()
-        end,
-        mode = "n",
-        desc = "scope:| ext |=> find files",
-      },
-    },
-  },
-  {
     "cljoly/telescope-repo.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },
     config = function()
@@ -338,109 +317,6 @@ return {
         end,
         mode = "n",
         desc = "scope:| ext |=> lazy",
-      },
-    },
-  },
-  {
-    "octarect/telescope-menu.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("telescope").load_extension("menu")
-    end,
-    keys = {
-      {
-        key_scope.menu,
-        function()
-          require("telescope").extensions.menu.menu()
-        end,
-        mode = "n",
-        desc = "scope:| ext:menu |=> menu",
-      },
-    },
-  },
-  {
-    "crispgm/telescope-heading.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("telescope").load_extension("heading")
-    end,
-    keys = {
-      {
-        key_scope.heading,
-        function()
-          require("telescope").extensions.heading.heading()
-        end,
-        mode = "n",
-        desc = "scope:| ext |=> heading",
-      },
-    },
-  },
-  {
-    "nvim-telescope/telescope-project.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("telescope").load_extension("project")
-    end,
-    keys = {
-      {
-        "<leader>fp",
-        false,
-      },
-      {
-        key_scope.project,
-        function()
-          require("telescope").extensions.project.project({
-            display_type = "full",
-          })
-        end,
-      },
-    },
-  },
-  {
-    "jvgrootveld/telescope-zoxide",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("telescope").load_extension("zoxide")
-    end,
-    keys = {
-      {
-        key_scope.zoxide,
-        function()
-          local zutil = require("telescope._extensions.zoxide.utils")
-          local builtin = require("telescope.builtin")
-          require("telescope").extensions.zoxide.list({
-            prompt_title = "zoxide::choose directory",
-            mappings = {
-              ["<C-s>"] = { action = zutil.create_basic_command("vsplit") },
-              ["<C-e>"] = { action = zutil.create_basic_command("edit") },
-              ["<C-h>"] = { action = zutil.create_basic_command("split") },
-              ["<C-b>"] = {
-                keepinsert = true,
-                action = function(selection)
-                  builtin.file_browser({
-                    cwd = selection.path,
-                  })
-                end,
-              },
-              ["<C-f>"] = {
-                keepinsert = true,
-                action = function(selection)
-                  builtin.find_files({ cwd = selection.path })
-                end,
-              },
-              ["<C-t>"] = {
-                action = function(selection)
-                  vim.cmd.tcd(selection.path)
-                end,
-              },
-              ["<C-CR>"] = {
-                action = function(selection)
-                  vim.cmd.tcd(selection.path)
-                end,
-              },
-            },
-          })
-        end,
       },
     },
   },
@@ -526,40 +402,6 @@ return {
     },
   },
   {
-    "nvim-telescope/telescope-media-files.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("telescope").load_extension("media_files")
-    end,
-    keys = {
-      {
-        key_scope.media_files,
-        function()
-          require("telescope").extensions.media_files.media_files()
-        end,
-        mode = "n",
-        desc = "scope:| ext |=> media files",
-      },
-    },
-  },
-  {
-    "olacin/telescope-cc.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("telescope").load_extension("conventional_commits")
-    end,
-    keys = {
-      {
-        key_scope.conventional_commits,
-        function()
-          require("telescope").extensions.conventional_commits.conventional_commits()
-        end,
-        mode = "n",
-        desc = "scope:| ext |=> cc",
-      },
-    },
-  },
-  {
     "debugloop/telescope-undo.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },
     config = function()
@@ -594,23 +436,6 @@ return {
     },
   },
   {
-    "keyvchan/telescope-find-pickers.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("telescope").load_extension("find_pickers")
-    end,
-    keys = {
-      {
-        key_scope.pickers.all,
-        function()
-          require("telescope").extensions.find_pickers.find_pickers()
-        end,
-        mode = "n",
-        desc = "scope:| ext |=> all pickers",
-      },
-    },
-  },
-  {
     "barrett-ruth/telescope-http.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },
     config = function()
@@ -624,107 +449,6 @@ return {
         end,
         mode = "n",
         desc = "scope:| ext |=> http status code",
-      },
-    },
-  },
-  {
-    "LinArcX/telescope-ports.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("telescope").load_extension("ports")
-    end,
-    keys = {
-      {
-        key_scope.ports,
-        function()
-          require("telescope").extensions.ports.ports()
-        end,
-        mode = "n",
-        desc = "scope:| ext |=> ports",
-      },
-    },
-  },
-  {
-    "lpoto/telescope-tasks.nvim",
-    config = function()
-      require("telescope").load_extension("tasks")
-    end,
-    keys = {
-      {
-        key_scope.tasks,
-        funext("tasks"),
-        mode = "n",
-        desc = "scope=> search tasks",
-      },
-    },
-    dependencies = {
-      "nvim-telescope/telescope.nvim",
-      opts = function(_, opts)
-        opts.extensions = mopts({
-          tasks = {
-            theme = "ivy",
-            output = {
-              style = "float", -- "split" | "float" | "tab"
-              layout = "center", -- "left" | "right" | "center" | "below" | "above"
-              scale = 0.6, -- output window to editor size ratio
-              -- NOTE: scale and "center" layout are only relevant when style == "float"
-            },
-          },
-        }, opts.extensions or {})
-      end,
-    },
-  },
-  {
-    "SalOrak/whaler.nvim",
-    dependencies = {
-      "nvim-telescope/telescope.nvim",
-      opts = function(_, opts)
-        opts.extensions = mopts({
-          whaler = {
-            auto_file_explorer = true,
-            auto_cwd = true,
-            file_explorer = "oil",
-            theme = {
-              results_title = true,
-              layout_strategy = "bottom_pane",
-              layout_config = {
-                height = 0.4,
-                width = 0.6,
-              },
-            },
-          },
-        }, opts.extensions or {})
-      end,
-    },
-    keys = {
-      {
-        key_scope.whaler,
-        funext("whaler"),
-        mode = "n",
-        desc = "scope:| ext |=> directories (whaler)",
-      },
-    },
-    config = function(_, opts)
-      require("telescope").load_extension("whaler")
-    end,
-  },
-  {
-    "folke/noice.nvim",
-    dependencies = {
-      "nvim-telescope/telescope.nvim",
-    },
-    keys = {
-      {
-        key_newts.notifications,
-        funext("notify"),
-        mode = "n",
-        desc = "scope=> search notifications",
-      },
-      {
-        key_scope.notice,
-        funext("notify"),
-        mode = "n",
-        desc = "scope=> search notifications",
       },
     },
   },
@@ -749,7 +473,7 @@ return {
           require("telescope").extensions.lsp_server_capabilities.lsp_server_capabilities()
         end,
         mode = "n",
-        desc = "scope=> lsp capabilities",
+        desc = "scope:| lsp |=> capabilities",
       },
     },
   },

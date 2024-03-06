@@ -2,6 +2,7 @@ local env = require("environment.ui")
 local opt = require("environment.optional")
 
 local key_games = require("environment.keys").games
+local key_way = require("environment.keys").time.oogway
 
 return {
   {
@@ -191,6 +192,70 @@ return {
         "<CMD>Speedtyper<CR>",
         mode = "n",
         desc = "speedtyper=> new game",
+      },
+    },
+  },
+  {
+    "0x5a4/oogway.nvim",
+    cmd = { "Oogway" },
+    keys = {
+      {
+        key_way.sense,
+        function()
+          require("oogway").sense_the_dragon_warrior()
+        end,
+        mode = "n",
+        desc = "way:| oog |=> sense",
+      },
+      {
+        key_way.wisdom,
+        function()
+          require("oogway").what_is_your_wisdom()
+        end,
+        mode = "n",
+        desc = "way:| oog |=> wisdom",
+      },
+      {
+        key_way.inspire,
+        function()
+          require("oogway").inspire_me()
+        end,
+        mode = "n",
+        desc = "way:| oog |=> inspiration",
+      },
+      {
+        key_way.all_wisdom,
+        function()
+          require("oogway").wisdoms()
+        end,
+        mode = "n",
+        desc = "way:| oog |=> all wisdom",
+      },
+      {
+        key_way.all_inspiration,
+        function()
+          require("oogway").oogways()
+        end,
+        mode = "n",
+        desc = "way:| oog |=> all inspiration",
+      },
+    },
+    config = function(_, opts)
+      require("oogway").setup(opts)
+    end,
+    opts = {},
+  },
+  {
+    "NStefan002/2048.nvim",
+    config = function(_, opts) end,
+    opts = {},
+    cmd = { "Play2048" },
+    keys = {
+      {
+        key_games.play2048,
+        "<CMD>Play2048<CR>",
+        mode = "n",
+        desc = "pog:| 2048 |=> play",
       },
     },
   },
