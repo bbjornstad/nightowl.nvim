@@ -71,6 +71,7 @@ return {
         fold_reset = "zW",
       },
     },
+
     config = function(_, opts)
       require("outline").setup(opts)
     end,
@@ -153,17 +154,38 @@ return {
   },
   {
     "aznhe21/actions-preview.nvim",
-    opts = {
-      diff = { ctxlen = 3 },
-      telescope = vim.tbl_extend(
+    opts = function(_, opts)
+      opts.diff = vim.tbl_deep_extend("force", { ctxlen = 3 }, opts.diff or {})
+      opts.highlight_command = vim.tbl_deep_extend("force", {
+        require("actions-preview.highlight").delta(),
+        require("actions-preview.highlight").diff_so_fancy(),
+        require("actions-preview.highlight").diff_highlight(),
+      }, opts.highlight_command or {})
+      opts.telescope = vim.tbl_deep_extend(
         "force",
-        require("telescope.themes").get_dropdown(),
-        {
-          make_value = nil,
-          make_make_display = nil,
-        }
-      ),
-      nui = {
+        vim.tbl_extend("force", {
+          "force",
+          require("telescope.themes").get_dropdown(),
+          {
+            make_value = nil,
+            make_make_display = nil,
+          },
+        }, opts.telescope or {})
+      )
+      opts.backend =
+        vim.tbl_deep_extend("force", { "nui", "telescope" }, opts.backend or {})
+      opts.nui = vim.tbl_deep_extend("force", {
+        dir = "row",
+        layout = {
+          position = "50%",
+          size = {
+            width = "40%",
+            height = "40%",
+          },
+          min_width = "24",
+          min_height = "16",
+          relative = "cursor",
+        },
         preview = {
           size = "64%",
           border = { style = env.borders.main, padding = { 1, 2 } },
@@ -172,8 +194,8 @@ return {
           size = "36%",
           border = { style = env.borders.main, padding = { 1, 2 } },
         },
-      },
-    },
+      }, opts.nui or {})
+    end,
     config = function(_, opts)
       require("actions-preview").setup(opts)
     end,
@@ -184,7 +206,7 @@ return {
           require("actions-preview").code_actions()
         end,
         mode = { "v", "n" },
-        desc = "lsp=> preview code actions",
+        desc = "lsp:| action => preview",
       },
     },
   },
@@ -208,7 +230,7 @@ return {
     event = "VeryLazy",
     keys = {
       {
-        key_lsp.auxiliary.output_panel,
+        key_lsp.action.output_panel,
         "<CMD>OutputPanel<CR>",
         mode = "n",
         desc = "lsp:| log |=> panel",
@@ -225,13 +247,13 @@ return {
     config = true,
     keys = {
       {
-        key_lsp.auxiliary.toggle.server,
+        key_lsp.action.toggle.server,
         "<CMD>ToggleLSP<CR>",
         mode = "n",
         desc = "lsp:buf| toggle |=> server",
       },
       {
-        key_lsp.auxiliary.toggle.nullls,
+        key_lsp.action.toggle.nullls,
         "<CMD>ToggleNullLSP<CR>",
         mode = "n",
         desc = "lsp:buf| toggle |=> null-ls",
@@ -441,34 +463,7 @@ return {
     event = "LspAttach",
   },
   {
-    "onsails/diaglist.nvim",
-    opts = { debug = false, debounce_ms = 300 },
-    config = function(_, opts)
-      require("diaglist").init(opts)
-    end,
-    event = "LspAttach",
-    keys = {
-      {
-        key_view.diagnostic.diaglist.workspace,
-        function()
-          require("diaglist").open_all_diagnostics()
-        end,
-        mode = "n",
-        desc = "lsp:| diag |=> list all",
-      },
-      {
-        key_view.diagnostic.diaglist.buffer,
-        function()
-          require("diaglist").open_buffer_diagnostics()
-        end,
-        mode = "n",
-        desc = "lsp:| diag |=> list buffer",
-      },
-    },
-  },
-  {
     "bbjornstad/hovercraft.nvim",
-    dev = true,
     opts = function(_, opts)
       local Provider = require("hovercraft.provider")
       opts.providers = vim.tbl_deep_extend("force", opts.providers or {}, {

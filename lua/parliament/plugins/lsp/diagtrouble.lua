@@ -31,6 +31,8 @@
 local env = require("environment.ui")
 local kenv = require("environment.keys")
 local key_trouble = kenv.diagnostic
+local key_bracket = kenv.bracket
+local key_ui = kenv.ui
 
 return {
   {
@@ -38,7 +40,7 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       position = "bottom",
-      height = 24,
+      height = 16,
       width = 24,
       icons = true,
       mode = "workspace_diagnostics",
@@ -235,7 +237,7 @@ return {
           require("todo-comments").jump_prev()
         end,
         mode = "n",
-        desc = "todo:| |=> prev comment",
+        desc = "todo:| comments |=> previous",
       },
       {
         "]t",
@@ -243,12 +245,12 @@ return {
           require("todo-comments").jump_next()
         end,
         mode = "n",
-        desc = "todo:| |=> next comment",
+        desc = "todo:| comments |=> next",
       },
     },
   },
   {
-    "bbjornstad/corn.nvim",
+    "RaafatTurki/corn.nvim",
     config = function(_, opts)
       require("corn").setup(opts)
     end,
@@ -268,28 +270,48 @@ return {
         info = env.icons.diagnostic.Info,
         hint = env.icons.diagnostic.Hint,
       },
-      on_toggle = function(is_hidden)
-        vim.diagnostic.config({
-          virtual_text = not vim.diagnostic.config().virtual_text,
-        })
-      end,
+      blacklisted_modes = { "i" },
+      border_style = env.borders.alt,
+      on_toggle = function(is_hidden) end,
       item_preprocess_func = function(item)
         return item
       end,
-      window_opts = function()
-        return {
-          border = env.borders.alt,
-          anchor = "SE",
-          relative = "win",
-          zindex = 100,
-          title = "󰼀 lsp::diagnostic",
-          title_pos = "right",
-          row = 0.96 * vim.api.nvim_win_get_height(0),
-          col = 0.98 * vim.api.nvim_win_get_width(0),
-        }
-      end,
     },
     event = "LspAttach",
+    keys = {
+      {
+        key_ui.diagnostics.corn.file,
+        function()
+          require("corn").scope("file")
+        end,
+        mode = "n",
+        desc = "ui:diag| corn |=> scope to file",
+      },
+      {
+        key_ui.diagnostics.corn.line,
+        function()
+          require("corn").scope("line")
+        end,
+        mode = "n",
+        desc = "ui:diag| corn |=> scope to line",
+      },
+      {
+        key_ui.diagnostics.corn.cycle,
+        function()
+          require("corn").scope_cycle()
+        end,
+        mode = "n",
+        desc = "ui:diag| corn |=> cycle scope",
+      },
+      {
+        key_ui.diagnostics.corn.toggle,
+        function()
+          require("corn").toggle()
+        end,
+        mode = "n",
+        desc = "ui:diag| corn |=> toggle",
+      },
+    },
   },
   {
     "neovim/nvim-lspconfig",

@@ -25,7 +25,7 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     keys = {
       {
-        key_lsp.auxiliary.lint,
+        key_lsp.action.lint,
         function()
           require("lint").try_lint()
         end,
@@ -53,7 +53,7 @@ return {
     event = "LspAttach",
     keys = {
       {
-        key_lsp.auxiliary.rules.ignore,
+        key_lsp.action.rules.ignore,
         function()
           require("rulebook").ignoreRule()
         end,
@@ -61,7 +61,7 @@ return {
         desc = "lsp:| lint |=> ignore rule",
       },
       {
-        key_lsp.auxiliary.rules.lookup,
+        key_lsp.action.rules.lookup,
         function()
           require("rulebook").lookupRule()
         end,

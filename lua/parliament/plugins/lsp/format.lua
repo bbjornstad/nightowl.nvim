@@ -84,7 +84,7 @@ return {
     end,
     keys = {
       {
-        key_lsp.auxiliary.format.default,
+        key_lsp.action.format.default,
         function()
           require("conform").format({ async = true })
         end,
@@ -92,7 +92,7 @@ return {
         desc = "lsp:buf| fmt |=> apply",
       },
       {
-        key_lsp.auxiliary.format.list,
+        key_lsp.action.format.list,
         function()
           require("conform").list_formatters(0)
         end,
@@ -100,36 +100,10 @@ return {
         desc = "lsp:buf| fmt |=> list formatters",
       },
       {
-        key_lsp.auxiliary.format.info,
+        key_lsp.action.format.info,
         "<CMD>ConformInfo<CR>",
         mode = "n",
         desc = "lsp:| fmt |=> info",
-      },
-    },
-  },
-  {
-    "fmbarina/pick-lsp-formatter.nvim",
-    event = "LspAttach",
-    dependencies = {
-      "stevearc/dressing.nvim", -- Optional, better picker
-      "nvim-telescope/telescope.nvim", -- Optional, better picker
-    },
-    main = "plf",
-    opts = {
-      data_dir = vim.fn.expand(vim.fn.stdpath("state") .. "/picklspformat/"),
-      when_unset = "pick",
-      set_on_pick = true,
-      find_project = true,
-      find_patterns = { ".git" },
-    },
-    keys = {
-      {
-        key_lsp.auxiliary.format.pick,
-        function()
-          require("plf").format()
-        end,
-        mode = "n",
-        desc = "lsp:| fmt |=> pick",
       },
     },
   },
