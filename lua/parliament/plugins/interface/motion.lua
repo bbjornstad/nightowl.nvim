@@ -2,6 +2,7 @@ local env = require("environment.ui")
 local opt = require("environment.optional")
 local kenv = require("environment.keys").motion.standard
 local qenv = require("environment.keys").motion.qortal
+local ui_keys = require("environment.keys").ui
 
 return {
   {
@@ -11,15 +12,15 @@ return {
     opts = {
       buffer = { suffix = "b", options = {} },
       comment = { suffix = "c", options = {} },
-      conflict = { suffix = "x", options = {} },
+      conflict = { suffix = "g", options = {} },
       diagnostic = { suffix = "d", options = {} },
       file = { suffix = "f", options = {} },
-      indent = { suffix = "i", options = {} },
+      indent = { suffix = "n", options = {} },
       jump = { suffix = "j", options = {} },
       location = { suffix = "l", options = {} },
       oldfile = { suffix = "o", options = {} },
       quickfix = { suffix = "q", options = {} },
-      treesitter = { suffix = "t", options = {} },
+      treesitter = { suffix = "e", options = {} },
       undo = { suffix = "u", options = {} },
       window = { suffix = "w", options = {} },
       yank = { suffix = "y", options = {} },
@@ -285,154 +286,21 @@ return {
         noautocmd = true,
       },
     },
-    config = true,
-    cmd = { "Portal" },
-    dependencies = { "cbochs/grapple.nvim", "ThePrimeagen/harpoon" },
-  },
-  {
-    "ThePrimeagen/harpoon",
-    opts = {
-      save_on_toggle = false,
-      save_on_change = true,
-      enter_on_sendcmd = false,
-      tabline = true,
-      tabline_prefix = "󰓩   ",
-      tabline_suffix = "╶╶╶╶",
-    },
+    -- init = function()
+    --   local function deleter(it)
+    --     if type(it) == "table" then
+    --       vim.tbl_map(deleter, it)
+    --     else
+    --       vim.keymap.set("n", it, "<nop>")
+    --     end
+    --   end
+    --   vim.tbl_map(deleter, qenv)
+    -- end,
     config = function(_, opts)
-      require("harpoon").setup(opts)
-      require("telescope").load_extension("harpoon")
+      require("portal").setup(opts)
     end,
-    keys = {
-      {
-        qenv.harpoon.add_file,
-        function()
-          require("harpoon.mark").add_file()
-        end,
-        mode = "n",
-        desc = "harpoon=> add file",
-      },
-      {
-        qenv.harpoon.quick_menu,
-        function()
-          require("harpoon.ui").toggle_quick_menu()
-        end,
-        mode = "n",
-        desc = "harpoon=> quick menu",
-      },
-      {
-        qenv.harpoon.nav.next,
-        function()
-          require("harpoon.ui").nav_next()
-        end,
-        mode = "n",
-        desc = "harpoon=> next mark",
-      },
-      {
-        qenv.harpoon.nav.previous,
-        function()
-          require("harpoon.ui").nav_prev()
-        end,
-        mode = "n",
-        desc = "harpoon=> previous mark",
-      },
-      {
-        qenv.harpoon.nav.file,
-        function()
-          require("harpoon.ui").nav_file()
-        end,
-        mode = "n",
-        desc = "harpoon=> to file",
-      },
-      {
-        qenv.harpoon.term.to,
-        function()
-          require("harpoon.term").gotoTerminal()
-        end,
-        mode = "n",
-        desc = "harpoon=> to terminal",
-      },
-      {
-        qenv.harpoon.term.send,
-        function()
-          require("harpoon.ui").sendCommand()
-        end,
-        mode = "n",
-        desc = "harpoon=> send command",
-      },
-      {
-        kenv.harpoon.term.menu,
-        function()
-          require("harpoon.cmd-ui").toggle_quick_menu()
-        end,
-        mode = "n",
-        desc = "harpoon=> command quick menu",
-      },
-      {
-        kenv.harpoon.add_file,
-        function()
-          require("harpoon.mark").add_file()
-        end,
-        mode = "n",
-        desc = "harpoon=> add file",
-      },
-      {
-        kenv.harpoon.quick_menu,
-        function()
-          require("harpoon.ui").toggle_quick_menu()
-        end,
-        mode = "n",
-        desc = "harpoon=> quick menu",
-      },
-      {
-        kenv.harpoon.nav.next,
-        function()
-          require("harpoon.ui").nav_next()
-        end,
-        mode = "n",
-        desc = "harpoon=> next mark",
-      },
-      {
-        kenv.harpoon.nav.previous,
-        function()
-          require("harpoon.ui").nav_prev()
-        end,
-        mode = "n",
-        desc = "harpoon=> previous mark",
-      },
-      {
-        kenv.harpoon.nav.file,
-        function()
-          require("harpoon.ui").nav_file()
-        end,
-        mode = "n",
-        desc = "harpoon=> to file",
-      },
-      {
-        kenv.harpoon.term.to,
-        function()
-          require("harpoon.term").gotoTerminal()
-        end,
-        mode = "n",
-        desc = "harpoon=> to terminal",
-      },
-      {
-        kenv.harpoon.term.send,
-        function()
-          require("harpoon.ui").sendCommand()
-        end,
-        mode = "n",
-        desc = "harpoon=> send command",
-      },
-      {
-        kenv.harpoon.term.menu,
-        function()
-          require("harpoon.cmd-ui").toggle_quick_menu()
-        end,
-        mode = "n",
-        desc = "harpoon=> command quick menu",
-      },
-    },
+    cmd = { "Portal" },
+    dependencies = { "cbochs/grapple.nvim" },
   },
   {
     "roobert/tabtree.nvim",
@@ -440,7 +308,6 @@ return {
       require("tabtree").setup(opts)
     end,
     event = "VeryLazy",
-    enabled = false, --opt.tabtree,
     opts = {
       -- print the capture group name when executing next/previous
       debug = true,
@@ -476,7 +343,7 @@ return {
     "folke/flash.nvim",
     ---@type Flash.Config
     opts = {
-      label = { rainbow = { enabled = true, shade = 7 }, style = "overlay" },
+      label = { rainbow = { enabled = true, shade = 4 }, style = "overlay" },
       modes = { char = { keys = { "f", "F", "t", "T", "," } } },
       jump = { autojump = true },
     },
@@ -492,12 +359,64 @@ return {
         desc = "::flash=> jump to",
       },
       {
-        "<BS>",
+        "<C-CR>",
         function()
           require("flash").treesitter()
         end,
         mode = { "n", "x", "o" },
         desc = "::flash=> jump treesitter",
+      },
+    },
+  },
+  {
+    "boltlessengineer/smart-tab.nvim",
+    opts = { mapping = "<tab>" },
+    event = "VeryLazy",
+    config = function(_, opts)
+      require("smart-tab").setup(opts)
+    end,
+  },
+  {
+    "PeterRincker/vim-argumentative",
+    opts = {},
+    config = function(_, opts) end,
+    event = "VeryLazy",
+  },
+  {
+    "VidocqH/auto-indent.nvim",
+    event = "VeryLazy",
+    opts = {
+      lightmode = true,
+      indentexpr = nil,
+      ignore_filetype = env.ft_ignore_list,
+    },
+    config = function(_, opts)
+      require("auto-indent").setup(opts)
+    end,
+  },
+  {
+    "jinh0/eyeliner.nvim",
+    config = function(_, opts)
+      require("eyeliner").setup(opts)
+    end,
+    opts = {},
+    event = "VeryLazy",
+    init = function()
+      vim.api.nvim_set_hl(
+        0,
+        "EyelinerPrimary",
+        { bold = true, underline = true }
+      )
+      vim.api.nvim_set_hl(0, "EyelinerSecondary", { underline = true })
+    end,
+    keys = {
+      {
+        ui_keys.eyeliner,
+        function()
+          vim.cmd([[EyelinerToggle]])
+        end,
+        mode = "n",
+        desc = "ui:| liner |=> toggle",
       },
     },
   },

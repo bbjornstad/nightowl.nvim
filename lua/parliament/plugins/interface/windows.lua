@@ -37,7 +37,7 @@ return {
           require("mini.bufremove").delete(0, false)
         end,
         mode = "n",
-        desc = "buf:| => delete",
+        desc = "buf:| die => current",
       },
       {
         key_buffer.force_delete,
@@ -45,7 +45,7 @@ return {
           require("mini.bufremove").delete(0, true)
         end,
         mode = "n",
-        desc = "buf:| [!] |=> delete",
+        desc = "buf:| die! |=> delete",
       },
       {
         key_buffer.wipeout,
@@ -53,7 +53,7 @@ return {
           require("mini.bufremove").wipeout(0, false)
         end,
         mode = "n",
-        desc = "buf:| |=> wipeout",
+        desc = "buf:| DIE |=> wipeout",
       },
       {
         key_buffer.force_wipeout,
@@ -61,7 +61,29 @@ return {
           require("mini.bufremove").wipeout(0, true)
         end,
         mode = "n",
-        desc = "buf:| [!] |=> wipeout",
+        desc = "buf:| DIE! |=> wipeout",
+      },
+      {
+        key_buffer.delete_others,
+        function()
+          local bs = vim.cmd([[buffers]])
+          vim.tbl_map(function(b)
+            require("mini.bufremove").delete(b, false)
+          end, bs)
+        end,
+        mode = "n",
+        desc = "buf:| die |=> others",
+      },
+      {
+        key_buffer.force_delete_others,
+        function()
+          local bs = vim.cmd([[buffers]])
+          vim.tbl_map(function(b)
+            require("mini.bufremove").delete(b, true)
+          end, bs)
+        end,
+        mode = "n",
+        desc = "buf:| die! |=> others",
       },
     },
   },
@@ -89,7 +111,12 @@ return {
           preview_title = "content ",
           layout_config = { preview_width = 0.5 },
         }),
-        fzf = { window = { width = 0.5, height = 0.4 } },
+        fzf = {
+          window = {
+            width = 0.5,
+            height = 0.4,
+          },
+        },
 
         -- Options for nui Menu
         nui = {
@@ -271,50 +298,6 @@ return {
           size = { height = 0.5 },
         })
       end
-
-      --- inserts the contents of the `copts` argument into the target edgy
-      --- window if it satisfies the given condition evaluation.
-      ---@param condition_to any expression to evaluate as a boolean condition.
-      ---@param edgy_loc "bottom" | "left" | "right" window edge location to
-      ---insert into.
-      ---@param values table the values that are to be inserted as a new
-      ---component.
-      local function condition(condition_to, edgy_loc, values)
-        local function opts_mapper(cond, cprime)
-          if has(cond) or has(cond .. ".nvim") then
-            return mopts({}, cprime)
-          end
-        end
-        table.insert(
-          op[edgy_loc],
-          #op[edgy_loc],
-          opts_mapper(condition_to, values)
-        )
-      end
-      local function set_term_options(term, opts)
-        local buf = vim.bo[term.bufnr]
-        buf = vim.tbl_extend("force", buf, opts)
-      end
-
-      condition("toggleterm.nvim", "left", {
-        title = "fm::broot",
-        ft = "broot",
-        size = { height = 0.6 },
-        pinned = true,
-        open = require("environment.utiliterm").broot({
-          direction = "horizontal",
-          on_open = function(term)
-            set_term_options(term, { filetype = "broot" })
-          end,
-        }),
-      })
-      -- condition("aerial.nvim", "left", {
-      --   title = "symb::aerial",
-      --   ft = "aerial",
-      --   size = {
-      --     height = 0.5,
-      --   },
-      -- })
     end,
   },
   {
@@ -322,14 +305,14 @@ return {
     event = "BufWinEnter",
     cmd = { "PinBuffer", "PinBuftype", "PinFiletype", "Unpin" },
     opts = {
-      get_auto_pin = function(bufnr)
-        -- do any required filtration prior to using default settings.
-        local bufft = vim.api.nvim_buf_get_option(bufnr, "filetype")
-        if vim.list_contains({ "nnn" }, bufft) then
-          return "filetype"
-        end
-        return require("stickybuf").should_auto_pin(bufnr)
-      end,
+      -- get_auto_pin = function(bufnr)
+      --   -- do any required filtration prior to using default settings.
+      --   local bufft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+      --   if vim.list_contains({ "lazy" }, bufft) then
+      --     return "filetype"
+      --   end
+      --   return require("stickybuf").should_auto_pin(bufnr)
+      -- end,
     },
   },
   {
@@ -371,7 +354,7 @@ return {
       split = { bufnew = true },
       ui = {
         number = false,
-        hybridnumber = false,
+        hybridnumber = true,
         absolutenumber_unfocussed = false,
         cursorline = false,
         winhighlight = false,
@@ -385,7 +368,7 @@ return {
         key_win.focus.maximize,
         "<CMD>FocusMaxOrEqual<CR>",
         mode = "n",
-        desc = "win::| focus |=> toggle max",
+        desc = "win:| focus |=> toggle max",
       },
       {
         key_win.focus.split.cycle,
@@ -405,7 +388,7 @@ return {
         key_ui.focus,
         toggle.focus,
         mode = "n",
-        desc = "win:| focus |=> toggle",
+        desc = "ui:| focus |=> toggle",
       },
     },
   },
@@ -441,7 +424,6 @@ return {
   },
   {
     "jyscao/ventana.nvim",
-    enabled = opt.windowing.ventana,
     cmd = { "VentanaTranspose", "VentanaShift", "VentanaShiftMaintainLinear" },
     keys = {
       {
@@ -466,7 +448,6 @@ return {
   },
   {
     "ghillb/cybu.nvim",
-    enabled = opt.windowing.cybu,
     event = "VeryLazy",
     branch = "main",
     dependencies = { "nvim-tree/nvim-web-devicons", "nvim-lua/plenary.nvim" },
@@ -553,7 +534,6 @@ return {
   },
   {
     "chrisgrieser/nvim-early-retirement",
-    enabled = opt.windowing.early_retirement,
     config = function(_, opts)
       require("early-retirement").setup(opts)
     end,
@@ -562,7 +542,10 @@ return {
       retirementAgeMins = 30,
 
       -- filetypes to ignore
-      ignoredFiletypes = env.ft_ignore_list,
+      ignoredFiletypes = vim.list_extend(
+        { "norg", "org", "md", "oil", "spaceport", "scissors" },
+        env.ft_ignore_list
+      ),
 
       -- ignore files matching this lua pattern; empty string disables this setting
       ignoreFilenamePattern = "",
@@ -589,7 +572,7 @@ return {
 
       -- ignore unloaded buffers. Session-management plugin often add buffers
       -- to the buffer list without loading them.
-      ignoreUnloadedBufs = false,
+      ignoreUnloadedBufs = true,
 
       -- Show notification on closing. Works with nvim-notify or noice.nvim
       notificationOnAutoClose = true,
@@ -688,13 +671,11 @@ return {
     config = function(_, opts)
       require("bufresize").setup(opts)
     end,
-    enabled = true,
     event = "BufWinEnter",
   },
   {
     "michaelPotter/accordian.nvim",
     opts = {},
-    enabled = true,
     config = function(_, opts)
       require("accordian").setup()
     end,
@@ -709,31 +690,35 @@ return {
     },
   },
   {
-    "anuvyklack/windows.nvim",
-    enabled = false,
-    -- enabled = opt.prefer.focus_windows == "windows",
-    dependencies = {
-      "anuvyklack/middleclass",
-    },
-    opts = {
-      autowidth = {
-        enable = false,
-        winwidth = 1.2,
-      },
-      ignore = {
-        buftype = { "quickfix", "nofile", "prompt", "popup" },
-        filetype = env.ft_ignore_list,
-      },
-      animation = {
-        enable = false,
-      },
-    },
+    "yutkat/confirm-quit.nvim",
+    event = "CmdlineEnter",
+    opts = { overwrite_q_command = true },
     config = function(_, opts)
-      vim.o.winwidth = 16
-      vim.o.winminwidth = 12
-      vim.o.equalalways = false
-      require("windows").setup(opts)
+      require("confirm-quit").setup(opts)
     end,
-    event = "BufWinEnter",
+  },
+  {
+    "Lilja/zellij.nvim",
+    enabled = false,
+    event = "VeryLazy",
+    config = function(_, opts)
+      require("zellij").setup(opts)
+    end,
+    opts = {
+      path = "zellij",
+      replaceVimWindowNavigationKeybinds = true,
+      vimTmuxNavigatorKeybinds = true,
+      debug = false,
+    },
+    cmd = {
+      "ZellijNavigateLeft",
+      "ZellijNavigateRight",
+      "ZellijNavigateUp",
+      "ZellijNavigateDown",
+      "ZellijNewPane",
+      "ZellijNewTab",
+      "ZellijRenamePane",
+      "ZellijRenameTab",
+    },
   },
 }

@@ -32,12 +32,17 @@
 local env = require("environment.ui")
 local kenv = require("environment.keys")
 local key_newts = kenv.newts
+local key_scope = kenv.scope
 
 return {
   {
     "folke/noice.nvim",
     opts = {
       debug = false,
+      notify = {
+        enabled = true,
+        view = "notify",
+      },
       lsp = {
         -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
         override = {
@@ -61,7 +66,7 @@ return {
       },
       smart_move = {
         enabled = true,
-        excluded_filetypes = { "notify" },
+        excluded_filetype = { "notify" },
       },
       views = {
         popup = {
@@ -161,7 +166,7 @@ return {
             style = env.borders.main,
             padding = env.padding.noice.small,
           },
-          relative = "editor",
+          relative = "cursor",
         },
         messages = {
           view = "split",
@@ -257,7 +262,7 @@ return {
           require("noice").redirect(vim.fn.getcmdline())
         end,
         mode = "c",
-        desc = "noice=> redirect cmdline",
+        desc = "noice:| cmdline |=> redirect",
       },
       {
         "<C-d>",
@@ -287,7 +292,63 @@ return {
         key_newts.messages,
         "<CMD>messages<CR>",
         mode = "n",
-        desc = "newts:| msg |=> open",
+        desc = "newts:| vim |=> messages",
+      },
+      {
+        key_newts.errors,
+        function()
+          require("noice").cmd("errors")
+        end,
+        mode = "n",
+        desc = "newts:| errors |=> open",
+      },
+      {
+        key_newts.notifications,
+        function()
+          require("noice").cmd("telescope")
+        end,
+        mode = "n",
+        desc = "newts:| history |=> telescope",
+      },
+      {
+        key_newts.history,
+        function()
+          require("noice").cmd("history")
+        end,
+        mode = "n",
+        desc = "newts:| history |=> messages",
+      },
+      {
+        key_newts.stats,
+        function()
+          require("noice").cmd("stats")
+        end,
+        mode = "n",
+        desc = "newts:| debug |=> show stats",
+      },
+      {
+        key_newts.last,
+        function()
+          require("noice").cmd("last")
+        end,
+        mode = "n",
+        desc = "newts:| history |=> last message",
+      },
+      {
+        key_scope.notice,
+        function()
+          require("noice").cmd("telescope")
+        end,
+        mode = "n",
+        desc = "scope:| newts |=> search",
+      },
+      {
+        key_newts.dismiss,
+        function()
+          require("noice").cmd("dismiss")
+        end,
+        mode = "n",
+        desc = "newts:| notice |=> clear",
       },
     },
   },
@@ -300,19 +361,31 @@ return {
           border = env.borders.main,
           zindex = 300,
         })
+        vim.api.nvim_win_set_option(win, "wrap", true)
       end,
       background_colour = "Pmenu",
       stages = "static",
     },
     keys = {
       {
-        "<leader>un",
+        "<leader>nC",
         function()
           require("notify").dismiss({ silent = true, pending = true })
         end,
         mode = "n",
-        desc = "newts:| ui |=> clear all",
+        desc = "ui:| notice |=> clear",
+      },
+      {
+        "<leader>nN",
+        function()
+          require("notify").history()
+        end,
+        mode = "n",
+        desc = "newts:| history |=> notifications",
       },
     },
+    config = function(_, opts)
+      require("notify").setup(opts)
+    end,
   },
 }

@@ -64,49 +64,6 @@ return {
     },
   },
   {
-    "lukas-reineke/indent-blankline.nvim",
-    event = "VeryLazy",
-    config = function(_, opts)
-      local defhl = require("funsak.colors").set_hl_multi
-      defhl({
-        "IndentBlanklineWhitespace",
-        "IndentBlanklineScope",
-        "IndentBlanklineIndent",
-      }, { link = "@comment" })
-      require("ibl").setup(opts)
-    end,
-    init = function()
-      vim.opt.list = true
-      vim.opt.listchars:append("space:·")
-      vim.opt.listchars:append("eol:↴")
-      vim.opt.listchars:append("tab:  ⏗")
-      vim.opt.showbreak = "⊧ "
-    end,
-    opts = {
-      enabled = false,
-      debounce = 400,
-      indent = {
-        char = "┆",
-        highlight = "IndentBlanklineIndent",
-      },
-      whitespace = {
-        highlight = "IndentBlanklineWhitespace",
-      },
-      scope = {
-        enabled = true,
-        char = "",
-        show_end = true,
-        show_start = true,
-        injected_languages = true,
-        priority = 100,
-        highlight = "IndentBlanklineScope",
-      },
-      exclude = {
-        filetypes = env.ft_ignore_list,
-      },
-    },
-  },
-  {
     "yamatsum/nvim-cursorline",
     event = "VeryLazy",
     opts = {
@@ -151,25 +108,6 @@ return {
     },
   },
   {
-    "utilyre/sentiment.nvim",
-    version = "*",
-    event = "VeryLazy",
-    opts = {
-      pairs = {
-        { "(", ")" },
-        { "{", "}" },
-        { "[", "]" },
-        { "<", ">" },
-      },
-      delay = 50,
-      limit = 60,
-    },
-    init = function()
-      -- `matchparen.vim` needs to be disabled manually in case of lazy loading
-      vim.g.loaded_matchparen = 1
-    end,
-  },
-  {
     "lukas-reineke/virt-column.nvim",
     event = "VeryLazy",
     config = function(_, opts)
@@ -185,55 +123,68 @@ return {
     },
   },
   {
-    "shellRaining/hlchunk.nvim",
-    event = "UIEnter",
+    "luukvbaal/statuscol.nvim",
     config = function(_, opts)
-      local chunk_ft = require("hlchunk.utils.filetype")
-      opts.chunk.support_filetypes = vim.list_extend(
-        opts.chunk.support_filetypes,
-        chunk_ft.support_filetypes
-      )
-      opts.chunk.exclude_filetypes = vim.list_extend(
-        opts.chunk.exclude_filetypes,
-        chunk_ft.exclude_filetypes
-      )
-      require("hlchunk").setup(opts)
+      require("statuscol").setup(opts)
     end,
+    opts = function(_, opts)
+      local builtin = require("statuscol.builtin")
+      opts = opts or {}
+      opts.relculright = opts.relculright or true
+      opts.segments = vim.list_extend({
+        {
+          text = { builtin.lnumfunc, " ", " ", " " },
+          condition = { true, builtin.not_empty, true, true },
+          sign = { colwidth = 4, maxwidth = 1 },
+          click = "v:lua.ScLa",
+        },
+
+        {
+          sign = {
+            name = { "Diagnostic*" },
+            colwidth = 2,
+            maxwidth = 1,
+            auto = false,
+          },
+          click = "v:lua.ScSa",
+        },
+        {
+          sign = {
+            name = { ".*" },
+            colwidth = 1,
+            maxwidth = 1,
+            auto = true,
+            wrap = true,
+          },
+          click = "v:lua.ScSa",
+        },
+        {
+          sign = {
+            name = { "smoothcursor*" },
+            colwidth = 1,
+            maxwidth = 1,
+            auto = false,
+          },
+          click = "v:lua.ScSa",
+        },
+        { text = { "⦙" } },
+      }, opts.segments or {})
+    end,
+    event = "VeryLazy",
+  },
+  {
+    "CWood-sdf/melon.nvim",
     opts = {
-      indent = {
-        enable = true,
-        chars = { "┆", "┊" },
-        style = require("funsak.colors").dvalue("@comment", "fg"),
-      },
-      line_num = {
-        enable = true,
-        use_treesitter = true,
-        style = require("funsak.colors").dvalue("@text.environment", "fg"),
-      },
-      blank = {
-        enable = false,
-        chars = {
-          "․",
-        },
-      },
-      chunk = {
-        enable = true,
-        notify = true,
-        use_treesitter = true,
-        support_filetypes = {},
-        exclude_filetypes = {},
-        chars = {
-          horizontal_line = "-",
-          vertical_line = "|",
-          left_top = "-",
-          left_bottom = "-",
-          right_arrow = ">",
-        },
-        style = {
-          { fg = require("funsak.colors").dvalue("DiagnosticInfo", "fg") },
-          { fg = require("funsak.colors").dvalue("DiagnosticError", "fg") },
-        },
+      ignore = function(_)
+        return false
+      end,
+      signOpts = {
+        texthl = "NightowlMelonSigns",
       },
     },
+    config = function(_, opts)
+      require("melon").setup(opts)
+    end,
+    event = "VeryLazy",
   },
 }
