@@ -29,30 +29,33 @@
 ---@author Bailey Bjornstad
 ---@license MIT
 
+-- ╓─────────────────────────────────────────────────────────────────────╖
+-- ║ - ASCII text manipulation                                           ║
+-- ╙─────────────────────────────────────────────────────────────────────╜
+
 local env = require("environment.ui").borders
 local key_editor = require("environment.keys").editor
 local key_cbox = key_editor.cbox
 local key_cline = key_editor.cline
 local key_figlet = key_editor.figlet
-local key_cframe = key_editor.comment_frame
 local key_venn = key_editor.venn
 local key_iconpick = key_editor.glyph.picker
-local key_significant = key_editor.significant
 
 local mopts = require("funsak.table").mopts
 local inp = require("parliament.utils.input")
-local compute_remaining_width =
-  require("parliament.utils.text").compute_remaining_width
 
 local function change_figlet_font(fontopts)
-  vim.g.figban_fontstyle = fontopts.name or "Impossible"
-  require("figlet").Config(mopts({ font = "Impossible" }, fontopts))
+  vim.g.figban_fontstyle = fontopts.name or "impossible"
+  require("figlet").Config(mopts({ font = "impossible" }, fontopts))
 end
+
+-- ─[ comment divisions selector functions ]─────────────────────────────
 
 local function box_selector(boxid)
   return function()
-    local fn = require("comment-box")[("%sbox"):format(boxid)]
-    vim.notify(vim.inspect(fn))
+    local fn = function(num)
+      vim.cmd(([[CB%sbox%s]]):format(boxid, num))
+    end
     local mapper = {
       "rounded",
       "classic",
@@ -77,14 +80,17 @@ local function box_selector(boxid)
       "horizontally enclosed b",
       "horizontally enclosed c",
     }
-    vim.ui.select(
-      vim.iter(ipairs(mapper)):totable(),
-      { prompt = "󰺫 box type" },
-      function(choice)
-        local num, sel = unpack(choice)
-        return fn(num)
+    vim.ui.select(mapper, {
+      prompt = "󰺫 box type: ",
+      format_item = function(item)
+        return "󱅃  " .. item
+      end,
+    }, function(choice, num)
+      if not choice then
+        return
       end
-    )
+      return fn(num)
+    end)
   end
 end
 
@@ -112,16 +118,17 @@ local function line_selector(lineid)
       "ascii b",
       "ascii c",
     }
-    vim.ui.select(
-      vim.iter(ipairs(mapper)):totable(),
-      { prompt = "󰘤 line type" },
-      function(choice)
-        local num, sel = unpack(choice)
-        require("funsak.lazy").info(type(num))
-        require("funsak.lazy").info(vim.inspect(sel))
-        return fn(num)
+    vim.ui.select(mapper, {
+      prompt = "󰘤 line type: ",
+      format_item = function(item)
+        return "󰕞  " .. item
+      end,
+    }, function(choice, num)
+      if not choice then
+        return
       end
-    )
+      return fn(num)
+    end)
   end
 end
 
@@ -649,25 +656,8 @@ return {
     },
   },
   {
-    "ElPiloto/significant.nvim",
-    opts = {},
-    config = function(_, opts)
-      require("significant").setup(opts)
-    end,
-    keys = {
-      {
-        key_significant.start_signs,
-        function()
-          require("significant").start_animated_sign(10, "dots4", 300)
-        end,
-        mode = "n",
-        desc = "sgnfcnt:| start |=> animation",
-      },
-    },
-  },
-  {
     "bbjornstad/ficus.nvim",
-    enabled = true,
+    enabled = false,
     dev = true,
     opts = {},
     config = function(_, opts)
