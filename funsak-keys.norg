@@ -1,0 +1,80 @@
+@document.meta
+title: funsak-keys
+description: implementation strategy for funsak keybundling module
+authors: ursa-major
+categories: funsak,nvim,prj,portfolio
+created: 2024-02-16T15:31:48-0700
+updated: 2024-02-16T16:58:29-0700
+version: 1.1.1
+@end
+
+* `funsak.keys` Implementation and Design Notes
+  This document contains a general strategy for defining and implementing the
+  core key management interfaces for the `funsak` module. As a refreshing note:
+  `funsak` is a portmanteau of `functional` and the abbreviated `SAK` (Swiss
+  Army Knife). It is essentially a small library of functions that help to ease
+  the process of configuring neovim using lazy.nvim, written in
+  functional-programming style.
+
+  One of the major pain points that the `funsak` module seeks to address is the
+  somewhat inconsistently defined/documented behavior of keymappings using
+  lazy.nvim, especially regarding the manner in which lazy loading of plugin
+  modules is affected.
+
+  One such manner on which this implementation relies is that I find it much
+  simpler to define keymaps from a semantic standpoint first, and then fill in
+  what those Keystrokes should be specifically to enforce a certain degree of
+  sameness between my semantic groupings into families of Keybinds and the
+  triggering sequence. This is easiest to achieve by defining Keybindings in a
+  tabular format, whose indices give general familial descriptions as well as
+  the specifically targeted action. This table is then imported whenever
+  Keybinds and specifically the Keystroke Sequence is needed to define plugin
+  mappings.
+** Definitions
+   $ Keybind
+   A `Keymap` is a conceptual representation of a neovim action bound to a
+   specific trigger sequence of keystrokes that should be pressed to initiate
+   the action. It is in this sense a conceptual compound data type comprised of
+   the trigger sequence specified as a string in Vim-style bind-notation
+   together with the action itself, typically in the form of a lua function or
+   Vim command.
+
+   $ Keystroke
+   A `Keystroke` refers specifically to the set of trigger-keys that initiate
+   the action of a particular keybind. In this sense it is more related to the
+   action of fingers on the keyboard than the action that is initiated.
+   Generally, this term is used more when the focus of an implementation point
+   or framework detail is specifically about the sequence pressed.
+
+   $ Keybundle
+   A `Keybundle` is a conceptual grouping of Keybinds that are semantically and
+   structurally similar (the degree of which is left as a parameter for the
+   user to configure in order to achieve the target "keystroke topology").
+
+   $ Keystroke Topology
+   A `Keystroke Topology` refers to the overall "universe" of keybindings that are
+   afforded by a particular setup of Keybundles. To achieve the Keystroke
+   Topology implies that the actual set of Keybinds that comprise the Toplogy
+   are close or exactly what the user desires in the idealistic sense of their
+   keybindings, e.g. the most effective set of keybindings for the user's
+   workflow as determined by the user.
+
+   $ Keybundle Identifier
+   A `Keybundle Identifier` represents a familial Keystroke that is shared by
+   portions or the entirety of the Keybindings that are grouped together within
+   a `Keybundle`. In the classic example of this definition, consider that a
+   "leader" sequence that prefixes many Keybinds is shared amongst those
+   Keybinds whose target is similar (e.g. from the same plugin, or of the same
+   class of neovim action)
+
+   $ Automorphism
+   Borrowing from the more typical mathematical definition of `automorphism`, an
+   Automorphism in the context of `funsak.keys` refers to a transformation that
+   can be applied to one Keymap to create another which is respectful of the
+   underlying Keystroke Topology induced by the particular configuration. In
+   this sense, it is something like a homomorphism (e.g. structure preserving
+   map) of the Keybind space to itself (e.g. Auto) which is isomorphic. N.B.
+   this is not a precise mathematical definition of Automorphism, we're simply
+   borrowing the term and a few key concepts for the purposes of better
+   illustrating the design strategy for Keybundling
+** Implementations

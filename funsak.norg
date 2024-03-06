@@ -4,11 +4,14 @@ description:
 authors: ursa-major
 categories:
 created: 2023-11-27T00:58:03-0700
-updated: 2024-01-11T22:25:20-0700
+updated: 2024-02-16T15:31:33-0700
 version: 1.1.1
 @end
 
-* `funsak`: A Functional Swiss Army Knife for lazy.nvim and neovim configs-nvim
+* ( ) `funsak`: A Functional Swiss Army Knife for lazy.nvim and neovim configs-nvim
+  The aim of this document is to provide a working record of the capabilities
+  and functionality provided by the `funsak` module that I have written for
+  configuring neovim.
 ** `funsak.keys`
    This submodule contains important or useful utilities for managing large sets
    of keymaps. The goal is to facilitate disconnecting the keymap topology, e.g.
@@ -42,4 +45,22 @@ version: 1.1.1
     does not change the semantics of any of the bindings. This is to say that we
     can create nested tables which have at labels the semantic interpretation of
     the keymap, while the bind is described in a constructive fashion through
-    th table structure.
+    the table structure.
+    ---
+** ( ) `funsak` implementations roadmap
+   implementation items that remain needed for completion of the funsak module
+**** ( ) `funsak.color`: for controlling highlights
+     This does need a bit more sprucing up most likely in the way of
+     documentation et al. Moreover, there should be some further development of
+     the implementations to better facilitate the target goal: to achieve
+     consistency in auxillary highlight definitions across color schemes without
+     needing to fork an existing scheme to match its architecture, or create a
+     bespoke scheme that provides such consistency.
+
+     The distillation of this is that we need tools which externally wrap around
+     colorschemes and provide a registration method for the desired set of
+     colors/base highlight group "palette"
+**** ( ) `funsak.keys`
+     The big item that we need to finish off here is the keygroup
+     implementation as a derived class item that can also interpret keymaps
+     from individual files.
