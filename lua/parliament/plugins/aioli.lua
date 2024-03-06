@@ -8,7 +8,8 @@ local key_ai = require("environment.keys").ai
 --- constructs a notification message detailing whether each of the installed ai
 --- tools are enabled presently.
 local function notify_agents()
-  vim.notify(
+  local notf = require("funsak.lazy").info
+  notf(
     string.format(
       [[
 AI Plugin Status:
@@ -38,6 +39,7 @@ AI Plugin Status:
   -> **gen**: %s
   -> **dante.nvim**: %s
   -> **text2scheme**: %s
+  -> **gemini**: %s
 
 
 *plugin is used during nvim-cmp autocompletion, and will therefore connect to an external service without explicit instruction to do so*
@@ -68,9 +70,9 @@ AI Plugin Status:
       enb.ollero.enable,
       enb.gen.enable,
       enb.dante.enable,
-      enb.text_to_colorscheme.enable
-    ),
-    vim.log.levels.INFO
+      enb.text_to_colorscheme.enable,
+      enb.gemini.enable
+    )
   )
 end
 
@@ -88,7 +90,7 @@ vim.api.nvim_create_autocmd({ "VimEnter" }, {
       { "n" },
       key_ai:leader() .. "N",
       notify_agents,
-      { desc = "ai.status=> notify agent statuses", remap = false }
+      { desc = "ai:| status |=> notify agent statuses", remap = false }
     )
   end,
 })
@@ -143,14 +145,13 @@ return {
       require("codeium").setup(opts)
     end,
     init = function()
-      vim.keymap.set(
-        "i",
-        key_ai.codeium:accept() or "<C-;>",
-        function()
-          return vim.fn["codeium#Accept"]()
-        end,
-        { expr = true, desc = "ai.codeium=> accept suggestion", buffer = true }
-      )
+      vim.keymap.set("i", key_ai.codeium:accept() or "<C-;>", function()
+        return vim.fn["codeium#Accept"]()
+      end, {
+        expr = true,
+        desc = "ai:| codeium |=> accept suggestion",
+        buffer = true,
+      })
     end,
     opts = {},
     keys = {
@@ -158,19 +159,19 @@ return {
         key_ai.codeium.disable,
         "<CMD>CodeiumDisable<CR>",
         mode = "n",
-        desc = "ai.codeium=> disable",
+        desc = "ai:| codeium |=> disable",
       },
       {
         key_ai.codeium.enable,
         "<CMD>CodeiumEnable<CR>",
         mode = "n",
-        desc = "ai.codeium=> enable",
+        desc = "ai:| codeium |=> enable",
       },
       {
         key_ai.codeium.authenticate,
         "<CMD>Codeium Auth<CR>",
         mode = "n",
-        desc = "ai.codeium=> authenticate",
+        desc = "ai:| codeium |=> authenticate",
       },
     },
   },
@@ -215,13 +216,13 @@ return {
         key_ai.llm.toggle,
         "<CMD>LLMToggleAutoSuggest<CR>",
         mode = "n",
-        desc = "ai.llm=> toggle insert mode autosuggest",
+        desc = "ai:| llm |=> toggle insert mode autosuggest",
       },
       {
         key_ai.llm.oneshot,
         "<CMD>LLMSuggestion<CR>",
         mode = "n",
-        desc = "ai.llm=> suggest",
+        desc = "ai:| llm |=> suggest",
       },
     },
   },
@@ -263,25 +264,25 @@ return {
         key_ai.copilot.authenticate,
         "<CMD>Copilot auth<CR>",
         mode = "n",
-        desc = "ai.copilot=> authenticate",
+        desc = "ai:| copilot |=> authenticate",
       },
       {
         key_ai.copilot.toggle,
         "<CMD>Copilot toggle<CR>",
         mode = "n",
-        desc = "ai.copilot=> toggle",
+        desc = "ai:| copilot |=> toggle",
       },
       {
         key_ai.copilot.status,
         "<CMD>Copilot status<CR>",
         mode = "n",
-        desc = "ai.copilot=> status",
+        desc = "ai:| copilot |=> status",
       },
       {
         key_ai.copilot.detach,
         "<CMD>Copilot detach<CR>",
         mode = "n",
-        desc = "ai.copilot=> detach",
+        desc = "ai:| copilot |=> detach",
       },
     },
   },
@@ -343,7 +344,7 @@ return {
         key_ai.rgpt,
         "<CMD>ReviewGPT review<CR>",
         mode = "n",
-        desc = "ai.rgpt=> enable ai code review",
+        desc = "ai:| rgpt |=> enable ai code review",
       },
     },
   },
@@ -356,31 +357,31 @@ return {
         key_ai.tabnine.status,
         "<CMD>TabnineStatus<CR>",
         mode = "n",
-        desc = "ai.nine=> status",
+        desc = "ai:| nine |=> status",
       },
       {
         key_ai.tabnine.enable,
         "<CMD>TabnineEnable<CR>",
         mode = "n",
-        desc = "ai.nine=> enable",
+        desc = "ai:| nine |=> enable",
       },
       {
         key_ai.tabnine.disable,
         "<CMD>TabnineDisable<CR>",
         mode = "n",
-        desc = "ai.nine=> disable",
+        desc = "ai:| nine |=> disable",
       },
       {
         key_ai.tabnine.toggle,
         "<CMD>TabnineToggle<CR>",
         mode = "n",
-        desc = "ai.nine=> toggle",
+        desc = "ai:| nine |=> toggle",
       },
       {
         key_ai.tabnine.chat,
         "<CMD>TabnineChat<CR>",
         mode = "n",
-        desc = "ai.nine=> chat",
+        desc = "ai:| nine |=> chat",
       },
     },
     opts = {
@@ -437,7 +438,7 @@ return {
         key_ai.codegpt,
         "<CMD>CodeGPT<CR>",
         mode = { "n" },
-        desc = "ai.codegpt=> open interface",
+        desc = "ai:| codegpt |=> open interface",
       },
     },
   },
@@ -451,7 +452,7 @@ return {
         key_ai.neural,
         "<CMD>Neural<CR>",
         mode = { "n", "v" },
-        desc = "ai.neural=> chatgpt neural interface",
+        desc = "ai:| neural |=> chatgpt neural interface",
       },
     },
   },
@@ -468,33 +469,129 @@ return {
       "ChatGPTCompleteCode",
     },
     opts = {
-      popup_window = { border = { style = env.borders.alt } },
-      popup_input = { border = { style = env.borders.alt } },
+      edit_with_instructions = {
+        diff = false,
+      },
+      chat = {
+        loading_text = "...now loading chatgpt...",
+        question_sign = "󱄶",
+        answer_sign = "󱩨",
+        border_left_sign = "⟨",
+        border_right_sign = "⟩",
+        max_line_length = 80,
+        sessions_window = {
+          active_sign = "  ",
+          inactive_sign = " 󰭐 ",
+          current_line_sign = " 󰌖 ",
+          border = {
+            style = env.borders.alt,
+            text = {
+              top = " sessions ",
+            },
+          },
+        },
+      },
+      popup_window = {
+        border = {
+          style = env.borders.alt,
+          text = {
+            top = " aioli::chatgpt ",
+          },
+        },
+        win_options = {
+          wrap = true,
+          linebreak = true,
+          foldcolumn = "1",
+          winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+        },
+        buf_options = {
+          filetype = "markdown",
+        },
+      },
+      popup_input = {
+        prompt = " 󱩾 ",
+        border = {
+          style = env.borders.alt,
+          text = {
+            top_align = "left",
+            top = " prompt ",
+          },
+        },
+      },
+
+      system_window = {
+        border = {
+          style = env.borders.alt,
+        },
+        win_options = {
+          wrap = true,
+          linebreak = true,
+          foldcolumn = "2",
+          winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+        },
+      },
+      settings_window = {
+        setting_sign = "  ",
+        border = {
+          style = env.borders.alt,
+          text = {
+            top = " settings",
+          },
+        },
+      },
+      help_window = {
+        setting_sign = " 󰮦 ",
+        border = {
+          style = env.borders.alt,
+          text = {
+            top = " help ",
+          },
+        },
+      },
+      openai_params = {
+        model = "gpt-4",
+        frequency_penalty = 0,
+        presence_penalty = 0,
+        max_tokens = 300,
+        temperature = 0,
+        top_p = 1,
+        n = 1,
+      },
+      openai_edit_params = {
+        model = "gpt-4",
+        frequency_penalty = 0,
+        presence_penalty = 0,
+        temperature = 0,
+        top_p = 1,
+        n = 1,
+      },
+      show_quickfixes_cmd = "Trouble quickfix",
+      predefined_chat_gpt_prompts = "https://raw.githubusercontent.com/f/awesome-chatgpt-prompts/main/prompts.csv",
     },
     keys = {
       {
         key_ai.chatgpt.open_interface,
         "<CMD>ChatGPT<CR>",
         mode = "n",
-        desc = "ai.chatgpt=> open interface",
+        desc = "ai:| chatgpt |=> open interface",
       },
       {
         key_ai.chatgpt.roles,
         "<CMD>ChatGPTActAs<CR>",
         mode = "n",
-        desc = "ai.chatgpt=> role prompts",
+        desc = "ai:| chatgpt |=> role prompts",
       },
       {
         key_ai.chatgpt.edit,
         "<CMD>ChatGPTEditWithInstructions<CR>",
         mode = "n",
-        desc = "ai.chatgpt=> edit with instructions",
+        desc = "ai:| chatgpt |=> edit with instructions",
       },
       {
         key_ai.chatgpt.code_actions,
         "<CMD>ChatGPTCustomCodeAction<CR>",
         mode = "n",
-        desc = "ai.chatgpt=> code actions",
+        desc = "ai:| chatgpt |=> code actions",
       },
     },
   },
@@ -553,7 +650,7 @@ return {
         {
           name = "textify",
           key = key_ai.neoai.textify,
-          desc = "ai.neoai=> fix text (textify)",
+          desc = "ai:| neoai |=> fix text (textify)",
           use_context = true,
           prompt = function()
             return [[
@@ -568,7 +665,7 @@ return {
         {
           name = "gitcommit",
           key = key_ai.neoai.gitcommit,
-          desc = "ai.neoai=> generate git commit message",
+          desc = "ai:| neoai |=> generate git commit message",
           use_context = false,
           prompt = function()
             return [[
@@ -583,7 +680,7 @@ return {
         {
           name = "professional email (affirm)",
           key = key_ai.neoai.email.affirm,
-          desc = "ai.neoai=> generate professional email (affirm)",
+          desc = "ai:| neoai |=> generate professional email (affirm)",
           use_context = true,
           prompt = function()
             return [[
@@ -602,7 +699,7 @@ return {
         {
           name = "professional email (decline)",
           key = key_ai.neoai.email.decline,
-          desc = "ai.neoai=> generate professional email (decline)",
+          desc = "ai:| neoai |=> generate professional email (decline)",
           use_context = true,
           prompt = function()
             return [[
@@ -623,7 +720,7 @@ return {
         {
           name = "professional email (cold-contact)",
           key = key_ai.neoai.email.cold,
-          desc = "ai.neoai=> generate professional email (cold-contact)",
+          desc = "ai:| neoai |=> generate professional email (cold-contact)",
           use_context = true,
           prompt = function()
             return [[
@@ -645,7 +742,7 @@ return {
         {
           name = "The Spacebar (from Outline)",
           key = key_ai.neoai.blog.new,
-          desc = "ai.neoai=> blog post for 'The Spacebar'",
+          desc = "ai:| neoai |=> blog post for 'The Spacebar'",
           use_context = true,
           prompt = function()
             return [[
@@ -666,7 +763,7 @@ return {
         {
           name = "The Spacebar (from Existing)",
           key = key_ai.neoai.blog.existing,
-          desc = "ai.neoai=> polish blog post rough draft for 'The Spacebar'",
+          desc = "ai:| neoai |=> polish blog post rough draft for 'The Spacebar'",
           use_context = true,
           prompt = function()
             return [[
@@ -739,31 +836,31 @@ return {
         key_ai.navi.append,
         "<cmd>lua require('navi').Append()<cr>",
         mode = "n",
-        desc = "ai.navi=> append",
+        desc = "ai:| navi |=> append",
       },
       {
         key_ai.navi.edit,
         "<cmd>lua require('navi').Edit()<cr>",
         mode = "v",
-        desc = "ai.navi=> edit",
+        desc = "ai:| navi |=> edit",
       },
       {
         key_ai.navi.bufedit,
         "<cmd>lua require('navi').EditBuffer()<cr>",
         mode = "n",
-        desc = "ai.navi=> edit buffer",
+        desc = "ai:| navi |=> edit buffer",
       },
       {
         key_ai.navi.review,
         "<cmd>lua require('navi').Review()<cr>",
         mode = "v",
-        desc = "ai.navi=> review",
+        desc = "ai:| navi |=> review",
       },
       {
         key_ai.navi.chat,
         "<cmd>lua require('navi').Chat()<cr>",
         mode = "n",
-        desc = "ai.navi=> chat",
+        desc = "ai:| navi |=> chat",
       },
     },
   },
@@ -801,7 +898,7 @@ return {
           require("explain-it").call_gpt({})
         end,
         mode = "n",
-        desc = "ai.xplain=> explain it",
+        desc = "ai:| xplain |=> explain it",
       },
       {
         key_ai.explain_it.buffer,
@@ -814,7 +911,7 @@ return {
           end)
         end,
         mode = { "n", "v" },
-        desc = "ai.xplain=> explain buffer (supply context)",
+        desc = "ai:| xplain |=> explain buffer (supply context)",
       },
     },
   },
@@ -845,7 +942,7 @@ return {
         key_ai.model.default,
         "<CMD>Model<CR>",
         mode = "n",
-        desc = "ai.llm=> use default llm model",
+        desc = "ai:| llm |=> use default llm model",
       },
       {
         key_ai.model.prompt,
@@ -855,7 +952,7 @@ return {
           end)
         end,
         mode = { "n", "v" },
-        desc = "ai.model=> select and use llm model",
+        desc = "ai:| model |=> select and use llm model",
       },
     },
   },
@@ -876,25 +973,25 @@ return {
         key_ai.backseat.review,
         "<CMD>Backseat<CR>",
         mode = "n",
-        desc = "ai.backseat=> review",
+        desc = "ai:| backseat |=> review",
       },
       {
         key_ai.backseat.ask,
         "<CMD>BackseatAsk<CR>",
         mode = "n",
-        desc = "ai.backseat=> ask",
+        desc = "ai:| backseat |=> ask",
       },
       {
         key_ai.backseat.clear,
         "<CMD>BackseatClear<CR>",
         mode = "n",
-        desc = "ai.backseat=> clear ai notes",
+        desc = "ai:| backseat |=> clear ai notes",
       },
       {
         key_ai.backseat.clearline,
         "<CMD>BackseatClearLine<CR>",
         mode = "n",
-        desc = "ai.backseat=> clear line's ai notes",
+        desc = "ai:| backseat |=> clear line's ai notes",
       },
     },
   },
@@ -916,7 +1013,7 @@ return {
           require("wtf").ai()
         end,
         mode = { "n" },
-        desc = "ai.wtf=> debug diagnostic",
+        desc = "ai:| wtf |=> debug diagnostic",
       },
       {
         key_ai.wtf.search,
@@ -924,7 +1021,7 @@ return {
           require("wtf").search()
         end,
         mode = { "n" },
-        desc = "ai.wtf=> google diagnostic",
+        desc = "ai:| wtf |=> google diagnostic",
       },
     },
   },
@@ -945,25 +1042,25 @@ return {
         key_ai.prompter.replace,
         "<CMD>PrompterReplace<CR>",
         mode = "n",
-        desc = "ai.prompt=> replace prompt",
+        desc = "ai:| prompt |=> replace prompt",
       },
       {
         key_ai.prompter.edit,
         "<CMD>PrompterEdit<CR>",
         mode = "n",
-        desc = "ai.prompt=> edit prompt",
+        desc = "ai:| prompt |=> edit prompt",
       },
       {
         key_ai.prompter.continue,
         "<CMD>PrompterContinue<CR>",
         mode = "n",
-        desc = "ai.prompt=> continue prompt",
+        desc = "ai:| prompt |=> continue prompt",
       },
       {
         key_ai.prompter.browser,
         "<CMD>PrompterBrowser<CR>",
         mode = "n",
-        desc = "ai.prompt=> browser prompt",
+        desc = "ai:| prompt |=> browser prompt",
       },
     },
   },
@@ -984,19 +1081,19 @@ return {
         key_ai.aider.noauto,
         "<CMD>lua AiderOpen(AIDER_NO_AUTO_COMMITS=1, 'editor')<CR>",
         mode = "n",
-        desc = "ai.aider=> no auto commits",
+        desc = "ai:| aider |=> no auto commits",
       },
       {
         key_ai.aider.float,
         "<CMD>lua AiderOpen()<CR>",
         mode = "n",
-        desc = "ai.aider=> floating window",
+        desc = "ai:| aider |=> floating window",
       },
       {
         key_ai.aider.three,
         "<CMD>lua AiderOpen(AIDER_NO_AUTO_COMMITS=1 aider -3, 'editor')<CR>",
         mode = "n",
-        desc = "ai.aider=> model 3.5",
+        desc = "ai:| aider |=> model 3.5",
       },
     },
   },
@@ -1005,46 +1102,43 @@ return {
     enabled = enb.gptnvim.enable,
     config = function(_, opts)
       require("gpt").setup(opts)
-      local kopts = function(op)
-        return vim.tbl_deep_extend(
-          "force",
-          { silent = false, noremap = true },
-          op
-        )
-      end
-      vim.keymap.set(
-        "v",
-        key_ai.gptnvim.replace,
-        require("gpt").replace,
-        kopts({ desc = "ai.gpt=> replace selected" })
-      )
-      vim.keymap.set(
-        "v",
-        key_ai.gptnvim.visual_prompt,
-        require("gpt").visual_prompt,
-        kopts({ desc = "ai.gpt=> visual prompt" })
-      )
-      -- vim.keymap.set(
-      --   "i",
-      --   kenv.gptnvim.prompt,
-      --   require("gpt").prompt,
-      --   kopts({ desc = "ai.gpt=> prompt" })
-      -- )
-      vim.keymap.set(
-        "n",
-        key_ai.gptnvim.cancel,
-        require("gpt").cancel,
-        kopts({ desc = "ai.gpt=> cancel" })
-      )
-      vim.keymap.set(
-        "n",
-        key_ai.gptnvim.prompt,
-        require("gpt").prompt,
-        kopts({ desc = "ai.gpt=> prompt" })
-      )
     end,
     opts = {
-      api_key = vim.env.OPENAI_API_KEY,
+      api_key = os.getenv("OPENAI_API_KEY"),
+    },
+    keys = {
+      {
+        key_ai.gptnvim.replace,
+        function()
+          require("gpt").replace()
+        end,
+        mode = "v",
+        desc = "ai:| gpt |=> replace",
+      },
+      {
+        key_ai.gptnvim.visual_prompt,
+        function()
+          require("gpt").visual_prompt()
+        end,
+        mode = "v",
+        desc = "ai:| gpt |=> prompt",
+      },
+      {
+        key_ai.gptnvim.prompt,
+        function()
+          require("gpt").prompt()
+        end,
+        mode = "n",
+        desc = "ai:| gpt |=> prompt",
+      },
+      {
+        key_ai.gptnvim.cancel,
+        function()
+          require("gpt").cancel()
+        end,
+        mode = "n",
+        desc = "ai:| gpt |=> cancel",
+      },
     },
   },
   {
@@ -1061,7 +1155,7 @@ return {
           require("nvim-llama").interactive_llama()
         end,
         mode = "n",
-        desc = "ai.llama=> open",
+        desc = "ai:| llama |=> open",
       },
     },
   },
@@ -1079,7 +1173,7 @@ return {
           require("ollero").open()
         end,
         mode = "n",
-        desc = "ai.ollero=> open",
+        desc = "ai:| ollero |=> open",
       },
       {
         key_ai.ollero.open,
@@ -1087,7 +1181,7 @@ return {
           require("ollero").list_llms()
         end,
         mode = "n",
-        desc = "ai.ollero=> open",
+        desc = "ai:| ollero |=> open",
       },
     },
   },
@@ -1099,19 +1193,29 @@ return {
       require("gen").setup(opts)
     end,
     opts = {
-      debugCommand = true,
+      debug = true,
       display_mode = "float",
       show_prompt = true,
       show_model = true,
       no_auto_close = true,
-      no_serve = false,
+      init = function(options)
+        pcall(io.popen, "ollama serve > /dev/null 2>&1 &")
+      end,
     },
     keys = {
       {
         key_ai.gen.gen,
-        "<CMD>Gen<CR>",
+        function()
+          vim.ui.select(
+            vim.tbl_keys(require("gen").prompts),
+            { prompt = "llm prompt: ", format_item = tostring },
+            function(sel)
+              vim.cmd(([[Gen %s]]):format(sel))
+            end
+          )
+        end,
         mode = { "n", "v" },
-        desc = "ai.gen=> text generation",
+        desc = "ai:| gen |=> text generation",
       },
       {
         key_ai.gen.prompts,
@@ -1119,7 +1223,7 @@ return {
           vim.notify(vim.inspect(require("gen").prompts))
         end,
         mode = { "n", "v" },
-        desc = "ai.gen=> text generation",
+        desc = "ai:| gen |=> text generation",
       },
       {
         key_ai.gen.model,
@@ -1127,7 +1231,7 @@ return {
           require("gen").select_model()
         end,
         mode = { "n", "v" },
-        desc = "ai.gen=> text generation",
+        desc = "ai:| gen |=> text generation",
       },
     },
   },
@@ -1140,25 +1244,25 @@ return {
         {
           "[z",
           "<Plug>JumpDiffCharPrevStart",
-          desc = "Previous diff",
+          desc = "diff:| char |=> previous",
           silent = true,
         },
         {
           "]z",
           "<Plug>JumpDiffCharNextStart",
-          desc = "Next diff",
+          desc = "diff:| char |=> previous",
           silent = true,
         },
         {
           "do",
           "<Plug>GetDiffCharPair",
-          desc = "Obtain diff",
+          desc = "diff:| char |=> get",
           silent = true,
         },
         {
           "dp",
           "<Plug>PutDiffCharPair",
-          desc = "Put diff",
+          desc = "diff:| char |=> put",
           silent = true,
         },
       },
@@ -1177,7 +1281,7 @@ return {
         key_ai.dante,
         "<CMD>Dante<CR>",
         mode = { "n", "v" },
-        desc = "ai.dante=> to hell",
+        desc = "ai:| dante |=> to hell",
       },
     },
   },
@@ -1198,9 +1302,148 @@ return {
         "<leader>C;",
         "<CMD>T2CGenerate<CR>",
         mode = "n",
-        desc = "ai.scheme=> new colorscheme",
+        desc = "ai:| scheme |=> new colorscheme",
       },
     },
   },
-  {},
+  {
+    "kiddos/gemini.nvim",
+    enabled = enb.gemini.enable,
+    event = "VeryLazy",
+    opts = function()
+      return {
+        menu_key = "<C-;>",
+        insert_result_key = "<C-y>",
+        hints_delay = 3000,
+        instruction_delay = 2000,
+        menu_prompts = {
+          {
+            name = "Generate Unit Tests",
+            command_name = "GeminiUnitTest",
+            menu = "󰙨 Unit Test",
+            prompt = "Write unit tests for the following code\n",
+          },
+          {
+            name = "Review Code",
+            command_name = "GeminiCodeReview",
+            menu = "󱒅 Code Review",
+            prompt = "Do a thorough code review for the following code.\nProvide detailed explanation and sincere comments.\n",
+          },
+          {
+            name = "Explain Code",
+            command_name = "GeminiCodeExplain",
+            menu = "󱡴 Code Explain",
+            prompt = "Explain the folloiwng code\nProvide the answer in Markdown\n",
+          },
+        },
+
+        hints_prompt = [[
+Instruction: Use 1 or 2 sentences to describe what the following {filetype} function does:
+
+\`\`\`{filetype}
+{code_block}
+\`\`\`
+  ]],
+        instruction_prompt = [[
+Context: filename: \`{filename}\`
+
+Instruction: ***{instruction}***
+
+  ]],
+      }
+    end,
+    config = function(_, opts)
+      require("gemini").setup(opts)
+    end,
+    build = { "pip install -r requirements.txt", ":UpdateRemotePlugins" },
+  },
+  {
+    "archibate/nvim-gpt",
+    enabled = enb.nvim_gpt.enable,
+    cmd = { "GPTOpen", "GPTCode", "GPTWrite", "GPT", "GPTModel" },
+    opts = {
+      model = "gpt-4",
+      params = {
+        ["gpt-3.5-turbo"] = {
+          -- see https://platform.openai.com/docs/api-reference/chat/create
+          temperature = 0.85,
+          top_p = 1,
+          n = 1,
+          presence_penalty = 0,
+          frequency_penalty = 0,
+        },
+        ["gpt-4"] = {
+          -- see https://platform.openai.com/docs/api-reference/chat/create
+          temperature = 0.85,
+          top_p = 1,
+          n = 1,
+          presence_penalty = 0,
+          frequency_penalty = 0,
+          -- same as above
+        },
+        ["gpt-4-32k"] = {
+          -- see https://platform.openai.com/docs/api-reference/chat/create
+          temperature = 0.85,
+          top_p = 1,
+          n = 1,
+          presence_penalty = 0,
+          frequency_penalty = 0,
+          -- same as above
+        },
+        ["google-search"] = {
+          -- see https://pypi.org/project/googlesearch-python
+          num_results = 10,
+          sleep_interval = 0,
+          timeout = 5,
+          lang = "en",
+          format = "# {title}\n{url}\n\n{desc}",
+        },
+      },
+      window_width = 32,
+      window_options = {
+        wrap = true,
+        list = true,
+        cursorline = true,
+        number = false,
+        relativenumber = true,
+      },
+      no_default_keymaps = true,
+      question_templates = [[
+Could you find any possible bugs in this code?
+Write a test for this code.
+Write documentation or API reference for this code.
+Find any potential bugs in this code.
+Write a benchmark for this code. You may want to use the Google Benchmark as framework.
+Rewrite to simplify this code.
+Edit the code to fix the problem.
+How do I fix this error?
+Explain the purpose of this code, step by step.
+Rename the variable and function names to make them more readable.
+Rewrite to make this code more readable and maintainable.
+This line is too long and complex. Could you split it for readability?
+Please reduce duplication by following the Don't Repeat Yourself principle.
+Complete the missing part of code with given context.
+Implement the function based on its calling signature.
+Here is a markdown file that have several links in the format [name](link), please fill the links according to given name. You may want to search the web if you are not sure about the link.
+Help me to think step by step through this code to make improvements.
+Note that you shall only output the plain answer, with no additional text like 'Sure' or 'Here is the result'.
+Please wrap the final answer with triple quotes like ```answer```.
+The answer is wrong, please try again.
+Could you verify this?
+Since the output length is limited. Please omit the unchanged part with ellipses. Only output the changed or newly-added part.
+Please provide multiple different versions of answer for reference.
+Please provide sources for your assertive statements.
+Fix possible grammar issues or typos in my writing.
+Rewrite with better choices of words.
+Translate from Chinese to English, or English to Chinese.
+]],
+    },
+    config = function(_, opts)
+      require("nvim-gpt").setup(opts)
+      require("telescope").load_extension("nvim-gpt")
+    end,
+    dependencies = {
+      { "nvim-telescope/telescope.nvim" },
+    },
+  },
 }

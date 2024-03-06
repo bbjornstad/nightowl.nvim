@@ -51,6 +51,8 @@ env.enabled = env.enablements({
   gen = { env = true, fallback = false },
   dante = { env = true, fallback = false },
   text_to_colorscheme = { env = true, fallback = false },
+  gemini = { env = true, fallback = false },
+  nvim_gpt = { env = true, fallback = false },
 })
 env.status_notify_on_startup = false
 
