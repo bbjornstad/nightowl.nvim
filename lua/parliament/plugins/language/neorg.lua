@@ -71,15 +71,26 @@ return {
       },
       "lukas-reineke/headlines.nvim",
       { "madskjeldgaard/neorg-figlet-module", optional = true },
-      { "pysan3/neorg-templates", optional = true },
+      {
+        "pysan3/neorg-templates",
+        dependencies = { "L3MON4D3/LuaSnip" },
+        optional = true,
+      },
       { "tamton-aquib/neorg-jupyter", optional = true },
       { "laher/neorg-exec", optional = true },
+      { "phenax/neorg-timelog", optional = true },
+      { "Jarvismkennedy/neorg-roam.nvim", optional = true },
+      {
+        "pritchett/neorg-capture",
+        dependencies = { "pysan3/neorg-templates" },
+        optional = true,
+      },
     },
     cmd = "Neorg",
     ft = { "norg" },
+    build = ":Neorg sync-parsers",
     config = function(_, opts)
       require("neorg").setup(opts)
-      vim.cmd([[Neorg sync-parsers]])
     end,
     opts = {
       load = {
@@ -287,6 +298,37 @@ return {
             neorg_leader = key_norg:leader(),
           },
         },
+        ["core.integrations.roam"] = {
+          config = {
+            keymaps = {
+              -- select_prompt is used to to create new note / capture from the prompt directly
+              -- instead of the telescope choice.
+              select_prompt = "<C-Y>",
+              insert_link = "<localleader>ni",
+              find_note = "<localleader>nf",
+              capture_note = "<localleader>ncn",
+              capture_index = "<localleader>nci",
+              capture_cancel = "<C-c>",
+              capture_save = "<localleader>bw",
+            },
+          },
+          theme = "ivy",
+          capture_templates = {
+            {
+              name = "default",
+              file = "${title}",
+              lines = { "" },
+            },
+          },
+          substitutions = {
+            title = function(metadata)
+              return metadata.title
+            end,
+            date = function(metadata)
+              return os.date("%Y-%m-%d")
+            end,
+          },
+        },
         ["external.templates"] = {
           config = {
             snippets_overwrite = {
@@ -297,6 +339,87 @@ return {
               "templates",
               "neorg-templates"
             ),
+          },
+        },
+        ["external.timelog"] = {
+          config = {
+            time_format = "%Y-%m-%d %H:%M",
+          },
+        },
+        ["external.capture"] = {
+          config = {
+            templates = {
+              {
+                description = "antifleet: TODO (standard priority)",
+                name = "fleet-TODO-standard",
+                file = function()
+                  return string.format("fleet-items_%s", os.date("%mm%YYYY"))
+                end,
+                datetree = true,
+                headline = "priority: standard",
+                path = { "preclusion: todo" },
+              },
+              {
+                description = "antifleet: TODO (recurring)",
+                name = "fleet-TODO-recurring",
+                file = function()
+                  return string.format("fleet-items_%s", os.date("%mm%YYYY"))
+                end,
+                datetree = true,
+                headline = "recurring",
+                path = { "preclusion: todo" },
+              },
+              {
+                description = "antifleet: TODO (high priority)",
+                name = "fleet-TODO-high",
+                file = function()
+                  return string.format("fleet-items_%s", os.date("%mm%YYYY"))
+                end,
+                datetree = true,
+                headline = "priority: high",
+                path = { "preclusion: todo" },
+              },
+              {
+                description = "antifleet: TODO (low priority)",
+                name = "fleet-TODO-low",
+                file = function()
+                  return string.format("fleet-items_%s", os.date("%mm%YYYY"))
+                end,
+                datetree = true,
+                headline = "priority: low",
+                path = { "preclusion: todo" },
+              },
+              {
+                description = "antifleet: NOTE (reflective)",
+                name = "fleet-NOTE-reflective",
+                file = function()
+                  return string.format("fleet-items_%s", os.date("%mm%YYYY"))
+                end,
+                datetree = true,
+                headline = "reflective",
+                path = { "flightlog: notes" },
+              },
+              {
+                description = "antifleet: NOTE (observation)",
+                name = "fleet-NOTE-observation",
+                file = function()
+                  return string.format("fleet-items_%s", os.date("%mm%YYYY"))
+                end,
+                datetree = true,
+                headline = "observation",
+                path = { "flightlog: notes" },
+              },
+              {
+                description = "antifleet: NOTE (meta)",
+                name = "fleet-NOTE-meta",
+                file = function()
+                  return string.format("fleet-items_%s", os.date("%mm%YYYY"))
+                end,
+                datetree = true,
+                headline = "meta",
+                path = { "flightlog: notes" },
+              },
+            },
           },
         },
       },
@@ -350,10 +473,29 @@ return {
         mode = "n",
         desc = "norg:| note |=> new",
       },
+      {
+        key_norg.notes.capture.todo.low,
+        function()
+          vim.cmd([[Neorg capture fleet-TODO-low]])
+        end,
+        mode = "n",
+        desc = "norg:todo| capt |=> low priority",
+      },
+      {
+        key_norg.journal.custom,
+        function()
+          vim.cmd([[Neorg journal custom]])
+        end,
+        mode = "n",
+        desc = "norg:| jrnl |=> select date",
+      },
     },
   },
   { "madskjeldgaard/neorg-figlet-module", ft = "norg" },
   { "pysan3/neorg-templates", ft = "norg" },
   { "tamton-aquib/neorg-jupyter", ft = "norg" },
   { "laher/neorg-exec", ft = "norg" },
+  { "phenax/neorg-timelog", ft = "norg" },
+  { "Jarvismkennedy/neorg-roam.nvim", ft = "norg" },
+  { "pritchett/neorg-capture", ft = "norg" },
 }
