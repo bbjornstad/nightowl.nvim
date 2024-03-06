@@ -1,5 +1,4 @@
 local kenv = require("environment.keys")
-local key_yaml = kenv.lang.yaml
 local lsp = require("funsak.lsp")
 
 local toggle_fmtoption = require("parliament.utils.text").toggle_fmtopt
@@ -71,15 +70,5 @@ return {
       toggle_fmtoption("l")
       vim.opt.formatoptions:append("o")
     end,
-    keys = {
-      {
-        key_yaml.schema,
-        function()
-          require("yaml-companion").open_ui_select()
-        end,
-        mode = "n",
-        desc = "schema=> yaml schema",
-      },
-    },
   },
 }
