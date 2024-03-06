@@ -1,4 +1,5 @@
 -- SPDX-FileCopyrightText: 2024 Bailey Bjornstad | ursa-major <bailey@bjornstad.dev>
+-- vim: set ft=lua:
 -- SPDX-License-Identifier: MIT
 
 -- MIT License
@@ -74,8 +75,15 @@ local keygroup = require("funsak.keys.group").keygroup
 local leader_shortcut = false
 kenv.shortcut = keygroup({
   diagnostics = {
-    go = { next = "]d", previous = "[d" },
-    breakpoint = { next = "]k", previous = "[k", stopped = "]K" },
+    go = {
+      next = "]d",
+      previous = "[d",
+    },
+    breakpoint = {
+      next = "]k",
+      previous = "[k",
+      stopped = "]K",
+    },
   },
   history = { command = "q:" },
   operations = {
@@ -111,6 +119,7 @@ kenv.shortcut = keygroup({
         git = "g",
         remote = "r",
       },
+      yazi = "z",
     },
     grep = { live = "/" },
     files = {
@@ -128,14 +137,26 @@ kenv.shortcut = keygroup({
     down = "<C-j>",
     up = "<C-k>",
   },
-  buffers = { [LEADER_ID] = { append = "<leader>b" }, fuzz = "b", scope = "z" },
-  weather = { [LEADER_ID] = { append = "<leader>" }, open = "W" },
+  buffers = {
+    [LEADER_ID] = { append = "<leader>b" },
+    fuzz = "b",
+    scope = "z",
+  },
+  weather = {
+    [LEADER_ID] = { append = "<leader>" },
+    open = "W",
+  },
 }, leader_shortcut, {})
 
 kenv.treesitter = keygroup({
   modules = {
     [LEADER_ID] = { append = "gt" },
-    textsubjects = { smart = "t", outer = "o", inner = "i", previous = "p" },
+    textsubjects = {
+      smart = "t",
+      outer = "o",
+      inner = "i",
+      previous = "p",
+    },
   },
 }, false, {})
 
@@ -151,26 +172,43 @@ kenv.buffer = keygroup({
   force_quit = "Q",
   write_quit = "W",
   delete = "d",
+  delete_others = "r",
   force_delete = "D",
+  force_delete_others = "R",
   telescope = { scope = "B" },
   jabs = "j",
   hbac = {
     [LEADER_ID] = { append = "a" },
-    pin = { toggle = "p", unpin_all = "u", close_unpinned = "c", all = "P" },
+    pin = {
+      toggle = "p",
+      unpin_all = "u",
+      close_unpinned = "c",
+      all = "P",
+    },
     telescope = "t",
   },
 }, leader_buffer, {})
 
 local leader_window = "<leader>w"
 kenv.window = keygroup({
-  ventana = { transpose = "t", shift = "s", linear_shift = "S" },
+  ventana = {
+    transpose = "t",
+    shift = "s",
+    linear_shift = "S",
+  },
   goto_led = {
     left = "<Left>",
     right = "<Right>",
     up = "<Up>",
     down = "<Down>",
   },
-  focus = { maximize = "z", split = { cycle = "c", direction = "s" } },
+  focus = {
+    maximize = "z",
+    split = {
+      cycle = "c",
+      direction = "s",
+    },
+  },
   accordian = "a",
   windows = {
     maximize = "z",
@@ -200,11 +238,22 @@ kenv.motion = keygroup({
       select = "s",
       quickfix = "q",
       reset = "d",
-      cycle = { backward = "C", forward = "c" },
+      cycle = {
+        backward = "C",
+        forward = "c",
+      },
       list_tags = "T",
     },
-    quickfix = { [LEADER_ID] = { append = "q" }, forward = "f", backward = "b" },
-    jumplist = { [LEADER_ID] = { append = "j" }, forward = "f", backward = "b" },
+    quickfix = {
+      [LEADER_ID] = { append = "q" },
+      forward = "f",
+      backward = "b",
+    },
+    jumplist = {
+      [LEADER_ID] = { append = "j" },
+      forward = "f",
+      backward = "b",
+    },
     harpoon = {
       [LEADER_ID] = { append = "h" },
       forward = "f",
@@ -216,7 +265,11 @@ kenv.motion = keygroup({
       },
       add_file = "h",
       quick_menu = "q",
-      term = { to = "t", send = "s", menu = "M" },
+      term = {
+        to = "t",
+        send = "s",
+        menu = "M",
+      },
     },
   },
   standard = {
@@ -230,18 +283,33 @@ kenv.motion = keygroup({
       select = "s",
       quickfix = "q",
       reset = "d",
-      cycle = { backward = "C", forward = "c" },
+      cycle = {
+        backward = "C",
+        forward = "c",
+      },
       list_tags = "T",
     },
     portal = {
       [LEADER_ID] = { append = "o" },
-      changelist = { forward = "c", backward = "C" },
-      grapple = { forward = "g", backward = "G" },
-      quickfix = { forward = "q", backward = "Q" },
-      jumplist = { forward = "j", backward = "j" },
+      changelist = {
+        forward = "c",
+        backward = "C",
+      },
+      grapple = {
+        forward = "g",
+        backward = "G",
+      },
+      quickfix = {
+        forward = "q",
+        backward = "Q",
+      },
+      jumplist = {
+        forward = "j",
+        backward = "j",
+      },
     },
     harpoon = {
-      [LEADER_ID] = { append = "h" },
+      [LEADER_ID] = { append = "H" },
       nav = { next = "n", previous = "p", file = "f" },
       add_file = "h",
       quick_menu = "m",
@@ -249,6 +317,31 @@ kenv.motion = keygroup({
     },
   },
 }, false, {})
+
+local leader_bracket = false
+kenv.bracket = keygroup({
+  todo = {
+    [LEADER_ID] = { append = "t" },
+  },
+  diagtrouble = {
+    [LEADER_ID] = { append = "x" },
+    error = {
+      [LEADER_ID] = { append = "e" },
+    },
+    warning = {
+      [LEADER_ID] = { append = "w" },
+    },
+    info = {
+      [LEADER_ID] = { append = "i" },
+    },
+    hint = {
+      [LEADER_ID] = { append = "h" },
+    },
+    general = {
+      [LEADER_ID] = { append = "x" },
+    },
+  },
+}, leader_bracket, {})
 
 local leader_lazy = "<leader>L"
 kenv.lazy = keygroup({
@@ -272,7 +365,11 @@ kenv.lazy = keygroup({
 
 local leader_fm = "<leader>f"
 kenv.fm = keygroup({
-  fs = { find_files = "f", recent_files = "r", new = "e" },
+  fs = {
+    find_files = "f",
+    recent_files = "r",
+    new = "e",
+  },
   oil = {
     [LEADER_ID] = { append = "o" },
     open_float = "o",
@@ -287,11 +384,20 @@ kenv.fm = keygroup({
   },
   broot = {
     [LEADER_ID] = { append = "t" },
-    working_dir = "o",
-    current_dir = "O",
+    working_dir = "t",
+    current_dir = "c",
+    git_root = "g",
   },
-  bolt = { [LEADER_ID] = { append = "l" }, open_root = "o", open_cwd = "O" },
-  memento = { [LEADER_ID] = { append = "m" }, toggle = "m", clear = "c" },
+  bolt = {
+    [LEADER_ID] = { append = "l" },
+    open_root = "o",
+    open_cwd = "O",
+  },
+  memento = {
+    [LEADER_ID] = { append = "m" },
+    toggle = "m",
+    clear = "c",
+  },
   attempt = {
     [LEADER_ID] = { append = "s" },
     new_select = "n",
@@ -315,6 +421,13 @@ kenv.fm = keygroup({
     tab = "<tab>",
     change_manager = "m",
   },
+  yazi = {
+    [LEADER_ID] = { append = "z" },
+    global_working_dir = "g",
+    working_dir = "Z",
+    current_file_dir = "c",
+    select_dir = "z",
+  },
 }, leader_fm, {})
 
 local leader_code = "<leader>c"
@@ -329,7 +442,7 @@ kenv.lsp = keygroup({
     references = "r",
     signature_help = "K",
     glance = {
-      [LEADER_ID] = { append = "l" },
+      [LEADER_ID] = { append = "L" },
       definition = "d",
       declaration = "D",
       implementation = "i",
@@ -343,11 +456,10 @@ kenv.lsp = keygroup({
     workspace = "D",
     buffer = "d",
   },
-  auxiliary = {
-    [LEADER_ID] = { append = leader_code },
+  action = {
+    [LEADER_ID] = { append = leader_code .. "a" },
     rename = "r",
     format = {
-      [LEADER_ID] = { append = "f" },
       zero = "F",
       default = "f",
       pick = "p",
@@ -358,7 +470,11 @@ kenv.lsp = keygroup({
     code_action = "a",
     open_float = "d",
     output_panel = "p",
-    toggle = { [LEADER_ID] = { append = "t" }, server = "s", nullls = "n" },
+    toggle = {
+      [LEADER_ID] = { append = "t" },
+      server = "s",
+      nullls = "n",
+    },
     rules = { ignore = "I", lookup = "L" },
     info = "i",
     log = "g",
@@ -374,9 +490,14 @@ kenv.lsp = keygroup({
     incoming = "n",
     outgoing = "o",
   },
+  clh = {
+    [LEADER_ID] = { append = leader_code .. "h" },
+    regrun = "h",
+  },
+  mason = leader_code .. "m",
+  venv = leader_code .. "v",
+  cmp = leader_code .. "x",
 }, false, {})
-
-kenv.code = keygroup({ mason = "m", venv = "v", cmp = "x" }, leader_code, {})
 
 local leader_trouble = "<leader>x"
 kenv.diagnostic = keygroup({
@@ -388,52 +509,166 @@ kenv.diagnostic = keygroup({
   lsp_references = "r",
 }, leader_trouble, {})
 
-local leader_lang = "`"
+local leader_lang = "'"
 kenv.lang = keygroup({
-  yaml = { schema = "y" },
-  python = { fstring_toggle = "f" },
+  yaml = {
+    [LEADER_ID] = leader_lang,
+    schema = "y",
+  },
+  python = {
+    [LEADER_ID] = { append = leader_lang },
+    fstring_toggle = "f",
+  },
   api = {
-    [LEADER_ID] = { append = "a" },
-    endpoint = { go = "g", recents = "r", list = "a" },
+    [LEADER_ID] = { append = leader_lang .. "a" },
+    endpoint = {
+      go = "g",
+      recents = "r",
+      list = "a",
+    },
     refresh = "r",
     select = "s",
     select_env = "e",
     remote_env = "R",
   },
-}, leader_lang, {})
+  rust = {
+    led = {
+      [LEADER_ID] = { append = leader_lang },
+      debuggable = "d",
+      diagnostic = {
+        [LEADER_ID] = { append = "x" },
+        explain = "x",
+        render = "r",
+        fly_check = "f",
+      },
+      runnable = "r",
+      testable = "t",
+      macros = {
+        [LEADER_ID] = { append = "m" },
+        expand = "m",
+        rebuild = "r",
+      },
+      action = {
+        [LEADER_ID] = { append = "a" },
+        grouped = "a",
+        hover = "A",
+      },
+      crates = {
+        open_cargo = "c",
+        graph = "g",
+      },
+      parent = "p",
+      symbol = {
+        workspace = "y",
+        workspace_filtered = "f",
+      },
+      join_lines = "j",
+      search = {
+        [LEADER_ID] = { append = "s" },
+        replace = "r",
+      },
+      view = {
+        [LEADER_ID] = { append = "v" },
+        syntax_tree = "s",
+        item_tree = "i",
+        hir = "h",
+        mir = "m",
+        unpretty = {
+          hir = "H",
+          mir = "M",
+        },
+        memory_layout = "r",
+      },
+      docs = {
+        view = "D",
+      },
+    },
+    unled = {
+      move = {
+        up = "<C-S-u>",
+        down = "<C-S-d>",
+      },
+      hover = "K",
+    },
+  },
+}, false, {})
 
 local leader_ui = "<leader>u"
 kenv.ui = keygroup({
-  color = "k",
+  color = {
+    [LEADER_ID] = { append = "C" },
+    pineapple = "C",
+  },
   easyread = "B",
   block = "b",
   signs = {
     [LEADER_ID] = { append = "s" },
-    actions = { toggle = "a", toggle_label = "A" },
+    actions = {
+      toggle = "a",
+      toggle_label = "A",
+    },
   },
   spelling = "z",
   bionic = "B",
-  numbers = { [LEADER_ID] = { append = "n" }, line = "l", relative = "r" },
+  numbers = {
+    [LEADER_ID] = { append = "n" },
+    line = "n",
+    relative = "r",
+  },
   pairs = "p",
   wrap = "w",
   diagnostics = {
     [LEADER_ID] = { append = "d" },
-    toggle = "t",
+    toggle = "d",
     toggle_lines = "l",
+    corn = {
+      [LEADER_ID] = { append = "c" },
+      toggle = "C",
+      file = "f",
+      line = "l",
+      cycle = "c",
+    },
   },
-  matchparen = { [LEADER_ID] = { append = "m" }, enable = "m", disable = "d" },
+  matchparen = {
+    [LEADER_ID] = { append = "m" },
+    enable = "m",
+    disable = "d",
+  },
   focus = "f",
+  hlslens = "e",
+  eyeliner = "F",
+  conceal = "c",
+  inlay_hints = "h",
+  centerscroll = "R",
+  treesitter = "T",
 }, leader_ui, {})
 
 local leader_color = "<leader>C"
 kenv.color = keygroup({
-  pick = { ccc = "c", tils = "t" },
-  darken = "d",
-  lighten = "l",
-  greyscale = "g",
-  list = "L",
-  convert = "v",
-  inline_hl = { toggle = "C", disable = "q", enable = "o" },
+  pick = "C",
+  darken = "D",
+  lighten = "L",
+  greyscale = "G",
+  list = "l",
+  convert = {
+    [LEADER_ID] = "V",
+    select = "V",
+    hex = "X",
+    hsl = "S",
+    rgb = "R",
+    rgba = "A",
+    eightbit = "E",
+    oklab = "L",
+    okhsl = "S",
+    oklch = "H",
+  },
+  inline_hl = {
+    toggle = "c",
+    detach = "d",
+    attach = "a",
+    reload = "r",
+  },
+  interactive = "I",
 }, leader_color, {})
 
 -- TODO: fix this mapping...generally maybe just rework this again.
@@ -500,8 +735,16 @@ kenv.build = keygroup({
     close = "q",
     toggle = "v",
     task = { new = "n", list = "l" },
-    bundle = { list = "b", load = "L", delete = "d" },
-    run = { [LEADER_ID] = { append = "r" }, template = "r", action = "a" },
+    bundle = {
+      list = "b",
+      load = "L",
+      delete = "d",
+    },
+    run = {
+      [LEADER_ID] = { append = "r" },
+      template = "r",
+      action = "a",
+    },
   },
   runner = {
     [LEADER_ID] = { append = "r" },
@@ -568,16 +811,38 @@ kenv.time = keygroup({
       tomorrow = "t",
       toc = "c",
       templates = "p",
+      custom = "j",
     },
-    notes = { [LEADER_ID] = { append = "n" }, new = "n" },
+    notes = {
+      [LEADER_ID] = { append = "n" },
+      new = "n",
+      capture = {
+        [LEADER_ID] = { append = "c" },
+        todo = {
+          [LEADER_ID] = { append = "t" },
+          high = "h",
+          medium = "m",
+          low = "l",
+          recurring = "r",
+        },
+      },
+    },
     linkable = {
       [LEADER_ID] = { append = "l" },
       find = "f",
       insert = "i",
       file = "e",
     },
-    metagen = { [LEADER_ID] = { append = "m" }, inject = "i", update = "u" },
-    workspace = { [LEADER_ID] = { append = "w" }, default = "d", switch = "w" },
+    metagen = {
+      [LEADER_ID] = { append = "m" },
+      inject = "i",
+      update = "u",
+    },
+    workspace = {
+      [LEADER_ID] = { append = "w" },
+      default = "d",
+      switch = "w",
+    },
     dt = {
       [LEADER_ID] = { append = "d" },
       insert = "t",
@@ -615,6 +880,14 @@ kenv.time = keygroup({
       detach = "d",
     },
   },
+  oogway = {
+    [LEADER_ID] = { append = "o" },
+    sense = "d",
+    wisdom = "w",
+    inspire = "i",
+    all_wisdom = "W",
+    all_inspiration = "I",
+  },
 }, leader_time, {})
 
 local leader_ai = ";"
@@ -643,10 +916,18 @@ kenv.ai = keygroup({
       decline = "d",
       cold = "c",
     },
-    blog = { [LEADER_ID] = { append = "s" }, new = "o", existing = "t" },
+    blog = {
+      [LEADER_ID] = { append = "s" },
+      new = "o",
+      existing = "t",
+    },
   },
   cmp_ai = "a",
-  llm = { [LEADER_ID] = { append = "h" }, toggle = "h", oneshot = "s" },
+  llm = {
+    [LEADER_ID] = { append = "h" },
+    toggle = "h",
+    oneshot = "s",
+  },
   chatgpt = {
     [LEADER_ID] = { append = "c" },
     open_interface = "g",
@@ -665,7 +946,11 @@ kenv.ai = keygroup({
     explain = "x",
     chat = "c",
   },
-  explain_it = { [LEADER_ID] = { append = "x" }, it = "x", buffer = "X" },
+  explain_it = {
+    [LEADER_ID] = { append = "x" },
+    it = "x",
+    buffer = "X",
+  },
   tabnine = {
     [LEADER_ID] = { append = "9" },
     status = "s",
@@ -675,8 +960,16 @@ kenv.ai = keygroup({
     chat = "c",
   },
   doctor = "d",
-  model = { [LEADER_ID] = { append = "m" }, default = "d", prompt = "m" },
-  wtf = { [LEADER_ID] = { append = "w" }, debug = "w", search = "s" },
+  model = {
+    [LEADER_ID] = { append = "m" },
+    default = "d",
+    prompt = "m",
+  },
+  wtf = {
+    [LEADER_ID] = { append = "w" },
+    debug = "w",
+    search = "s",
+  },
   backseat = {
     [LEADER_ID] = { append = "b" },
     review = "b",
@@ -699,7 +992,11 @@ kenv.ai = keygroup({
     cancel = "c",
   },
   llama = "L",
-  ollero = { [LEADER_ID] = { append = "o" }, open = "o", list = "l" },
+  ollero = {
+    [LEADER_ID] = { append = "o" },
+    open = "o",
+    list = "l",
+  },
   aider = {
     [LEADER_ID] = { append = "y" },
     noauto = "o",
@@ -748,7 +1045,11 @@ kenv.repl = keygroup({
   },
   molten = {
     [LEADER_ID] = { append = "m" },
-    evaluate = { line = "l", visual = "e", cell = "r" },
+    evaluate = {
+      line = "l",
+      visual = "e",
+      cell = "r",
+    },
     delete = "d",
     show = "s",
   },
@@ -784,8 +1085,16 @@ kenv.fuzz = keygroup({
     lines = "l",
     all_lines = "L",
   },
-  quickfix = { [LEADER_ID] = { append = "q" }, qf = "f", stack = "F" },
-  loclist = { [LEADER_ID] = { append = "l" }, list = "l", stack = "L" },
+  quickfix = {
+    [LEADER_ID] = { append = "q" },
+    qf = "f",
+    stack = "F",
+  },
+  loclist = {
+    [LEADER_ID] = { append = "l" },
+    list = "l",
+    stack = "L",
+  },
   arguments = "r",
   grep = {
     [LEADER_ID] = { append = "g" },
@@ -831,7 +1140,10 @@ kenv.fuzz = keygroup({
       workspace_live = "l",
     },
     code_actions = "a",
-    calls = { incoming = "i", outgoing = "o" },
+    calls = {
+      incoming = "i",
+      outgoing = "o",
+    },
   },
   diagnostics = {
     [LEADER_ID] = { append = "d" },
@@ -849,9 +1161,21 @@ kenv.fuzz = keygroup({
   resume = "R",
   builtin = "<leader>",
   fzf_profiles = "p",
-  help = { [LEADER_ID] = { append = "h" }, tags = "h", man = "m" },
-  colors = { [LEADER_ID] = { append = "C" }, schemes = "s", highlights = "h" },
-  history = { [LEADER_ID] = { append = "h" }, command = ":", search = "/" },
+  help = {
+    [LEADER_ID] = { append = "h" },
+    tags = "h",
+    man = "m",
+  },
+  colors = {
+    [LEADER_ID] = { append = "C" },
+    schemes = "s",
+    highlights = "h",
+  },
+  history = {
+    [LEADER_ID] = { append = "h" },
+    command = ":",
+    search = "/",
+  },
   tags = {
     [LEADER_ID] = { append = "t" },
     project = "t",
@@ -878,16 +1202,63 @@ kenv.fuzz = keygroup({
   spelling = "z",
 }, leader_fuzz, {})
 
+local leader_tab = "<leader><Tab>"
+kenv.tab = keygroup({}, leader_tab, {})
+
 local leader_mpick = "<leader>M"
-kenv.mpick = keygroup({ registry = "p", cli = "c" }, leader_mpick, {})
+kenv.mpick = keygroup({
+  registry = "p",
+  cli = "c",
+}, leader_mpick, {})
 
 local leader_debug = "<leader>d"
-kenv.debug = keygroup({ adapters = "a", printer = "P" }, leader_debug, {})
+kenv.debug = keygroup({
+  adapters = "a",
+  printer = "P",
+  chainsaw = {
+    [LEADER_ID] = { append = "l" },
+    message = "m",
+    variable = "v",
+    object = "o",
+    assertion = "a",
+    beep = "b",
+    time = "t",
+    debug = "d",
+    remove = "r",
+  },
+  dap = {
+    continue = "c",
+    step_over = "o",
+    step_into = "s",
+    step_out = "S",
+    breakpoint = {
+      toggle = "b",
+      set = "B",
+      log = "l",
+    },
+    repl_open = "e",
+    run_last = "r",
+    hover = "k",
+    preview = "p",
+    frames = "f",
+    scopes = "z",
+  },
+}, leader_debug, {})
 
 local leader_term = "<leader>m"
 kenv.term = keygroup({
-  layout = { vertical = "v", horizontal = "h", float = "f", tabbed = "<tab>" },
-  utiliterm = { broot = "t", weechat = "w", sysz = "s", btop = "b" },
+  layout = {
+    vertical = "v",
+    horizontal = "h",
+    float = "f",
+    tabbed = "<tab>",
+  },
+  utiliterm = {
+    broot = "t",
+    weechat = "w",
+    sysz = "s",
+    btop = "b",
+  },
 }, leader_term, {})
 
 local leader_git = "<leader>g"
@@ -954,7 +1325,28 @@ kenv.git = keygroup({
 }, leader_git, {})
 
 local leader_mail = "<leader>M"
-kenv.mail = keygroup({ himalaya = "m", mountaineer = "M" }, leader_mail, {})
+kenv.mail = keygroup({
+  himalaya = leader_mail,
+  action = {
+    change_folder = "gf",
+    page = {
+      previous = "[p",
+      next = "]p",
+    },
+    read = "<CR>",
+    compose = "C",
+    reply = "rr",
+    reply_all = "ra",
+    forward = "f",
+    download_attachments = "ga",
+    locate = {
+      copy = "gc",
+      move = "gF",
+      delete = "gd",
+    },
+    add_attachment = "gA",
+  },
+}, false, {})
 
 local leader_view = "<leader>v"
 kenv.view = keygroup({
@@ -963,9 +1355,17 @@ kenv.view = keygroup({
     toggle = "a",
     open = "o",
     close = "q",
-    force = { toggle = "A", open = "O", close = "Q" },
+    force = {
+      toggle = "A",
+      open = "O",
+      close = "Q",
+    },
   },
-  symbols_outline = { toggle = "v", open = "o", close = "q" },
+  symbols_outline = {
+    toggle = "v",
+    open = "o",
+    close = "q",
+  },
   undotree = {
     [LEADER_ID] = { append = "u" },
     toggle = "t",
@@ -974,18 +1374,30 @@ kenv.view = keygroup({
   },
   infowindow = "i",
   keyseer = "k",
-  lens = { [LEADER_ID] = { append = "l" }, toggle = "t", on = "o", off = "q" },
+  lens = {
+    [LEADER_ID] = { append = "l" },
+    toggle = "t",
+    on = "o",
+    off = "q",
+  },
   context = {
     [LEADER_ID] = { append = "t" },
     toggle = "t",
     debug = "d",
     biscuits = "b",
   },
-  edgy = { [LEADER_ID] = { append = "e" }, toggle = "e", select = "s" },
+  edgy = {
+    [LEADER_ID] = { append = "e" },
+    toggle = "e",
+    select = "s",
+  },
   diagnostic = {
     [LEADER_ID] = { append = "d" },
     open_float = "d",
-    diaglist = { workspace = "Q", buffer = "q" },
+    diaglist = {
+      workspace = "Q",
+      buffer = "q",
+    },
     lsp_lines = { toggle = "l" },
     error_lens = { toggle = "e" },
   },
@@ -1002,7 +1414,12 @@ kenv.view = keygroup({
 
 local leader_docs = "<leader>D"
 kenv.docs = keygroup({
-  neogen = { generate = "d", class = "c", fn = "f", type = "t" },
+  neogen = {
+    generate = "d",
+    class = "c",
+    fn = "f",
+    type = "t",
+  },
   devdocs = {
     buffer = "B",
     buffer_float = "b",
@@ -1115,6 +1532,7 @@ kenv.scope = keygroup({
   luasnip = "s",
   project = "p",
   zoxide = "z",
+  workspaces = "S",
   dap = {
     [LEADER_ID] = { append = "d" },
     commands = "c",
@@ -1132,16 +1550,32 @@ kenv.scope = keygroup({
   all_recent = "R",
   tasks = "'",
   whaler = "w",
-  glymbol = { [LEADER_ID] = { append = "y" }, symbols = "s", glyph = "g" },
+  glymbol = {
+    [LEADER_ID] = { append = "y" },
+    symbols = "s",
+    glyph = "g",
+  },
   media_files = "X",
   heading = "#",
   neorg = "n",
-  diagnostic = { [LEADER_ID] = { append = "d" }, error_lens = "l" },
+  diagnostic = {
+    [LEADER_ID] = { append = "d" },
+    error_lens = "l",
+  },
+  pineapple = "C",
 }, leader_scope, {})
 
 local leader_editor = "<localleader>"
 kenv.editor = keygroup({
-  notes = { [LEADER_ID] = { append = "n" }, eureka = "n" },
+  notes = {
+    [LEADER_ID] = { append = "n" },
+    eureka = "n",
+    weaver = {
+      [LEADER_ID] = { append = "w" },
+      current_buffer = "w",
+      global = "g",
+    },
+  },
   venn = "v",
   figlet = {
     [LEADER_ID] = { append = "f" },
@@ -1155,7 +1589,10 @@ kenv.editor = keygroup({
     },
   },
   textgen = "t",
-  significant = { [LEADER_ID] = { append = "g" }, start_signs = "s" },
+  significant = {
+    [LEADER_ID] = { append = "g" },
+    start_signs = "s",
+  },
   cbox = {
     [LEADER_ID] = { append = "b" },
     catalog = "b",
@@ -1212,7 +1649,11 @@ kenv.editor = keygroup({
       following = { insert = "f", nospace = "F" },
     },
   },
-  code_shot = "s",
+  silicon = {
+    [LEADER_ID] = { append = "S" },
+    yank = "y",
+    save = "s",
+  },
   modeline = "m",
   licenses = {
     [LEADER_ID] = { append = "c" },
@@ -1276,8 +1717,15 @@ kenv.editor = keygroup({
   },
   wrapping = {
     [LEADER_ID] = { append = "w" },
-    mode = { hard = "h", soft = "s", toggle = "w" },
+    mode = {
+      hard = "h",
+      soft = "s",
+      toggle = "w",
+    },
     log = "l",
+  },
+  workspaces = {
+    [LEADER_ID] = { append = "e" },
   },
 }, leader_editor, {})
 
@@ -1333,24 +1781,38 @@ kenv.macro = keygroup({
 
 local leader_games = "`<leader><bar>"
 kenv.games = keygroup({
-  solitaire = { [LEADER_ID] = { append = "s" }, new = "n", next = "N" },
+  solitaire = {
+    [LEADER_ID] = { append = "s" },
+    new = "n",
+    next = "N",
+  },
   tetris = "t",
   sudoku = "u",
   blackjack = "j",
   nvimesweeper = "w",
   killersheep = "k",
   speedtyper = "y",
+  play2048 = "2",
 }, leader_games, {})
 
 local leader_session = "<leader>p"
-kenv.session = keygroup(
-  { new = "n", update = "u", delete = "d", list = "p" },
-  leader_session,
-  {}
-)
-
-local leader_mc = "<leader>T"
-kenv.multicursor = keygroup({ start = "T" }, leader_mc, {})
+kenv.session = keygroup({
+  new = "N",
+  update = "u",
+  delete = "d",
+  list = "p",
+  workspaces = {
+    add = "n",
+    remove = "x",
+    add_dir = "a",
+    remove_dir = "X",
+    rename = "r",
+    list = "l",
+    list_dirs = "L",
+    sync_dirs = "y",
+    telescope = "z",
+  },
+}, leader_session, {})
 
 local leader_test = "<leader>t"
 kenv.test = keygroup({}, leader_test, {})
