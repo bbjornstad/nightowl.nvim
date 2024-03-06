@@ -1,4 +1,4 @@
-local termlib = require("parliament.utils.term")
+local termlib = require("funsak.terminal")
 
 local mod = {}
 

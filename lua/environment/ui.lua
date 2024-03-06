@@ -1,9 +1,54 @@
 local env = {}
 
+function env.load_scheme(scheme, opts)
+  opts = opts or {}
+  local cs_has_lua, csmod = pcall(require, scheme)
+  local load_ok, load_res
+  if cs_has_lua then
+    load_ok, load_res = pcall(csmod.load)
+  end
+  if not load_ok then
+    if not opts.suppress_warning then
+      require("funsak.lazy").warn(
+        ("Could not load scheme using lua: %s\nmsg: %s\nAttempting to load using vim"):format(
+          scheme,
+          load_res
+        )
+      )
+    end
+    local vload_ok, vload_res =
+      pcall(vim.cmd, ("colorscheme %s"):format(scheme))
+    if not vload_ok then
+      if not opts.suppress_warning then
+        require("funsak.lazy").warn(
+          ("Could not load scheme using vim fallback: %s\nmsg: %s\nAttempting to load using vim"):format(
+            scheme,
+            vload_res
+          )
+        )
+      end
+    end
+  end
+end
+
+local function configer(plugin, op)
+  op = op or {}
+  op.hooks = op.hooks or {}
+  return function(plg, opts)
+    if op.hooks.before then
+      op.hooks.before(plg, opts)
+    end
+    require(plugin).setup(opts)
+    if op.hooks.after then
+      op.hooks.after(plg, opts)
+    end
+  end
+end
+
 local environment_def_scheme = os.getenv("NIGHTOWL_COLORSCHEME")
 env.colorscheme = {
   light = environment_def_scheme or "dawnfox",
-  dark = environment_def_scheme or "nightfox",
+  dark = environment_def_scheme or "kanagawa",
 }
 
 -- UI: Borders
@@ -48,6 +93,8 @@ env.ft_ignore_list = {
   "broot",
   "gundo",
   "NvimTree",
+  "spaceport",
+  "alpha",
 }
 
 env.ft_ignore_list_alt = vim.iter(env.ft_ignore_list):fold({}, function(t, v)
