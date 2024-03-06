@@ -6,15 +6,9 @@ local key_shortcut = kenv.shortcut
 local key_yank = kenv.yank
 local key_fm = kenv.fm
 local mapx = vim.keymap.set
+local fz = require("funsak.fz")
 
-local function fza(target, opts)
-  opts = opts or {}
-  return function()
-    require("fzf-lua")[target]({
-      winopts = { title = "󱈇 query: " .. target },
-    })
-  end
-end
+local fza = fz.fza
 
 --- creates an fzf-window for browsing directories. Provides options for the
 --- scope of the change of directory (tab, buffer, or global)
@@ -22,7 +16,7 @@ end
 local function fzf_dirs(opts)
   local fzf_lua = require("fzf-lua")
   opts = opts or {}
-  opts.title = "󱈇 query: directories"
+  opts.title = "󱈇 fz:dir "
   opts.prompt = vim.uv.cwd() .. ": "
   opts.fn_transform = function(x)
     return fzf_lua.utils.ansi_codes.magenta(x)
@@ -97,28 +91,33 @@ return {
     opts = {
       keymap = {
         builtin = {
-          [key_fuzz:close()] = "abort",
+          ["<C-c>"] = "cancel",
           ["<C-j>"] = "down",
           ["<C-k>"] = "up",
           ["<C-a>"] = "toggle-all",
           ["<C-p>"] = "previous",
           ["<C-n>"] = "next",
-          ["<A-p>"] = "toggle-preview",
-          ["<A-j>"] = "preview-down",
-          ["<A-k>"] = "preview-up",
+          ["<C-v>"] = "toggle-preview",
+          ["<C-f>"] = "preview-down",
+          ["<C-b>"] = "preview-up",
+          ["<C-d>"] = "half-page-down",
+          ["<C-u>"] = "half-page-up",
+          ["<C-s>"] = "toggle-search",
+          ["<C-r>"] = "refresh-preview",
         },
         fzf = {
           -- most of these are free by default if there is no masking key bound
           -- in vim, namely the up and down commands.
-          ["ctrl-p"] = "up",
-          ["ctrl-n"] = "down",
+          ["ctrl-c"] = "cancel",
+          ["ctrl-v"] = "toggle-preview",
+          ["ctrl-f"] = "preview-down",
+          ["ctrl-b"] = "preview-up",
+          ["ctrl-d"] = "half-page-down",
+          ["ctrl-u"] = "half-page-up",
           ["ctrl-a"] = "toggle-all",
-          ["ctrl-j"] = "down",
-          ["ctrl-k"] = "up",
-          ["alt-p"] = "toggle-preview",
-          ["alt-j"] = "preview-down",
-          ["alt-k"] = "preview-up",
-          [string.lower(string.gsub(key_fuzz:close(), "[<>]", ""))] = "abort",
+          ["ctrl-s"] = "toggle-search",
+          ["ctrl-r"] = "refresh-preview",
+          -- [string.lower(string.gsub(key_fuzz:close(), "[<>]", ""))] = "abort",
         },
       },
       fzf_opts = {
@@ -151,14 +150,18 @@ return {
           -- they need this, but apparently it's the case.
           vim.keymap.set("t", "<C-j>", "<C-j>", { buffer = true })
           vim.keymap.set("t", "<C-k>", "<C-k>", { buffer = true })
-          vim.keymap.set("t", "<A-j>", "<A-j>", { buffer = true })
-          vim.keymap.set("t", "<A-k>", "<A-k>", { buffer = true })
+          vim.keymap.set("t", "<c-f>", "<c-f>", { buffer = true })
+          vim.keymap.set("t", "<c-b>", "<c-b>", { buffer = true })
           vim.keymap.set("t", "<C-n>", "<C-n>", { buffer = true })
           vim.keymap.set("t", "<C-p>", "<C-p>", { buffer = true })
           vim.keymap.set("t", "<C-d>", "<C-d>", { buffer = true })
           vim.keymap.set("t", "<C-c>", "<C-c>", { buffer = true })
           vim.keymap.set("t", "<C-q>", "<C-q>", { buffer = true })
           vim.keymap.set("t", "<C-l>", "<C-l>", { buffer = true })
+          vim.keymap.set("t", "<C-s>", "<C-s>", { buffer = true })
+          vim.keymap.set("t", "<C-a>", "<C-a>", { buffer = true })
+          vim.keymap.set("t", "<C-r>", "<C-r>", { buffer = true })
+          vim.keymap.set("t", "<C-v>", "<C-v>", { buffer = true })
           mapx(
             "t",
             key_fuzz:close(),
@@ -699,9 +702,7 @@ return {
       },
       {
         key_shortcut.fm.files.config,
-        function()
-          fza("files", { cwd = vim.fn.stdpath("config") })
-        end,
+        fza("files", { cwd = vim.fs.normalize(vim.fn.stdpath("config")) }),
         mode = "n",
         desc = "::fz:| config |=> files",
       },
