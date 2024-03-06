@@ -62,7 +62,6 @@ return {
   },
   {
     "mrcjkb/rustaceanvim",
-    -- version = "^3",
     ft = { "rust", "rs" },
     config = function(_, opts)
       vim.g.rust_recommended_style = 1
@@ -70,6 +69,9 @@ return {
     end,
     opts = {
       tools = {
+        code_actions = {
+          ui_select_fallback = true,
+        },
         hover_actions = {
           border = env.borders.main,
           auto_focus = true,
@@ -81,5 +83,15 @@ return {
         },
       },
     },
+  },
+  {
+    "nvim-neotest/neotest",
+    opts = function(_, opts)
+      opts = opts or {}
+      opts.adapters = vim.list_extend(
+        opts.adapters or {},
+        { require("rustaceanvim.neotest") }
+      )
+    end,
   },
 }
