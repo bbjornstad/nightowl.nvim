@@ -30,7 +30,7 @@
 ---@license MIT
 
 -- parliament.nvim: A neovim configuration of the highest order, in fact, the
--- prestige here is so great that 
+-- prestige here is so great that
 
 -- we have to be very careful what we include here using a require call. This is
 -- an easy place to accidentally create a circular dependency.
@@ -71,6 +71,7 @@ require("lazy").setup({
   {
     "abeldekat/lazyflex.nvim",
     version = "*",
+    cond = true,
     import = "lazyflex.hook",
     opts = {},
   },
@@ -175,10 +176,17 @@ require("lazy").setup({
   },
 })
 
--- Basic Keymaps
--- =============
+-- ─[ Basic Keymaps ]────────────────────────────────────────────────────
+--  =================
 require("parliament.config.keymaps")
 
--- Basic Autocommands
--- ==================
+-- ─[ Basic Autocommands ]───────────────────────────────────────────────
+--  ======================
 require("parliament.config.autocmds")
+
+-- ─[ Setup Colorscheme ]────────────────────────────────────────────────
+--  =====================
+local loader = uienv.load_scheme
+local bg = os.getenv("NIGHTOWL_BACKGROUND") or "dark"
+vim.opt.background = bg
+loader(uienv.colorscheme[bg], { suppress_warning = false })
