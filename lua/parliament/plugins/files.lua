@@ -1,3 +1,34 @@
+-- SPDX-FileCopyrightText: 2024 Bailey Bjornstad | ursa-major <bailey@bjornstad.dev>
+-- SPDX-License-Identifier: MIT
+
+-- MIT License
+
+--  Copyright (c) 2024 Bailey Bjornstad | ursa-major bailey@bjornstad.dev
+
+-- Permission is hereby granted, free of charge, to any person obtaining a copy
+-- of this software and associated documentation files (the "Software"), to deal
+-- in the Software without restriction, including without limitation the rights
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- copies of the Software, and to permit persons to whom the Software is
+-- furnished to do so, subject to the following conditions:
+
+-- The above copyright notice and this permission notice (including the next
+-- paragraph) shall be included in all copies or substantial portions of the
+-- Software.
+
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+
+---@module "parliament.plugins.files" file manager utility plugin configurations
+---@author Bailey Bjornstad | ursa-major
+---@license MIT
+
+---@diagnostic disable: param-type-mismatch
 local env = require("environment.ui")
 local opt = require("environment.optional")
 
@@ -7,106 +38,28 @@ local key_shortcut = kenv.shortcut
 
 return {
   {
-    "nvim-neo-tree/neo-tree.nvim",
+    "9999years/broot.nvim",
     enabled = true,
-    config = function(_, opts)
-      require("neo-tree").setup(opts)
-    end,
-    keys = {
-      {
-        key_shortcut.fm.explore.tree.fs,
-        "<CMD>Neotree filesystem<CR>",
-        mode = "n",
-        desc = "fm:| tree |=> explore filesystem",
-      },
-      {
-        key_shortcut.fm.explore.tree.git,
-        "<CMD>Neotree git_status<CR>",
-        mode = "n",
-        desc = "fm:| tree |=> explore filesystem",
-      },
-      {
-        key_shortcut.fm.explore.tree.remote,
-        "<CMD>Neotree netman.ui.neo-tree<CR>",
-        mode = "n",
-        desc = "fm:| tree |=> explore filesystem",
-      },
-    },
-    dependencies = {
-      "miversen33/netman.nvim",
-    },
     opts = {
-      sources = {
-        "filesystem",
-        "git_status",
-        "netman.ui.neo-tree",
+      config_files = {
+        vim.fs.normalize(vim.fn.expand("~/.config/broot/conf.hjson")),
+        vim.fs.normalize(vim.fn.expand("~/.config/broot/nvim.hjson")),
       },
-      source_selector = {
-        winbar = true,
-        sources = {
-          {
-            source = "filesystem",
-            display_name = "fs::files",
-          },
-          {
-            source = "git_status",
-            display_name = "git::status",
-          },
-          {
-            source = "netman.ui.neo-tree",
-            display_name = "netfs::files",
-          },
-        },
-      },
-      popup_border_style = env.borders.main,
-      close_if_last_window = true,
-      enable_git_status = true,
-      enable_diagnostics = true,
-      enable_normal_mode_for_inputs = false,
-      default_component_configs = {
-        indent = {
-          padding = 2,
-          indent_marker = "╽",
-          last_indent_marker = "┖",
-        },
-        name = {
-          trailing_slash = true,
-          use_git_status_colors = true,
-        },
-      },
-      window = {
-        width = 24,
-        position = "left",
-      },
-      filesystem = {
-        follow_current_file = {
-          enabled = true,
-          leave_dirs_open = true,
-        },
-        hijack_netrw_behavior = "disabled",
-      },
-      buffers = {
-        follow_current_file = {
-          enabled = true,
-          leave_dirs_open = true,
-        },
-      },
+      create_user_commands = true,
+      default_directory = function()
+        return require("broot.default_directory").git_root() or vim.fn.getcwd()
+      end,
+      broot_binary = "broot",
     },
-  },
-  {
-    "bbjornstad/broot.nvim",
-    enabled = opt.file_managers.broot,
-    opts = {},
-    config = function(_, opts) end,
-    init = function()
-      vim.g.broot_replace_netrw = 0
+    config = function(_, opts)
+      require("broot").setup(opts)
     end,
     keys = {
       {
         key_fm.broot.working_dir,
         function()
-          vim.cmd([[vsplit | wincmd l | vertical resize 24]])
-          vim.cmd([[BrootWorkingDirectory]])
+          -- vim.cmd([[vsplit | wincmd l | vertical resize 24]])
+          require("broot").broot({})
         end,
         mode = "n",
         desc = "fm:| broot |=> cwd",
@@ -114,60 +67,26 @@ return {
       {
         key_fm.broot.current_dir,
         function()
-          vim.cmd([[vsplit | wincmd l | vertical resize 24]])
-          vim.cmd([[BrootCurrentDirectory]])
+          -- vim.cmd([[vsplit | wincmd l | vertical resize 24]])
+          require("broot").broot({
+            directory = require("broot.default_directory").current_file(),
+          })
         end,
         mode = "n",
         desc = "fm:| broot |=> root",
       },
-    },
-  },
-  {
-    "is0n/fm-nvim",
-    enabled = opt.file_managers.fm_nvim,
-    cmd = {
-      -- "Lazygit",
-      "Joshuto",
-      "Ranger",
-      -- "Broot",
-      -- "Gitui",
-      "Xplr",
-      "Vifm",
-      "Skim",
-      -- "Nnn",
-      "Fff",
-      "Twf",
-      -- "Fzf",
-      -- "Fzy",
-      "Lf",
-      "Fm",
-    },
-    opts = {
-      edit_cmd = "edit",
-      ui = {
-        default = "float",
-        float = {
-          border = env.borders.main,
-          float_hl = "Normal",
-          border_hl = "FloatBorder",
-          blend = 20,
-          height = 0.6,
-          width = 0.6,
-        },
-        split = {
-          direction = "topleft",
-          size = 24,
-        },
-      },
-      mappings = {
-        vert_split = "<C-v>",
-        horz_split = "<C-h>",
-        tabedit = "<C-t>",
-        edit = "<C-m>",
-        ESC = "<ESC>",
+      {
+        key_fm.broot.git_root,
+        function()
+          -- vim.cmd([[vsplit | wincmd l | vertical resize 24]])
+          require("broot").broot({
+            directory = require("broot.default_directory").git_root(),
+          })
+        end,
+        mode = "n",
+        desc = "fm:| broot => git root",
       },
     },
-    config = true,
   },
   {
     "stevearc/oil.nvim",
@@ -179,15 +98,18 @@ return {
       vim.g.oil_extended_column_mode = env.oil.init_columns == "extended"
     end,
     opts = {
-      default_file_explorer = false,
+      default_file_explorer = true,
       skip_confirm_for_simple_edits = true,
       prompt_save_on_select_new_entry = true,
       columns = env.oil.init_columns == "succinct" and env.oil.columns.succinct
         or env.oil.columns.extended,
       delete_to_trash = true,
       float = {
-        padding = 4,
+        padding = 3,
         border = env.borders.main,
+        win_options = {
+          winblend = 5,
+        },
       },
       preview = {
         max_width = { 100, 0.8 },
@@ -207,18 +129,16 @@ return {
         },
       },
       keymaps = {
-        ["`"] = "actions.tcd",
-        ["<C-CR>"] = "actions.tcd",
+        ["g."] = "actions.tcd",
         ["<BS>"] = "actions.toggle_hidden",
         ["."] = "actions.toggle_hidden",
         ["-"] = "actions.parent",
         ["_"] = "actions.open_cwd",
         ["q"] = "actions.close",
-        [key_fm.oil:close()] = "actions.close",
-        [".."] = "actions.parent",
+        ["<C-c>"] = "actions.close",
         ["<C-r>"] = "actions.refresh",
         ["<C-p>"] = "actions.preview",
-        ["<C-e>"] = {
+        ["gc"] = {
           callback = function()
             local extended_is_target = vim.b.oil_extended_column_mode
               or vim.g.oil_extended_column_mode
@@ -232,14 +152,22 @@ return {
           desc = "fm:| oil |=> toggle succinct columns",
         },
         ["<C-v>"] = "actions.select_vsplit",
-        ["<C-s>"] = "actions.select_split",
+        ["<C-h>"] = "actions.select_split",
         ["?"] = "actions.show_help",
-        ["<S-CR>"] = "actions.select_vsplit",
         ["<CR>"] = "actions.select",
         ["e"] = "actions.select",
         ["<C-y>"] = "actions.select",
-        ["<C-t>"] = "actions.toggle_trash",
-        ["T"] = "actions.toggle_trash",
+        ["gt"] = "actions.toggle_trash",
+        ["<C-t>"] = "actions.select_tab",
+        ["<C-q>"] = "actions.add_to_qflist",
+        ["<C-l>"] = "actions.add_to_loclist",
+        ["<C-L>"] = "actions.send_to_loclist",
+        ["<C-Q>"] = "actions.send_to_qflist",
+        ["H"] = "actions.parent",
+        ["K"] = "actions.select",
+        ["gx"] = "open_external",
+        ["<C-b>"] = "preview_scroll_up",
+        ["<C-f>"] = "preview_scroll_down",
       },
       view_options = {
         sort = {
@@ -249,6 +177,10 @@ return {
           { "size", "asc" },
         },
       },
+      lsp_file_methods = {
+        timeout_ms = 2000,
+        autosave_changes = true,
+      },
     },
     keys = {
       {
@@ -257,16 +189,20 @@ return {
           return require("oil").open_float()
         end,
         mode = { "n" },
-        desc = "fm:| oil |=> open (float)",
+        desc = "fm:float| oil |=> open",
       },
       {
         key_fm.oil.split,
         function()
-          vim.cmd([[vsplit | wincmd l | vertical resize 24]])
+          local count = 32
+          if vim.v.count > 0 then
+            count = vim.v.count
+          end
+          vim.cmd(([[vsplit | wincmd r | vertical resize %s]]):format(count))
           require("oil").open()
         end,
         mode = "n",
-        desc = "fm:| oil |=> open (split)",
+        desc = "fm:split| oil |=> open",
       },
       {
         key_fm.oil.open,
@@ -282,78 +218,20 @@ return {
           require("oil").open_float()
         end,
         mode = { "n" },
-        desc = "fm:| oil |=> open",
+        desc = "fm:float| oil |=> open",
       },
       {
         key_shortcut.fm.explore.split,
         function()
-          -- local cwd = vim.loop.cwd() or "."
-          vim.cmd([[vsplit | wincmd l | vertical resize 24]])
+          local count = 32
+          if vim.v.count > 0 then
+            count = vim.v.count
+          end
+          vim.cmd(([[vsplit | wincmd r | vertical resize %s]]):format(count))
           require("oil").open()
         end,
         mode = { "n" },
-        desc = "fm:| oil |=> open oil (split)",
-      },
-    },
-  },
-  {
-    "luukvbaal/nnn.nvim",
-    config = true,
-    cmd = { "NnnExplorer", "NnnPicker" },
-    opts = function(_, opts)
-      opts.replace_netrw = opts.replace_netrw or nil
-      opts.quitcd = opts.quitcd or "tcd"
-      opts.explorer = vim.tbl_deep_extend("force", {
-        width = 24,
-        side = "topleft",
-        session = "shared",
-        tabs = true,
-        fullscreen = false,
-      }, opts.explorer or {})
-      opts.picker = vim.tbl_deep_extend("force", {
-        style = {
-          width = 0.12,
-          height = 0.6,
-          border = env.borders.main,
-        },
-      }, opts.picker or {})
-      local builtin = require("nnn").builtin
-      opts.mappings = vim.tbl_deep_extend("force", {
-        { "<C-t>", builtin.open_in_tab }, -- open file(s) in tab
-        { "<C-s>", builtin.open_in_vsplit }, -- open file(s) in split
-        { "<C-v>", builtin.open_in_vsplit }, -- open file(s) in vertical split
-        { "<C-h>", builtin.open_in_split }, -- open file(s) in vertical split
-        { "<C-p>", builtin.open_in_preview }, -- open file in preview split keeping nnn focused
-        { "<C-y>", builtin.copy_to_clipboard }, -- copy file(s) to clipboard
-        { "g.", builtin.cd_to_path }, -- cd to file directory
-        { "<C-CR>", builtin.cd_to_path }, -- cd to file directory
-        { "<A-:>", builtin.populate_cmdline }, -- populate cmdline (:) with file(s)
-      }, opts.mappings or {})
-      opts.auto_close = opts.auto_close ~= nil and opts.auto_close or true
-      opts.auto_open = vim.tbl_deep_extend("force", {
-        tabpage = "picker",
-        empty = "explorer",
-        ft_ignore = env.ft_ignore_list,
-      }, opts.auto_open or {})
-    end,
-    keys = {
-      {
-        key_fm.nnn.explorer,
-        "<CMD>NnnExplorer<CR>",
-        mode = "n",
-        desc = "fm:| nnn |=> explorer",
-      },
-      {
-        key_fm.nnn.explorer_here,
-        "<CMD>NnnExplorer %:p<CR>",
-        mode = "n",
-        desc = "fm:| nnn |=> explorer",
-      },
-      {
-        key_fm.nnn.picker,
-        "<CMD>NnnPicker<CR>",
-        mode = { "n" },
-        desc = "fm:| nnn |=> picker",
+        desc = "fm:split| oil |=> open",
       },
     },
   },
@@ -516,76 +394,81 @@ return {
     },
   },
   {
-    "rolv-apneseth/tfm.nvim",
-    lazy = true,
-    event = "VeryLazy",
-    cmd = { "Tfm", "TfmSplit", "TfmVsplit", "TfmTabedit" },
+    "SR-MyStar/yazi.nvim",
     opts = {
-      file_manager = "yazi",
-      replace_netrw = false,
-      enable_cmds = true,
-      keybindings = {
-        ["<ESC>"] = "q",
+      border = env.borders.main,
+      style = "",
+      title = "󰱂 fm::yazi ",
+      title_pos = "left",
+      pos = "cc",
+      command_args = {
+        open_dir = vim.cmd.edit,
+        open_file = vim.cmd.edit,
       },
-      ui = {
-        border = env.borders.main,
-        height = 0.9,
-        width = 0.32,
-        x = 0,
-        y = 0.8,
+      size = {
+        width = 0.8,
+        height = 0.6,
       },
     },
+    config = function(_, opts)
+      opts = opts or {}
+      if opts.command_args and opts.command_args.open_dir == "oil" then
+        opts.command_args.open_dir = function(path)
+          require("oil").open_float(path)
+        end
+      end
+      require("yazi").setup(opts)
+    end,
+    cmd = "Yazi",
     keys = {
       {
-        key_fm.tfm.open,
+        key_fm.yazi.global_working_dir,
         function()
-          require("tfm").open()
+          require("yazi").open({ cwd = vim.fn.getcwd(-1, -1) })
         end,
         mode = "n",
-        desc = "fm:| tfm |=> open",
+        desc = "fm:| yazi |=> global cwd",
       },
       {
-        key_fm.tfm.hsplit,
+        key_fm.yazi.working_dir,
         function()
-          local tfm = require("tfm")
-          tfm.open(nil, tfm.OPEN_MODE.split)
+          require("yazi").open({ cwd = vim.fn.getcwd(0, 0) })
         end,
         mode = "n",
-        desc = "fm:| tfm |=> hsplit",
+        desc = "fm:| yazi |=> cwd",
       },
       {
-        key_fm.tfm.vsplit,
+        key_fm.yazi.current_file_dir,
         function()
-          local tfm = require("tfm")
-          tfm.open(nil, tfm.OPEN_MODE.vsplit)
+          require("yazi").open({
+            cwd = vim.fs.normalize(vim.fn.expand("%:p:h")),
+          })
         end,
         mode = "n",
-        desc = "fm:| tfm |=> vsplit",
+        desc = "fm:| yazi |=> current file",
       },
       {
-        key_fm.tfm.tab,
+        key_fm.yazi.select_dir,
         function()
-          local tfm = require("tfm")
-          tfm.open(nil, tfm.OPEN_MODE.tabedit)
-        end,
-        mode = "n",
-        desc = "fm:| tfm |=> new tab",
-      },
-      {
-        key_fm.tfm.change_manager,
-        function()
-          local tfm = require("tfm")
-          vim.ui.select(vim.tbl_keys[tfm.FILE_MANAGERS], {
-            prompt = "Choose TFM Backend: ",
-            kind = "TFM File Manager",
-          }, function(sel)
-            if sel ~= "" and tfm.FILE_MANAGERS[sel] ~= nil then
-              tfm.select_file_manager(sel)
+          vim.ui.input(
+            { prompt = "directory: ", default = vim.fn.getcwd(0, 0) },
+            function(sel)
+              require("yazi").open({
+                cwd = vim.fs.normalize(vim.fn.expand(sel)),
+              })
             end
-          end)
+          )
         end,
         mode = "n",
-        desc = "fm:| tfm |=> change backend",
+        desc = "fm:| yazi |=> go to",
+      },
+      {
+        key_shortcut.fm.explore.yazi,
+        function()
+          require("yazi").open({ cwd = vim.fn.getcwd(0, 0) })
+        end,
+        mode = "n",
+        desc = "fm:| yazi |=> cwd",
       },
     },
   },
