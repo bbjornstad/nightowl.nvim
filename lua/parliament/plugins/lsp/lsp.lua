@@ -1,9 +1,10 @@
 local env = require("environment.ui")
 local opt = require("environment.optional")
-local key_code = require("environment.keys").code
 local key_lsp = require("environment.keys").lsp
 local key_sc = require("environment.keys").shortcut
 local mopts = require("funsak.table").mopts
+local colorizer = require("funsak.colors").set_hls
+local colorpick = require("funsak.colors").dvalue
 local lz = require("funsak.lazy")
 
 -- ╓─────────────────────────────────────────────────────────────────────╖
@@ -18,9 +19,9 @@ local lz = require("funsak.lazy")
 
 --- extension of the standard lsp.Client object to hold additional parliament
 --- specific options.
----@class owl.lsp.ServerClient: string
+---@class (exact) owl.lsp.ServerClient: string
 
----@class owl.lsp.ClientConfig: lspconfig.options
+---@class (exact) owl.lsp.ClientConfig: lspconfig.options
 
 ---@alias owl.lsp.EnhancementSpec
 ---| boolean # flag to enable or disable the corresponding enhancement
@@ -35,6 +36,7 @@ local lz = require("funsak.lazy")
 ---@field virtual_types owl.lsp.EnhancementSpec?
 --- enabling flag or options for lsp inlay_hints
 ---@field inlay_hints owl.lsp.EnhancementSpec?
+---@field extra_lens owl.lsp.EnhancementSpec
 
 --- extension of lsp.ConfigurationParams to hold additional parliament
 --- specific options.
@@ -57,32 +59,40 @@ local lz = require("funsak.lazy")
 ---@field log_level vim.log.levels?
 
 -- ─[ LSP setup helpers ]───────────────────────────────────────────────────────
+
+--- generates a function which when called will set up the appropriately
+--- remapped LSP-default keybindings. This is the place where custom keymaps are
+--- implemented in code, even if the implementation here is likely to rely on a
+--- longer-term sequestration of keymaps into a separate file.
+---@param opts vim.api.keyset.keymap? keymapping options table
+---@return fun(client: lsp.Client, bufnr: integer) mapper function that will
+---create the appropriate lsp keybindings.
 local function generate_lsp_keymapper(opts)
   local function lsp_keymapper(client, bufnr)
-    vim.keymap.set("n", key_lsp.auxiliary.format.zero, function()
+    vim.keymap.set("n", key_lsp.action.format.zero, function()
       require("lsp-zero").async_autoformat(client, bufnr, {})
     end, { desc = "lsp:buf| fmt |=> apply zero", buffer = bufnr })
     vim.keymap.set(
       "n",
-      key_lsp.auxiliary.code_action,
+      key_lsp.action.code_action,
       vim.lsp.buf.code_action,
       { desc = "lsp:| act |=> code actions", buffer = bufnr }
     )
     vim.keymap.set(
       "n",
-      key_lsp.auxiliary.rename,
+      key_lsp.action.rename,
       vim.lsp.buf.rename,
       { desc = "lsp:| act |=> rename symb", buffer = bufnr }
     )
     vim.keymap.set(
       "n",
-      key_lsp.auxiliary.info,
+      key_lsp.action.info,
       "<CMD>LspInfo<CR>",
       { desc = "lsp:| info |=> servers", buffer = bufnr }
     )
     vim.keymap.set(
       "n",
-      key_lsp.auxiliary.log,
+      key_lsp.action.log,
       "<CMD>LspLog<CR>",
       { desc = "lsp:| log |=> view", buffer = bufnr }
     )
@@ -150,6 +160,13 @@ local function generate_lsp_keymapper(opts)
   return lsp_keymapper
 end
 
+---@class kopts: { exclude: string[]? }
+
+--- generates a function which, when called, will create keybindings derived
+--- from the default keymappings that lsp-zero offers. This is the place wherein
+--- overrides for the lsp-zero keymaps are implemented.
+---@param opts kopts
+---@return fun(client: lsp.Client, bufnr: integer) mapper
 local function generate_zero_keymapper(opts)
   local function zero_keymaps(client, bufnr)
     local zero = require("lsp-zero")
@@ -161,6 +178,9 @@ local function generate_zero_keymapper(opts)
   return zero_keymaps
 end
 
+--- helper function that wraps up generation of the two keymapper function
+--- factories.
+---@return fun(client: lsp.Client, bufnr: integer), fun(client: lsp.Client, bufnr: integer)
 local function generate_keymappers()
   local zk = lz.opts("lsp-zero.nvim").default_keymaps or {}
   zk = vim.tbl_contains({ "boolean", "table" }, type(zk)) and zk or { zk }
@@ -192,35 +212,61 @@ local function generate_attach_handler(enhancements)
   hints = not vim.tbl_contains({ "table", "boolean" }, type(hints))
       and { hints }
     or hints
+  local extra_lens = enhancements.extra_lens ~= nil and enhancements.extra_lens
+    or true
 
+  local ok, res
   ---@param client lsp.Client
   local function attach_handler(client, bufnr)
     if status and lz.has("lsp-status.nvim") then
-      require("lsp-status").on_attach(client)
+      ok, res = pcall(require("lsp-status").on_attach, client)
+      if not ok then
+        lz.warn(([[
+Failed attaching lsp-status handlers for server %s with result: %s
+Check lanuguage support
+        ]]):format(client, res))
+      end
     end
     if
       vtypes
       and client.supports_method("textDocument/codeLens")
       and lz.has("virtual-types.nvim")
     then
-      require("virtualtypes").on_attach(client, bufnr)
+      ok, res = pcall(require("virtualtypes").on_attach, client, bufnr)
+      if not ok then
+        lz.warn(([[
+Failed attaching virtual types handlers for server %s with result: %s
+Check language support
+        ]]):format(client, res))
+      end
     end
     if hints and client.supports_method("textDocument/inlayHint") then
-      if vim.fn.has("nvim-0.10.0") == 0 and lz.has("lsp-inlayhints.nvim") then
-        require("lsp-inlayhints").on_attach(client, bufnr)
+      -- if vim.fn.has("nvim-0.10.0") == 0 and lz.has("lsp-inlayhints.nvim") then
+      --   require("lsp-inlayhints").on_attach(client, bufnr)
+      -- else
+      -- local ih = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
+      -- local hint_with = ih.enable ~= nil and ih.enable or ih
+      -- ok, res = pcall(hint_with, bufnr, true)
+      ok, res = pcall(require("funsak.toggle").inlay_hints, bufnr, true)
+      if not ok then
+        lz.warn(([[
+      Failed setting inlay hints handlers for server %s with result: %s
+      Check language support
+                ]]):format(client, res))
       else
-        local ih = vim.lsp.inlay_hint.enable ~= nil
-            and vim.lsp.inlay_hint.enable
-          or vim.lsp.inlay_hint
-        local ok, res = pcall(ih, bufnr, true)
-        if not ok then
-          lz.warn(
-            ("Failed to set inlay hints for server: %s\nMessage: %s"):format(
-              client,
-              res
-            )
-          )
-        end
+        lz.info(([[
+      Successfully enabled inlay-hints for server %s
+                ]]):format(client))
+      end
+      -- end
+    end
+    if extra_lens and lz.has("nvim-extra-codelens") then
+      ok, res = pcall(require("extra-codelens").on_attach, client, bufnr)
+      if not ok then
+        lz.warn(([[
+Failed loading extra codelens handlers for server %s with result: %s
+Check language support
+        ]]):format(client, res))
       end
     end
   end
@@ -271,7 +317,7 @@ return {
     },
     keys = {
       {
-        key_code.mason,
+        key_lsp.mason,
         "<CMD>Mason<CR>",
         mode = "n",
         desc = "lsp:| mason |=> info panel",
@@ -314,7 +360,6 @@ return {
       { "nvim-lua/lsp-status.nvim", optional = true },
     },
 
-    ---@param _ LazyPlugin
     ---@param opts owl.lsp.LSPConfigSpec
     config = function(_, opts)
       -- unlike LazyVim, we are using the lsp-zero plugin as the underlying glue
@@ -337,16 +382,24 @@ return {
         )
       end
 
-      local vtypes_opts, status_opts, hint_opts
+      local vtypes_opts, status_opts, hint_opts, lens_opts = {}, {}, {}, {}
       if lz.has("virtual-types.nvim") then
         vtypes_opts = lz.opts("virtual-types.nvim") or {}
       end
       if lz.has("lsp-status.nvim") then
         status_opts = lz.opts("lsp-status.nvim") or {}
       end
-      hint_opts = (vim.fn.has("nvim-0.10.0") and opts.inlay_hints)
-        or (lz.has("lsp-inlayhints.nvim") and lz.opts("lsp-inlayhints.nvim"))
+      ---@diagnostic disable-next-line: cast-local-type
+      hint_opts = (
+        vim.fn.has("nvim-0.10.0")
+          and (type(opts.inlay_hints) ~= "table" and {
+            enabled = opts.inlay_hints,
+          } or opts.inlay_hints)
         or {}
+      )
+      if lz.has("nvim-extra-codelens") then
+        lens_opts = lz.opts("nvim-extra-codelens") or {}
+      end
 
       -- ─[ optional enhancement submodules ]───────────────────────────────────
       -- ====================================
@@ -359,6 +412,7 @@ return {
           or vtypes_opts,
         inlay_hint = hint_opts.enabled ~= nil and hint_opts.enabled
           or hint_opts,
+        lens_opts = lens_opts.enabled ~= nil and lens_opts.enabled or lens_opts,
       }
 
       if enhance.status then
@@ -426,14 +480,6 @@ return {
       -- configuration of language servers. It does so by using a combination of
       -- handler-factories, e.g. factory functions which produce specifically
       -- configured handlers based on the user configurations provided.
-      --
-      -- TODO: we may perhaps want to utilize the fact that lazy.nvim ships with
-      -- a set of utilities (that are not very well covered in docs and seem
-      -- mostly internal) that can manipulate the internal plugin spec object
-      -- that tracks all plugin configurations provided by the user. The current
-      -- methods are more like LazyVim in their spirit, given that we dogpile
-      -- many configuration options for different plugins of the lsp into the
-      -- nvim-lspconfig spec.
       local has_mason, mlspcfg = pcall(require, "mason-lspconfig")
       local mlsp_mapping = {}
       if has_mason then
@@ -576,24 +622,64 @@ return {
       )
     end,
   },
+  -- ─[ extra enhancement plugins ]────────────────────────────────────────
   {
     "jubnzv/virtual-types.nvim",
     config = function(_, opts) end,
     opts = { enabled = true },
     event = "LspAttach",
   },
-  {
-    "lvimuser/lsp-inlayhints.nvim",
-    config = function(_, opts)
-      require("lsp-inlayhints").setup()
-    end,
-    opts = { enabled = true },
-    event = "LspAttach",
-  },
+  -- {
+  --   "lvimuser/lsp-inlayhints.nvim",
+  --   config = function(_, opts)
+  --     require("lsp-inlayhints").setup()
+  --   end,
+  --   opts = { enabled = true },
+  --   event = "LspAttach",
+  -- },
   {
     "nvim-lua/lsp-status.nvim",
     config = function(_, opts) end,
     opts = { enabled = true },
     event = "LspAttach",
+  },
+  {
+    "phenax/nvim-extra-codelens",
+    opts = {},
+    config = function(_, opts)
+      colorizer(
+        { "LspCodeLens" },
+        { fg = colorpick("NightowlContextHints", "fg") }
+      )
+    end,
+    event = "LspAttach",
+  },
+  {
+    "SvSchen/clh.nvim",
+    opts = {
+      history = {
+        maxLength = 5,
+      },
+      ui = {
+        width = 0.8,
+        height = 0.6,
+      },
+    },
+    config = function(_, opts)
+      require("clh").setup(opts)
+      require("telescope").load_extension("clh")
+    end,
+    event = "LspAttach",
+    keys = {
+      {
+        key_lsp.clh.regrun,
+        function()
+          return require("clh").registerAndRunCodeLens()
+            or require("telescope").extensions.clh.selectCodeLens()
+        end,
+        mode = "n",
+        desc = "lsp:| lens |=> register/run/select",
+      },
+    },
   },
 }
