@@ -1,6 +1,5 @@
 ---@diagnostic disable: param-type-mismatch
 local env = require("environment.ui")
-local key_mc = require("environment.keys").multicursor
 local signs = env.icons.cursorsigns
 
 local cb = require("funsak.wrap").cb

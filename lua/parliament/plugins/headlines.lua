@@ -10,6 +10,7 @@ return {
       vim.api.nvim_set_hl(0, "Headline", { link = "NormalFloat" })
     end,
     opts = {
+      bullets = {},
       markdown = {
         headline_highlights = { "Headline" },
       },

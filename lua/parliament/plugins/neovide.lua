@@ -6,11 +6,10 @@ local M = {}
 if vim.g.neovide then
   -- font setup.
   vim.o.guifont = table.concat({
+    "Berkeley Mono Variable",
     "Monaspace\\ Argon",
     "Lilex",
-    "IntelOne\\ Mono",
     "Martian\\ Mono",
-    "Lekton",
     "Fira\\ Mono",
     "JuliaMono",
     "Maple\\ Mono",
