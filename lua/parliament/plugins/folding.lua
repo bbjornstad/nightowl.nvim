@@ -155,7 +155,7 @@ return { -- add folding range to capabilities
       },
       fill_char = "🮦",
 
-      remove_fold_markers = true,
+      remove_fold_markers = false,
 
       -- Keep the indentation of the content of the fold string.
       keep_indentation = true,
