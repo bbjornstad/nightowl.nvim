@@ -107,7 +107,7 @@ return {
         key_git.diffview,
         "<CMD>DiffviewOpen<CR>",
         mode = "n",
-        desc = "::git.diff=> compare",
+        desc = "git:| diff |=> compare",
       },
     },
   },
@@ -121,9 +121,15 @@ return {
       signs = {
         section = { "󰧛", "󰧗" },
         item = { "󰄾", "󰄼" },
-        hunk = { "󰅂", "󰅀" },
+        hunk = { "", "" },
       },
-      integrations = { telescope = true, diffview = true },
+      integrations = { fzf_lua = true, diffview = true },
+      graph_style = "unicode",
+      git_services = {
+        ["github.com"] = "https://github.com/${owner}/${repository}/compare/${branch_name}?expand=1",
+        ["bitbucket.org"] = "https://bitbucket.org/${owner}/${repository}/pull-requests/new?source=${branch_name}&t=1",
+        ["gitlab.com"] = "https://gitlab.com/${owner}/${repository}/merge_requests/new?merge_request[source_branch]=${branch_name}",
+      },
     },
     keys = {
       {
@@ -340,6 +346,184 @@ return {
     opts = {},
     keys = {},
     event = "VeryLazy",
+  },
+  {
+    "natecraddock/workspaces.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    config = function(_, opts)
+      require("workspaces").setup(opts)
+      require("telescope").load_extension("workspaces")
+    end,
+    opts = {
+      path = vim.fn.stdpath("data") .. "/workspaces",
+      cd_type = "tab",
+      auto_open = true,
+    },
+    event = "VeryLazy",
+    cmd = {
+      "WorkspacesAdd",
+      "WorkspacesAddDir",
+      "WorkspacesOpen",
+      "WorkspacesRemove",
+      "WorkspacesRemoveDir",
+      "WorkspacesRename",
+      "WorkspacesList",
+      "WorkspacesListDirs",
+      "WorkspacesSyncDirs",
+    },
+    keys = {
+      {
+        key_session.workspaces.add,
+        function()
+          local thisfile = vim.fn.expand("%", false, false)
+          ---@cast thisfile string
+          local path = vim.fs.normalize(vim.fn.getcwd(0, 0))
+            or vim.fs.dirname(thisfile)
+          vim.ui.input({
+            prompt = "new workspace name: ",
+          }, function(selname)
+            vim.ui.select(
+              vim
+                .iter(vim.fs.dir(path or vim.fn.getcwd(0, 0)))
+                :filter(function(item)
+                  return item.type == "directory"
+                end)
+                :totable(),
+              {
+                prompt = "new workspace path: ",
+                format_item = function(item)
+                  return item.name
+                end,
+              },
+              function(selpath, idx)
+                require("workspaces").add(selpath, selname)
+              end
+            )
+          end)
+        end,
+        mode = "n",
+        desc = "session:| spaces |=> new",
+      },
+      {
+        key_session.workspaces.add_dir,
+        function()
+          local thisfile = vim.fn.expand("%", false, false)
+          ---@cast thisfile string
+          local path = vim.fs.normalize(vim.fn.getcwd(0, 0))
+            or vim.fs.dirname(thisfile)
+          vim.ui.select(
+            vim
+              .iter(vim.fs.dir(path or vim.fn.getcwd(0, 0)))
+              :filter(function(item)
+                return item.type == "directory"
+              end)
+              :totable(),
+            {
+              prompt = "select space supremum: ",
+              format_item = function(item)
+                return item.name
+              end,
+            },
+            function(sel)
+              require("workspaces").add_dir(sel)
+            end
+          )
+        end,
+        mode = "n",
+        desc = "session:| spaces |=> add supremum",
+      },
+      {
+        key_session.workspaces.remove,
+        function()
+          vim.ui.select(require("workspaces").get(), {
+            prompt = "remove workspace: ",
+            format_item = function(item)
+              return ("%s: %s -- %s"):format(
+                item.name,
+                item.path,
+                item.last_opened
+              )
+            end,
+          }, function(sel, idx)
+            require("workspaces").remove(sel.name)
+          end)
+        end,
+        mode = "n",
+        desc = "session:| spaces |=> remove",
+      },
+      {
+        key_session.workspaces.rename,
+        function()
+          vim.ui.select(require("workspaces").get(), {
+            prompt = "old workspace: ",
+            format_item = function(item)
+              return ("%s: %s -- %s"):format(
+                item.name,
+                item.path,
+                item.last_opened
+              )
+            end,
+          }, function(old, idx)
+            vim.ui.input({ prompt = "new workspace name: " }, function(new)
+              require("workspaces").rename(old.name, new)
+            end)
+          end)
+        end,
+        mode = "n",
+        desc = "session:| spaces |=> rename",
+      },
+      {
+        key_session.workspaces.remove_dir,
+        function()
+          vim.ui.select(require("workspaces").get(), {
+            prompt = "remove space supremum: ",
+            format_item = function(item)
+              return ("%s: %s -- %s"):format(
+                item.name,
+                item.path,
+                item.last_opened
+              )
+            end,
+          }, function(sel, idx)
+            require("workspaces").remove_dir(sel.path)
+          end)
+        end,
+        mode = "n",
+        desc = "session:| spaces |=> remove supremum",
+      },
+      {
+        key_session.workspaces.list,
+        function()
+          require("workspaces").list()
+        end,
+        mode = "n",
+        desc = "session:| spaces |=> list",
+      },
+      {
+        key_session.workspaces.list_dirs,
+        function()
+          require("workspaces").list_dirs()
+        end,
+        mode = "n",
+        desc = "session:| spaces |=> directories",
+      },
+      {
+        key_session.workspaces.sync_dirs,
+        function()
+          require("workspaces").sync()
+        end,
+        mode = "n",
+        desc = "session:| spaces |=> sync",
+      },
+      {
+        key_session.workspaces.telescope,
+        function()
+          require("telescope").extensions.workspaces.workspaces()
+        end,
+        mode = "n",
+        desc = "session:| spaces |=> scope",
+      },
+    },
   },
   {
     "lewis6991/gitsigns.nvim",
