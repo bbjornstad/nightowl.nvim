@@ -1388,13 +1388,39 @@ kenv.help = keygroup({
     no_comments = "S",
     alt = "c",
   },
+  vimhelp = "h",
 }, leader_help, {})
 
 local leader_newts = "<leader>n"
 kenv.newts = keygroup({
   notifications = "n",
   messages = "m",
+  errors = "e",
+  last = "l",
+  stats = "s",
+  history = "h",
+  dismiss = "c",
 }, leader_newts, {})
+
+local leader_port = "<leader>p"
+kenv.projport = keygroup({
+  home = "P",
+  tag = "t",
+  find = "p",
+  projects = "j",
+}, leader_port, {})
+
+leader_test = "<leader>t"
+kenv.test = keygroup({
+  run = {
+    [LEADER_ID] = { append = "r" },
+    nearest = "r",
+    file = "R",
+    dap = "d",
+    stop = "s",
+    attach = "a",
+  },
+}, leader_test, {})
 
 function kenv:leader()
   return NVIM_DYN_LEADER

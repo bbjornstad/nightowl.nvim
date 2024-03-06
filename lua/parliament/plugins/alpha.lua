@@ -1,10 +1,14 @@
 -- vim: set ft=lua: --
 local env = require("environment.ui")
 local nightowl_splash = require("environment.alpha").nightowl_splash
+local nightowl_splash_minimal =
+  require("environment.alpha").nightowl_splash_minimal
 local nightowl_splash_frames =
   require("environment.alpha").nightowl_splash_frames
 local nightowl_splash_compact_frames =
   require("environment.alpha").nightowl_splash_compact_frames
+
+local key_port = require("environment.keys").projport
 
 local function alpha_state()
   vim.cmd([[Veil]])
@@ -30,8 +34,74 @@ return {
     },
   },
   {
+    "CWood-sdf/spaceport.nvim",
+    opts = {
+      replaceHome = true,
+      projectEntry = "edit .",
+      lastViewTime = "weekly",
+      maxRecentFiles = 10,
+      sections = {
+        {
+          lines = nightowl_splash_minimal,
+          title = "Invisible Things are the Only Realities",
+          topBuffer = 6,
+        },
+        "recents",
+        "remaps",
+        "_global_remaps",
+      },
+    },
+    config = function(_, opts)
+      require("spaceport").setup(opts)
+      require("telescope").load_extension("spaceport")
+    end,
+    lazy = false,
+    dependencies = {
+      "andrewferrier/wrapping.nvim",
+      "nvim-telescope/telescope.nvim",
+      -- "stevearc/oil.nvim",
+    },
+    keys = {
+      {
+        key_port.projects,
+        function()
+          require("telescope").extensions.spaceport.projects()
+        end,
+        mode = "n",
+        desc = "scope:| port |=> open",
+      },
+      {
+        key_port.find,
+        function()
+          require("telescope").extensions.spaceport.find()
+        end,
+        mode = "n",
+        desc = "port:| scope |=> find & add",
+      },
+      {
+        key_port.home,
+        "<CMD>Spaceport<CR>",
+        mode = "n",
+        desc = "start:|א port |=> init",
+      },
+      {
+        key_port.tag,
+        "<CMD>Spaceport<CR>",
+        mode = "n",
+        desc = "start:|א port |=> tag",
+      },
+      {
+        "<Home>",
+        "<CMD>Spaceport<CR>",
+        mode = "n",
+        desc = "start:|א port |=> init",
+      },
+    },
+  },
+  {
     "willothy/veil.nvim",
     lazy = false,
+    enabled = false,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "ibhagwan/fzf-lua",
@@ -76,7 +146,7 @@ return {
           }, { hl = "@keyword" }),
           require("veil.builtin").sections.buttons({
             {
-              icon = "󰷉",
+              icon = "󰷎",
               text = "edit::cwd",
               shortcut = ".",
               callback = function()
@@ -138,7 +208,7 @@ return {
         "<Home>",
         alpha_state,
         mode = { "n" },
-        desc = "א:| α => alpha state",
+        desc = "א:veil| α => init",
       },
     },
   },
