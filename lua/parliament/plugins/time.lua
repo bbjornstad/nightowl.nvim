@@ -44,8 +44,93 @@ return {
       vim.cmd([[syntax on]])
       vim.cmd([[filetype plugin on]])
       vim.opt.hidden = opts.hidden or true
-
+    end,
+    opts = {
+      hidden = true,
+    },
+    init = function()
       vim.g.himalaya_folder_picker = "fzf"
+      local cmdr = require("funsak.autocmd").autocmdr("Himalaya", true)
+      cmdr({ "FileType" }, {
+        pattern = { "himalaya-email-listing", "mail" },
+        callback = function(ev)
+          local mapx = vim.keymap.set
+          local opts = { buffer = ev.bufnr, remap = false }
+          local mapn = function(lhs, rhs, desc, op)
+            return mapx(
+              "n",
+              lhs,
+              rhs,
+              vim.tbl_deep_extend("force", opts, op or {}, { desc = desc })
+            )
+          end
+          mapn(
+            key_mail.action.change_folder,
+            "<plug>(himalaya-folder-select)",
+            "mail:| folder |=> goto"
+          )
+          mapn(
+            key_mail.action.page.next,
+            "<plug>(himalaya-folder-select-next-page)",
+            "mail:| folder |=> next page"
+          )
+          mapn(
+            key_mail.action.page.previous,
+            "<plug>(himalaya-folder-select-previous-page)",
+            "mail:| folder |=> previous page"
+          )
+          mapn(
+            key_mail.action.read,
+            "<plug>(himalaya-email-read)",
+            "mail:| message |=> read"
+          )
+          mapn(
+            key_mail.action.compose,
+            "<plug>(himalaya-email-write)",
+            "mail:| message |=> write"
+          )
+          mapn(
+            key_mail.action.reply,
+            "<plug>(himalaya-email-reply)",
+            "mail:| message |=> reply"
+          )
+          mapn(
+            key_mail.action.reply_all,
+            "<plug>(himalaya-email-reply-all)",
+            "mail:| message |=> reply all"
+          )
+          mapn(
+            key_mail.action.forward,
+            "<plug>(himalaya-email-forward)",
+            "mail:| message |=> forward"
+          )
+          mapn(
+            key_mail.action.download_attachments,
+            "<plug>(himalaya-email-download-attachments)",
+            "mail:| message |=> download attachments"
+          )
+          mapn(
+            key_mail.action.locate.copy,
+            "<plug>(himalaya-email-copy)",
+            "mail:| message |=> copy"
+          )
+          mapn(
+            key_mail.action.locate.move,
+            "<plug>(himalaya-email-move)",
+            "mail:| message |=> move"
+          )
+          mapn(
+            key_mail.action.locate.delete,
+            "<plug>(himalaya-email-delete)",
+            "mail:| message |=> delete"
+          )
+          mapn(
+            key_mail.action.add_attachment,
+            "<plug>(himalaya-email-add-attachment)",
+            "mail:| message |=> add attachment"
+          )
+        end,
+      })
     end,
     cmd = "Himalaya",
     keys = {
@@ -53,20 +138,7 @@ return {
         key_mail.himalaya,
         "<CMD>Himalaya<CR>",
         mode = "n",
-        desc = "::mail=> update servers and view mail",
-      },
-    },
-  },
-  {
-    "elmarsto/mountaineer.nvim",
-    dependencies = { "https://git.sr.ht/~soywod/himalaya-vim" },
-    cmd = "Himalaya",
-    keys = {
-      {
-        key_mail.mountaineer,
-        "<CMD>Telescope mountaineer<CR>",
-        mode = "n",
-        desc = "::mail=> telescope view mail",
+        desc = "mail:| himalaya |=> update & view",
       },
     },
   },
@@ -245,6 +317,23 @@ return {
       opts.sections = opts.sections or {}
       opts.sections.lualine_z = vim.list_extend(opts.sections.lualine_z or {}, {
         "require'wttr'.text",
+      })
+    end,
+  },
+  {
+    "liljaylj/codestats.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    event = { "TextChanged", "InsertEnter" },
+    cmd = { "CodeStatsXpSend", "CodeStatsProfileUpdate" },
+    config = function()
+      require("codestats").setup({
+        username = "ursa-major", -- needed to fetch profile data
+        base_url = "https://codestats.net", -- codestats.net base url
+        api_key = os.getenv("CODESTATS_API_KEY"),
+        send_on_exit = true, -- send xp on nvim exit
+        send_on_timer = true, -- send xp on timer
+        timer_interval = 60000, -- timer interval in milliseconds (minimum 1000ms to prevent DDoSing codestat.net servers)
+        curl_timeout = 5, -- curl request timeout in seconds
       })
     end,
   },
