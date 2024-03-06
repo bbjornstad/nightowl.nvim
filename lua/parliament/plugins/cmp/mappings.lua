@@ -87,7 +87,6 @@ return {
                 select = false,
                 behavior = cmp.ConfirmBehavior.Insert,
               })
-            else
               fallback()
             end
           end,
@@ -109,7 +108,7 @@ return {
             end
           end,
         }),
-        ["<C-CR>"] = function(fallback)
+        ["<C-S-CR>"] = function(fallback)
           cmp.abort()
           fallback()
         end,
@@ -154,15 +153,15 @@ return {
         [kenv_cmp.docs.backward] = cmp.mapping.scroll_docs(-4),
         [kenv_cmp.docs.forward] = cmp.mapping.scroll_docs(4),
         [kenv_cmp.external.complete_common_string] = cmp.mapping.complete_common_string(),
-        [kenv_cmp:accept()] = cmp.mapping.confirm({
+        ["<C-e>"] = cmp.mapping.abort(),
+        ["<C-c>"] = cmp.mapping.close(),
+        ["<C-y>"] = cmp.mapping.confirm({
           behavior = cmp.ConfirmBehavior.Replace,
           select = cmp.SelectBehavior.Insert,
         }),
         ["<A-j>"] = cmp_action.luasnip_jump_forward(),
         ["<A-k>"] = cmp_action.luasnip_jump_backward(),
         [kenv_cmp.trigger] = cmp.mapping.complete(),
-        [kenv_cmp:cancel()] = cmp.mapping.abort(),
-        [kenv_cmp:close()] = cmp.mapping.close(),
         -- we are going to make a mapping that will allow us to access focused
         -- groups of the completion menu with certain keystrokes. In particular, we
         -- have that Ctrl+Space should be the way that we bring up a completion

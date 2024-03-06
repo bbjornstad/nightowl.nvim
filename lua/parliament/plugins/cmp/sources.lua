@@ -90,13 +90,6 @@ local default_sources = {
     name = "async_path",
     keyword_length = 2,
     trigger_characters = { "/" },
-    -- group_index = 2,
-  },
-  {
-    name = "fuzzy_path",
-    keyword_length = 3,
-    trigger_characters = { "/" },
-    -- group_index = 2,
   },
   {
     name = "gitlog",
@@ -157,7 +150,7 @@ return {
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
-      "tzachar/cmp-fuzzy-path",
+      -- "tzachar/cmp-fuzzy-path",
       "FelipeLema/cmp-async-path",
       "hrsh7th/cmp-cmdline",
       "hrsh7th/cmp-nvim-lsp-signature-help",
@@ -369,10 +362,10 @@ return {
   -- ==============
   { "hrsh7th/cmp-buffer", dependencies = { ncmp } },
   { "FelipeLema/cmp-async-path", optional = true, dependencies = { ncmp } },
-  {
-    "tzachar/cmp-fuzzy-path",
-    dependencies = { ncmp, "tzachar/fuzzy.nvim" },
-  },
+  -- {
+  --   "tzachar/cmp-fuzzy-path",
+  --   dependencies = { ncmp, "tzachar/fuzzy.nvim" },
+  -- },
   { "hrsh7th/cmp-cmdline", dependencies = { ncmp } },
   {
     "hrsh7th/cmp-nvim-lua",
@@ -511,7 +504,6 @@ return {
       "bibtex",
     },
     dependencies = { ncmp },
-    ["~/.config/nushell/util/*"] = "nu",
   },
   {
     "jcha0713/cmp-tw2css",
