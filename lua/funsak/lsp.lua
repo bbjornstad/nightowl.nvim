@@ -25,9 +25,7 @@
 
 -- funsak.lsp:
 -- a collection of useful tools and utilities that can be used to setup a
---╭─────────────────────────────────────────────────────────────────────────────╮
---│             targeted LSP configuration through language units.              │
---╰─────────────────────────────────────────────────────────────────────────────╯
+-- targeted LSP configuration through language units.
 
 ---@class funsak.lsp a collection of important utility functions which help to
 ---set up integrated services for language server protocol defined behavior,
@@ -45,8 +43,8 @@ local recurser = require("funsak.wrap").recurser
 --- form of callback functions attached to callback hooks occurring directly
 --- before or after the setup of the server.
 ---@class owl.lsp.SetupHooks
----@field before owl.lsp.SetupHandler
----@field after owl.lsp.SetupHandler
+---@field before owl.lsp.SetupHandler?
+---@field after owl.lsp.SetupHandler?
 
 --- allows for modification of the server's setup behavior to be made by
 --- providing a field to pass callback functions to be executed at the specific
@@ -54,8 +52,8 @@ local recurser = require("funsak.wrap").recurser
 --- completely override the handler from its generated form based on other
 --- parameters.
 ---@class owl.lsp.SetupConfig
----@field hooks owl.lsp.SetupHooks
----@field handler owl.lsp.SetupHandler
+---@field hooks owl.lsp.SetupHooks?
+---@field handler owl.lsp.SetupHandler?
 
 --- server-level specific configuration options for mason and mason-lspconfig,
 --- currently only allows for enablement/disablement of the specific server with
@@ -142,8 +140,18 @@ local function server(name, opts)
   }
 end
 
----
-M.server = recurser(server)
+--- adds a specification component which sets up a language server within the
+--- lsp support in neovim; essentially just a reduction of boilerplate when
+--- writing the configuration for languages separately--we now can simply know a
+--- target "conceptual schema" for language setup and skip writing in all the
+--- superfluous table elements.
+---@param name owl.lsp.ServerClient language server name, e.g. "lua_ls"
+---@param opts owl.lsp.LangServerConfig?
+---@return LazyPluginSpec
+function M.server(name, opts)
+  local f = recurser(server)
+  return f(name, opts)
+end
 
 ---@alias owl.lint.Linter string
 
@@ -251,13 +259,12 @@ function M.debuggers(daps, opts)
   end
   return dapcore(), use_masondap and masondap() or nil
 end
-
 --- assigns the value to a new table whose keys are the given index item
 ---@param idx any[] new table's keys, given as a list.
 ---@param value any a value to be assigned to each item of `idx`
 ---@param box boolean whether or not the values should be assigned into a boxing
 ---table before assignment into the final results
----@return { [any]: any } the merged table.
+---@return { [any]: any } tbl the merged table.
 local function per(idx, value, box)
   local function wrapped_per(i)
     return { [i] = box and { value } or value }

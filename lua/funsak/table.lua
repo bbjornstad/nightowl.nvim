@@ -87,8 +87,11 @@ function M.tabler(item, enforce_list_input, return_empty)
   return not return_empty and (tbl or {}) or tbl
 end
 
----@alias OptifyHandlersPhase funsak.Ix_Options
----@alias OptsFunction fun(plugin: LazyPlugin, opts: funsak.GenericOpts)
+---@alias OptifyHandlersPhase
+---| funsak.Ix_Options #
+
+---@alias OptsFunction
+---| fun(plugin: LazyPlugin, opts: funsak.GenericOpts)
 
 --- turns a table that is specified in an opts field of a LazyPluginSpec into a
 --- function which deeply merges each indexed field of the spec with the _opts
@@ -116,13 +119,14 @@ end
 ---assumed that the keys match a subset of the keys of the original opts table,
 ---and each handler is applied after the specific step that merges a single
 ---field.
----@param behavior {merge_before: boolean, tbl_merge: TblExtendBehavior}
+---@param behavior {merge_phase: OptifyHandlersPhase?, extend: TblExtendBehavior}
 ---@return OptsFunction optified
 function M.fopts(opts, handlers, behavior)
   opts = opts or {}
   local inset_merge = type(opts) == "table" and not vim.tbl_islist(opts)
   behavior = behavior or {}
-  local merge_before = behavior.merge_before or false
+  local merge_before = vim.tbl_contains(behavior.merge_phase, "before") or false
+  local merge_after = vim.tbl_contains(behavior.merge_phase, "before") or false
 
   local function get_handler(key)
     key = key or nil
@@ -379,7 +383,7 @@ function M.per(tbl, idxr)
     local idx = vim.iter(idxr)
     idx:map(function(k, v)
       -- there are really two possibilities here, either we are iterating over a
-      -- list-like item in which case, 
+      -- list-like item in which case,
       return fn(v, unpack(args))
     end)
   end

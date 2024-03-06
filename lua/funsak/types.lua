@@ -49,14 +49,14 @@
 ---@class Aut<T>: { [Ix<`T`>]: `T` }
 
 ---@generic T
-
+--- by definition, an automorphism is an isomorphic endomorphism, which is to
+--- say a map from the space composing a class of mathematical structures onto
+--- itself that is isomorphic. Isomorphic generally refers to the features of
+--- certain special transoformative operations which hold certain notions
+--- consistent through the mapping, such as the algebraic structure underpinning
+--- all, and bijectivity or 0-1-ness.
 ---@alias FnAutomorphism<T>
----| fun(t_dom: Aut<`T`>): Aut<`T`> # by definition, an automorphism is an
----isomorphic endomorphism, which is to say a map from the space composing a
----class of mathematical structures onto itself that is isomorphic. Isomorphic
----generally refers to the features of certain special transoformative
----operations which hold certain notions consistent through the mapping, such as
----the algebraic structure underpinning all, and bijectivity or 1-1-ness.
+---| fun(t_dom: Aut<`T`>): Aut<`T`>
 
 ---@alias TblExtendBehavior
 ---| '"error"' # if a key is present in both tables, an error is raised. Used
@@ -71,44 +71,69 @@
 ---| '"suppress"' # error on merging of input tables is not propagated
 ---| '"error"' # error on merging of input tables is propagated
 
----@alias funsak.OptsField
----| any value in a `T_Opts` table
+--- value in a table of plugin-specific configuration options used (typically)
+--- in lazy.nvim's `opts` field of a `LazyPluginSpec`
+---@alias funsak.LazyOptsField
+---| any
 
+--- indexing item in a table of configuration options, e.g. the table structure
+--- will depend on the particular calling function's signature and
+--- parameterization.
 ---@alias funsak.Ix_Options
----| Ix<funsak.OptsField> # indexing item in a table of configuration options, e.g.
----the table structure will depend on the particular calling function's
----signature and parameterization.
+---| Ix<funsak.LazyOptsField>
 
 --- a table of options, representing the `opts` argument to any selected
 --- function, generally. There might be more specific choices which are better
 --- suited given the context.
----@class funsak.GenericOpts: { [funsak.Ix_Options]: funsak.OptsField }
+---@class funsak.GenericOpts: { [funsak.Ix_Options]: funsak.LazyOptsField }
 
+--- data of a generic type which can be either a concrete instance of that type
+--- or a callback function which will return a concrete instance of that type.
+--- This is not dissimilar to a promise, in this sense, though more rudimentary.
 ---@generic T
+--- represents a parameter which can be accepted both as raw data or as a
+--- function which returns raw data when evaluated.
 ---@alias funsak.Fowl<T>
 ---| `T` # data of a generic type
 ---| fun(...): `T`? # function accepting any arguments and returning data of
 ---generic captured type `T`
 
+--- filetype name known to neovim
 ---@alias funsak.FType
----| string # filetype name known to neovim
+---| string
 
+--- a string which would be valid as a portion of (including a full portion) a
+--- full path
 ---@alias funsak.PathComponent
----| string # a string which would be valid as a portion of a full path
+---| string
 
+--- a string consisting of two characters and whose digits represent numbers in
+--- base 16. This is obviously constructed such that 0-255 are the possible
+--- numerical values represented with the characters between "00" and "FF".
 ---@alias funsak.Hexadecimal
----| string # a string consisting of two characters and whose digits represent
----numbers in base 16. This is obviously constructed such that 0-255 are the
----possible numerical values represented with the characters between "00" and
----"FF".
+---| string
 
----@alias funsak.RGBColor { red: number, green: number, blue: number, alpha: number? }
----@alias funsak.HSVColor { hue: number, saturation: number, lightness: number, alpha: number? }
----@alias funsak.Hexpanded { red: funsak.Hexadecimal, green: funsak.Hexadecimal, blue: funsak.Hexadecimal, alpha: funsak.Hexadecimal? }
+--- a color in standard RGB-A format
+---@alias funsak.RGBColor
+---| { red: number, green: number, blue: number, alpha: number? }
+
+--- a color given as hue, saturation, lightness triplets (+ alpha if needed)
+--- implemented with HSLuv
+---@alias funsak.HSLuvColor
+---| { hue: number, saturation: number, lightness: number, alpha: number? }
+
+--- a color in hexadecimal form, in a table to agnosticize the location of the
+--- alpha channel (ARGB vs RGBA)
+---@alias funsak.Hexpanded
+---| { red: funsak.Hexadecimal, green: funsak.Hexadecimal, blue: funsak.Hexadecimal, alpha: funsak.Hexadecimal? }
+
+--- a color in hexadecimal form, smushed together in a string to form the
+--- familiar hex format presentation. We choose RGB-A as our standard instead of
+--- A-RGB for compatibility with external programs.
+---@alias funsak.Hexpact
+---| string
+
 ---@alias funsak.HexColor
----| string # a string of the form "#??????" or "#????????", where each
----successive pair of hexadecimal digits represents the red, green, and blue
----channels. If the string has a full 8 characters, the last pair represents the
----alpha channel.
+---| funsak.Hexpact
 ---| funsak.Hexpanded # Hex representation in table form with individual components
 ---separated but given in hex form

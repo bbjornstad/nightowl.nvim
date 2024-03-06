@@ -369,11 +369,11 @@ function M.extermiwrap(fn)
   end
 end
 
----@alias EvaluatedExpression fun(...): any
+---@alias Evaluatable fun(...): any
 --- creates and returns an anonynous function based on the input expression
---- representation as a string in the form: `"arg1,arg2,...argn |="`
+--- representation as a string in the form: `"arg1,arg2,...argn |=> ~expr~"`
 ---@param expr string expression of form `"arg1,arg2...argn |=> ~expr~"`
----@return EvaluatedExpression fun
+---@return Evaluatable fn when called this function will return the final
+---result
 function M.lambda(expr) end
-
 return M

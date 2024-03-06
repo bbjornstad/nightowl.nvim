@@ -30,7 +30,7 @@
 ---@author Bailey Bjornstad | ursa-major [bailey@bjornstad.dev]
 ---@license MIT
 
-local lz = require('funsak.lazy')
+local lz = require("funsak.lazy")
 
 local M = {}
 
@@ -45,8 +45,10 @@ function M.option(option, silent, values)
       ---@diagnostic disable-next-line: no-unknown
       vim.opt_local[option] = values[1]
     end
-    return lz.info("Set " .. option .. " to " .. vim.opt_local[option]:get(),
-      { title = "Option" })
+    return lz.info(
+      "Set " .. option .. " to " .. vim.opt_local[option]:get(),
+      { title = "Option" }
+    )
   end
   ---@diagnostic disable-next-line: no-unknown
   vim.opt_local[option] = not vim.opt_local[option]:get()
@@ -59,13 +61,17 @@ function M.option(option, silent, values)
   end
 end
 
+function M.toggler(cb, initial_state)
+  local toggle_state = initial_state or false
+end
+
 local nu = { number = true, relativenumber = true }
+--- toggles line numbers
 function M.number()
   if vim.opt_local.number:get() or vim.opt_local.relativenumber:get() then
     nu = {
       number = vim.opt_local.number:get(),
-      relativenumber = vim.opt_local
-          .relativenumber:get()
+      relativenumber = vim.opt_local.relativenumber:get(),
     }
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
@@ -78,6 +84,7 @@ function M.number()
 end
 
 local diagnostics_enabled = true
+--- toggles diagnostic output
 function M.diagnostics()
   diagnostics_enabled = not diagnostics_enabled
   if diagnostics_enabled then
@@ -89,28 +96,70 @@ function M.diagnostics()
   end
 end
 
+local hint_enabled = true
+--- toggles use of inlay hints
 ---@param buf? number
 ---@param value? boolean
 function M.inlay_hints(buf, value)
+  buf = buf or 0
+  -- local state = vim.lsp.inlay_hint.is_enabled(buf)
   local ih = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
+  if value == nil then
+    hint_enabled = not hint_enabled
+    value = hint_enabled
+  end
   if type(ih) == "function" then
     ih(buf, value)
   elseif type(ih) == "table" and ih.enable then
-    if value == nil then
-      value = not ih.is_enabled(buf)
-    end
     ih.enable(buf, value)
+  end
+  if value then
+    lz.info("Enabled inlay hints")
+  else
+    lz.warn("Disabled inlay hints")
   end
 end
 
 local focus_enabled = true
+--- toggles use of focus.nvim automatic windowing layout
+---@param buf? integer bufnr identifer
 function M.focus(buf)
   buf = buf or 0
   focus_enabled = not focus_enabled
   if not focus_enabled then
     vim.b[buf].focus_disable = true
+    lz.warn("Disabled focus windowing")
   else
     vim.b[buf].focus_disable = false
+    lz.info("Enabled focus windowing")
+  end
+end
+
+--- given a callback argument whose purpose is to toggle an option or plugin
+--- setting, this will return a function of matching signature for the proper
+--- notification of the state of that setting. Allows for the user to specify
+--- particular behavior for computation of setting state and notification
+--- message if desired.
+---@param cb fun(...): any? a function which will result in the appropriate
+---setting adjustment behavior when it is evaluated. The signature of this
+---function determines the signature of the returned wrapper. Can return a
+---value, in which case it will be used as the resultant computed state if the
+---`state` callback parameter is not provided.
+---@param state? fun(...): any? a function which will result in the appropriate
+---computation of the new state when evaluated with the same arguments as the
+---`cb` parameter. If this value is nil, the result of the computation of the
+---`cb` parameter is used instead.
+---@param msgfmt? fun(result: string): string a function of a single value, the
+---result of the state computation, which returns the formatted notification
+---message. Defaults to `vim.inspect`.
+function M.with_notice(cb, state, msgfmt)
+  msgfmt = msgfmt or vim.inspect
+  return function(...)
+    local state_res = state and state(...)
+    local cb_res = cb(...)
+    local ret_res = state_res or cb_res
+    vim.notify(msgfmt(ret_res))
+    return ret_res
   end
 end
 
