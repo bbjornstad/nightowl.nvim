@@ -32,62 +32,40 @@
 local env = require("environment.ui")
 local default_colorizer = require("funsak.colors").identify_highlight
 local comp = require("funsak.colors").component
+local hlval = require("funsak.colors").dvalue
 local conv = require("funsak.convert")
 local lz = require("funsak.lazy")
 local bg_style = os.getenv("NIGHTOWL_BACKGROUND")
 local scheme_sel = os.getenv("NIGHTOWL_COLORSCHEME")
+local key_ui = require("environment.keys").ui
+local key_scope = require("environment.keys").scope
+
+local function importcs()
+  local res = require("schemes.pineapple")
+  vim.notify(vim.inspect(res))
+  return type(res) == "table" and res or {}
+end
 
 if conv.bool_from_env("NIGHTOWL_DEBUG") then
-  lz.info("Selected Background " .. bg_style)
-  lz.info("Selected Colorscheme " .. scheme_sel)
+  local cmdr = require("funsak.autocmd").autocmdr("Nightowl_ColorschemeInfo")
+  cmdr({ "UIEnter" }, {
+    callback = function(ev)
+      lz.info("Selected Background: " .. bg_style)
+      lz.info("Selected Colorscheme: " .. scheme_sel)
+    end,
+  })
 end
--- if vim.fn.has("termguicolors") then
---   vim.cmd([[set termguicolors]])
--- end
 
 -- warn if there is not a background designation set in the corresponding
 -- environment variable.
 if not bg_style then
-  vim.notify(
-    [[This configuration is missing a background specification in the environment.
-    You can set the background using the NIGHTOWL_BACKGROUND environment variable,
-    which accepts two possible values: "light" or "dark". Without setting this variable,
-    defaults to "dark"]]
-  )
+  lz.info([[This configuration is missing a background specification in the
+    environment. You can set the background using the NIGHTOWL_BACKGROUND
+    environment variable, which accepts two possible values: "light" or "dark".
+    Without setting this variable, defaults to "dark"]])
 end
 
-local defhl = require("funsak.colors").set_hl_multi
-
-local function load_scheme(scheme, opts)
-  opts = opts or {}
-  local cs_has_lua, csmod = pcall(require, scheme)
-  local load_ok, load_res
-  if cs_has_lua then
-    load_ok, load_res = pcall(csmod.load)
-  end
-  if not load_ok then
-    if not opts.suppress_warning then
-      require("funsak.lazy").warn(
-        ("Could not load scheme using lua: %s\nmsg: %s\nAttempting to load using vim"):format(
-          scheme,
-          load_res
-        )
-      )
-    end
-    local vload_ok, vload_res =
-      pcall(vim.cmd, ("colorscheme %s"):format(scheme))
-    if not vload_ok then
-      if not opts.suppress_warning then
-        require("funsak.lazy").warn(
-          ("Could not load scheme using vim fallback: %s\nmsg: %s\nAttempting to load using vim"):format(
-            scheme,
-            vload_res
-          )
-        )
-      end
-    end
-  end
-end
+local defhl = require("funsak.colors").set_hls
 
 local REQUIRED_HLS = {
   telescope = {
@@ -150,25 +128,78 @@ local function autocmdr(group_name, group_opts)
   end
 end
 
-local cs_autocmd =
-  autocmdr("ColorScheme-HLRequired", { augroup = { clear = true } })
-cs_autocmd({ "ColorSchemePre" }, function(ev)
-  vim.api.nvim_set_hl(0, "Headline", { link = "NormalFloat" })
-  vim.api.nvim_set_hl(0, "IndentBlanklineIndent", { link = "@comment" })
-  vim.api.nvim_set_hl(0, "IndentBlanklineWhitespace", { link = "@comment" })
-  vim.api.nvim_set_hl(0, "IndentBlanklineScope", { link = "@comment" })
-  vim.api.nvim_set_hl(0, "NightowlContextHints", { link = "@comment" })
-  vim.api.nvim_set_hl(0, "NightowlContextHintsBright", { link = "@comment" })
-  vim.api.nvim_set_hl(0, "NightowlStartupHeader", { link = "@comment" })
-  vim.api.nvim_set_hl(0, "NightowlStartupEntry", { link = "@" })
-  vim.api.nvim_set_hl(0, "NightowlStartupConvenience", { link = "@function" })
-end)
+local cs_autocmdr =
+  require("funsak.autocmd").autocmdr("RequiredHighlight", true)
+
+local brush = require("funsak.paint")
+cs_autocmdr({ "ColorScheme" }, {
+  callback = function(ev)
+    local owhl = vim.api.nvim_create_namespace("NightowlNvim")
+    vim.api.nvim_set_hl(0, "manBold", { bold = true, underline = true })
+    vim.api.nvim_set_hl(0, "Headline", { link = "NormalFloat" })
+    vim.api.nvim_set_hl(0, "IndentBlanklineIndent", { link = "@conceal" })
+    vim.api.nvim_set_hl(0, "IndentBlanklineWhitespace", { link = "@conceal" })
+    vim.api.nvim_set_hl(0, "IndentBlanklineScope", { link = "@conceal" })
+    vim.api.nvim_set_hl(0, "NightowlInlayHints", {
+      fg = brush.find("DiagnosticVirtualTextInfo").bg,
+      bg = brush.find("WinSeparator").fg,
+      italic = true,
+    })
+    vim.api.nvim_set_hl(0, "NightowlMelonSigns", { link = "@label" })
+    vim.api.nvim_set_hl(
+      0,
+      "NightowlContextHints",
+      { fg = brush.find("@markup.raw").fg, italic = true }
+    )
+    vim.api.nvim_set_hl(
+      0,
+      "NightowlContextHintsBright",
+      { fg = brush.find("@tag").fg, italic = true }
+    )
+    vim.api.nvim_set_hl(0, "NightowlStartupHeader", { link = "@function" })
+    vim.api.nvim_set_hl(0, "NightowlStartupEntry", { link = "NvimIdentifier" })
+    vim.api.nvim_set_hl(
+      0,
+      "NightowlStartupConvenience",
+      { link = "@conditional" }
+    )
+    vim.api.nvim_set_hl(
+      0,
+      "SpaceportRecentsTitle",
+      { link = "NightowlStartupHeader" }
+    )
+    vim.api.nvim_set_hl(
+      0,
+      "SpaceportRecentsProject",
+      { link = "@lsp.type.property" }
+    )
+    vim.api.nvim_set_hl(
+      0,
+      "SpaceportRemapDescription",
+      { link = "NightowlStartupConvenience" }
+    )
+    vim.api.nvim_set_hl(
+      0,
+      "SpaceportRemapKey",
+      { link = "NightowlStartupEntry" }
+    )
+    vim.api.nvim_set_hl(
+      0,
+      "SpaceportRecentsCount",
+      { link = "NightowlStartupEntry" }
+    )
+    vim.api.nvim_set_hl(0, "EyelinerPrimary", { bold = true, underline = true })
+    vim.api.nvim_set_hl(0, "EyelinerSecondary", { underline = true })
+    vim.api.nvim_set_hl(0, "BiscuitColor", { link = "NightowlContextHints" })
+    vim.api.nvim_set_hl(0, "LspInlayHint", { link = "NightowlInlayHints" })
+  end,
+})
 
 return {
   {
     "rebelot/kanagawa.nvim",
     lazy = false,
-    priority = 990,
+    priority = 1000,
     opts = {
       globalStatus = true,
       dimInactive = true,
@@ -207,6 +238,7 @@ return {
           DropBarIconCurrentContext = { bg = "NONE" },
           DropBarPreview = { bg = "NONE" },
           BiscuitColor = { link = "NightowlContextHints" },
+          LspInlayHint = { link = "NightowlInlayHints" },
           TreesitterContextBottom = { underline = true },
           NightowlContextHints = {
             italic = true,
@@ -227,6 +259,11 @@ return {
           NightowlStartupConvenience = {
             bold = false,
             fg = pcol.waveBlue2,
+          },
+          NightowlInlayHints = {
+            fg = brush.find("DiagnosticVirtualTextInfo").bg,
+            bg = brush.find("WinSeparator").fg,
+            italic = true,
           },
           IndentBlanklineWhitespace = { link = "@comment" },
           IndentBlanklineScope = { link = "@comment" },
@@ -405,63 +442,48 @@ return {
           keywords = "bold",
         },
         module_default = true,
+        groups = {
+          NightowlContextHints = { link = "@markup.raw" },
+          NightowlContextHintsBright = { link = "@tag" },
+        },
       },
     },
     priority = 970,
     lazy = false,
   },
   {
-    "yorik1984/newpaper.nvim",
-    config = function(_, opts)
-      require("newpaper").setup(opts)
-    end,
-    priority = 950,
-    opts = {
-      style = bg_style ~= nil and bg_style or "dark",
-      editor_better_view = true,
-      keywords = "bold",
-      doc_keywords = "bold,italic",
-      error_highlight = "undercurl",
-      saturation = -0.2,
-      italic_strings = false,
-      italic_comments = true,
-      italic_doc_comments = true,
-      italic_functions = true,
-      italic_variables = false,
-      borders = true,
-    },
+    "CWood-sdf/pineapple",
     lazy = false,
-  },
-  {
-    "linrongbin16/colorbox.nvim",
-    lazy = false,
-    priority = 1000,
-    cmd = { "Colorbox" },
-    dependencies = {
-      "rktjmp/lush.nvim",
-      "rebelot/kanagawa.nvim",
-      "yorik1984/newpaper.nvim",
-      "Verf/deepwhite.nvim",
-      "EdenEast/nightfox.nvim",
-      "ronisbr/nano-theme.nvim",
-      "cryptomilk/nightcity.nvim",
-      "rose-pine/neovim",
-      "katawful/kat.nvim",
-    },
+    dependencies = vim.list_extend(
+      { "nvim-telescope/telescope.nvim" },
+      importcs()
+    ),
     opts = {
-      policy = "single",
-      timing = "startup",
-      background = bg_style,
+      installedRegistry = "schemes.pineapple",
+      colorschemeFile = "after/plugin/theme.lua",
     },
-    build = function()
-      require("colorbox").update()
-    end,
+    cmd = "Pineapple",
     config = function(_, opts)
-      require("colorbox").setup(opts)
-      local bg = opts.background or "dark"
-      vim.opt.background = bg
-      local cs = env.colorscheme[bg]
-      load_scheme(cs)
+      require("pineapple").setup(opts)
+      require("telescope").load_extension("pineapple")
     end,
+    keys = {
+      {
+        key_ui.color.pineapple,
+        function()
+          vim.cmd([[Pineapple]])
+        end,
+        mode = "n",
+        desc = "ui:| scheme |=> pineapple",
+      },
+      {
+        key_scope.pineapple,
+        function()
+          require("telescope").extensions.pineapple.colorschemes()
+        end,
+        mode = "n",
+        desc = "scope:| ext |=> colorschemes",
+      },
+    },
   },
 }

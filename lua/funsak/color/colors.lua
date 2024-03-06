@@ -39,7 +39,7 @@ local M = {}
 -- ┌─ Type Definitions ─────────────────────────────────────────────────────────┐
 ---@alias funsak.colors.Representation
 ---| funsak.RGBColor # color in RGB format
----| funsak.HSVColor # color in HSV format
+---| funsak.HSLuvColor # color in HSV format
 ---| funsak.HexColor # color in Hex format
 
 ---@alias funsak.colors.HighlightGroup
@@ -85,38 +85,6 @@ end)
 M.idxmax = M.ix(function(new, prev)
   return new > prev
 end)
-
---- converts a color from RGB representation into the HCL space.
----@param color funsak.RGBColor
----@return funsak.HSVColor color
-function M.rgb_to_hcl(color)
-  local cmin, cminval = M.idxmin(color)
-  local cmax, cmaxval = M.idxmax(color)
-end
-
---- any table, generally should be thought of as an individual item in a group
---- of comparable items. Comparable in this case means from the same metric
---- space.
----@generic Point: table
---- computes the euclidean distance between two items; the euclidean distance is
---- the sum-of-squared-differences method for computing the distance, and works
---- for any metric
----@param this Point any table, but the shape must match `that`
----@param that Point any table, but the shape must match `this`
----@return number distance the computed euclidean distance, e.g. square root of
----the L2 norm, e.g. square root of sum of squares
-function M.euclidean(this, that)
-  local items = require("funsak.wrap").rezip({ this, that })
-  local squares = vim.tbl_map(function(i)
-    local _this, _that = unpack(i)
-    return (_this - _that) ^ 2
-  end, items)
-  local summed = require("funsak.wrap").reduce(function(agg, new)
-    return agg + new
-  end, squares, {})
-  return math.sqrt(summed)
-end
-
 ---@alias funsak.colors.ScaleMethod
 ---| `"exp"` # exponential scaling factor
 ---| `"log"` # logistic scaling factor
@@ -148,8 +116,8 @@ end
 
 --- normalizes an HSL color to specifically force that each component is between
 --- 0 and 1.
----@param color funsak.HSVColor
----@return funsak.HSVColor normalized
+---@param color funsak.HSLuvColor
+---@return funsak.HSLuvColor normalized
 function M.normalize_hsv(color)
   -- TODO: Implementation
   return color
@@ -160,7 +128,7 @@ function M.hsv_to_rgb(color) end
 --- lightens or darkens the given color, by first converting the color to hsv
 --- space and then scaling the `value` component according to the user
 --- parameters.
----@param color funsak.HSVColor an HSL described color representation
+---@param color funsak.HSLuvColor an HSL described color representation
 ---@param opts funsak.colors.Scaler? intensity scaling operation configuration
 ---options
 function M.scale(axis, color, opts)
@@ -236,42 +204,13 @@ function M.metric_rgb(color, other)
   return math.sqrt(red + green + blue)
 end
 
---- computes the distance between two colors in HSV space. This is essentially
---- the calculation of a notion of distance which makes sense according to
---- analytical principles of metric spaces
---- (https://en.wikipedia.org/wiki/Metric_space). This is a slightly different
---- representation of the color-space than RGB and so we also provide the metric
---- implementation in this context so that conversion into RGB values is not
---- strictly necessary (though very likely). I believe that the
---- conversion/transformation is basically a projection onto a radial, e.g.
---- circular curve. Supposedly this provides a more accurate representation of
---- how colors blend physically to create new colors and the human perception
---- thereof.
----@param color funsak.HSVColor
----@param other funsak.HSVColor
-function M.metric_hsv(color, other)
-  color = M.normalize_hsv(color)
-  other = M.normalize_hsv(other)
-  local first = (
-    math.sin(color.hue) * color.saturation * color.value
-    - math.sin(other.hue) * other.saturation * other.value
-  ) ^ 2
-  local second = (
-    math.cos(color.hue) * color.saturation * color.value
-    - math.cos(other.hue) * other.saturation * other.value
-  ) ^ 2
-  local third = (color.value - other.value) ^ 2
-
-  return math.sqrt(first + second + third)
-end
-
 --- sets the given highlight groups to have the definitions specified as
 --- options.
 ---@param hls funsak.colors.HighlightGroup | funsak.colors.HighlightGroup[] list of highlight group names
 ---that are to receive the `opts` as their definitions.
 ---@param defn vim.api.keyset.highlight options that are passed to the
 ---underlying call to nvim_set_hl
-function M.set_hl_multi(hls, defn)
+function M.set_hls(hls, defn)
   hls = type(hls) ~= "table" and { hls } or hls
   ---@cast hls -string
   vim.tbl_map(function(n)
@@ -285,24 +224,6 @@ end
 ---@class funsak.color.HighlighterOpts
 ---@field ns integer?
 ---@field colormods (funsak.colors.Modifier | funsak.colors.Modifier[])?
-
---- directly sets highlight groups using an internal vim api call.
----@param hls { [funsak.colors.HighlightGroup]: vim.api.keyset.highlight? }
----@param opts owl.color.HighlighterOpts
-function M.set_hl(hls, opts)
-  opts = opts or {}
-  opts.colormods = opts.colormods ~= nil and opts.colormods
-  opts.colormods = type(opts.colormods) == "table" and opts.colormods
-    or { opts.colormods }
-  for k, v in pairs(hls) do
-    if opts.colormods then
-      for i, fn in ipairs(opts.colormods) do
-        v = fn(v)
-      end
-    end
-    vim.api.nvim_set_hl(opts.ns or 0, k, v)
-  end
-end
 
 --- retrieves the foreground color of the specified highlight group.
 ---@param hlgroup funsak.colors.HighlightGroup
