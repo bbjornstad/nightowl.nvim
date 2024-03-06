@@ -80,7 +80,7 @@ mapx(
 -- Rebind the help menu to be attached to "gh"
 mapx(
   "n",
-  "gH",
+  kenv.help.vimhelp,
   helpmapper,
   { desc = "got:| |=> get help", remap = false, nowait = true }
 )
@@ -138,7 +138,18 @@ mapx(
   "<CMD>LazyExtras<CR>",
   { desc = "lazy:| |=> extras" }
 )
-pcall(delx, { "n" }, "<leader>l")
+mapx("n", "<C-c>", function()
+  local win = vim.api.nvim_get_current_win()
+  local buf = vim.api.nvim_get_current_buf()
+  local ft = vim.bo[buf].filetype
+  if ft == "lazy" then
+    vim.api.nvim_win_close(win, true)
+    vim.api.nvim_buf_delete(buf, true)
+  else
+    return "<C-c>"
+  end
+end, { expr = true, desc = "close" })
+-- pcall(delx, { "n" }, "<leader>l")
 
 -- ─[ motion keymappings: ]────────────────────────────────────────────────
 -- Move Lines
@@ -153,14 +164,16 @@ mapx("v", "<A-S-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 -- default behavior which is next and previous buffers. These are rebound to
 -- include Control modifier, so that I stop accidentally switching buffers when
 -- I don't want to.
-mapx({ "n", "v" }, "<S-h>", "_", { desc = "goto:| |=> line first character" })
-mapx({ "n", "v" }, "<S-l>", "$", { desc = "goto:| |=> line end character" })
 mapx("i", "<C-S-h>", "<C-o>_", { desc = "goto:| |=> line first character" })
 mapx("i", "<C-S-l>", "<C-o>$", { desc = "goto:| |=> line end character" })
 mapx("i", "<C-j>", "<C-o><down>", { desc = "buf:| |=> cursor down" })
 mapx("i", "<C-k>", "<C-o><up>", { desc = "buf:| |=> cursor up" })
 mapx("i", "<C-h>", "<C-o><left>", { desc = "buf:| |=> cursor left" })
 mapx("i", "<C-l>", "<C-o><right>", { desc = "buf:| |=> cursor right" })
+mapx("n", "gh", "_", { desc = "`_` BOL" })
+mapx("n", "gl", "$", { desc = "`$` EOL" })
+mapx("n", "H", "_", { desc = "`_` BOL" })
+mapx("n", "L", "$", { desc = "`$` EOL" })
 
 -- ─[ Ctrl-Q Quit Bindings ]───────────────────────────────────────────────
 mapx("n", "<C-q><C-q>", "<CMD>quit<CR>", { desc = "quit:| |=> terminate" })
@@ -244,23 +257,16 @@ mapx(
 -- NOTE: This should be done most effectively in a wrapping conditional check
 -- for plugins that may interfere with the typical behavior, even though
 -- ultimately they should be overwritten with the plugin regardless.
--- TODO: maybe we should ditch the check?
-if not has("cybu.nvim") then
-  mapx("n", "<C-S-h>", "<cmd>bprevious<cr>", { desc = "buf:| |=> previous" })
-  mapx("n", "<C-S-l>", "<cmd>bnext<cr>", { desc = "buf:| |=> next" })
-  mapx("n", "[b", "<cmd>bprevious<cr>", { desc = "buf:| |=> previous" })
-  mapx("n", "]b", "<cmd>bnext<cr>", { desc = "buf:| |=> next" })
-end
 
+mapx("n", "<C-S-h>", "<cmd>bprevious<cr>", { desc = "buf:| |=> previous" })
+mapx("n", "<C-S-l>", "<cmd>bnext<cr>", { desc = "buf:| |=> next" })
+mapx("n", "[b", "<cmd>bprevious<cr>", { desc = "buf:| |=> previous" })
+mapx("n", "]b", "<cmd>bnext<cr>", { desc = "buf:| |=> next" })
 mapx("n", "<leader>bb", "<cmd>e #<cr>", { desc = "buf:| |=> autocycle" })
-mapx("n", "<leader>`", "<cmd>e #<cr>", { desc = "buf:| |=> autocycle" })
 
 -- ─[ Window Keymaps ]─────────────────────────────────────────────────────
 -- closing windows without quitting.
 mapx("n", "<C-c>", function()
-  vim.api.nvim_win_close(0, false)
-end, { desc = "win:| |=> close window" })
-mapx("n", "qqq", function()
   vim.api.nvim_win_close(0, false)
 end, { desc = "win:| |=> close window" })
 
@@ -269,10 +275,6 @@ mapx("n", "<C-h>", "<C-w>h", { desc = "win:| go |=> left", remap = true })
 mapx("n", "<C-j>", "<C-w>j", { desc = "win:| go |=> down", remap = true })
 mapx("n", "<C-k>", "<C-w>k", { desc = "win:| go |=> up", remap = true })
 mapx("n", "<C-l>", "<C-w>l", { desc = "win:| go |=> right", remap = true })
-mapx("n", "<A-h>", "<C-w>h", { desc = "win:| go |=> left", remap = true })
-mapx("n", "<A-j>", "<C-w>j", { desc = "win:| go |=> down", remap = true })
-mapx("n", "<A-k>", "<C-w>k", { desc = "win:| go |=> up", remap = true })
-mapx("n", "<A-l>", "<C-w>l", { desc = "win:| go |=> right", remap = true })
 
 -- resize window using <ctrl> + arrow keys
 mapx(
@@ -445,6 +447,8 @@ mapx(
   "<cmd>tabprevious<cr>",
   { desc = "win:| tab |=> previous" }
 )
+mapx("n", "[<tab>", "<CMD>tabprevious<CR>", { desc = "win:| tab |=> previous" })
+mapx("n", "]<tab>", "<CMD>tabnext<CR>", { desc = "win:| tab |=> next" })
 
 -- ─[ loclist and quickfix ]───────────────────────────────────────────────
 -- quickfix list
@@ -629,62 +633,68 @@ mapx(
 mapx(
   "n",
   "<leader>ui",
-  vim.show_pos,
+  "<CMD>Inspect!<CR>",
+  -- function()
+  --   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  --   local res = vim.inspect_pos(0, row, col, {
+  --     syntax = true,
+  --     extmarks = true,
+  --     treesitter = true,
+  --     semantic_tokens = true,
+  --   })
+  --   require("funsak.lazy").info(res)
+  -- end,
   { desc = "ui:| hl |=> inspect under cursor" }
 )
 
-mapx("n", "<leader>uz", function()
+mapx("n", kenv.ui.spelling, function()
   toggle("spell")
 end, { desc = "ui:| spell |=> toggle" })
-mapx("n", "<leader>uw", function()
+mapx("n", kenv.ui.wrap, function()
   toggle("wrap")
 end, { desc = "ui:| wrap |=> toggle" })
-mapx("n", "<leader>uL", function()
+mapx("n", kenv.ui.numbers.relative, function()
   toggle("relativenumber")
 end, { desc = "ui:| number |=> toggle rellineno" })
-mapx("n", "<leader>ul", function()
+mapx("n", kenv.ui.numbers.line, function()
   toggle.number()
 end, { desc = "ui:| number |=> toggle lineno" })
-mapx("n", "<leader>ud", function()
+mapx("n", kenv.ui.diagnostics.toggle, function()
   toggle.diagnostics()
 end, { desc = "ui:| lsp |=> toggle diagnostics" })
 local conceallevel = vim.o.conceallevel > 0 and vim.o.conceallevel or 3
-mapx("n", "<leader>uc", function()
+mapx("n", kenv.ui.conceal, function()
   toggle("conceallevel", false, { 0, conceallevel })
 end, { desc = "ui:| conceal |=> toggle" })
 if vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint then
-  mapx("n", "<leader>uh", function()
+  mapx("n", kenv.ui.inlay_hints, function()
     toggle.inlay_hints()
   end, { desc = "ui:| lsp |=> toggle inlay-hints" })
 end
-mapx("n", "<leader>uT", function()
-  if vim.b.ts_highlight then vim.treesitter.stop() else
+mapx("n", kenv.ui.treesitter, function()
+  if vim.b.ts_highlight then
+    vim.treesitter.stop()
+    require("funsak.lazy").warn("Treesitter highlighting disabled")
+  else
     vim.treesitter.start()
+    require("funsak.lazy").info("Treesitter highlighting enabled")
   end
 end, { desc = "ui:| ts |=> toggle highlight" })
 
 local scrollval = vim.o.scrolloff
-mapx("n", "<leader>uR", function()
+mapx("n", kenv.ui.centerscroll, function()
   toggle("scrolloff", false, { 200 - scrollval, scrollval })
 end, { desc = "ui.scroll:| vertical |=> toggle centered cursor" })
 
-mapx("n", "g`", "`", { desc = "vim:| |=> marks", remap = true })
-mapx("n", "g''", "\"", { desc = "vim:| |=> registers", remap = true })
+-- ─[ datetime insertion ]───────────────────────────────────────────────
+mapx("n", "<localleader>dt", function()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local date = os.date("%Y-%m-%d")
+  vim.api.nvim_buf_set_text(0, row, col, row, col, { date })
+end, { desc = "insert date" })
 
-mapx("n", "<C-:>", function()
-  local keys = vim.api.nvim_replace_termcodes("<CMD>lua ", true, false, true)
-  vim.api.nvim_feedkeys("<CMD>lua ", "n", false)
-end, { desc = "vim:| cmd |=> luastart" })
-
-mapx(
-  "n",
-  "<localleader>dt",
-  "<CMD>put=strftime('%Y-%m-%d')<CR>",
-  { desc = "insert date" }
-)
-
--- ─[ modelines ]──────────────────────────────────────────────────────────
-mapx("n", "\\mf", function()
+-- ─[ modelines ]────────────────────────────────────────────────────────
+mapx("n", "<localleader>mf", function()
   local ft = vim.bo.filetype
   local cs = vim.bo.commentstring
   vim.api.nvim_buf_set_lines(
@@ -695,3 +705,60 @@ mapx("n", "\\mf", function()
     { cs:format(string.format("vim: set ft=%s:", ft)) }
   )
 end, { remap = false })
+mapx("n", "<localleader>mF", function()
+  vim.ui.input(
+    { prompt = "filetype: ", default = vim.bo.filetype, complete = "filetype" },
+    function(sel)
+      if sel == nil then
+        return
+      end
+      local cs = vim.bo.commentstring
+      vim.api.nvim_buf_set_lines(
+        0,
+        1,
+        1,
+        false,
+        { cs:format(string.format("vim: set ft=%s:", sel)) }
+      )
+    end
+  )
+end)
+
+vim.g.mc = "y/\\V<C-r>=escape(@\", '/')<CR><CR>"
+-- ─[ `cn` remappings ]──────────────────────────────────────────────────
+-- https://www.kevinli.co/posts/2017-01-19-multiple-cursors-in-500-bytes-of-vimscript/
+mapx("n", "cn", "*``cgn", { desc = "change next" })
+mapx("n", "cN", "*``cgN", { desc = "change previous" })
+mapx("v", "cn", "g:mc . '*``cgn'", { expr = true, desc = "change next" })
+mapx("v", "cN", "g:mc . '*``cgN'", { expr = true, desc = "change previous" })
+
+local function setup_cr()
+  mapx(
+    "n",
+    "_",
+    vim.cmd(
+      [[nnoremap _ n@z<CR>q:<C-u>let @z=strpart(@z,0,strlen(@z)-1)<CR>n@z]]
+    ),
+    { buffer = true }
+  )
+end
+
+mapx("n", "cq", function()
+  setup_cr()
+  vim.cmd([[*``qz]])
+end, { remap = false, desc = "change with macro" })
+mapx("n", "cQ", function()
+  setup_cr()
+  vim.cmd([[#``qz]])
+end, { remap = false, desc = "change with macro" })
+
+-- cut, paste, copy, etc
+-- send `x` results to void register
+-- this avoids issues where previously copied stuff elsewhere on the system is
+-- overwritten when using x to edit the location where the stuff should get
+-- pasted.
+mapx("n", "x", "\"_x", { desc = "`x` cut to void" })
+mapx("v", "x", "\"_x", { desc = "`x` cut to void" })
+mapx("n", "p", "p==", { desc = "`p` reindent" })
+mapx("n", "P", "P==", { desc = "`P` reindent" })
+mapx("n", "Y", "y$", { desc = "`$` yank -> EOL" })
