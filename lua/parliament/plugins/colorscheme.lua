@@ -141,21 +141,19 @@ cs_autocmdr({ "ColorScheme" }, {
     vim.api.nvim_set_hl(0, "IndentBlanklineWhitespace", { link = "@conceal" })
     vim.api.nvim_set_hl(0, "IndentBlanklineScope", { link = "@conceal" })
     vim.api.nvim_set_hl(0, "NightowlInlayHints", {
-      fg = brush.find("DiagnosticVirtualTextInfo").bg,
-      bg = brush.find("WinSeparator").fg,
-      italic = true,
+      link = "DiagnosticSignInfo",
     })
     vim.api.nvim_set_hl(0, "NightowlMelonSigns", { link = "@label" })
-    vim.api.nvim_set_hl(
-      0,
-      "NightowlContextHints",
-      { fg = brush.find("@markup.raw").fg, italic = true }
-    )
-    vim.api.nvim_set_hl(
-      0,
-      "NightowlContextHintsBright",
-      { fg = brush.find("@tag").fg, italic = true }
-    )
+    vim.api.nvim_set_hl(0, "NightowlContextHints", {
+      bg = brush.find("Normal").bg,
+      fg = brush.find("@markup.raw").fg,
+      italic = true,
+    })
+    vim.api.nvim_set_hl(0, "NightowlContextHintsBright", {
+      bg = brush.find("Normal").bg,
+      fg = brush.find("@tag").fg,
+      italic = true,
+    })
     vim.api.nvim_set_hl(0, "NightowlStartupHeader", { link = "@function" })
     vim.api.nvim_set_hl(0, "NightowlStartupEntry", { link = "NvimIdentifier" })
     vim.api.nvim_set_hl(
@@ -211,73 +209,85 @@ return {
       transparent = false,
       -- overrides some highlighting colors to get a more modern output for some
       -- views.
-      overrides = function(colors)
-        local theme = colors.theme
-        local pcol = colors.palette
-        return {
-          TelescopeTitle = { fg = theme.ui.special, bold = true },
-          TelescopePromptNormal = { bg = theme.ui.bg_p1 },
-          TelescopePromptBorder = { fg = theme.ui.bg_p1, bg = theme.ui.bg_p1 },
-          TelescopeResultsNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m1 },
-          TelescopeResultsBorder = { fg = theme.ui.bg_m1, bg = theme.ui.bg_m1 },
-          TelescopePreviewNormal = { bg = theme.ui.bg_dim },
-          TelescopePreviewBorder = {
-            bg = theme.ui.bg_dim,
-            fg = theme.ui.bg_dim,
-          },
-          Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 },
-          PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
-          PmenuSbar = { bg = theme.ui.bg_m1 },
-          PmenuThumb = { bg = theme.ui.bg_p2 },
-          InclineNormal = { bg = theme.ui.bg_p2 },
-          InclineNormalNC = { bg = theme.ui.bg_dim },
-          WinBar = { bg = pcol.sumiInk4 },
-          WinBarNC = { bg = pcol.sumiInk4 },
-          DropBarCurrentContext = { bg = "NONE" },
-          DropBarMenuCurrentContext = { bg = "NONE" },
-          DropBarIconCurrentContext = { bg = "NONE" },
-          DropBarPreview = { bg = "NONE" },
-          BiscuitColor = { link = "NightowlContextHints" },
-          LspInlayHint = { link = "NightowlInlayHints" },
-          TreesitterContextBottom = { underline = true },
-          NightowlContextHints = {
-            italic = true,
-            fg = pcol.winterGreen,
-          },
-          NightowlContextHintsBright = {
-            italic = true,
-            fg = pcol.winterYellow,
-          },
-          NightowlStartupEntry = {
-            bold = true,
-            fg = pcol.springViolet2,
-          },
-          NightowlStartupHeader = {
-            bold = true,
-            fg = pcol.springViolet1,
-          },
-          NightowlStartupConvenience = {
-            bold = false,
-            fg = pcol.waveBlue2,
-          },
-          NightowlInlayHints = {
-            fg = brush.find("DiagnosticVirtualTextInfo").bg,
-            bg = brush.find("WinSeparator").fg,
-            italic = true,
-          },
-          IndentBlanklineWhitespace = { link = "@comment" },
-          IndentBlanklineScope = { link = "@comment" },
-          IndentBlanklineIndent = { link = "@comment" },
-          Headline = {
-            fg = pcol.sumiInk0,
-            bg = pcol.sumiInk0,
-          },
-        }
-      end,
     },
     config = function(_, opts)
       require("kanagawa").setup(opts)
       -- require("kanagawa").load("wave")
+    end,
+  },
+  {
+    "rebelot/kanagawa.nvim",
+    opts = function(_, opts)
+      opts.overrides = opts.overrides
+        or function(colors)
+          local theme = colors.theme
+          local pcol = colors.palette
+          return {
+            TelescopeTitle = { fg = theme.ui.special, bold = true },
+            TelescopePromptNormal = { bg = theme.ui.bg_p1 },
+            TelescopePromptBorder = { fg = theme.ui.bg_p1, bg = theme.ui.bg_p1 },
+            TelescopeResultsNormal = {
+              fg = theme.ui.fg_dim,
+              bg = theme.ui.bg_m1,
+            },
+            TelescopeResultsBorder = {
+              fg = theme.ui.bg_m1,
+              bg = theme.ui.bg_m1,
+            },
+            TelescopePreviewNormal = { bg = theme.ui.bg_dim },
+            TelescopePreviewBorder = {
+              bg = theme.ui.bg_dim,
+              fg = theme.ui.bg_dim,
+            },
+            Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 },
+            PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
+            PmenuSbar = { bg = theme.ui.bg_m1 },
+            PmenuThumb = { bg = theme.ui.bg_p2 },
+            InclineNormal = { bg = theme.ui.bg_p2 },
+            InclineNormalNC = { bg = theme.ui.bg_dim },
+            WinBar = { bg = pcol.sumiInk4 },
+            WinBarNC = { bg = pcol.sumiInk4 },
+            DropBarCurrentContext = { bg = "NONE" },
+            DropBarMenuCurrentContext = { bg = "NONE" },
+            DropBarIconCurrentContext = { bg = "NONE" },
+            DropBarPreview = { bg = "NONE" },
+            BiscuitColor = { link = "NightowlContextHints" },
+            LspInlayHint = { link = "NightowlInlayHints" },
+            TreesitterContextBottom = { underline = true },
+            NightowlContextHints = {
+              bg = brush.find("Normal").bg,
+              fg = brush.find("@markup.raw").fg,
+              italic = true,
+            },
+            NightowlContextHintsBright = {
+              bg = brush.find("Normal").bg,
+              fg = brush.find("@tag").fg,
+              italic = true,
+            },
+            NightowlStartupEntry = {
+              bold = true,
+              fg = pcol.springViolet2,
+            },
+            NightowlStartupHeader = {
+              bold = true,
+              fg = pcol.springViolet1,
+            },
+            NightowlStartupConvenience = {
+              bold = false,
+              fg = pcol.waveBlue2,
+            },
+            NightowlInlayHints = {
+              link = "DiagnosticSignInfo",
+            },
+            IndentBlanklineWhitespace = { link = "@comment" },
+            IndentBlanklineScope = { link = "@comment" },
+            IndentBlanklineIndent = { link = "@comment" },
+            Headline = {
+              fg = pcol.sumiInk0,
+              bg = pcol.sumiInk0,
+            },
+          }
+        end
     end,
   },
   {

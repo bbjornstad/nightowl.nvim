@@ -115,7 +115,7 @@ return {
 
       local acmdr =
         require("funsak.autocmd").autocmdr("SpaceportBackgroundFix", true)
-      acmdr({ "BufWinEnter" }, {
+      acmdr({ "BufReadPost" }, {
         callback = function(ev)
           vim.cmd([[DisableHL]])
         end,

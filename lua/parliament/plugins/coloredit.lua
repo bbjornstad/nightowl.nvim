@@ -4,20 +4,25 @@ local key_color = require("environment.keys").color
 
 return {
   {
-    "norcalli/nvim-colorizer.lua",
+    "NvChad/nvim-colorizer.lua",
     event = "VeryLazy",
     opts = {
-      { "*" },
-      {
+      filetypes = { "*" },
+      user_default_options = {
         RGB = true,
         RRGGBB = true,
         RRGGBBAA = true,
+        AARRGGBB = true,
         names = true,
         rgb_fn = true,
         hsl_fn = true,
         css = true,
         css_fn = true,
         mode = "background",
+        tailwind = true,
+        sass = { enable = true, parsers = { "css" } },
+        virtualtext = "󰐮 ",
+        always_update = true,
       },
     },
     cmd = {
@@ -26,7 +31,14 @@ return {
       "ColorizerToggle",
     },
     config = function(_, opts)
-      require("colorizer").setup(unpack(opts))
+      require("colorizer").setup(opts)
+      -- local autocmdr = require("funsak.autocmd").autocmdr("NvimColorizer", true)
+      -- autocmdr({ "BufReadPost" }, {
+      --   callback = function(ev)
+      --     require("colorizer").attach_to_buffer(ev.buf)
+      --   end,
+      --   desc = "attach nvim-colorizer for all files",
+      -- })
     end,
     keys = {
       {
