@@ -159,8 +159,6 @@ return {
           behavior = cmp.ConfirmBehavior.Replace,
           select = cmp.SelectBehavior.Insert,
         }),
-        ["<A-j>"] = cmp_action.luasnip_jump_forward(),
-        ["<A-k>"] = cmp_action.luasnip_jump_backward(),
         [kenv_cmp.trigger] = cmp.mapping.complete(),
         -- we are going to make a mapping that will allow us to access focused
         -- groups of the completion menu with certain keystrokes. In particular, we

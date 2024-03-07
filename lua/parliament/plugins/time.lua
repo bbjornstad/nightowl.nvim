@@ -55,7 +55,7 @@ return {
         pattern = { "himalaya-email-listing", "mail" },
         callback = function(ev)
           local mapx = vim.keymap.set
-          local opts = { buffer = ev.bufnr, remap = false }
+          local opts = { buffer = ev.buf, remap = false }
           local mapn = function(lhs, rhs, desc, op)
             return mapx(
               "n",

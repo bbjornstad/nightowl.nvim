@@ -512,7 +512,7 @@ kenv.diagnostic = keygroup({
 local leader_lang = "'"
 kenv.lang = keygroup({
   yaml = {
-    [LEADER_ID] = leader_lang,
+    [LEADER_ID] = { append = leader_lang },
     schema = "y",
   },
   python = {
@@ -651,7 +651,7 @@ kenv.color = keygroup({
   greyscale = "G",
   list = "l",
   convert = {
-    [LEADER_ID] = "V",
+    [LEADER_ID] = { append = "V" },
     select = "V",
     hex = "X",
     hsl = "S",
@@ -1307,7 +1307,7 @@ kenv.git = keygroup({
       deleted = "d",
     },
     reset = {
-      [LEADER_ID] = "R",
+      [LEADER_ID] = { append = "R" },
       buffer = "b",
       hunk = "h",
       base = "B",
