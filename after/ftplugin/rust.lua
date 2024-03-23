@@ -1,31 +1,8 @@
 local key_rust = require("environment.keys").lang.rust
 local mapx = vim.keymap.set
-local mapn = function(lhs, rhs, opts)
-  mapx("n", lhs, rhs, opts)
-end
-local omapx = function(mode, lhs, rhs, opts)
-  opts = opts or {}
-  local descmap = {
-    class = opts.class or "",
-    family = opts.family or "",
-    label = opts.label or "",
-  }
-  opts.class = nil
-  opts.family = nil
-  opts.label = nil
-  opts = vim.tbl_deep_extend("force", {
-    desc = string.format(
-      "%s:rust| %s |=> %s",
-      descmap.class,
-      descmap.family,
-      descmap.label
-    ),
-    remap = false,
-    buffer = 0,
-  })
-  mapx(mode, lhs, rhs, opts)
-end
-local omapn = function(lhs, rhs, opts)
+local omapx = require("funsak.keys.group").omapx
+
+local function omapn(lhs, rhs, opts)
   omapx("n", lhs, rhs, opts)
 end
 
