@@ -219,89 +219,8 @@ return {
     },
   },
   {
-    "folke/edgy.nvim",
-    init = function()
-      vim.opt.splitkeep = "screen"
-    end,
-    keys = {
-      {
-        key_view.edgy.toggle,
-        function()
-          require("edgy").toggle()
-        end,
-        mode = "n",
-        desc = "win:| edgy |=> toggle",
-      },
-      {
-        key_view.edgy.select,
-        function()
-          require("edgy").select()
-        end,
-        mode = "n",
-        desc = "win:| edgy |=> select",
-      },
-    },
-    opts = function()
-      local op = {
-        options = {
-          left = { size = 28 },
-          right = { size = 30 },
-          bottom = { size = 16 },
-          top = { size = 16 },
-        },
-        bottom = {
-          {
-            ft = "toggleterm",
-            title = "term.toggle::",
-            size = { height = 0.4 },
-            filter = function(buf, win)
-              return vim.api.nvim_win_get_config(win).relative == ""
-            end,
-          },
-          {
-            ft = "noice",
-            size = { height = 0.4 },
-            filter = function(buf, win)
-              return vim.api.nvim_win_get_config(win).relative == ""
-            end,
-          },
-          {
-            ft = "lazyterm",
-            title = "term.lazy::",
-            size = { height = 0.4 },
-            filter = function(buf)
-              return not vim.b[buf].lazyterm_cmd
-            end,
-          },
-          { ft = "Trouble", title = "diag::trouble" },
-          { ft = "qf", title = "edit::quickfix" },
-          {
-            ft = "spectre_panel",
-            title = "edit::search/replace",
-            size = { height = 0.4 },
-          },
-          {
-            title = "neotest::output",
-            ft = "neotest-output-panel",
-            size = { height = 15 },
-          },
-        },
-        left = { { title = "neotest::summary", ft = "neotest-summary" } },
-        right = {},
-        exit_when_last = true,
-      }
-
-      if has("outline.nvim") then
-        op.left = vim.list_extend(op.left, {
-          title = "symb::outline",
-          ft = "Outline",
-          size = { height = 0.5 },
-        })
-      end
-    end,
-  },
-  {
     "stevearc/stickybuf.nvim",
+    enabled = false,
     event = "BufWinEnter",
     cmd = { "PinBuffer", "PinBuftype", "PinFiletype", "Unpin" },
     opts = {
@@ -423,30 +342,6 @@ return {
     },
   },
   {
-    "jyscao/ventana.nvim",
-    cmd = { "VentanaTranspose", "VentanaShift", "VentanaShiftMaintainLinear" },
-    keys = {
-      {
-        key_win.ventana.transpose,
-        "<CMD>VentanaTranspose<CR>",
-        mode = "n",
-        desc = "win:| vent |=> transpose",
-      },
-      {
-        key_win.ventana.shift,
-        "<CMD>VentanaShift<CR>",
-        mode = "n",
-        desc = "win:| vent |=> shift",
-      },
-      {
-        key_win.ventana.linear_shift,
-        "<CMD>VentanaShiftMaintainLinear<CR>",
-        mode = "n",
-        desc = "win:| vent |=> linear shift",
-      },
-    },
-  },
-  {
     "ghillb/cybu.nvim",
     event = "VeryLazy",
     branch = "main",
@@ -494,7 +389,7 @@ return {
         anchor = "topleft",
         vertical_offset = 12,
         horizontal_offset = 16,
-        max_win_height = 8,
+        max_win_height = 12,
         max_win_width = 0.4,
       },
       style = {
@@ -672,22 +567,6 @@ return {
       require("bufresize").setup(opts)
     end,
     event = "BufWinEnter",
-  },
-  {
-    "michaelPotter/accordian.nvim",
-    opts = {},
-    config = function(_, opts)
-      require("accordian").setup()
-    end,
-    event = "VeryLazy",
-    keys = {
-      {
-        key_win.accordian,
-        "<CMD>Accordian<CR>",
-        mode = "n",
-        desc = "win:| accordian |=> toggle",
-      },
-    },
   },
   {
     "yutkat/confirm-quit.nvim",
