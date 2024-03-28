@@ -112,17 +112,6 @@ return {
         chunk_ft.exclude_filetypes
       )
       require("hlchunk").setup(opts)
-
-      local acmdr =
-        require("funsak.autocmd").autocmdr("SpaceportBackgroundFix", true)
-      acmdr({ "BufReadPost" }, {
-        callback = function(ev)
-          vim.cmd([[DisableHL]])
-        end,
-        -- buffer = true,
-        desc = "Disable Spaceport Background HLChunk",
-        pattern = "*spaceport*",
-      })
     end,
     opts = {
       indent = {
