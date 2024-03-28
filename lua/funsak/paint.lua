@@ -81,14 +81,43 @@ function Brush:query(attrs)
   )
 end
 
-function Brush:blend(other, opts) end
+function Brush:blend(other, opts)
+  opts = opts or {}
+  local old, que = M.find(other)
+  local new = self:mix(old, opts)
+end
+
+function Brush:parse_mods(opts)
+  opts = opts or {}
+  local mods = opts.mods or {}
+  local mapped = vim.tbl_map(function(i)
+    if type(i) == "table" then
+      -- TODO: Implement
+      return function(this, that) end
+    else
+      return i
+    end
+  end, mods)
+  return mapped
+end
+
+---@class funsak.paint.Mixers
+---@field filter vim.api.keyset.highlight[]?
+---@field alter { [vim.api.keyset.highlight]: fun(this, that): vim.api.keyset.highlight | { this: any?, that: any? } }
+---@field copy boolean?
 
 function Brush:mix(onto, opts)
   opts = opts or {}
+  opts.copy = opts.copy ~= nil and opts.copy or true
+  onto = opts.copy and vim.deepcopy(onto) or onto
   -- onto has to be a highlight group
-  local new =
-    vim.tbl_deep_extend("force", opts.copy and vim.deepcopy(onto) or onto, self)
-  return new
+  local mods = self:parse_mods(opts)
+  local mapped = vim.tbl_map(function(cb)
+    local this = self[cb]
+    local that = onto[cb]
+    return cb(this, that)
+  end, mods)
+  return mapped
 end
 
 function M.fz(namespace, opts)
@@ -98,8 +127,8 @@ end
 
 function M.brush(opts)
   opts = opts or {}
-  local query
-  return Brush.from(query)
+
+  return Brush.from(opts)
 end
 
 local mt = {
