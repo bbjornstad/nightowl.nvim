@@ -39,10 +39,10 @@ local bg_style = os.getenv("NIGHTOWL_BACKGROUND")
 local scheme_sel = os.getenv("NIGHTOWL_COLORSCHEME")
 local key_ui = require("environment.keys").ui
 local key_scope = require("environment.keys").scope
+local key_colors = require("environment.keys").color
 
-local function importcs()
+local function import_pineapple()
   local res = require("schemes.pineapple")
-  vim.notify(vim.inspect(res))
   return type(res) == "table" and res or {}
 end
 
@@ -50,8 +50,12 @@ if conv.bool_from_env("NIGHTOWL_DEBUG") then
   local cmdr = require("funsak.autocmd").autocmdr("Nightowl_ColorschemeInfo")
   cmdr({ "UIEnter" }, {
     callback = function(ev)
-      lz.info("Selected Background: " .. bg_style)
-      lz.info("Selected Colorscheme: " .. scheme_sel)
+      vim.schedule(function()
+        lz.info("Selected Background: " .. bg_style)
+      end)
+      vim.schedule(function()
+        lz.info("Selected Colorscheme: " .. scheme_sel)
+      end)
     end,
   })
 end
@@ -104,29 +108,6 @@ local REQUIRED_HLS = {
     "IndentBlanklineScope",
   },
 }
-
--- set up an autocommand to make sure that on change of colorscheme, we actually
--- go forward and apply the highlights that are necessary for functioning
--- without erroring all over the map.
-
-local function autocmdr(group_name, group_opts)
-  group_opts = group_opts or {}
-  local augroup_opts = group_opts.augroup or {}
-  augroup_opts = vim.tbl_deep_extend("force", { clear = true }, augroup_opts)
-  return function(events, handler, specopts)
-    specopts = specopts or {}
-    vim.api.nvim_create_autocmd(
-      events,
-      vim.tbl_deep_extend("force", vim.is_callable(handler) and {
-        group = vim.api.nvim_create_augroup(group_name, augroup_opts),
-        callback = handler,
-      } or {
-        group = vim.api.nvim_create_augroup(group_name, augroup_opts),
-        command = handler,
-      }, specopts)
-    )
-  end
-end
 
 local cs_autocmdr =
   require("funsak.autocmd").autocmdr("RequiredHighlight", true)
@@ -256,7 +237,7 @@ return {
             TreesitterContextBottom = { underline = true },
             NightowlContextHints = {
               bg = brush.find("Normal").bg,
-              fg = brush.find("@markup.raw").fg,
+              fg = brush.find("Folded@function.call").fg,
               italic = true,
             },
             NightowlContextHintsBright = {
@@ -342,79 +323,10 @@ return {
     end,
   },
   {
-    "rose-pine/neovim",
-    enabled = true,
-    name = "rose-pine",
-    opts = function(_, opts)
-      local rppal = require("rose-pine.palette")
-      opts.variant = "auto" or opts.variant
-      opts.dark_variant = "moon" or opts.dark_variant
-      opts.highlight_groups = vim.tbl_deep_extend("force", {
-        TelescopeBorder = { fg = "overlay", bg = "overlay" },
-        TelescopeNormal = { fg = "subtle", bg = "overlay" },
-        TelescopeSelection = { fg = "text", bg = "highlight_med" },
-        TelescopeSelectionCaret = { fg = "love", bg = "highlight_med" },
-        TelescopeMultiSelection = { fg = "text", bg = "highlight_high" },
-
-        TelescopeTitle = { fg = "base", bg = "love" },
-        TelescopePromptTitle = { fg = "base", bg = "pine" },
-        TelescopePreviewTitle = { fg = "base", bg = "iris" },
-
-        TelescopePromptNormal = { fg = "text", bg = "surface" },
-        TelescopePromptBorder = { fg = "surface", bg = "surface" },
-        Pmenu = { fg = rppal.rose, bg = rppal.base },
-        PmenuSel = { fg = "NONE", bg = rppal.surface },
-        PmenuSbar = { bg = rppal.muted },
-        PmenuThumb = { bg = rppal.overlay },
-        InclineNormal = { bg = rppal.surface },
-        InclineNormalNC = { bg = rppal.base },
-        WinBar = { bg = rppal.surface },
-        WinBarNC = { bg = rppal.base },
-        BiscuitColor = { link = "@comment" },
-        DropBarCurrentContext = { bg = "NONE" },
-        DropBarMenuCurrentContext = { bg = "NONE" },
-        DropBarIconCurrentContext = { bg = "NONE" },
-        DropBarPreview = { bg = "NONE" },
-        TreesitterContextBottom = { underline = true },
-        NightowlContextHints = {
-          italic = true,
-          fg = default_colorizer("@punctuation"),
-        },
-        IndentBlanklineWhitespace = { link = "@comment" },
-        IndentBlanklineScope = { link = "@comment" },
-        IndentBlanklineIndent = { link = "@comment" },
-
-        Headline = { fg = rppal.base },
-      }, opts.highlight_groups or {})
-    end,
-    config = true,
-    lazy = false,
-    priority = 960,
-  },
-  {
     "Verf/deepwhite.nvim",
     priority = 980,
     config = function(_, opts)
       local dw_accent = "#E5E5E5"
-      -- defhl({ "TelescopeBorder" }, { fg = "overlay", bg = "overlay" })
-      -- defhl({ "TelescopeNormal" }, { fg = "subtle", bg = "overlay" })
-      -- defhl({ "TelescopeSelection" }, { fg = "text", bg = "highlight_med" })
-      -- defhl(
-      --   { "TelescopeSelectionCaret" },
-      --   { fg = "love", bg = "highlight_med" }
-      -- )
-      -- defhl(
-      --   { "TelescopeMultiSelection" },
-      --   { fg = "text", bg = "highlight_high" }
-      -- )
-      --
-      -- defhl({ "TelescopeTitle" }, { fg = "base", bg = "love" })
-      -- defhl({ "TelescopePromptTitle" }, { fg = "base", bg = "pine" })
-      -- defhl({ "TelescopePreviewTitle" }, { fg = "base", bg = "iris" })
-      --
-      -- defhl({ "TelescopePromptNormal" }, { fg = "text", bg = "surface" })
-      -- defhl({ "TelescopePromptBorder" }, { fg = "surface", bg = "surface" })
-
       defhl({ "TreesitterContextBottom" }, { fg = dw_accent, underline = true })
       defhl({ "NightowlContextHints" }, { italic = true, fg = dw_accent })
       defhl({ "WinSeparator" }, { fg = dw_accent })
@@ -453,6 +365,7 @@ return {
         },
         module_default = true,
         groups = {
+
           NightowlContextHints = { link = "@markup.raw" },
           NightowlContextHintsBright = { link = "@tag" },
         },
@@ -462,11 +375,30 @@ return {
     lazy = false,
   },
   {
+    "olivercederborg/poimandres.nvim",
+    config = function(_, opts)
+      require("poimandres").setup(opts)
+    end,
+    opts = {},
+    lazy = false,
+    priority = 850,
+  },
+  {
+    "kepano/flexoki-neovim",
+    opts = {},
+    name = "flexoki",
+    config = function(_, opts)
+      -- require("flexoki").setup(opts)
+    end,
+    lazy = false,
+    priority = 840,
+  },
+  {
     "CWood-sdf/pineapple",
     lazy = false,
     dependencies = vim.list_extend(
       { "nvim-telescope/telescope.nvim" },
-      importcs()
+      import_pineapple()
     ),
     opts = {
       installedRegistry = "schemes.pineapple",
@@ -478,6 +410,14 @@ return {
       require("telescope").load_extension("pineapple")
     end,
     keys = {
+      {
+        key_colors.pineapple,
+        function()
+          vim.cmd([[Pineapple]])
+        end,
+        mode = "n",
+        desc = "color:| scheme |=> pineapple",
+      },
       {
         key_ui.color.pineapple,
         function()
