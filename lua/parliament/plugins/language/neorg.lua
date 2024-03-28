@@ -88,7 +88,6 @@ return {
     },
     cmd = "Neorg",
     ft = { "norg" },
-    build = ":Neorg sync-parsers",
     config = function(_, opts)
       require("neorg").setup(opts)
     end,

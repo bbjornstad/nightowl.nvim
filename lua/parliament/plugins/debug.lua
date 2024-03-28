@@ -158,6 +158,7 @@ return {
           }, opts.library or {})
         end,
       },
+      "nvim-neotest/nvim-nio",
     },
   },
   -- which key integration
