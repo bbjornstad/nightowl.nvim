@@ -41,6 +41,7 @@ return {
       "scheme",
       "guile",
       "julia",
+      "lisp",
     },
     dependencies = {
       {
@@ -56,6 +57,7 @@ return {
           "scheme",
           "guile",
           "julia",
+          "lisp",
         },
       },
     },
