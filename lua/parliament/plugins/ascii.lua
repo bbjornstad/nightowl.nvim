@@ -40,6 +40,7 @@ local key_cline = key_editor.cline
 local key_figlet = key_editor.figlet
 local key_venn = key_editor.venn
 local key_iconpick = key_editor.glyph.picker
+local key_uni = key_editor.glyph.unicode
 
 local mopts = require("funsak.table").mopts
 local inp = require("parliament.utils.input")
@@ -299,19 +300,19 @@ return {
           vim.notify(("Assigned Figlet Font: %s"):format(input))
         end),
         mode = { "n" },
-        desc = "figlet.ban=> select banner font",
+        desc = "figlet:| ban |=> select banner font",
       },
       {
         key_figlet.banner.generate,
         inp.cmdtext_input("banner text:", [[Figban %s]]),
         mode = "n",
-        desc = "figlet.ban=> generate banner",
+        desc = "figlet:| ban |=> generate banner",
       },
       {
         key_figlet.banner.generate,
         "<CMD>Figban<CR>",
         mode = "v",
-        desc = "figlet.ban=> selection generate banner",
+        desc = "figlet:| ban |=> selection generate banner",
       },
     },
   },
@@ -377,7 +378,7 @@ return {
     config = false,
     init = function()
       -- venn.nvim: enable or disable keymappings
-      function _G.ToggleVenn()
+      local function ToggleVenn()
         local venn_enabled = vim.inspect(vim.b.venn_enabled)
         if venn_enabled == "nil" then
           vim.b.venn_enabled = true
@@ -426,13 +427,10 @@ return {
         end
       end
 
+      vim.keymap.set("n", key_venn, function()
+        ToggleVenn()
+      end, { noremap = true, desc = "ascii:| venn |=> toggle" })
       -- toggle keymappings for venn using <leader>v
-      vim.api.nvim_set_keymap(
-        "n",
-        key_venn,
-        "<CMD>lua ToggleVenn()<CR>",
-        { noremap = true }
-      )
     end,
   },
   {
@@ -447,7 +445,7 @@ return {
         key_editor.glyph.nerdy,
         "<CMD>Nerdy<CR>",
         mode = "n",
-        desc = "glyph.nerdfont=> symbols",
+        desc = "glyph:| nerdfont |=> symbols",
       },
     },
   },
@@ -470,7 +468,7 @@ return {
         key_editor.glyph.nerdicons,
         "<CMD>NerdIcons<CR>",
         mode = "n",
-        desc = "glyph.nerdicons=> symbols",
+        desc = "glyph:| nerdicons |=> symbols",
       },
     },
   },
@@ -513,145 +511,186 @@ return {
         key_iconpick.normal.everything,
         "<CMD>PickEverything<CR>",
         mode = "n",
-        desc = "glyph.pick=> everything",
+        desc = "glyph:| pick |=> everything",
       },
       {
         key_iconpick.normal.icons,
         "<CMD>PickIcons<CR>",
         mode = "n",
-        desc = "glyph.pick=> icons",
+        desc = "glyph:| pick |=> icons",
       },
       {
         key_iconpick.normal.emoji,
         "<CMD>PickEmoji<CR>",
         mode = "n",
-        desc = "glyph.pick=> emoji",
+        desc = "glyph:| pick |=> emoji",
       },
       {
         key_iconpick.normal.nerd,
         "<CMD>PickNerd<CR>",
         mode = "n",
-        desc = "glyph.icons=> nerdfont",
+        desc = "glyph:| icons |=> nerdfont",
       },
       {
         key_iconpick.normal.nerdv3,
         "<CMD>PickNerdV3<CR>",
         mode = "n",
-        desc = "glyph.icons=> v3 nerdfont",
+        desc = "glyph:| icons |=> v3 nerdfont",
       },
       {
         key_iconpick.normal.symbols,
         "<CMD>PickSymbols<CR>",
         mode = "n",
-        desc = "glyph.icons=> symbols",
+        desc = "glyph:| icons |=> symbols",
       },
       {
         key_iconpick.normal.altfont,
         "<CMD>PickAltFont<CR>",
         mode = "n",
-        desc = "glyph.icons=> font (alt)",
+        desc = "glyph:| icons |=> font (alt)",
       },
       {
         key_iconpick.normal.altfontsymbols,
         "<CMD>PickAltFontAndSymbols<CR>",
         mode = "n",
-        desc = "glyph.icons=> font and symbols (alt)",
+        desc = "glyph:| icons |=> font and symbols (alt)",
       },
       {
         key_iconpick.yank.everything,
         "<CMD>PickEverythingYank<CR>",
         mode = "n",
-        desc = "glyph.pick=> everything",
+        desc = "glyph:| pick |=> everything",
       },
       {
         key_iconpick.yank.icons,
         "<CMD>PickIconsYank<CR>",
         mode = "n",
-        desc = "glyph.pick=> icons",
+        desc = "glyph:| pick |=> icons",
       },
       {
         key_iconpick.yank.emoji,
         "<CMD>PickEmojiYank<CR>",
         mode = "n",
-        desc = "glyph.pick=> emoji",
+        desc = "glyph:| pick |=> emoji",
       },
       {
         key_iconpick.yank.nerd,
         "<CMD>PickNerdYank<CR>",
         mode = "n",
-        desc = "glyph.icons=> nerdfont",
+        desc = "glyph:| icons |=> nerdfont",
       },
       {
         key_iconpick.yank.nerdv3,
         "<CMD>PickNerdV3Yank<CR>",
         mode = "n",
-        desc = "glyph.icons=> v3 nerdfont",
+        desc = "glyph:| icons |=> v3 nerdfont",
       },
       {
         key_iconpick.yank.symbols,
         "<CMD>PickSymbolsYank<CR>",
         mode = "n",
-        desc = "glyph.icons=> symbols",
+        desc = "glyph:| icons |=> symbols",
       },
       {
         key_iconpick.yank.altfont,
         "<CMD>PickAltFontYank<CR>",
         mode = "n",
-        desc = "glyph.icons=> font (alt)",
+        desc = "glyph:| icons |=> font (alt)",
       },
       {
         key_iconpick.yank.altfontsymbols,
         "<CMD>PickAltFontAndSymbolsYank<CR>",
         mode = "n",
-        desc = "glyph.icons=> font and symbols (alt)",
+        desc = "glyph:| icons |=> font and symbols (alt)",
       },
       {
         key_iconpick.insert.everything,
         "<CMD>PickEverythingInsert<CR>",
         mode = "n",
-        desc = "glyph.pick=> everything",
+        desc = "glyph:| pick |=> everything",
       },
       {
         key_iconpick.insert.icons,
         "<CMD>PickIconsInsert<CR>",
         mode = "n",
-        desc = "glyph.pick=> icons",
+        desc = "glyph:| pick |=> icons",
       },
       {
         key_iconpick.insert.emoji,
         "<CMD>PickEmojiInsert<CR>",
         mode = "n",
-        desc = "glyph.pick=> emoji",
+        desc = "glyph:| pick |=> emoji",
       },
       {
         key_iconpick.insert.nerd,
         "<CMD>PickNerdInsert<CR>",
         mode = "n",
-        desc = "glyph.icons=> nerdfont",
+        desc = "glyph:| icons |=> nerdfont",
       },
       {
         key_iconpick.insert.nerdv3,
         "<CMD>PickNerdV3Insert<CR>",
         mode = "n",
-        desc = "glyph.icons=> v3 nerdfont",
+        desc = "glyph:| icons |=> v3 nerdfont",
       },
       {
         key_iconpick.insert.symbols,
         "<CMD>PickSymbolsInsert<CR>",
         mode = "n",
-        desc = "glyph.icons=> symbols",
+        desc = "glyph:| icons |=> symbols",
       },
       {
         key_iconpick.insert.altfont,
         "<CMD>PickAltFontInsert<CR>",
         mode = "n",
-        desc = "glyph.icons=> font (alt)",
+        desc = "glyph:| icons |=> font (alt)",
       },
       {
         key_iconpick.insert.altfontsymbols,
         "<CMD>PickAltFontAndSymbolsInsert<CR>",
         mode = "n",
-        desc = "glyph.icons=> font and symbols (alt)",
+        desc = "glyph:| icons |=> font and symbols (alt)",
+      },
+    },
+  },
+  {
+    "chrisbra/unicode.vim",
+    keys = {
+      {
+        key_uni.digraphs,
+        "<CMD>Digraphs<CR>",
+        mode = "n",
+        desc = "glyph:| unicode |=> digraphs",
+      },
+      {
+        key_uni.search,
+        "<CMD>UnicodeSearch<CR>",
+        mode = "n",
+        desc = "glyph:| unicode |=> search",
+      },
+      {
+        key_uni.search_add,
+        "<CMD>UnicodeSearch!<CR>",
+        mode = "n",
+        desc = "glyph:| unicode |=> search>add",
+      },
+      {
+        key_uni.name,
+        "<CMD>UnicodeName<CR>",
+        mode = "n",
+        desc = "glyph:| unicode |=> name",
+      },
+      {
+        key_uni.table,
+        "<CMD>UnicodeTable<CR>",
+        mode = "n",
+        desc = "glyph:| unicode |=> table",
+      },
+      {
+        key_uni.update,
+        "<CMD>DownloadUnicode<CR>",
+        mode = "n",
+        desc = "glyph:| unicode |=> update data",
       },
     },
   },

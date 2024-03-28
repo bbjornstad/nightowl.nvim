@@ -57,7 +57,7 @@ return {
           require("undotree").toggle()
         end,
         mode = "n",
-        desc = "::undo=> toggle tree",
+        desc = "undo:| tree |=> toggle",
         noremap = true,
         silent = true,
       },
@@ -67,7 +67,7 @@ return {
           require("undotree").open()
         end,
         mode = "n",
-        desc = "::undo=> open tree",
+        desc = "undo:| tree |=> open",
         noremap = true,
         silent = true,
       },
@@ -77,7 +77,7 @@ return {
           require("undotree").close()
         end,
         mode = "n",
-        desc = "::undo=> close tree",
+        desc = "undo:| tree |=> close",
         noremap = true,
         silent = true,
       },
@@ -136,7 +136,7 @@ return {
         key_git.neogit,
         "<CMD>Neogit<CR>",
         mode = { "n" },
-        desc = "::git.neo=> open",
+        desc = "git:| neo |=> open",
       },
     },
   },
@@ -159,43 +159,43 @@ return {
         key_git.conflict.quickfix,
         "<CMD>GitConflictListQf<CR>",
         mode = "n",
-        desc = "::git.conflict=> quick fix",
+        desc = "git:| conflict |=> quick fix",
       },
       {
         key_git.conflict.choose_ours,
         "<CMD>GitConflictChooseOurs<CR>",
         mode = "n",
-        desc = "::git.conflict=> choose ours",
+        desc = "git:| conflict |=> ours",
       },
       {
         key_git.conflict.choose_theirs,
         "<CMD>GitConflictChooseTheirs<CR>",
         mode = "n",
-        desc = "::git.conflict=> choose theirs",
+        desc = "git:| conflict |=> theirs",
       },
       {
         key_git.conflict.choose_both,
         "<CMD>GitConflictChooseBoth<CR>",
         mode = "n",
-        desc = "::git.conflict=> choose both",
+        desc = "git:| conflict |=> both",
       },
       {
         key_git.conflict.choose_none,
         "<CMD>GitConflictChooseNone<CR>",
         mode = "n",
-        desc = "::git.conflict=> choose none",
+        desc = "git:| conflict |=> none",
       },
       {
         key_git.conflict.next,
         "<CMD>GitConflictNextConflict<CR>",
         mode = "n",
-        desc = "::git.conflict=> next",
+        desc = "git:| conflict |=> next",
       },
       {
         key_git.conflict.previous,
         "<CMD>GitConflictPrevConflict<CR>",
         mode = "n",
-        desc = "::git.conflict=> previous",
+        desc = "git:| conflict |=> previous",
       },
     },
   },
@@ -207,7 +207,7 @@ return {
         key_view.infowindow,
         "<CMD>InfoWindowToggle<CR>",
         mode = "n",
-        desc = "::info=> buffer metadata/file info",
+        desc = "info:buf| meta |=> show",
       },
     },
   },
@@ -252,7 +252,7 @@ return {
         end,
         mode = { "n" },
         -- mode = { "n", "v" },
-        desc = "::git.log=> check",
+        desc = "git:| log |=> check",
       },
     },
   },
@@ -276,14 +276,27 @@ return {
         key_git.tardis,
         "<CMD>Tardis<CR>",
         mode = "n",
-        desc = "::git.tardis=> open",
+        desc = "git:| tardis |=> open",
       },
     },
   },
   {
     "gennaro-tedesco/nvim-possession",
     dependencies = { "ibhagwan/fzf-lua" },
-    opts = { autoswitch = { enable = true } },
+    opts = {
+      autoswitch = { enable = true },
+      sessions = {
+        sessions_path = vim.fs.joinpath(vim.fn.stdpath("data"), "sessions"),
+        sessions_icon = "󰨇",
+        sessions_prompt = "󱈇 fz:sessions",
+      },
+      fzf_winopts = {
+        width = 0.64,
+        preview = {
+          vertical = "right:50%",
+        },
+      },
+    },
     config = function(_, opts)
       require("nvim-possession").setup(opts)
     end,
@@ -294,7 +307,7 @@ return {
           require("nvim-possession").list()
         end,
         mode = "n",
-        desc = "session=> list",
+        desc = "session:| sesh |=> list",
       },
       {
         key_session.new,
@@ -302,7 +315,7 @@ return {
           require("nvim-possession").new()
         end,
         mode = "n",
-        desc = "session=> new",
+        desc = "session:| sesh |=> new",
       },
       {
         key_session.update,
@@ -310,7 +323,7 @@ return {
           require("nvim-possession").update()
         end,
         mode = "n",
-        desc = "session=> update",
+        desc = "session:| sesh |=> update",
       },
       {
         key_session.delete,
@@ -318,7 +331,7 @@ return {
           require("nvim-possession").delete()
         end,
         mode = "n",
-        desc = "session=> delete",
+        desc = "session:| sesh |=> delete",
       },
     },
   },
@@ -355,7 +368,7 @@ return {
       require("telescope").load_extension("workspaces")
     end,
     opts = {
-      path = vim.fn.stdpath("data") .. "/workspaces",
+      path = vim.fs.joinpath(vim.fn.stdpath("data"), "workspaces"),
       cd_type = "tab",
       auto_open = true,
     },
@@ -644,6 +657,61 @@ return {
         end,
         mode = "n",
         desc = "git:diff| signs |=> diffthis",
+      },
+    },
+  },
+  {
+    "SuperBo/fugit2.nvim",
+    opts = {},
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "nvim-lua/plenary.nvim",
+      {
+        "chrisgrieser/nvim-tinygit",
+        dependencies = { "stevearc/dressing.nvim" },
+      },
+      "sindrets/diffview.nvim",
+    },
+    cmd = { "Fugit2", "Fugit2Graph", "Fugit2Diff" },
+    keys = {
+      {
+        key_git.fugit.open,
+        "<CMD>Fugit2<CR>",
+        mode = "n",
+        desc = "git:| fu => open",
+      },
+      {
+        key_git.fugit.graph,
+        "<CMD>Fugit2Graph<CR>",
+        mode = "n",
+        desc = "git:| fu => graph",
+      },
+      {
+        key_git.fugit.diff,
+        "<CMD>Fugit2Diff<CR>",
+        mode = "n",
+        desc = "git:| fu => diff",
+      },
+    },
+  },
+  {
+    "kilavila/nvim-gitignore",
+    cmd = { "Gitignore", "Licenses" },
+    opts = {},
+    config = function(_, opts) end,
+    keys = {
+      {
+        key_git.ignore.generate,
+        "<CMD>Gitignore<CR> ",
+        mode = "n",
+        desc = "git:| ignore |=> generate",
+      },
+      {
+        key_git.ignore.licenses,
+        "<CMD>Licenses<CR> ",
+        mode = "n",
+        desc = "git:| license |=> select",
       },
     },
   },

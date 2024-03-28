@@ -172,7 +172,7 @@ return {
           end)
         end,
         mode = "n",
-        desc = "::pulse=> new custom timer",
+        desc = "pulse:| new |=> custom now",
       },
       {
         key_pulse.new_disabled_custom,
@@ -182,7 +182,7 @@ return {
           end)
         end,
         mode = "n",
-        desc = "::pulse=> new custom timer (no enable)",
+        desc = "pulse:| new |=> custom promise",
       },
       {
         key_pulse.enable_standard,
@@ -190,7 +190,7 @@ return {
           require("pulse").enable("standard")
         end,
         mode = "n",
-        desc = "::pulse=> enable standard",
+        desc = "pulse:| std |=> enable",
       },
       {
         key_pulse.disable_standard,
@@ -198,7 +198,7 @@ return {
           require("pulse").disable("standard")
         end,
         mode = "n",
-        desc = "::pulse=> disable standard",
+        desc = "pulse:| std |=> disable",
       },
       {
         key_pulse.pick,
@@ -206,7 +206,7 @@ return {
           require("pulse").pick_timers()
         end,
         mode = "n",
-        desc = "::pulse=> pick timer",
+        desc = "pulse:| <all> |=> pick",
       },
     },
   },
@@ -223,7 +223,7 @@ return {
           local d, h, m = unpack(require("timewasted").dhms(total_sec))
           local time_str = string.format("%2dd %02dh %02dm", d, h, m)
 
-          return string.format("TWC: %s", time_str)
+          return time_str
         end,
       }
     end,
@@ -242,31 +242,31 @@ return {
         key_time.stand.now,
         "<CMD>StandNow<CR>",
         mode = "n",
-        desc = "time.stand=> now",
+        desc = "time:| stand |=> now",
       },
       {
         key_time.stand.every,
         "<CMD>StandEvery<CR>",
         mode = "n",
-        desc = "time.stand=> set interval",
+        desc = "time:| stand |=> set interval",
       },
       {
         key_time.stand.disable,
         "<CMD>StandDisable<CR>",
         mode = "n",
-        desc = "time.stand=> disable",
+        desc = "time:| stand |=> disable",
       },
       {
         key_time.stand.enable,
         "<CMD>StandEnable<CR>",
         mode = "n",
-        desc = "time.stand=> enable",
+        desc = "time:| stand |=> enable",
       },
       {
         key_time.stand.when,
         "<CMD>StandWhen<CR>",
         mode = "n",
-        desc = "time.stand=> when",
+        desc = "time:| stand |=> when",
       },
     },
   },
@@ -295,7 +295,7 @@ return {
     opts = {
       location = "Denver",
       -- format = 4,
-      custom_format = "%C+%cP:%p+T:%t+F:%f+%w+%m+%P+UV:%u+Hum:%h",
+      custom_format = "%l:%x:%f::%M",
     },
     keys = {
       {
@@ -304,21 +304,9 @@ return {
           require("wttr").get_forecast()
         end,
         mode = "n",
-        desc = "wttr |=> conditions",
+        desc = "wttr:| conditions |=> float",
       },
     },
-  },
-  {
-    "nvim-lualine/lualine.nvim",
-    dependencies = {
-      "lazymaniac/wttr.nvim",
-    },
-    opts = function(_, opts)
-      opts.sections = opts.sections or {}
-      opts.sections.lualine_z = vim.list_extend(opts.sections.lualine_z or {}, {
-        "require'wttr'.text",
-      })
-    end,
   },
   {
     "liljaylj/codestats.nvim",
