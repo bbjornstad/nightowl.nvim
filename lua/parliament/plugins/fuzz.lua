@@ -97,42 +97,57 @@ return {
           ["<C-a>"] = "toggle-all",
           ["<C-p>"] = "previous",
           ["<C-n>"] = "next",
-          ["<C-v>"] = "toggle-preview",
+          ["<C-e>"] = "toggle-preview",
           ["<C-f>"] = "preview-down",
           ["<C-b>"] = "preview-up",
           ["<C-d>"] = "half-page-down",
           ["<C-u>"] = "half-page-up",
-          ["<C-s>"] = "toggle-search",
+          ["<C-w>"] = "toggle-search",
           ["<C-r>"] = "refresh-preview",
         },
         fzf = {
           -- most of these are free by default if there is no masking key bound
           -- in vim, namely the up and down commands.
           ["ctrl-c"] = "cancel",
-          ["ctrl-v"] = "toggle-preview",
+          ["ctrl-e"] = "toggle-preview",
           ["ctrl-f"] = "preview-down",
           ["ctrl-b"] = "preview-up",
           ["ctrl-d"] = "half-page-down",
           ["ctrl-u"] = "half-page-up",
           ["ctrl-a"] = "toggle-all",
-          ["ctrl-s"] = "toggle-search",
+          ["ctrl-w"] = "toggle-search",
           ["ctrl-r"] = "refresh-preview",
           -- [string.lower(string.gsub(key_fuzz:close(), "[<>]", ""))] = "abort",
+        },
+      },
+      actions = {
+        files = {
+          ["default"] = action("file_edit_or_qf"),
+          ["ctrl-q"] = action("file_sel_to_qf"),
+          ["ctrl-l"] = action("file_sel_to_ll"),
+          ["ctrl-v"] = action("file_vsplit"),
+          ["ctrl-s"] = action("file_split"),
+          ["ctrl-t"] = action("file_tabedit"),
+        },
+        buffers = {
+          -- providers that inherit these actions:
+          --   buffers, tabs, lines, blines
+          ["default"] = action("buf_edit"),
+          ["ctrl-s"] = action("buf_split"),
+          ["ctrl-v"] = action("buf_vsplit"),
+          ["ctrl-t"] = action("buf_tabedit"),
         },
       },
       fzf_opts = {
         ["--ansi"] = "",
         ["--info"] = "inline",
-        ["--cycle"] = "",
+        ["--cycle"] = true,
         ["--scroll-off"] = 4,
+        ["--layout"] = "reverse",
       },
       files = {
         rg_opts = "--color=never --files --hidden --follow -g '!.git'",
         fd_opts = "--color=never --type f --hidden --follow --exclude .git",
-        actions = {
-          ["ctrl-q"] = action("file_sel_to_qf"),
-          ["ctrl-l"] = action("file_sel_to_ll"),
-        },
       },
       winopts = {
         title = "querying: ",
@@ -161,6 +176,9 @@ return {
           vim.keymap.set("t", "<C-s>", "<C-s>", { buffer = true })
           vim.keymap.set("t", "<C-a>", "<C-a>", { buffer = true })
           vim.keymap.set("t", "<C-r>", "<C-r>", { buffer = true })
+          vim.keymap.set("t", "<C-e>", "<C-e>", { buffer = true })
+          vim.keymap.set("t", "<C-e>", "<C-e>", { buffer = true })
+          vim.keymap.set("t", "<C-t>", "<C-t>", { buffer = true })
           vim.keymap.set("t", "<C-v>", "<C-v>", { buffer = true })
           mapx(
             "t",
@@ -226,7 +244,7 @@ return {
         key_shortcut.fm.grep.live,
         fza("live_grep"),
         mode = "n",
-        desc = "fz:| grep |=> universe [live]",
+        desc = "fz:grep| * |=> live",
       },
       {
         key_shortcut.fm.files.find,
@@ -311,55 +329,55 @@ return {
         key_fuzz.grep.last,
         fza("grep_last"),
         mode = "n",
-        desc = "fz:| grep |=> last universe",
+        desc = "fz:grep| * |=> last universe",
       },
       {
         key_fuzz.grep.cword,
         fza("grep_cword"),
         mode = "n",
-        desc = "fz:| grep |=> word [cursor]",
+        desc = "fz:grep| [cursor] |=> word",
       },
       {
         key_fuzz.grep.cWORD,
         fza("grep_cWORD"),
         mode = "n",
-        desc = "fz:| grep |=> WORD [cursor]",
+        desc = "fz:grep| [cursor] |=> WORD",
       },
       {
         key_fuzz.grep.visual,
         fza("grep_visual"),
         mode = { "x", "v" },
-        desc = "fz:| grep |=> selection",
+        desc = "fz:grep| * |=> selection",
       },
       {
         key_fuzz.grep.project,
         fza("grep_project"),
         mode = "n",
-        desc = "fz:| grep |=> project lines",
+        desc = "fz:grep| [proj] |=> lines",
       },
       {
         key_fuzz.grep.curbuf,
         fza("grep_curbuf"),
         mode = "n",
-        desc = "fz:| grep |=> lines [buffer]",
+        desc = "fz:grep| [buf] |=> lines [buffer]",
       },
       {
         key_fuzz.live_grep.everything,
         fza("live_grep"),
         mode = "n",
-        desc = "fz:| grep |=> universe [live]",
+        desc = "fz:grep| * |=> live",
       },
       {
         key_fuzz.live_grep.resume,
         fza("live_grep_resume"),
         mode = "n",
-        desc = "fz:| grep |=> resume {fz:-1} [live]",
+        desc = "fz:grep| {fz:-1}  |=> [live]",
       },
       {
         key_fuzz.live_grep.glob,
         fza("live_grep_glob"),
         mode = "n",
-        desc = "fz:| lrg |=> universe globs [live]",
+        desc = "fz:grep| * |=> globs [live]",
       },
       {
         key_fuzz.git.files,
@@ -654,43 +672,43 @@ return {
         key_fuzz.tags.grep.project,
         fza("tags_grep"),
         mode = "n",
-        desc = "::tags:| grep |=> project",
+        desc = "fz:grep| tags |=> project",
       },
       {
         key_fuzz.tags.grep.cWORD,
         fza("tags_grep_cWORD"),
         mode = "n",
-        desc = "::tags:| grep |=> cWORD",
+        desc = "fz:grep| tags |=> cWORD",
       },
       {
         key_fuzz.tags.grep.cword,
         fza("tags_grep_cword"),
         mode = "n",
-        desc = "::tags:| grep |=> cword",
+        desc = "fz:grep| tags |=> cword",
       },
       {
         key_fuzz.tags.grep.visual,
         fza("tags_grep_visual"),
         mode = { "v", "x" },
-        desc = "::tags:| grep |=> selection",
+        desc = "fz:grep| tags |=> selection",
       },
       {
         key_fuzz.tags.grep.live,
         fza("tags_live_grep"),
         mode = "v",
-        desc = "::tags:| grep |=> project [live]",
+        desc = "fz:grep| tags |=> project [live]",
       },
       {
         key_fuzz.files.directories,
         fzf_dirs,
         mode = "n",
-        desc = "::fz:| fs |=> directories",
+        desc = "fz:| fs |=> directories",
       },
       {
         key_shortcut.fm.explore.directories,
         fzf_dirs,
         mode = "n",
-        desc = "::fz:| fs |=> directories",
+        desc = "fz:| fs |=> directories",
       },
       {
         key_shortcut.fm.explore.home.directories,
@@ -698,13 +716,13 @@ return {
           fzf_dirs({ cwd = vim.fs.normalize("~") })
         end,
         mode = "n",
-        desc = "[~]::fz:| fs |=> directories",
+        desc = "fz:[~]| fs |=> directories",
       },
       {
         key_shortcut.fm.files.config,
         fza("files", { cwd = vim.fs.normalize(vim.fn.stdpath("config")) }),
         mode = "n",
-        desc = "::fz:| config |=> files",
+        desc = "fz:| fs |=> config files",
       },
     },
   },
