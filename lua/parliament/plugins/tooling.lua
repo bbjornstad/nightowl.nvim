@@ -170,29 +170,29 @@ return {
     },
   },
   {
-    "krivahtoo/silicon.nvim",
-    enabled = false,
+    "0oAstro/silicon.lua",
+    enabled = true,
     build = "./install.sh",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
     opts = {
-      output = {
-        clipboard = true,
-        path = ".",
-        format = vim.fn.expand("%:p")
-          .. "_code_[year][month][day]-[hour][minute][second].png",
-      },
+      output = vim.fn.expand("%:p")
+        .. "_code_[year][month][day]-[hour][minute][second].png",
       font = "Monaspace Argon=16",
-      theme = "Dracula",
-      background = "#15152A",
-      shadow = {
-        blur = 0.4,
-        offset_x = 4,
-        offset_y = 2,
-      },
-      round_corner = false,
-      window_controls = true,
-      line_number = true,
+      theme = "auto",
+      bgColor = vim.g.terminal_color_5,
+      shadowBlurRadius = 0.4,
+      shadowOffsetX = 4,
+      shadowOffsetY = 2,
+      shadowColor = "#66666B",
+      roundCorner = false,
+      windowControls = true,
+      linePad = 2,
+      padHoriz = 60,
+      padVert = 100,
       gobble = false,
-      highlight_selection = false,
+      debug = true,
     },
     event = "VeryLazy",
     config = function(_, opts)
@@ -207,7 +207,7 @@ return {
               return
             end
             vim.cmd(
-              ([[Silicon! %s]]):format(vim.fs.normalize(vim.fn.expand(sel)))
+              ([[Silicon %s]]):format(vim.fs.normalize(vim.fn.expand(sel)))
             )
           end)
         end,
@@ -221,6 +221,16 @@ return {
         desc = "shot:| screen |=> yank",
       },
     },
+    init = function()
+      local acmd =
+        require("funsak.autocmd").autocmdr("NightowlSiliconRefresh", true)
+      acmd({ "ColorScheme" }, {
+        callback = function(ev)
+          require("silicon.utils").build_tmTheme()
+          require("silicon.utils").reload_silicon_cache({ async = true })
+        end,
+      })
+    end,
   },
   {
     "andrewferrier/wrapping.nvim",
@@ -276,6 +286,7 @@ return {
   },
   {
     "GeekMasher/securitree.nvim",
+    enabled = false,
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "MunifTanjim/nui.nvim",
