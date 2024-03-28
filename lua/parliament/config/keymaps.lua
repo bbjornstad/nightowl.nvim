@@ -170,8 +170,6 @@ mapx("i", "<C-j>", "<C-o><down>", { desc = "buf:| |=> cursor down" })
 mapx("i", "<C-k>", "<C-o><up>", { desc = "buf:| |=> cursor up" })
 mapx("i", "<C-h>", "<C-o><left>", { desc = "buf:| |=> cursor left" })
 mapx("i", "<C-l>", "<C-o><right>", { desc = "buf:| |=> cursor right" })
-mapx("n", "gh", "_", { desc = "`_` BOL" })
-mapx("n", "gl", "$", { desc = "`$` EOL" })
 mapx("n", "H", "_", { desc = "`_` BOL" })
 mapx("n", "L", "$", { desc = "`$` EOL" })
 
@@ -225,7 +223,7 @@ mapx(
 
 -- remove macro on the q key, as I prefer to use a plugin to handle macros and
 -- the q key is prime real estate for other functions.
-mapx("n", "q", "<NOP>", { desc = "macro:| |=> don't record" })
+-- mapx("n", "q", "<NOP>", { desc = "macro:| |=> don't record" })
 
 -- ─[ buffers, saving, files ]─────────────────────────────────────────────
 mapx("n", kenv.fm.fs.new, function()
@@ -746,11 +744,11 @@ end
 mapx("n", "cq", function()
   setup_cr()
   vim.cmd([[*``qz]])
-end, { remap = false, desc = "change with macro" })
+end, { remap = false, desc = "macro-change next" })
 mapx("n", "cQ", function()
   setup_cr()
   vim.cmd([[#``qz]])
-end, { remap = false, desc = "change with macro" })
+end, { remap = false, desc = "macro-change previous" })
 
 -- cut, paste, copy, etc
 -- send `x` results to void register

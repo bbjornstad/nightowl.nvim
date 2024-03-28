@@ -79,14 +79,14 @@ vim.opt.tildeop = true
 vim.opt.ruler = true
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.signcolumn = "yes:2"
+vim.opt.signcolumn = "yes"
 
 -- allow cursorline, this too is generally revamped with a plugin
 vim.opt.cursorline = true
 
 -- sets up the max column for syntax detection
 -- see `:help synmaxcol`
-vim.opt.synmaxcol = 300
+vim.opt.synmaxcol = 3000
 
 -- don't use swapfiles, this really only makes sense since we have a plugin
 -- which is responsible for autosaving. Set to true to reenable the default
@@ -110,6 +110,13 @@ vim.opt.formatoptions:append("t")
 -- seeing as there is supposed to also be a winbar included per window like a
 -- per-window statusline, implemented with incline.nvim
 vim.opt.laststatus = 3
+vim.opt.showtabline = 2
+
+-- this is a relatively recent addition to neovim core, should probably be
+-- enough to replace stickybuf?
+if vim.fn.exists("&winfixfbuf") == 1 then
+  vim.opt.winfixbuf = true
+end
 
 -- specify character set for the fill characters for ui divisions that are
 -- filled using line-type elements.
@@ -123,6 +130,8 @@ vim.opt.fillchars:append({
   vertright = "┣",
   verthoriz = "╋",
   eob = "⮽",
+  stl = " ",
+  stlnc = " ",
 })
 
 vim.cmd.hi("clear SignColumns")
@@ -132,6 +141,8 @@ vim.opt.encoding = "utf-8"
 vim.opt.filetype = "on"
 
 vim.opt.conceallevel = 3
+
+vim.opt.virtualedit:append({ "block", "insert" })
 
 -- change the shell invocation used within neovim to launch any system calls or
 -- subprocess spawns. I normally use nushell, which breaks many bash-compatible
