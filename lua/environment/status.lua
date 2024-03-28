@@ -1,27 +1,28 @@
 local env = {}
 local has = require("funsak.lazy").has
 local conv = require("funsak.convert").booleanize
+local bufinc = require("funsak.status").inclinate
 
 local function searchcount(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
+  local f = bufinc(vim.fn.searchcount, { maxcount = 9999, timeout = 500 })
+  local ok, result = f(props, opts)
+  if not ok or result == nil then
+    return result
+  end
 
-  local ok, result =
-    pcall(vim.fn.searchcount, { maxcount = 999, timeout = 500 })
-
-  local denom = math.min(result.total, result.maxcount)
+  local denom = math.min(result.total or 0, result.maxcount or 0)
   local res = string.format("[%d/%d]", result.current, denom)
 
   return res
 end
 
 local function wrap_mode(props, opts)
-  props = props or {}
-  local buf = props.buf or nil
   opts = opts or {}
 
-  local wrapmode = require("wrapping").get_current_mode()
+  local wrapmode = vim.api.nvim_buf_call(props.buf, function()
+    return require("wrapping").get_current_mode()
+  end)
   if not wrapmode or wrapmode == "" then
     return
   end
@@ -29,8 +30,6 @@ local function wrap_mode(props, opts)
 end
 
 local function selectioncount(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   local res = require("lualine.components.selectioncount")
   local ret = res()
@@ -38,8 +37,6 @@ local function selectioncount(props, opts)
 end
 
 local function progress(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   local res = require("lualine.components.progress")
   ---@cast res +string
@@ -90,8 +87,6 @@ local function fname_update_status(highlight)
 end
 
 function env.cust_fname(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   local custom_fname = require("lualine.components.filename"):extend()
   local highlight = require("lualine.highlight")
@@ -101,8 +96,6 @@ function env.cust_fname(props, opts)
 end
 
 function env.memory_use(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   local free = vim.uv.get_free_memory() / vim.uv.get_total_memory()
   local used = 1 - free
@@ -116,8 +109,6 @@ function env.memory_use(props, opts)
 end
 
 function env.pulse_status(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   local pulse = require("pulse")
   local hours, minutes = pulse.status("standard")
@@ -131,8 +122,6 @@ function env.pulse_status(props, opts)
 end
 
 function env.diff_source(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   local gitsigns = vim.b.gitsigns_status_dict or vim.g.gitsigns_status_dict
   if gitsigns then
@@ -145,8 +134,6 @@ function env.diff_source(props, opts)
 end
 
 function env.recording_status(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   if not require("noice").api.status.mode.has() then
     return
@@ -156,8 +143,6 @@ function env.recording_status(props, opts)
 end
 
 function env.codeium(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   if not has("codeium.vim") then
     return
@@ -167,8 +152,6 @@ function env.codeium(props, opts)
 end
 
 local function grapple(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   if not has("grapple.nvim") then
     return
@@ -178,12 +161,11 @@ local function grapple(props, opts)
   if not grpl.exists then
     return
   end
-  local key = grpl.statusline()
+  local key = grpl and grpl.statusline()
   return key
 end
 
 local function match_local_hl(props, opts)
-  props = props or {}
   opts = opts or {}
   local res = require("local-highlight").match_count(props)
   if not res then
@@ -193,8 +175,6 @@ local function match_local_hl(props, opts)
 end
 
 function env.wpm(props, opts)
-  props = props or {}
-  props.buf = props.buf or nil
   opts = opts or {}
   local status, wpm = pcall(require, "wpm")
   local words = wpm.wpm()
@@ -204,7 +184,7 @@ function env.wpm(props, opts)
   return "󰗗 " .. words
 end
 
----@class owl.InfoOpts: owl.GenericOpts,{ formatter: string? }
+---@class owl.InfoOpts: { formatter: string? }, table
 
 --- collects metadata information about the currently open file for display in a
 --- component. used in incline.
@@ -212,10 +192,9 @@ end
 ---@param opts owl.InfoOpts
 ---@return string
 local function fileinfo(props, opts)
-  props = props or {}
   opts = opts or {}
-  local ftype = vim.bo[props.buf or 0].filetype
-  local fname = vim.api.nvim_buf_get_name(props.buf or 0)
+  local ftype = vim.api.nvim_buf_get_option(props.buf, "filetype")
+  local fname = vim.api.nvim_buf_get_name(props.buf)
 
   local fsize = vim.fn.getfsize(fname)
 
@@ -272,7 +251,6 @@ function env.conjoin(fn, handler)
 end
 
 local function incline_handler(props, opts)
-  props = props or {}
   opts = opts or {}
   local spec = (
     require("funsak.table").strip(
