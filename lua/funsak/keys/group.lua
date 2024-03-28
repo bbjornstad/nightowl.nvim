@@ -7,6 +7,30 @@ local mopts = require("funsak.table").mopts
 ---@class funsak.keys.group
 local M = {}
 
+function M.omapx(mode, lhs, rhs, opts)
+  local mapx = vim.keymap.set
+  opts = opts or {}
+  local descmap = {
+    class = opts.class or "",
+    family = opts.family or "",
+    label = opts.label or "",
+  }
+  opts.class = nil
+  opts.family = nil
+  opts.label = nil
+  opts = vim.tbl_deep_extend("force", {
+    desc = string.format(
+      "%s:rust| %s |=> %s",
+      descmap.class,
+      descmap.family,
+      descmap.label
+    ),
+    remap = false,
+    buffer = 0,
+  }, opts)
+  mapx(mode, lhs, rhs, opts)
+end
+
 ---@alias BoundKeys
 ---| string # a raw string which is a vim-parseable keymap specification. In
 ---particular, if a value is read at this scope, there should be no more
