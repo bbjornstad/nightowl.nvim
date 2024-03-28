@@ -233,7 +233,7 @@ kenv.motion = keygroup({
       backward = "b",
       toggle = "t",
       tag = "g",
-      popup = "p",
+      toggle_tags = "p",
       untag = "u",
       select = "s",
       quickfix = "q",
@@ -242,7 +242,6 @@ kenv.motion = keygroup({
         backward = "C",
         forward = "c",
       },
-      list_tags = "T",
     },
     quickfix = {
       [LEADER_ID] = { append = "q" },
@@ -278,7 +277,7 @@ kenv.motion = keygroup({
       [LEADER_ID] = { append = "p" },
       toggle = "t",
       tag = "g",
-      popup = "p",
+      toggle_tags = "p",
       untag = "u",
       select = "s",
       quickfix = "q",
@@ -287,7 +286,9 @@ kenv.motion = keygroup({
         backward = "C",
         forward = "c",
       },
-      list_tags = "T",
+      toggle_scopes = "z",
+      toggle_loaded = "l",
+      select_scope = "Z",
     },
     portal = {
       [LEADER_ID] = { append = "o" },
@@ -442,43 +443,54 @@ kenv.lsp = keygroup({
     references = "r",
     signature_help = "K",
     glance = {
-      [LEADER_ID] = { append = "L" },
+      [LEADER_ID] = { append = "l" },
       definition = "d",
       declaration = "D",
       implementation = "i",
       type_definition = "y",
       references = "r",
     },
-    line_items = { [LEADER_ID] = { append = "l" }, float = "l" },
+    line_items = {
+      [LEADER_ID] = { append = "l" },
+      float = "l",
+    },
   },
   diagnostic = {
     [LEADER_ID] = { append = leader_code },
     workspace = "D",
     buffer = "d",
   },
-  action = {
-    [LEADER_ID] = { append = leader_code .. "a" },
-    rename = "r",
-    format = {
-      zero = "F",
-      default = "f",
-      pick = "p",
-      list = "l",
-      info = "i",
-    },
+  rename = leader_code .. "r",
+  format = {
+    [LEADER_ID] = { append = leader_code .. "f" },
+    zero = "F",
+    default = "f",
+    pick = "p",
+    list = "l",
+    info = "i",
+  },
+  lint = {
+    [LEADER_ID] = { append = leader_code .. "l" },
     lint = "l",
-    code_action = "a",
-    open_float = "d",
-    output_panel = "p",
+    clear = "c",
+    ignore = "i",
+    lookup = "k",
+  },
+  log = leader_code .. "g",
+  code = {
+    [LEADER_ID] = { append = leader_code },
     toggle = {
       [LEADER_ID] = { append = "t" },
       server = "s",
       nullls = "n",
     },
-    rules = { ignore = "I", lookup = "L" },
-    info = "i",
-    log = "g",
+    action = "a",
+    output_panel = "p",
+    mason = "m",
+    venv = "v",
+    cmp = "x",
   },
+  info = leader_code .. "i",
   workspace = {
     [LEADER_ID] = { append = "<leader>W" },
     add = "a",
@@ -494,9 +506,6 @@ kenv.lsp = keygroup({
     [LEADER_ID] = { append = leader_code .. "h" },
     regrun = "h",
   },
-  mason = leader_code .. "m",
-  venv = leader_code .. "v",
-  cmp = leader_code .. "x",
 }, false, {})
 
 local leader_trouble = "<leader>x"
@@ -543,7 +552,7 @@ kenv.lang = keygroup({
       },
       runnable = "r",
       testable = "t",
-      macros = {
+      macro = {
         [LEADER_ID] = { append = "m" },
         expand = "m",
         rebuild = "r",
@@ -565,6 +574,7 @@ kenv.lang = keygroup({
       join_lines = "j",
       search = {
         [LEADER_ID] = { append = "s" },
+        query = "q",
         replace = "r",
       },
       view = {
@@ -582,6 +592,7 @@ kenv.lang = keygroup({
       docs = {
         view = "D",
       },
+      reload = "r",
     },
     unled = {
       move = {
@@ -669,6 +680,7 @@ kenv.color = keygroup({
     reload = "r",
   },
   interactive = "I",
+  pineapple = "P",
 }, leader_color, {})
 
 -- TODO: fix this mapping...generally maybe just rework this again.
@@ -683,6 +695,7 @@ kenv.completion = keygroup({
     [LEADER_ID] = { append = "<C-x>" },
     complete_common_string = "<C-s>",
     complete_fuzzy_path = "<C-f>",
+    complete_fuzzy_directory = "<C-d>",
   },
   submenus = {
     [LEADER_ID] = { append = "<C-Space>" },
@@ -696,6 +709,8 @@ kenv.completion = keygroup({
     lsp = "<C-l>",
     location = "<C-.>",
     snippet = "<C-s>",
+    prose = "<C-p>",
+    docs = "<C-d>",
   },
   docs = {
     forward = "<C-f>",
@@ -1258,6 +1273,7 @@ kenv.term = keygroup({
     weechat = "w",
     sysz = "s",
     btop = "b",
+    gitui = "g",
   },
 }, leader_term, {})
 
@@ -1275,7 +1291,7 @@ kenv.git = keygroup({
     mode_visual = "v",
   },
   conflict = {
-    [LEADER_ID] = { append = "f" },
+    [LEADER_ID] = { append = "c" },
     choose_both = "b",
     choose_none = "e",
     choose_ours = "o",
@@ -1322,6 +1338,17 @@ kenv.git = keygroup({
   },
   gh_actions = "a",
   tardis = "t",
+  fugit = {
+    [LEADER_ID] = { append = "f" },
+    open = "f",
+    diff = "d",
+    graph = "g",
+  },
+  ignore = {
+    [LEADER_ID] = { append = "i" },
+    generate = "i",
+    licenses = "l",
+  },
 }, leader_git, {})
 
 local leader_mail = "<leader>M"
@@ -1702,6 +1729,15 @@ kenv.editor = keygroup({
         altfont = "f",
         altfontsymbols = "F",
       },
+    },
+    unicode = {
+      [LEADER_ID] = { append = "u" },
+      digraphs = "g",
+      search = "s",
+      search_add = "S",
+      name = "n",
+      table = "t",
+      update = "U",
     },
   },
   comment_frame = {
