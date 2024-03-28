@@ -49,7 +49,6 @@ return {
           local full_mode = mode_map[current_mode] or false
           full_mode = full_mode and full_mode .. "Mode" or nil
 
-          local hlres = full_mode and hlcomp(full_mode, { "fg" })
           vim.api.nvim_set_hl(0, "SmoothCursor", { link = full_mode })
           vim.fn.sign_define("smoothcursor", { texthl = "SmoothCursor" })
         end,
