@@ -5,14 +5,13 @@ end
 local env = require("environment.ui")
 local opt = require("environment.optional")
 local key_action = kenv("action")
+local key_lspact = kenv("lsp").action
 local key_view = kenv("view")
 local key_lsp = kenv("lsp")
 local key_ui = kenv("ui")
 local key_oper = kenv("shortcut").operations
-local key_scope = kenv("scope")
 
 local mopts = require("funsak.table").mopts
-local comp = require("funsak.colors").component
 
 return {
   {
@@ -71,7 +70,10 @@ return {
         fold_reset = "zW",
       },
     },
-
+    init = function()
+      local fixer = require("funsak.autocmd").buffixcmdr("OutlineBufFix", true)
+      fixer({ "FileType" }, { pattern = "outline" })
+    end,
     config = function(_, opts)
       require("outline").setup(opts)
     end,
@@ -156,24 +158,18 @@ return {
     "aznhe21/actions-preview.nvim",
     opts = function(_, opts)
       opts.diff = vim.tbl_deep_extend("force", { ctxlen = 3 }, opts.diff or {})
-      opts.highlight_command = vim.tbl_deep_extend("force", {
+      opts.highlight_command = vim.tbl_extend("force", {
         require("actions-preview.highlight").delta(),
         require("actions-preview.highlight").diff_so_fancy(),
         require("actions-preview.highlight").diff_highlight(),
       }, opts.highlight_command or {})
-      opts.telescope = vim.tbl_deep_extend(
+      opts.telescope = vim.tbl_extend(
         "force",
-        vim.tbl_extend("force", {
-          "force",
-          require("telescope.themes").get_dropdown(),
-          {
-            make_value = nil,
-            make_make_display = nil,
-          },
-        }, opts.telescope or {})
+        require("telescope.themes").get_dropdown({ winblend = 10 }) or {},
+        opts.telescope or {}
       )
       opts.backend =
-        vim.tbl_deep_extend("force", { "nui", "telescope" }, opts.backend or {})
+        vim.tbl_extend("force", { "nui", "telescope" }, opts.backend or {})
       opts.nui = vim.tbl_deep_extend("force", {
         dir = "row",
         layout = {
@@ -184,15 +180,15 @@ return {
           },
           min_width = "24",
           min_height = "16",
-          relative = "cursor",
+          relative = "win",
         },
         preview = {
           size = "64%",
-          border = { style = env.borders.main, padding = { 1, 2 } },
+          border = { style = env.borders.alt, padding = { 1, 2 } },
         },
         select = {
           size = "36%",
-          border = { style = env.borders.main, padding = { 1, 2 } },
+          border = { style = env.borders.alt, padding = { 1, 2 } },
         },
       }, opts.nui or {})
     end,
@@ -230,7 +226,7 @@ return {
     event = "VeryLazy",
     keys = {
       {
-        key_lsp.action.output_panel,
+        key_lsp.code.output_panel,
         "<CMD>OutputPanel<CR>",
         mode = "n",
         desc = "lsp:| log |=> panel",
@@ -247,13 +243,13 @@ return {
     config = true,
     keys = {
       {
-        key_lsp.action.toggle.server,
+        key_lsp.code.toggle.server,
         "<CMD>ToggleLSP<CR>",
         mode = "n",
         desc = "lsp:buf| toggle |=> server",
       },
       {
-        key_lsp.action.toggle.nullls,
+        key_lsp.code.toggle.nullls,
         "<CMD>ToggleNullLSP<CR>",
         mode = "n",
         desc = "lsp:buf| toggle |=> null-ls",

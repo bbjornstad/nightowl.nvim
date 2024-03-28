@@ -69,30 +69,30 @@ local lz = require("funsak.lazy")
 ---create the appropriate lsp keybindings.
 local function generate_lsp_keymapper(opts)
   local function lsp_keymapper(client, bufnr)
-    vim.keymap.set("n", key_lsp.action.format.zero, function()
+    vim.keymap.set("n", key_lsp.format.zero, function()
       require("lsp-zero").async_autoformat(client, bufnr, {})
     end, { desc = "lsp:buf| fmt |=> apply zero", buffer = bufnr })
     vim.keymap.set(
       "n",
-      key_lsp.action.code_action,
+      key_lsp.code.action,
       vim.lsp.buf.code_action,
       { desc = "lsp:| act |=> code actions", buffer = bufnr }
     )
     vim.keymap.set(
       "n",
-      key_lsp.action.rename,
+      key_lsp.rename,
       vim.lsp.buf.rename,
       { desc = "lsp:| act |=> rename symb", buffer = bufnr }
     )
     vim.keymap.set(
       "n",
-      key_lsp.action.info,
+      key_lsp.info,
       "<CMD>LspInfo<CR>",
       { desc = "lsp:| info |=> servers", buffer = bufnr }
     )
     vim.keymap.set(
       "n",
-      key_lsp.action.log,
+      key_lsp.log,
       "<CMD>LspLog<CR>",
       { desc = "lsp:| log |=> view", buffer = bufnr }
     )
@@ -317,7 +317,7 @@ return {
     },
     keys = {
       {
-        key_lsp.mason,
+        key_lsp.code.mason,
         "<CMD>Mason<CR>",
         mode = "n",
         desc = "lsp:| mason |=> info panel",
@@ -629,18 +629,17 @@ return {
     opts = { enabled = true },
     event = "LspAttach",
   },
-  -- {
-  --   "lvimuser/lsp-inlayhints.nvim",
-  --   config = function(_, opts)
-  --     require("lsp-inlayhints").setup()
-  --   end,
-  --   opts = { enabled = true },
-  --   event = "LspAttach",
-  -- },
   {
     "nvim-lua/lsp-status.nvim",
-    config = function(_, opts) end,
-    opts = { enabled = true },
+    config = function(_, opts)
+      require("lsp-status").config(opts)
+    end,
+    opts = {
+      show_filename = false,
+      indicator_separator = ":",
+      diagnostics = false,
+      status_symbol = "󱁦",
+    },
     event = "LspAttach",
   },
   {

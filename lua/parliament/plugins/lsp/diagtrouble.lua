@@ -31,7 +31,6 @@
 local env = require("environment.ui")
 local kenv = require("environment.keys")
 local key_trouble = kenv.diagnostic
-local key_bracket = kenv.bracket
 local key_ui = kenv.ui
 
 return {
@@ -271,7 +270,7 @@ return {
         hint = env.icons.diagnostic.Hint,
       },
       blacklisted_modes = { "i" },
-      border_style = env.borders.alt,
+      border_style = env.borders.main,
       on_toggle = function(is_hidden) end,
       item_preprocess_func = function(item)
         return item

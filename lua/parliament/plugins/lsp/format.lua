@@ -84,7 +84,7 @@ return {
     end,
     keys = {
       {
-        key_lsp.action.format.default,
+        key_lsp.format.default,
         function()
           require("conform").format({ async = true })
         end,
@@ -92,7 +92,7 @@ return {
         desc = "lsp:buf| fmt |=> apply",
       },
       {
-        key_lsp.action.format.list,
+        key_lsp.format.list,
         function()
           require("conform").list_formatters(0)
         end,
@@ -100,7 +100,7 @@ return {
         desc = "lsp:buf| fmt |=> list formatters",
       },
       {
-        key_lsp.action.format.info,
+        key_lsp.format.info,
         "<CMD>ConformInfo<CR>",
         mode = "n",
         desc = "lsp:| fmt |=> info",
