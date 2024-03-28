@@ -5,6 +5,7 @@ return {
     "hrsh7th/nvim-cmp",
     dependencies = {
       "onsails/lspkind.nvim",
+      "luckasRanarison/tailwind-tools.nvim",
     },
     opts = function(_, opts)
       local cmp = require("cmp")
@@ -56,6 +57,7 @@ return {
           AI = "󱁊",
           Copilot = "",
         },
+        before = require("tailwind-tools.cmp").lspkind_format,
       })
       -- The following changes the appearance of the menu. Noted changes:
       -- * different row field order
