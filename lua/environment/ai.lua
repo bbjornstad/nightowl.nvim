@@ -53,8 +53,9 @@ env.enabled = env.enablements({
   text_to_colorscheme = { env = true, fallback = false },
   gemini = { env = true, fallback = false },
   nvim_gpt = { env = true, fallback = false },
+  codecompanion = { env = true, fallback = false },
 })
-env.status_notify_on_startup = false
+env.status_notify_on_startup = true
 
 -- =============================================================================
 -- HuggingFace: Large Language Models
