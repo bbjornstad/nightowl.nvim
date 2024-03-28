@@ -35,6 +35,15 @@ return {
   },
   {
     "CWood-sdf/spaceport.nvim",
+    init = function()
+      local aucmdr = require("funsak.autocmd").autocmdr("SpaceportHlFix")
+      aucmdr({ "User" }, {
+        pattern = "SpaceportEnter",
+        callback = function(ev)
+          vim.cmd([[DisableHLChunk]])
+        end,
+      })
+    end,
     opts = {
       replaceHome = true,
       projectEntry = "edit .",
@@ -49,6 +58,14 @@ return {
         "recents",
         "remaps",
         "_global_remaps",
+      },
+      shortcuts = {
+        { "F", ".config/nvim/" },
+        { "S", ".config/nushell/" },
+        { "E", ".envrc.d/" },
+        { "W", ".config/wezterm/" },
+        { "P", "prj/" },
+        { "O", "org/" },
       },
     },
     config = function(_, opts)
