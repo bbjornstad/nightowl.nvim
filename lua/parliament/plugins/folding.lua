@@ -201,7 +201,7 @@ return { -- add folding range to capabilities
     event = "CursorHold",
     config = true,
     opts = {
-      offset = -3,
+      offset = -2,
       foldsigns = {
         open = "⌐",
         close = "⌙",
