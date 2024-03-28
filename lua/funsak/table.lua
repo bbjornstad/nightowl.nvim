@@ -65,6 +65,25 @@ function M.strip(item, strip, defaults, deepcopy)
   return res
 end
 
+function M.dstrip(tbl, items, deepcopy)
+  local res = {}
+  local strip
+  local input_is_list = vim.tbl_islist(items)
+  if input_is_list then
+    strip = items
+  else
+    strip = vim.tbl_keys(items)
+  end
+
+  deepcopy = deepcopy or false
+  for _, v in ipairs(strip) do
+    local this = tbl[v] or items[v] or nil
+    res[v] = deepcopy and (this and vim.deepcopy(this)) or this
+    tbl[v] = nil
+  end
+  return res
+end
+
 --- forces that the specified input item is of a table form, which is to say
 --- that if it is a table, the item is returned unchanged, but if not, the item
 --- is placed into a new table by itself. Used typically to prepare function

@@ -29,17 +29,6 @@
 ---@author Bailey Bjornstad | ursa-major
 ---@license MIT
 
----@alias RegistryItemID string
-
----@generic T: any
----@class MonadicRegistry<T>
----@field embedders { [RegistryItemID]: fun(t: `T`): funsak.monad<`T`> }
----@field composers { [RegistryItemID]: fun(this: funsak.monad<`T`>, that: funsak.monad<`T`>): funsak.monad<`T`> }
-local registry = {
-  embedders = {},
-  composers = {},
-}
-
 --- `monad` implementation based on category theory and beyond. A `monad` is a
 --- combination of a few conceptual frameworks, and is useful as a programmatic
 --- concept because the main goal when working in functional style is to
@@ -64,13 +53,25 @@ local registry = {
 --- for additional info.
 ---@generic T: any
 ---@class funsak.monad<T>
----@field slots MonadicSlots<`T`>
+---@field slots MonadicSlots
+---@field embedder Embedder
+---@field composer Composer
 local M = {}
 
 ---@generic T: any
+---@alias Embedder fun(t: `T`): funsak.monad<`T`>
+
+---@generic T: any
+---@alias Composer fun(this: funsak.monad<`T`>, that: funsak.monad<`T`>): funsak.monad<`T`>
+
+---@class EmbedderRegistry: { [Embedder]: integer }
+
+---@class ComposerRegistry: { [Composer]: integer }
+
+---@generic T: any
 ---@class MonadicSlots<T>
----@field embedder fun(t: `T`): funsak.monad<`T`>
----@field composer fun(this: funsak.monad<`T`>, that: funsak.monad<`T`>): funsak.monad<`T`>
+---@field embedders EmbedderRegistry
+---@field composers ComposerRegistry
 
 --- any type of data which is to be wrapped monadically
 ---@generic T: any
@@ -79,13 +80,14 @@ local M = {}
 --- somehow. Common examples include things like `Nullable<T>`, `Maybe<T>`,
 --- `Enumerable<T>`, etc.
 ---@param t T the input data of a generic type `T`
----@return funsak.monad<T> new the newly constructed monad wrapping input data
+---@return funsak.monad<`T`> new the newly constructed monad wrapping input data
 function M.new(t, opts)
   opts = opts or {}
   t = opts.box == true and { t } or t
-  t = (opts.box == false or type(t) == "table") and t or { t }
+  t = (not opts.box or type(t) == "table") and t or { t }
   local cls = {}
   cls.__index = cls
+  cls.slots = {}
   return setmetatable(t, cls)
 end
 
@@ -94,27 +96,51 @@ end
 --- Defning this function in the public API of this submodule means that users
 --- can specify desired "unit"-embedding behavior for a particular monad, or
 --- they can use one of the standard premade options.
----@param embedder fun(t: T): funsak.monad<T> function that can perform monad
----embedding.
-function M.register_embedder(embedder) end
+---@param embedder Embedder
+---@return funsak.monad<`T`>
+function M:register_embedder(embedder)
+  vim.tbl_deep_extend(
+    "force",
+    self.slots.embedders or {},
+    { [embedder] = #self.slots.embedders + 1 }
+  )
+end
 
 ---@generic T: any
 --- registers a new selectable option for the bind operation of this monad.
 --- Defining this function in the public API of this submodule means that users
 --- can specify desired "bind"-mapping behavior for a particular monad, or they
 --- can use a standard premade option
----@param composer fun(this: funsak.monad<T>, that: funsak.monad<T>): funsak.monad<T>
----@return funsak.monad<T>
-function M.register_composer(composer) end
+---@param composer Composer
+---@return funsak.monad<`T`>
+function M:register_composer(composer)
+  vim.tbl_deep_extend(
+    "force",
+    self.slots.composers or {},
+    { [composer] = #self.slots.composers + 1 }
+  )
+end
+
+local wrap = require("funsak.wrap")
+function M:__embedder()
+  self.embedder = vim.iter(self.slots.embedders):fold(wrap.F, function(t, k, v)
+    return k(t(v))
+  end)
+end
+function M:__composer()
+  self.composer = vim.iter(self.slots.composers):fold(wrap.F, function(t, k, v)
+    return k(t(v))
+  end)
+end
 
 ---@generic T: any data of any single type.
 --- the unit operation for monads; a type-conversion function which embeds data
 --- `t: T` into the monad using a particular selection of embedding behavior.
 ---@param t T
----@return funsak.monad<T>
-function M.unit(t) end
+---@return funsak.monad<`T`>
+function M:embed(t) end
 
 ---@generic T
-function M.bind() end
+function M:compose() end
 
 return M

@@ -63,12 +63,10 @@ end
 
 local root_markers = M.config
 
---- [TODO:description]
----@param opts vim.api.keyset.option
 local function lsp_root(opts)
   opts = opts or {}
   opts.bufnr = opts.bufnr or 0
-    local buf_ft = vim.api.nvim_get_option_value("filetype", { buf = 0, filetype =  })
+  local buf_ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
   local clients = vim.lsp.get_clients(opts)
   if next(clients) == nil then
     return nil
