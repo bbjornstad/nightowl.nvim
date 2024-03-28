@@ -155,7 +155,7 @@ require("lazy").setup({
       require = "󰢱 ",
       source = " ",
       start = " ",
-      task = "✔ ",
+      task = "",
       list = {
         "⋄",
         "⇀",
