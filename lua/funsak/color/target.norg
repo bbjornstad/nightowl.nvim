@@ -1,0 +1,163 @@
+@document.meta
+title: target
+description: Implementation Strategy for Color Modifications
+authors: ursa-major
+categories: nvim,implementation,brainstorm
+created: 2024-03-22T01:53:26-0700
+updated: 2024-03-22T18:19:39-0700
+version: 1.1.1
+@end
+
+* funsak.color Rework
+  Need to rework the way that we make color modifications in neovim...because
+  the current way that it is implemented is a bit convoluted for what I am
+  seeking to accomplish.
+** Current Issues with Implementation
+   - Not ergonomic to use
+   - poorly specified set of modification abilities
+   - current ideas for fixing the poor spec don't provide enough flexibility for
+     the variety of colorspace modifications.
+   - namespacing? Do we want to use it?
+   - lack of composability seems to be problematic as well; ideally we want to
+     be able to construct a new highlight group from an existing one. This would
+     be best achieved with Rust-style factory builder objects combined with
+     method chaining methinks.
+** A New Implementation, With a Design
+   I think that one of the issues that has been plaguing my current
+   configuration procedure is a lack of a design strategy and unclear
+   expectations about target functionality. Hopefully, here we can lay that out
+   in a more straightforward way that expresses the goals of functionality
+   without beating around the bush too much.
+*** Ergonomic
+    In this context, we shall use the term `ergonomic` to refer to the ability
+    to use the tools implemented in the library in a variety of different
+    code contexts without needing to write too much additional boilerplate to
+    integrate the functionality. This goes hand in hand with composability,
+    needless to say.
+
+    In order to get to this point, the following will need to be true:
+    ~ API is somewhat stable, but mostly is minimal. This means that there
+      should be only a few places that the user should need to interact with the
+      underlying implemented code
+    ~ API should be fully typed, documented, etc.
+    ===
+* Target API
+** Outline
+   The following components will be necessary for the implementation to
+   succeed:
+   ~ A way to get any highlight group from its given neovim name.
+   ~ A specification of available modifications that can be made to a highlight
+     group.
+   3. A specification of available blending options that can be made for two
+     highlight groups to produce a new third group.
+   ~ A function to combine highlight groups with optional modifications.
+   4. If we want to include namespace considerations, we need a solid method of
+     parsing out that option in order to correctly pass to nvim's API.
+** Endpoints/Hooks
+*** `hilite`: to Hold Highlight Groups
+    The `hilite` module contains an implementation of an object which can store
+    the extra parameters that we need to track outside of the standard highlight
+    group table elements (e.g. `fg`, `bg`, etc). Alternative name: paint (gives
+    more semantic meaning to certain actions that should be taken by this
+    module)
+
+    This module will contain the following:
+    ~ `new`: construct a new highlight group wrapper (type Hilite).
+    ~ `derive`: from a hilite, apply modifications and filters to create a new
+      hilite instance
+    ~ `blend`: given another hilite, create a new hilite which is the blend of
+      the original (e.g. self) and the provided
+    4. `filter`: given a hilite, filter out only those attributes which are
+      specified.
+    5. `hsluv`: from a highlight, convert all color-related attributes
+      (alternatively a subset if specified) to hsluv format using the standard
+      implementation.
+    ~ `rgb`: from a hilite, convert all color-related attributes to RGB format
+      using the standard implementation
+    ~ `hex`: from a hilite, convert all color related attributes to hexadecimal
+      format, e.g. the standard format that we can give to nvim for the purposes
+      of applying the highlight.
+    6. colors: from a hilite, get a table mapping color values in a specified
+      format to the attributes targeted.
+    7 `invert`: from a hilite, produce a new highlight with the foreground and
+      background elements swapped. If one doesn't exist, the corresponding
+      inverted value will also not exist.
+
+*** `brush`: to blend, modify, compose highlight groups
+    The `brush` module contains implementations for the mixing and application
+    of highlight groups or derived highlight groups. Internally, we will
+    consider a brush to be an object which tracks a collection of hilites, maybe
+    in "prioritized" order in some fashion.
+
+    The following will be necessary:
+    ~ `new`: construct a brush, which is essentially just an item that will hold
+      a paint, e.g. a hilite and can make modifications to that hilite in
+      various ways.
+    ~ `blend`: from a brush, given either another brush or a hilite, creates a
+      new blended hilite with the correct options and places it on the brush.
+    ~ `clear`: from a brush, remove all hilites associated.
+    ~ `apply`: given a highlight group name or other identifying feature, apply
+      the brush's current paint to the group.
+
+    Internally, the Brush is likely to be an object which tracks a collection of
+    Hilites. New highlights can be added with a `pigment` method, which will
+    introduce the new highlight to the registered set with an optional
+    weighting. (question remains of what to do in the case of no weighting
+    specified, but only when other specific choices are made for other
+    highlights, tbd.) Blending highlights will then mean using the weights for
+    combinatoric calculations between highlight attributes to produce the
+    ---
+** Modification Spec:
+   This section holds a rough outline of the target specification for what it
+   means to modify a highlight group definition.
+** `Hilite` Methods
+*** filter: Subset of Attributes
+    Parameters:
+    ~ `attr`: list\<vim.api.keyset.highlight\>? a list of highlight attributes which
+      should be returned from the hilite queried
+    ~ `exclude`: list\<vim.api.keyset.highlight\>? a list of highlight attributes
+      which should be excluded from being returned from the hilite queried.
+
+      Returns:
+    ~ new hilite with or without specified attributes
+
+*** `derive`: New hilite from existing hilite
+    This is a bit circular from a definition perspective, namely we have that
+    this is a method to create a new adjusted highlight group from an existing,
+    which is the entire point of the modification spec to begin with. this could
+    potentially be a general-purpose entry point which will take in as arguments
+    the different parameterizations for modifications that are possible.
+*** `hsluv`, `rgb` and `hex`: Conversion from Spaces
+    these three methods are all relatively straightforward in terms of their
+    application and design. They convert from one color space into another. The
+    only sticky point will be inferring the format of the input color spaces
+    (e.g. does it have HSL channels or RGB).
+*** `blend`: Mixing multiple highlight groups.
+    This method should accept another highlight group or collection thereof and
+    perform a mixing algorithm on the inputs to produce a single hilite output
+
+    Params:
+    ~ `opts`: specification of mixing parameterization
+    ~ ...: list\<Hilite\> a collection of hilites which should be blended into
+      the parent.
+*** `colors`: Identify Targeted Elements
+    this method should return a table mapping unique color values to a list of
+    their respective attributes in the hilite.
+    Params:
+    ~ `opts`: probably not useful
+
+    Returns:
+    ~ table\<vim.api.keyset.highlight, list\<string\>\>
+
+*** `invert`: swap attributes
+    This method produces a new hilite as the inversion of the fg and bg
+    attributes of the parent hilite.
+
+    Params:
+    ~ spec: table\<vim.api.keyset.highlight, vim.api.keyset.highlight\> as an
+      alternative to the default fg/bg swap, a new mapping can be given where
+      keys map old highlight attributes to the values given as new highlight
+      attributes.
+
+** `Brush` Methods:
+*** `blend`: combine highlight groups
