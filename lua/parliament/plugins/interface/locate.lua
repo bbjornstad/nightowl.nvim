@@ -34,7 +34,6 @@ return {
   {
     "mawkler/modicator.nvim",
     dependencies = {
-      "nvim-lualine/lualine.nvim",
       "rebelot/kanagawa.nvim",
     },
     event = "VeryLazy",
@@ -121,56 +120,6 @@ return {
         filetypes = env.ft_ignore_list,
       },
     },
-  },
-  {
-    "luukvbaal/statuscol.nvim",
-    config = function(_, opts)
-      require("statuscol").setup(opts)
-    end,
-    opts = function(_, opts)
-      local builtin = require("statuscol.builtin")
-      opts = opts or {}
-      opts.relculright = opts.relculright or true
-      opts.segments = vim.list_extend({
-        {
-          text = { builtin.lnumfunc, " ", " ", " " },
-          condition = { true, builtin.not_empty, true, true },
-          sign = { colwidth = 4, maxwidth = 1 },
-          click = "v:lua.ScLa",
-        },
-
-        {
-          sign = {
-            name = { "Diagnostic*" },
-            colwidth = 2,
-            maxwidth = 1,
-            auto = false,
-          },
-          click = "v:lua.ScSa",
-        },
-        {
-          sign = {
-            name = { ".*" },
-            colwidth = 1,
-            maxwidth = 1,
-            auto = true,
-            wrap = true,
-          },
-          click = "v:lua.ScSa",
-        },
-        {
-          sign = {
-            name = { "smoothcursor*" },
-            colwidth = 1,
-            maxwidth = 1,
-            auto = false,
-          },
-          click = "v:lua.ScSa",
-        },
-        { text = { "⦙" } },
-      }, opts.segments or {})
-    end,
-    event = "VeryLazy",
   },
   {
     "CWood-sdf/melon.nvim",
