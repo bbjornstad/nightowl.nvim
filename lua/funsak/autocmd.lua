@@ -44,7 +44,39 @@ function M.autocmdr(group_name, clear)
 
   return function(events, opts)
     opts = vim.tbl_deep_extend("force", { group = augroup }, opts)
-    vim.api.nvim_create_autocmd(events, opts)
+    vim.schedule(function()
+      vim.api.nvim_create_autocmd(events, opts)
+    end)
+  end
+end
+
+function M.ftcmdr(group_name, clear)
+  local cmdr = M.autocmdr(group_name, clear)
+  return function(ftypes, opts)
+    cmdr(
+      { "FileType" },
+      vim.tbl_deep_extend("force", { pattern = ftypes }, opts)
+    )
+  end
+end
+
+function M.buffixcmdr(group_name, clear)
+  local cmdr = M.autocmdr(group_name, clear)
+  return function(events, opts)
+    cmdr(
+      events,
+      vim.tbl_deep_extend("force", {
+        callback = function(ev)
+          local winnr = vim.api.nvim_get_current_win()
+          if ev.buf ~= vim.api.nvim_win_get_buf(winnr) then
+            return
+          end
+          if vim.fn.exists("&winfixbuf") == 1 then
+            vim.api.nvim_win_set_option(winnr, "winfixbuf", true)
+          end
+        end,
+      }, opts)
+    )
   end
 end
 

@@ -52,6 +52,8 @@ return {
       broot_binary = "broot",
     },
     config = function(_, opts)
+      local bfcmdr = require("funsak.autocmd").buffixcmdr("BrootFixBuf", true)
+      bfcmdr({ "FileType" }, { pattern = "broot" })
       require("broot").setup(opts)
     end,
     keys = {
@@ -96,6 +98,11 @@ return {
     init = function()
       -- can be either "succinct" or "extended".
       vim.g.oil_extended_column_mode = env.oil.init_columns == "extended"
+      local bfcmdr = require("funsak.autocmd").buffixcmdr("OilFixBuf", true)
+      bfcmdr({ "FileType" }, { pattern = "oil" })
+    end,
+    config = function(_, opts)
+      require("oil").setup(opts)
     end,
     opts = {
       default_file_explorer = true,
@@ -164,7 +171,7 @@ return {
         ["<C-L>"] = "actions.send_to_loclist",
         ["<C-Q>"] = "actions.send_to_qflist",
         ["H"] = "actions.parent",
-        ["K"] = "actions.select",
+        ["L"] = "actions.select",
         ["gx"] = "open_external",
         ["<C-b>"] = "preview_scroll_up",
         ["<C-f>"] = "preview_scroll_down",
@@ -410,6 +417,10 @@ return {
         height = 0.6,
       },
     },
+    init = function()
+      local bfcmdr = require("funsak.autocmd").buffixcmdr("YaziFixBuf", true)
+      bfcmdr({ "FileType" }, { pattern = "Yazi" })
+    end,
     config = function(_, opts)
       opts = opts or {}
       if opts.command_args and opts.command_args.open_dir == "oil" then
