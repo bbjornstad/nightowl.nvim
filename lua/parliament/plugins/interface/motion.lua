@@ -60,23 +60,38 @@ return {
   },
   {
     "cbochs/grapple.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function(_, opts)
+      require("grapple").setup(opts)
+      require("telescope").load_extension("grapple")
+    end,
     opts = {
-      log_level = "warn",
       scope = "git",
-      save_path = tostring(vim.fn.stdpath("data") .. "/grapple"),
+      save_path = vim.fs.joinpath(vim.fn.stdpath("data"), "grapple"),
+      icons = true,
+      status = true,
+      name_pos = "end",
+      style = "relative",
+      command = vim.cmd.edit,
+      prune = "30d",
+      tag_title = "-> grapple::tags <-",
+      scope_title = "-> grapple::scopes <-",
+      loaded_title = "-> grapple::scopes<loaded> <-",
       ---Window options used for the popup menu
-      popup_options = {
+      win_opts = {
+        border = env.borders.alt,
         relative = "editor",
         width = 60,
         height = 12,
         style = "minimal",
         focusable = false,
-        border = env.borders.main,
-      },
-      integrations = {
-        ---Support for saving tag state using resession.nvim
-        resession = false,
+        title_pos = "left",
+        title = "-> grapple <-",
+        title_padding = " :: ",
       },
     },
     keys = {
@@ -89,12 +104,28 @@ return {
         desc = "grapple:| tag |=> toggle",
       },
       {
-        kenv.grapple.popup,
+        kenv.grapple.toggle_tags,
         function()
-          require("grapple").popup_tags()
+          require("grapple").toggle_tags()
         end,
         mode = "n",
-        desc = "grapple:| pop |=> tags view",
+        desc = "grapple:| tags |=> toggle popup",
+      },
+      {
+        kenv.grapple.toggle_scopes,
+        function()
+          require("grapple").toggle_scopes()
+        end,
+        mode = "n",
+        desc = "grapple:| scopes |=> toggle popup",
+      },
+      {
+        kenv.grapple.toggle_loaded,
+        function()
+          require("grapple").toggle_loaded()
+        end,
+        mode = "n",
+        desc = "grapple:| loaded |=> toggle popup",
       },
       {
         kenv.grapple.tag,
@@ -126,7 +157,7 @@ return {
           require("grapple").quickfix()
         end,
         mode = "n",
-        desc = "grapple:| tag |=> to quickfix",
+        desc = "grapple:| qf |=> from scope",
       },
       {
         kenv.grapple.reset,
@@ -139,7 +170,7 @@ return {
       {
         kenv.grapple.cycle.backward,
         function()
-          require("grapple").cycle_backward()
+          require("grapple").cycle("backward")
         end,
         mode = "n",
         desc = "grapple:| tag |=> cycle backward",
@@ -147,18 +178,10 @@ return {
       {
         kenv.grapple.cycle.forward,
         function()
-          require("grapple").cycle_forward()
+          require("grapple").cycle("forward")
         end,
         mode = "n",
         desc = "grapple:| tag |=> cycle forward",
-      },
-      {
-        kenv.grapple.list_tags,
-        function()
-          require("grapple").tags()
-        end,
-        mode = "n",
-        desc = "grapple:| tag |=> list tags",
       },
     },
   },
