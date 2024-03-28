@@ -40,6 +40,7 @@ AI Plugin Status:
   -> **dante.nvim**: %s
   -> **text2scheme**: %s
   -> **gemini**: %s
+  -> **codecompanion**: %s
 
 
 *plugin is used during nvim-cmp autocompletion, and will therefore connect to an external service without explicit instruction to do so*
@@ -71,27 +72,27 @@ AI Plugin Status:
       enb.gen.enable,
       enb.dante.enable,
       enb.text_to_colorscheme.enable,
-      enb.gemini.enable
+      enb.gemini.enable,
+      enb.codecompanion.enable
     )
   )
 end
 
 if notify_on_startup then
-  vim.api.nvim_create_autocmd({ "VimEnter" }, {
+  vim.api.nvim_create_autocmd({ "UIEnter" }, {
     group = vim.api.nvim_create_augroup("ai_agents_startup_notification", {}),
-    callback = notify_agents,
+    callback = function()
+      vim.schedule(notify_agents)
+    end,
   })
 end
 
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
   group = vim.api.nvim_create_augroup("ai_agents_notification_keybind", {}),
   callback = function()
-    vim.keymap.set(
-      { "n" },
-      key_ai:leader() .. "N",
-      notify_agents,
-      { desc = "ai:| status |=> notify agent statuses", remap = false }
-    )
+    vim.keymap.set({ "n" }, key_ai:leader() .. "N", function()
+      vim.schedule(notify_agents)
+    end, { desc = "ai:| status |=> notify agent statuses", remap = false })
   end,
 })
 
@@ -1444,6 +1445,20 @@ Translate from Chinese to English, or English to Chinese.
     end,
     dependencies = {
       { "nvim-telescope/telescope.nvim" },
+    },
+  },
+  {
+    "olimorris/codecompanion.nvim",
+    enabled = enb.codecompanion.enable,
+    opts = {},
+    config = function(_, opts)
+      require("codecompanion").setup(opts)
+    end,
+    cmd = {
+      "CodeCompanion",
+      "CodeCompanionChat",
+      "CodeCompanionToggle",
+      "CodeCompanionActions",
     },
   },
 }
