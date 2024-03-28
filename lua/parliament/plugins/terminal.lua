@@ -16,7 +16,7 @@ return {
       open_mapping = "<F1>",
       float_opts = {
         border = env.borders.main,
-        winblend = 10,
+        winblend = 8,
       },
       insert_mappings = true,
       terminal_mappings = true,
@@ -31,9 +31,12 @@ return {
           return 85
         end
       end,
-      shading_factor = 4,
+      shading_factor = 5,
       winbar = {
-        enabled = false,
+        enabled = true,
+        name_formatter = function(term)
+          return ("--  : %s"):format(term.name)
+        end,
       },
     },
     keys = {
@@ -43,7 +46,7 @@ return {
           require("toggleterm").setup({ direction = "vertical" })
         end,
         mode = { "n", "t" },
-        desc = "term=> toggle vertical layout",
+        desc = "term:| layout |=> vertical",
       },
       {
         key_term.layout.horizontal,
@@ -51,7 +54,7 @@ return {
           require("toggleterm").setup({ direction = "horizontal" })
         end,
         mode = { "n", "t" },
-        desc = "term=> toggle horizontal layout",
+        desc = "term:| layout |=> horizontal",
       },
       {
         key_term.layout.float,
@@ -59,7 +62,7 @@ return {
           require("toggleterm").setup({ direction = "float" })
         end,
         mode = { "n", "t" },
-        desc = "term=> toggle float layout",
+        desc = "term:| layout |=> float",
       },
       {
         key_term.layout.tabbed,
@@ -67,7 +70,7 @@ return {
           require("toggleterm").setup({ direction = "tabbed" })
         end,
         mode = { "n", "t" },
-        desc = "term=> toggle tabbed layout",
+        desc = "term:| layout |=> tabbed",
       },
       -- custom terminal mappings go here.
       {
@@ -94,6 +97,12 @@ return {
         mode = "n",
         desc = "term:| fm |=> broot",
       },
+      {
+        key_term.utiliterm.gitui,
+        utiliterm.gitui(),
+        mode = "n",
+        desc = "term:| git |=> gitui",
+      },
     },
     init = function()
       vim.g.hidden = true
@@ -101,11 +110,11 @@ return {
         local opts = { buffer = bufnr or 0 }
         mapx(
           "t",
-          "<leader><esc>",
+          "<S-Esc>",
           [[<C-\><C-n>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
-            desc = "term=> escape",
+            desc = "term:| sys |=> escape",
           }, opts)
         )
         mapx(
@@ -114,7 +123,7 @@ return {
           [[<Cmd>wincmd h<CR>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
-            desc = "term=> go to left window",
+            desc = "term:| go |=> left window",
           }, opts)
         )
         mapx(
@@ -123,7 +132,7 @@ return {
           [[<Cmd>wincmd j<CR>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
-            desc = "term=> go to below window",
+            desc = "term:| go |=> below",
           }, opts)
         )
         mapx(
@@ -132,7 +141,7 @@ return {
           [[<Cmd>wincmd k<CR>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
-            desc = "term=> go to above window",
+            desc = "term:| go |=> above",
           }, opts)
         )
         mapx(
@@ -141,16 +150,16 @@ return {
           [[<Cmd>wincmd l<CR>]],
           vim.tbl_deep_extend("force", {
             nowait = true,
-            desc = "term=> go to right window",
+            desc = "term:| go |=> right",
           }, opts)
         )
         mapx(
           "t",
-          "<C-w>",
-          [[<C-\><C-n><C-w>]],
+          "<Leader>w",
+          [[<C-\><C-n> w]],
           vim.tbl_deep_extend("force", {
             nowait = true,
-            desc = "term=> window management",
+            desc = "term:| sys |=> window",
           }, opts)
         )
         mapx(
@@ -160,19 +169,22 @@ return {
           vim.tbl_deep_extend("force", {
             remap = false,
             nowait = true,
-            desc = "term=> close terminal",
+            desc = "term:| sys |=> close",
           }, opts)
         )
       end
 
       -- if you only want these mappings for toggle term use term://*toggleterm#* instead
       vim.api.nvim_create_autocmd("TermOpen", {
-        pattern = { "term://*toggleterm#*" },
+        pattern = { "term://*" },
         callback = function(ev)
           set_terminal_keymaps(ev.buf)
         end,
         group = vim.api.nvim_create_augroup("terminal_open_keymappings", {}),
       })
+      local fixer =
+        require("funsak.autocmd").buffixcmdr("ToggletermBufFix", true)
+      fixer({ "TermOpen" }, { pattern = "term://*" })
     end,
   },
 }
