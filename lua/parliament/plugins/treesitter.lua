@@ -223,7 +223,7 @@ return {
       keymaps = {
         init_selection = "<BS>",
         node_incremental = "<BS>",
-        node_decremental = "<S-BS>",
+        node_decremental = "<C-BS>",
       },
       filetype_exclude = env.ft_ignore_list,
     },
